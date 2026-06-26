@@ -39,7 +39,7 @@ target-version = ["py311"]
 [tool.isort]
 profile = "black"
 line_length = 88
-known_first_party = ["orion", "core", "base", "v1", "auth", "tenant", "tenant_svc", "user", "integrations"]
+known_first_party = ["orion", "core", "base", "v1", "auth", "tenant", "tenant_svc", "user", "integrations", "catalog", "catalog_svc", "platform_models", "platform_svc"]
 
 [tool.coverage.run]
 source = ["02-CORE", "03-MODELS", "04-SERVICES", "05-API"]

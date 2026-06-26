@@ -46,6 +46,10 @@ target_db = current_app.extensions["migrate"].db
 def get_metadata():
     # Import models so autogenerate sees wave-1 tables.
     import base.base_model  # noqa: F401
+    import catalog.brand  # noqa: F401
+    import catalog.category  # noqa: F401
+    import catalog.product  # noqa: F401
+    import platform_models.platform_settings  # noqa: F401
     import tenant.tenant  # noqa: F401
     import tenant.tenant_config  # noqa: F401
     import user.role  # noqa: F401

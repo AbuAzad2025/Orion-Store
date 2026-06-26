@@ -8,7 +8,7 @@ from flask import Flask, g, request
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from sqlalchemy.orm import joinedload
 
-from core.exceptions import AuthenticationError, NotFoundError
+from core.exceptions import AuthenticationError, AuthorizationError, NotFoundError
 from orion.extensions import db
 from tenant.tenant import Tenant
 from user.user import User
@@ -111,6 +111,15 @@ def _bind_user_to_context(user_public_id: str) -> None:
 def require_platform_admin() -> None:
     if not g.is_platform_admin:
         raise AuthenticationError("Platform admin required.")
+
+
+def require_tenant_admin() -> None:
+    if not g.tenant_id or not g.user:
+        raise AuthenticationError("Tenant context required.")
+    if g.is_platform_admin:
+        return
+    if not g.user.is_admin or g.user.tenant_id != g.tenant_id:
+        raise AuthorizationError("Tenant admin required.")
 
 
 def require_tenant_context() -> Tenant:

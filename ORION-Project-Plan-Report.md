@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 1 مكتملة + فجوات 0→1 مغلقة | جاهز لموجة 2 (§0.15)"
+status: "قيد التنفيذ — موجة 2 مكتملة | التالي: موجة 3 سلة وطلبات (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 1 ✅ → **التالي:** موجة 2 (كتالوج)  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 2 ✅ → **التالي:** موجة 3 (سلة وطلبات)  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -738,8 +738,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 |--------|--------|--------|--------|
 | **0** — البنية التحتية | ✅ | 8/8 | 2026-06-26 |
 | **1** — Tenant + Auth | ✅ | 10/10 | 2026-06-27 — انظر §0.12.3 |
-| **2** — كتالوج | ⬜ | 0/7 | التالي |
-| **3** — سلة وطلبات | ⬜ | 0/7 | — |
+| **2** — كتالوج | ✅ | 7/7 | 2026-06-27 — platform_settings + products API |
+| **3** — سلة وطلبات | ⬜ | 0/7 | التالي |
 | **4** — مالية وبوابات | ⬜ | 0/17 | — |
 | **5** — واجهات | ⬜ | 0/8 | — |
 | **6+** — ما بعد MVP | ⬜ | — | Release Train |
@@ -755,15 +755,15 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~36 اختبار؛ JWT + Alembic + عزل tenant |
+| `tests/` (pytest + Postgres) | ✅ | ~45 اختبار؛ catalog + platform_settings + عزل |
 
 #### معايير الانتقال (§0.12.6)
 
 | الانتقال | الحالة | الفجوة المتبقية |
 |----------|--------|----------------|
 | **0 → 1** | ✅ | CI Postgres ✅؛ pytest+عزل ✅؛ JWT ✅؛ Alembic `wave1_001`+`wave1_002` ✅ |
-| **1 → 2** | 🟡 | عزل ✅؛ CI coverage ≥85% ✅؛ JWT ✅؛ `platform_settings` ⬜ (بداية موجة 2) |
-| 2 → 3 | ⬜ | — |
+| **1 → 2** | ✅ | عزل ✅؛ JWT ✅؛ `platform_settings` seed ✅؛ product CRUD API ✅ |
+| **2 → 3** | 🟡 | CRUD منتج ✅؛ seed ✅؛ carts/orders ⬜ (بداية موجة 3) |
 | 3 → 4 | ⬜ | — |
 | 4 → 5 | ⬜ | — |
 | 5 → MVP | ⬜ | — |
@@ -776,7 +776,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.3 حدود حجم الملف | 🔒§0 | `scripts/check_file_length.py` + CI |
 | §0.4 Route → Service (لا ORM في routes) | ✅ | `routes.py` — status فقط، لا `db.session` |
 | §0.5 secrets في `.env` | ✅ | `.env.example`؛ `.gitignore` |
-| §0.12 لا قفز موجات | ✅ | موجتا 0–1 — التالي: كتالوج (موجة 2) |
+| §0.12 لا قفز موجات | ✅ | موجات 0–2 — التالي: سلة/طلبات (موجة 3) |
 | §0.13.2 `COMMISSION_FALLBACK_CHAIN` | 🟡 | `core/constants.py` — بدون `commission_service` |
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |

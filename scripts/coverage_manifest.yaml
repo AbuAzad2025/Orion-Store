@@ -47,6 +47,18 @@ files:
   "05-API/v1/routes.py": { wave: 0, min: 100 }
   "05-API/v1/auth.py": { wave: 1, min: 70 }
   "05-API/v1/tenants.py": { wave: 1, min: 70 }
+  # wave 2 — platform + catalog
+  "03-MODELS/platform_models/platform_settings.py": { wave: 2, min: 90 }
+  "03-MODELS/catalog/catalog_base.py": { wave: 2, min: 100 }
+  "03-MODELS/catalog/category.py": { wave: 2, min: 90 }
+  "03-MODELS/catalog/brand.py": { wave: 2, min: 90 }
+  "03-MODELS/catalog/product.py": { wave: 2, min: 90 }
+  "04-SERVICES/catalog_svc/product_service.py": { wave: 2, min: 80 }
+  "04-SERVICES/catalog_svc/category_service.py": { wave: 2, min: 80 }
+  "04-SERVICES/platform_svc/platform_settings_service.py": { wave: 2, min: 80 }
+  "05-API/v1/products.py": { wave: 2, min: 70 }
+  "05-API/v1/categories.py": { wave: 2, min: 70 }
+  "05-API/v1/platform_settings.py": { wave: 2, min: 80 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 def auth_headers(user, *, tenant_id: str | None = None) -> dict[str, str]:
     headers = {
-        "X-User-ID": user.public_id,
+        "X-User-ID": str(user.public_id),
         "Content-Type": "application/json",
     }
     if tenant_id:

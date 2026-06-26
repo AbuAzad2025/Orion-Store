@@ -28,6 +28,8 @@ def test_alembic_upgrade_and_downgrade(app):
         assert "tenants" in tables
         assert "users" in tables
         assert "roles" in tables
+        assert "products" in tables
+        assert "platform_settings" in tables
         command.downgrade(cfg, "base")
         tables_after = set(inspect(db.engine).get_table_names())
         assert "tenants" not in tables_after

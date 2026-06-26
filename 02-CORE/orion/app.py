@@ -26,6 +26,10 @@ def create_app(config_name: str | None = None) -> Flask:
     jwt.init_app(app)
 
     import base.base_model  # noqa: F401
+    import catalog.brand  # noqa: F401
+    import catalog.category  # noqa: F401
+    import catalog.product  # noqa: F401
+    import platform_models.platform_settings  # noqa: F401
     import tenant.tenant  # noqa: F401
     import tenant.tenant_config  # noqa: F401
     import user.role  # noqa: F401

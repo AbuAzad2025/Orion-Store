@@ -5,6 +5,9 @@ from __future__ import annotations
 from flask import Blueprint, Flask
 
 from v1.auth import auth_bp
+from v1.categories import categories_bp
+from v1.platform_settings import platform_settings_bp
+from v1.products import products_bp
 from v1.tenants import tenant_bp
 
 storefront_bp = Blueprint("storefront", __name__)
@@ -30,6 +33,9 @@ def webhooks_status():
 def register_blueprints(app: Flask) -> None:
     app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
     app.register_blueprint(tenant_bp, url_prefix="/api/v1/tenants")
+    app.register_blueprint(products_bp, url_prefix="/api/v1/products")
+    app.register_blueprint(categories_bp, url_prefix="/api/v1/categories")
+    app.register_blueprint(platform_settings_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(storefront_bp, url_prefix="/api/v1/store")
     app.register_blueprint(platform_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(webhooks_bp, url_prefix="/webhooks")
