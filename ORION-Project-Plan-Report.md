@@ -17,9 +17,9 @@ duration_weeks_full: 68
 database_tables: 144
 database_tables_mvp: 64
 database_tables_v2: 80
-implementation_wave: 0
-implementation_wave_status: "مكتملة — جاهز لموجة 1"
-implementation_updated: "2026-06-26"
+implementation_wave: 1
+implementation_wave_status: "موجة 1 — مكتملة أساسياً (tenant + auth + عزل)"
+implementation_updated: "2026-06-27"
 ---
 
 # 🚀 Azadexa — منصة التجارة الإلكترونية SaaS متعدد المستأجرين
@@ -29,7 +29,7 @@ implementation_updated: "2026-06-26"
 
 ---
 
-**الإصدار:** 1.10 | **التاريخ:** 26 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 0 ✅ | موجة 1 ⬜** (§0.15)
+**الإصدار:** 1.10 | **التاريخ:** 26 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 1 ✅ | موجة 2 ⬜** (§0.15)
 
 ---
 
@@ -413,20 +413,20 @@ flowchart BT
 | 7 | `02-CORE/core/events.py` (واجهة publish/subscribe) | payment/order لاحقاً | ✅ |
 | 8 | `05-API/v1/routes.py` (تسجيل blueprints) | هيكل URL ثابت | ✅ |
 
-##### موجة 1 — المستأجر والمصادقة (قبل أي منتج أو طلب) — ⬜ التالي
+##### موجة 1 — المستأجر والمصادقة — ✅ 2026-06-27
 
 | # | الملف / الوظيفة | يعتمد على | migration | الحالة |
 |---|-----------------|-----------|-----------|--------|
-| 9 | `03-MODELS/tenant/tenant.py`, `tenant_config.py` | base_model | `tenants`, `tenant_configs` | ⬜ |
-| 10 | `03-MODELS/user/user.py`, `role.py`, `permission.py` | tenant | `users`, `roles`, `permissions` | ⬜ |
-| 11 | migration: RLS policies template | tenants | `db/rls.sql` | ⬜ |
-| 12 | `02-CORE/core/middleware.py` (TenantResolver → Auth → RBAC) | tenant model — `joinedload(Tenant.config)` | — | ⬜ |
-| 13 | `02-CORE/core/permissions.py` | roles | — | ⬜ |
-| 14 | `04-SERVICES/auth/auth_service.py`, `rbac_service.py` | users | — | ⬜ |
-| 15 | `04-SERVICES/tenant/tenant_service.py` | tenants | — | ⬜ |
-| 16 | `05-API/v1/auth.py` | auth_service | — | ⬜ |
-| 17 | `05-API/v1/tenants.py` (platform فقط) | tenant_service | — | ⬜ |
-| 18 | **اختبارات عزل tenant** | `tests/security/test_tenant_isolation.py` | — | ⬜ |
+| 9 | `03-MODELS/tenant/tenant.py`, `tenant_config.py` | base_model | `tenants`, `tenant_configs` | ✅ |
+| 10 | `03-MODELS/user/user.py`, `role.py`, `permission.py` | tenant | `users`, `roles`, `permissions` | ✅ |
+| 11 | migration: RLS policies template | tenants | `db/rls.sql` | ✅ 📋 |
+| 12 | `02-CORE/core/middleware.py` | tenant — `joinedload(Tenant.config)` | — | ✅ |
+| 13 | `02-CORE/core/permissions.py` | roles | — | ✅ shell |
+| 14 | `04-SERVICES/auth/auth_service.py` | users | — | ✅ |
+| 15 | `04-SERVICES/tenant_svc/tenant_service.py` | tenants | — | ✅ |
+| 16 | `05-API/v1/auth.py` | auth_service | — | ✅ |
+| 17 | `05-API/v1/tenants.py` | tenant_service | — | ✅ |
+| 18 | **اختبارات عزل tenant** | `tests/security/test_tenant_isolation.py` | — | ✅ |
 
 > **لا تبنِ** `product_service` أو `checkout` قبل إكمال #9–18.
 
@@ -545,7 +545,7 @@ flowchart BT
 
 | القرار | متى يُقفل | المرجع | الحالة |
 |--------|-----------|--------|--------|
-| `tenant_id` على كل جدول | موجة 1 | §3.3 | ⬜ |
+| `tenant_id` على كل جدول | موجة 1 | §3.3 | ✅ models |
 | `financial_events` كجدول مركزي للمال | موجة 4 #33 | §4.49 | 📋 |
 | Route → Service → Model | موجة 0 | §0.4 | ✅ |
 | Blueprint prefixes (`/store`, `/tenant`, `/platform`) | موجة 0 #8 | §3.9 | ✅ |
@@ -733,9 +733,9 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 | الموجة | الحالة | التقدم | ملاحظة |
 |--------|--------|--------|--------|
-| **0** — البنية التحتية | ✅ | 8/8 | 2026-06-26 — انظر الجدول أدناه |
-| **1** — Tenant + Auth | ⬜ | 0/10 | التالي — `tenants`, middleware, RLS |
-| **2** — كتالوج | ⬜ | 0/7 | — |
+| **0** — البنية التحتية | ✅ | 8/8 | 2026-06-26 |
+| **1** — Tenant + Auth | ✅ | 10/10 | 2026-06-27 — انظر §0.12.3 |
+| **2** — كتالوج | ⬜ | 0/7 | التالي |
 | **3** — سلة وطلبات | ⬜ | 0/7 | — |
 | **4** — مالية وبوابات | ⬜ | 0/17 | — |
 | **5** — واجهات | ⬜ | 0/8 | — |
@@ -755,7 +755,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 | الانتقال | الحالة | الفجوة المتبقية |
 |----------|--------|----------------|
-| **0 → 1** | 🟡 | CI محلي ✅؛ `alembic upgrade head` ⬜ (لا migration schema)؛ login ⬜ |
+| **0 → 1** | 🟡 | pytest ✅ + عزل tenant ✅؛ JWT ⬜؛ `flask db upgrade` على PostgreSQL ⬜ |
 | 1 → 2 | ⬜ | — |
 | 2 → 3 | ⬜ | — |
 | 3 → 4 | ⬜ | — |
@@ -7848,21 +7848,23 @@ sentry-sdk==1.40.0
 | 17 | tenant_payment_gateways + platform_payment_integrations | §1.7, §4.49 | 6 | ⬜ |
 | 18 | مطابقة مالية + anti-evasion | §4.49 | 12 | ⬜ |
 | 19 | Forms ↔ Tables mapping للمستندات | §1.8 | 6 | 📋 |
-| 20 | Middleware pipeline كامل | §3.5 | 2 | ⬜ |
+| 20 | Middleware pipeline كامل | §3.5 | 2 | 🟡 resolver |
+| 27 | Tenant isolation tests | §0.8 | 2 | ✅ |
+| 34 | `joinedload(Tenant.config)` في middleware | §3.5 | 2 | ✅ |
 | 21 | Route → Service → Model (لا ORM في Routes) | §3.6, §4.51 | 1 | ✅ موجة 0 |
 | 22 | Domain events + Celery tasks | §3.8 | 6 | 🟡 events فقط |
 | 23 | Webhooks موقّعة + idempotency | §3.10 | 6 | ⬜ |
 | 24 | سلاسل E2E موثّقة | §4.50 | مراجعة | 📋 |
 | 25 | سياسة الهندسة §0 — pre-commit + file limits | §0 | 1 | ✅ 🔒§0 |
 | 26 | Route → Service فقط (لا ORM في routes) | §0.4 | 1 | ✅ |
-| 27 | Tenant isolation tests | §0.8 | 2 | ⬜ |
+| 27 | Tenant isolation tests | §0.8 | 2 | ✅ |
 | 28 | pip-audit + secrets scan | §0.5, §0.10 | 1 | 🟡 CI pip-audit |
 | 29 | بناء حسب موجات §0.12 (لا قفز) | §0.12 | كل مرحلة | ✅ موجة 0 |
 | 30 | financial_events قبل payments migration | §0.12.3 موجة 4 | 6 | 📋 |
 | 31 | MVP migrations فقط (64 جدول) — v2 في schema-v2.md | §0.13.1 | 1 | ✅ 📋 |
 | 32 | COMMISSION_FALLBACK_CHAIN موحّد (3 مستويات) | §0.13.2 | 6 | 🟡 constants |
 | 33 | `crypto.py` في موجة 0 (Fernet) | §0.12, §3.2 | 1 | ✅ |
-| 34 | `joinedload(Tenant.config)` في middleware | §3.5 | 2 | ⬜ |
+| 34 | `joinedload(Tenant.config)` في middleware | §3.5 | 2 | ✅ |
 | 35 | `webhook_secret` absent from API GET | §0.14, §4.49 | 6 | 🟡 helper+tests |
 | 36 | `platform_settings.singleton` CHECK | §4.0.9, §4.48 | 2 | 📋 |
 | 37 | `order_events` append-only documented | §4.5, §4.0.9 | 5 | 📋 |
@@ -8015,8 +8017,8 @@ sentry-sdk==1.40.0
 - **`schema-v2.md`:** 80 جدول v2 — booking، RMA، B2B، reconciliation…
 - نقاط القوة **بدون تغيير:** financial_events، RLS، COMMISSION chain، document_renderer
 
-**الخطوة التالية:** **موجة 1** — `tenants` + middleware + RLS + عزل tenant.  
-**مكتمل:** موجة 0 ✅ | `schema-v2.md` 📋 | سياسة §0 🔒§0 جزئياً
+**الخطوة التالية:** **موجة 2** — `platform_settings` + كتالوج منتجات.  
+**مكتمل:** موجة 0–1 ✅ | 12 pytest | [Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
 
 ---
 

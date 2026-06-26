@@ -13,9 +13,7 @@ def test_health_endpoint(client):
 
 def test_api_blueprints_registered(client):
     endpoints = [
-        "/api/v1/auth/status",
         "/api/v1/store/status",
-        "/api/v1/tenant/status",
         "/api/v1/platform/status",
         "/webhooks/status",
     ]

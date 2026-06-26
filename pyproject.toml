@@ -36,7 +36,7 @@ known_first_party = ["orion", "core", "base", "v1"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "02-CORE/tests"]
-pythonpath = ["02-CORE", "03-MODELS", "05-API"]
+pythonpath = ["02-CORE", "03-MODELS", "04-SERVICES", "05-API"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.orion.file_length]

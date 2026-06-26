@@ -6,38 +6,20 @@ Multi-tenant e-commerce SaaS — **wave 0** foundation.
 
 ## Quick start
 
-```bash
-# 1. Infrastructure
-docker compose -f 01-FOUNDATION/infrastructure/docker-compose.dev.yml up -d
-
-# 2. Python environment
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-pip install -e ".[dev]"
-
-# 3. Environment
-copy .env.example .env
-# Set ENCRYPTION_KEY: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-
-# 4. Run
-set FLASK_APP=orion.wsgi:app
-set PYTHONPATH=02-CORE;03-MODELS;05-API
-flask run
-
-# 5. Test
-pytest -v
+```powershell
+.\scripts\dev.ps1 docker-up    # PostgreSQL + Redis
+.\scripts\dev.ps1 test         # 12 pytest
+.\scripts\dev.ps1 run          # Flask dev server
 ```
 
 Health check: `GET http://127.0.0.1:5000/health`
 
-## Wave 0 deliverables
+## Wave 0–1 deliverables
 
 - Flask app factory + `/health`
-- `core/constants.py`, `core/crypto.py` (Fernet), `core/events.py`
-- `base/base_model.py` shell
-- API blueprint skeleton (`/api/v1/*`, `/webhooks`)
-- Docker: PostgreSQL 16 + Redis 7
-- CI: black, isort, flake8, pytest, file-length check
+- **Wave 1:** tenants, users, RBAC models, middleware, auth/tenant APIs
+- `core/constants.py`, `core/crypto.py`, `core/events.py`
+- `tests/security/test_tenant_isolation.py` — **12 tests passing**
 
 See `ORION-Project-Plan-Report.md` §0.12 for build order.  
 **تتبع التنفيذ:** §0.15 في الخطة (علامات ✅ 🟡 📋 ⬜ 🔒§0).

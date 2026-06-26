@@ -21,13 +21,13 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Black
-        run: black --check 02-CORE 03-MODELS 05-API tests scripts
+        run: black --check 02-CORE 03-MODELS 04-SERVICES 05-API tests scripts db
 
       - name: isort
-        run: isort --check-only 02-CORE 03-MODELS 05-API tests scripts
+        run: isort --check-only 02-CORE 03-MODELS 04-SERVICES 05-API tests scripts
 
       - name: Flake8
-        run: flake8 02-CORE 03-MODELS 05-API tests scripts
+        run: flake8 02-CORE 03-MODELS 04-SERVICES 05-API tests scripts
 
       - name: File length check
         run: python scripts/check_file_length.py
