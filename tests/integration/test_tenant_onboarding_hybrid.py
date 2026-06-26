@@ -23,7 +23,7 @@ pytestmark = pytest.mark.integration
 def test_tenant_onboarding_persists_to_postgres_and_stubs_gateway_callback(
     client, platform_admin, db_session, mocker
 ):
-    """POST /tenants writes Tenant + TenantConfig + admin User; gateway HTTP is mocked."""
+    """POST /tenants persists rows; outbound gateway HTTP is mocked."""
     gateway_response = mocker.Mock()
     gateway_response.raise_for_status = mocker.Mock()
     gateway_response.json.return_value = {
@@ -112,7 +112,7 @@ def test_duplicate_slug_rejected_with_single_database_row(
 
 
 def test_postgresql_check_constraint_blocks_invalid_superuser(db_session):
-    """Structural DB rule — only meaningful against PostgreSQL (CI service container)."""
+    """CHECK constraint on superuser — PostgreSQL only (CI container)."""
     from sqlalchemy.exc import IntegrityError
 
     from auth.auth_service import AuthService

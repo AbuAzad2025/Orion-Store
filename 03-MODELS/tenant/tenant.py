@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, Integer, Numeric, String, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -12,6 +13,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from base.pk import PrimaryKeyType
 from base.types import PlanType, TenantStatus
 from orion.extensions import db
+
+if TYPE_CHECKING:
+    from tenant.tenant_config import TenantConfig
 
 
 class Tenant(db.Model):

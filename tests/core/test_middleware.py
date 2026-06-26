@@ -18,7 +18,7 @@ def test_resolve_tenant_from_public_id_header(client):
 
 def test_resolve_tenant_from_subdomain(client):
     tenants = TenantService()
-    tenant = tenants.create_tenant(
+    tenants.create_tenant(
         name="Sub Store", slug="sub-store", email="sub@store.com", domain="substore"
     )
     response = client.get(

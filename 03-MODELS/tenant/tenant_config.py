@@ -4,12 +4,16 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Numeric, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from base.pk import PrimaryKeyType
 from orion.extensions import db
+
+if TYPE_CHECKING:
+    from tenant.tenant import Tenant
 
 
 class TenantConfig(db.Model):

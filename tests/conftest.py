@@ -45,7 +45,7 @@ def pytest_configure(config: pytest.Config) -> None:
     )
     config.addinivalue_line(
         "markers",
-        "external: Third-party HTTP via VCR/live sandbox — optional, not in default CI.",
+        "external: Third-party HTTP (VCR) — optional, excluded from CI.",
     )
 
 
@@ -176,7 +176,7 @@ class OrionTestClient:
 
 @pytest.fixture
 def client(app: Flask) -> Generator[OrionTestClient, None, None]:
-    """Flask test client with cookie/session support — mirrors production request stack."""
+    """Flask test client with cookies — mirrors production request stack."""
     with app.test_client(use_cookies=True) as flask_client:
         yield OrionTestClient(flask_client)
 
