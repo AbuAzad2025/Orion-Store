@@ -9,7 +9,10 @@ def test_get_platform_settings(client, platform_admin):
     with client.flask_client.application.app_context():
         PlatformSettingsService().ensure_seeded()
 
-    headers = {"X-User-ID": platform_admin.public_id, "Content-Type": "application/json"}
+    headers = {
+        "X-User-ID": platform_admin.public_id,
+        "Content-Type": "application/json",
+    }
     response = client.get("/api/v1/platform/settings", headers=headers)
     assert response.status_code == 200
     data = response.get_json()["settings"]

@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 2 مكتملة | التالي: موجة 3 سلة وطلبات (§0.15)"
+status: "قيد التنفيذ — موجة 3 مكتملة | التالي: موجة 4 مالية وبوابات (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 2 ✅ → **التالي:** موجة 3 (سلة وطلبات)  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 3 ✅ → **التالي:** موجة 4 (مالية وبوابات)  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -739,8 +739,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **0** — البنية التحتية | ✅ | 8/8 | 2026-06-26 |
 | **1** — Tenant + Auth | ✅ | 10/10 | 2026-06-27 — انظر §0.12.3 |
 | **2** — كتالوج | ✅ | 7/7 | 2026-06-27 — platform_settings + products API |
-| **3** — سلة وطلبات | ⬜ | 0/7 | التالي |
-| **4** — مالية وبوابات | ⬜ | 0/17 | — |
+| **3** — سلة وطلبات | ✅ | 7/7 | 2026-06-27 — cart + checkout بدون دفع |
+| **4** — مالية وبوابات | ⬜ | 0/17 | التالي |
 | **5** — واجهات | ⬜ | 0/8 | — |
 | **6+** — ما بعد MVP | ⬜ | — | Release Train |
 
@@ -763,8 +763,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 |----------|--------|----------------|
 | **0 → 1** | ✅ | CI Postgres ✅؛ pytest+عزل ✅؛ JWT ✅؛ Alembic `wave1_001`+`wave1_002` ✅ |
 | **1 → 2** | ✅ | عزل ✅؛ JWT ✅؛ `platform_settings` seed ✅؛ product CRUD API ✅ |
-| **2 → 3** | 🟡 | CRUD منتج ✅؛ seed ✅؛ carts/orders ⬜ (بداية موجة 3) |
-| 3 → 4 | ⬜ | — |
+| **2 → 3** | ✅ | carts/orders migration ✅؛ checkout API ✅ (بدون pay) |
+| **3 → 4** | 🟡 | checkout ✅؛ `financial_events` + payments ⬜ (بداية موجة 4) |
 | 4 → 5 | ⬜ | — |
 | 5 → MVP | ⬜ | — |
 

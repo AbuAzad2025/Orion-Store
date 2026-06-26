@@ -49,6 +49,8 @@ def get_metadata():
     import catalog.brand  # noqa: F401
     import catalog.category  # noqa: F401
     import catalog.product  # noqa: F401
+    import order.cart  # noqa: F401
+    import order.order  # noqa: F401
     import platform_models.platform_settings  # noqa: F401
     import tenant.tenant  # noqa: F401
     import tenant.tenant_config  # noqa: F401

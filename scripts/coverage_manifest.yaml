@@ -59,6 +59,13 @@ files:
   "05-API/v1/products.py": { wave: 2, min: 70 }
   "05-API/v1/categories.py": { wave: 2, min: 70 }
   "05-API/v1/platform_settings.py": { wave: 2, min: 80 }
+  # wave 3 — cart & orders
+  "03-MODELS/order/cart.py": { wave: 3, min: 90 }
+  "03-MODELS/order/order.py": { wave: 3, min: 85 }
+  "04-SERVICES/order_svc/cart_service.py": { wave: 3, min: 80 }
+  "04-SERVICES/order_svc/checkout_service.py": { wave: 3, min: 80 }
+  "04-SERVICES/order_svc/order_service.py": { wave: 3, min: 80 }
+  "05-API/v1/storefront.py": { wave: 3, min: 70 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

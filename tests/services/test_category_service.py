@@ -35,6 +35,4 @@ def test_parent_not_found_raises(app):
         name="Orphan", slug="orphan-store", email="orphan@test.com"
     )
     with pytest.raises(NotFoundError):
-        categories.create(
-            tenant_id=tenant.id, name="X", slug="x", parent_id=99999
-        )
+        categories.create(tenant_id=tenant.id, name="X", slug="x", parent_id=99999)

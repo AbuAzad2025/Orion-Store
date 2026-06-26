@@ -12,12 +12,12 @@ def test_health_endpoint(client):
 
 
 def test_api_blueprints_registered(client):
-    endpoints = [
-        "/api/v1/store/status",
-        "/api/v1/platform/status",
-        "/webhooks/status",
-    ]
-    for path in endpoints:
+    statuses = {
+        "/api/v1/store/status": "active",
+        "/api/v1/platform/status": "pending",
+        "/webhooks/status": "pending",
+    }
+    for path, expected in statuses.items():
         response = client.get(path)
         assert response.status_code == 200
-        assert response.get_json()["status"] == "pending"
+        assert response.get_json()["status"] == expected

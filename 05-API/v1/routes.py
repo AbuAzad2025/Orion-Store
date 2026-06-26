@@ -8,16 +8,11 @@ from v1.auth import auth_bp
 from v1.categories import categories_bp
 from v1.platform_settings import platform_settings_bp
 from v1.products import products_bp
+from v1.storefront import storefront_bp
 from v1.tenants import tenant_bp
 
-storefront_bp = Blueprint("storefront", __name__)
 platform_bp = Blueprint("platform", __name__)
 webhooks_bp = Blueprint("webhooks", __name__)
-
-
-@storefront_bp.get("/status")
-def storefront_status():
-    return {"blueprint": "storefront", "status": "pending"}, 200
 
 
 @platform_bp.get("/status")
