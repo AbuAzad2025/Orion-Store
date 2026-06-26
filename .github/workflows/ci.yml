@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Black
+        run: black --check 02-CORE 03-MODELS 05-API tests scripts
+
+      - name: isort
+        run: isort --check-only 02-CORE 03-MODELS 05-API tests scripts
+
+      - name: Flake8
+        run: flake8 02-CORE 03-MODELS 05-API tests scripts
+
+      - name: File length check
+        run: python scripts/check_file_length.py
+
+      - name: Pytest
+        env:
+          FLASK_ENV: testing
+        run: |
+          export ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
+          pytest -v
+
+      - name: pip-audit
+        run: pip-audit
+        continue-on-error: true

@@ -1,0 +1,49 @@
+[project]
+name = "orion-ecommerce"
+version = "0.1.0"
+description = "Azadexa multi-tenant e-commerce SaaS (Orion engine)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "Flask==3.0.3",
+    "Flask-SQLAlchemy==3.1.1",
+    "Flask-Migrate==4.0.7",
+    "psycopg2-binary==2.9.9",
+    "redis==5.0.3",
+    "python-dotenv==1.0.0",
+    "cryptography==42.0.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.1.1",
+    "pytest-flask==1.3.0",
+    "black==24.1.0",
+    "flake8==7.0.0",
+    "isort==5.13.2",
+    "pre-commit==3.6.0",
+    "pip-audit==2.7.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["orion", "core", "base", "v1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "02-CORE/tests"]
+pythonpath = ["02-CORE", "03-MODELS", "05-API"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.orion.file_length]
+default_max = 500
+paths = [
+    { glob = "**/*_service.py", max = 400 },
+    { glob = "05-API/v1/*.py", max = 300 },
+    { glob = "03-MODELS/**/*.py", max = 250 },
+    { glob = "migrations/versions/*.py", max = 200 },
+]
