@@ -32,9 +32,7 @@ def test_tenant_a_cannot_see_tenant_b_users(app):
 
 def test_superuser_has_no_tenant_id(app):
     auth = AuthService()
-    admin = auth.register_super_admin(
-        email="owner@azadexa.com", password="password123"
-    )
+    admin = auth.register_super_admin(email="owner@azadexa.com", password="password123")
     assert admin.is_superuser is True
     assert admin.tenant_id is None
     assert admin.is_customer is False

@@ -10,11 +10,11 @@ from __future__ import annotations
 
 import pytest
 import requests
+from support.factories import tenant_create_payload
+from support.http import auth_headers
 
 from tenant.tenant import Tenant
 from tenant.tenant_config import TenantConfig
-from support.factories import tenant_create_payload
-from support.http import auth_headers
 from user.user import User
 
 pytestmark = pytest.mark.integration
@@ -55,9 +55,11 @@ def test_tenant_onboarding_persists_to_postgres_and_stubs_gateway_callback(
 
     tenant = db_session.query(Tenant).filter_by(slug="gateway-store").one()
     config = db_session.query(TenantConfig).filter_by(tenant_id=tenant.id).one()
-    admin = db_session.query(User).filter_by(
-        tenant_id=tenant.id, email="admin@gateway.com"
-    ).one()
+    admin = (
+        db_session.query(User)
+        .filter_by(tenant_id=tenant.id, email="admin@gateway.com")
+        .one()
+    )
 
     assert config.business_name == "Gateway Store"
     assert admin.is_admin is True
@@ -90,7 +92,9 @@ def test_duplicate_slug_rejected_with_single_database_row(
     headers = auth_headers(platform_admin)
     first = tenant_create_payload(slug="once-only", name="First", email="a@t.com")
 
-    assert client.post("/api/v1/tenants/", headers=headers, json=first).status_code == 201
+    assert (
+        client.post("/api/v1/tenants/", headers=headers, json=first).status_code == 201
+    )
     duplicate = client.post(
         "/api/v1/tenants/",
         headers=headers,

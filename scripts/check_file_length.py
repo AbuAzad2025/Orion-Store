@@ -55,7 +55,9 @@ def main() -> int:
     violations: list[str] = []
     for path in _iter_files():
         limit = _max_for(path)
-        line_count = len(path.read_text(encoding="utf-8", errors="replace").splitlines())
+        line_count = len(
+            path.read_text(encoding="utf-8", errors="replace").splitlines()
+        )
         if line_count > limit:
             rel = path.relative_to(ROOT)
             violations.append(f"{rel}: {line_count} lines (max {limit})")

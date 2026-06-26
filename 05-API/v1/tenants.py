@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from flask import Blueprint, g, jsonify, request
 
+from auth.auth_service import AuthService
 from core.exceptions import OrionError
 from core.middleware import require_platform_admin
-from auth.auth_service import AuthService
 from tenant_svc.tenant_service import TenantService
 
 tenant_bp = Blueprint("tenants", __name__)

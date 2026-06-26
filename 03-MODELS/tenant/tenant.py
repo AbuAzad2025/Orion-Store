@@ -10,7 +10,6 @@ from sqlalchemy import Boolean, DateTime, Integer, Numeric, String, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from base.pk import PrimaryKeyType
-
 from base.types import PlanType, TenantStatus
 from orion.extensions import db
 
@@ -18,7 +17,9 @@ from orion.extensions import db
 class Tenant(db.Model):
     __tablename__ = "tenants"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
     public_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False
     )
@@ -46,8 +47,12 @@ class Tenant(db.Model):
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
     country_code: Mapped[str] = mapped_column(String(2), default="PS", nullable=False)
-    default_language: Mapped[str] = mapped_column(String(5), default="ar", nullable=False)
-    default_currency: Mapped[str] = mapped_column(String(3), default="ILS", nullable=False)
+    default_language: Mapped[str] = mapped_column(
+        String(5), default="ar", nullable=False
+    )
+    default_currency: Mapped[str] = mapped_column(
+        String(3), default="ILS", nullable=False
+    )
     timezone: Mapped[str] = mapped_column(
         String(50), default="Asia/Jerusalem", nullable=False
     )

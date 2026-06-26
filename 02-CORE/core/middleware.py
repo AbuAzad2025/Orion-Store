@@ -43,9 +43,7 @@ def _resolve_tenant_from_request() -> Tenant | None:
     if header_id:
         tenant = None
         try:
-            tenant = _tenant_query().filter_by(
-                public_id=uuid.UUID(header_id)
-            ).first()
+            tenant = _tenant_query().filter_by(public_id=uuid.UUID(header_id)).first()
         except ValueError:
             tenant = None
         if not tenant:

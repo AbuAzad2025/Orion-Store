@@ -103,7 +103,9 @@ def main() -> int:
     args = parser.parse_args()
 
     if not args.coverage_json.is_file():
-        print(f"ERROR: missing {args.coverage_json} — run pytest with --cov-report=json")
+        print(
+            f"ERROR: missing {args.coverage_json} — run pytest with --cov-report=json"
+        )
         return 1
 
     manifest = _load_manifest(args.manifest)

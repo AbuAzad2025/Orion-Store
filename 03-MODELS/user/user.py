@@ -18,7 +18,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 
 from base.pk import PrimaryKeyType
-
 from orion.extensions import db
 
 
@@ -35,7 +34,9 @@ class User(db.Model):
         ),
     )
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
     public_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False
     )
@@ -55,7 +56,10 @@ class User(db.Model):
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
     tenant_id: Mapped[int | None] = mapped_column(
-        PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=True, index=True
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
     )
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)

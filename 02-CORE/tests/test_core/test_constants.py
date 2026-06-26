@@ -14,7 +14,9 @@ from core.constants import (
 def test_commission_fallback_chain_has_three_levels():
     assert len(COMMISSION_FALLBACK_CHAIN) == 3
     assert COMMISSION_FALLBACK_CHAIN[0] == "tenants.platform_commission_percent"
-    assert COMMISSION_FALLBACK_CHAIN[1] == "platform_settings.default_commission_percent"
+    assert (
+        COMMISSION_FALLBACK_CHAIN[1] == "platform_settings.default_commission_percent"
+    )
     assert COMMISSION_FALLBACK_CHAIN[2] == Decimal("0.0100")
 
 

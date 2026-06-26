@@ -5,9 +5,7 @@ from __future__ import annotations
 import os
 
 # Production + testing target — PostgreSQL only (§0.8, §4.0).
-DEFAULT_DEV_DATABASE_URL = (
-    "postgresql://azadexa:azadexa_dev@localhost:5432/azadexa_dev"
-)
+DEFAULT_DEV_DATABASE_URL = "postgresql://azadexa:azadexa_dev@localhost:5432/azadexa_dev"
 DEFAULT_TEST_DATABASE_URL = (
     "postgresql://azadexa:azadexa_test@localhost:5433/azadexa_test"
 )

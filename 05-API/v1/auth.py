@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
 
-from core.exceptions import OrionError
 from auth.auth_service import AuthService
+from core.exceptions import OrionError
 
 auth_bp = Blueprint("auth", __name__)
 _auth = AuthService()
@@ -18,9 +18,7 @@ def login():
     password = data.get("password", "")
     tenant_id = data.get("tenant_id")
     try:
-        user = _auth.authenticate(
-            email=email, password=password, tenant_id=tenant_id
-        )
+        user = _auth.authenticate(email=email, password=password, tenant_id=tenant_id)
         return jsonify({"user": user.to_dict()}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

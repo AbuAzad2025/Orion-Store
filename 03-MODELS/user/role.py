@@ -8,14 +8,15 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from base.pk import PrimaryKeyType
-
 from orion.extensions import db
 
 
 class Role(db.Model):
     __tablename__ = "roles"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -37,7 +38,9 @@ class Role(db.Model):
 class Permission(db.Model):
     __tablename__ = "permissions"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -55,7 +58,9 @@ class RolePermission(db.Model):
         PrimaryKeyType, ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True
     )
     permission_id: Mapped[int] = mapped_column(
-        PrimaryKeyType, ForeignKey("permissions.id", ondelete="CASCADE"), primary_key=True
+        PrimaryKeyType,
+        ForeignKey("permissions.id", ondelete="CASCADE"),
+        primary_key=True,
     )
 
 

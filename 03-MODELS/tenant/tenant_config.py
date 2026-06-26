@@ -9,14 +9,15 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, Numeric, String, Text, fun
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from base.pk import PrimaryKeyType
-
 from orion.extensions import db
 
 
 class TenantConfig(db.Model):
     __tablename__ = "tenant_configs"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
