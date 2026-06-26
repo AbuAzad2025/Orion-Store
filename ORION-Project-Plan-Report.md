@@ -748,6 +748,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `ORION-Project-Plan-Report.md` v1.10 | ✅ | مراجعة تقنية مدمجة |
 | `01-FOUNDATION/docs/schema-v2.md` | 📋 | 80 جدول v2 — لا Alembic |
 | `README.md` | ✅ | تشغيل موجة 0 |
+| GitHub `AbuAzad2025/Orion-Store` | ✅ | [github.com/AbuAzad2025/Orion-Store](https://github.com/AbuAzad2025/Orion-Store) |
 | `.env.example` | ✅ | بدون secrets |
 
 #### معايير الانتقال (§0.12.6)
@@ -5990,7 +5991,7 @@ tenant: POST /api/v1/tenant/payments/{id}/refund
 
 | المهمة | التفاصيل | المخرجات | الحالة |
 |--------|----------|----------|--------|
-| إنشاء Git repository | GitHub/GitLab private repo | Repo جاهز | ⬜ |
+| إنشاء Git repository | GitHub/GitLab private repo | Repo جاهز | ✅ [Orion-Store](https://github.com/AbuAzad2025/Orion-Store) |
 | إعداد Git workflow | Branching strategy (GitFlow) | Workflow document | ⬜ |
 | إنشاء هيكل المجلدات | Structure كما في القسم 3.2 | Folders created | 🟡 جزئي |
 | إعداد .gitignore | Python, IDE, OS files | .gitignore file | ✅ |
@@ -6093,7 +6094,7 @@ sentry-sdk==1.40.0
 
 ### 5.4 المخرجات النهائية
 
-- [ ] Repository منظم على GitHub
+- [x] ✅ Repository منظم على GitHub — [AbuAzad2025/Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
 - [x] ✅ Flask app يعمل محلياً (`/health`)
 - [ ] PostgreSQL متصل ويعمل (🟡 Docker compose جاهز — لم يُربط في التطوير اليومي بعد)
 - [ ] Redis متصل ويعمل (🟡 compose جاهز — لم يُدمج في Flask بعد)
