@@ -1,0 +1,23 @@
+# Dedicated PostgreSQL for integration tests (isolated from dev data).
+# Usage:
+#   docker compose -f 01-FOUNDATION/infrastructure/docker-compose.test.yml up -d
+#   set DATABASE_URL=postgresql://azadexa:azadexa_test@localhost:5433/azadexa_test
+#   pytest -m "not external" -v
+
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: azadexa-postgres-test
+    environment:
+      POSTGRES_USER: azadexa
+      POSTGRES_PASSWORD: azadexa_test
+      POSTGRES_DB: azadexa_test
+    ports:
+      - "5433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U azadexa -d azadexa_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 10

@@ -22,7 +22,11 @@ dev = [
     "flake8==7.0.0",
     "isort==5.13.2",
     "pre-commit==3.6.0",
-    "pip-audit==2.7.0",
+    "pytest-cov==5.0.0",
+    "pytest-mock==3.14.0",
+    "coverage==7.4.4",
+    "pyyaml==6.0.1",
+    "vcrpy==6.0.1",
 ]
 
 [tool.black]
@@ -32,12 +36,33 @@ target-version = ["py311"]
 [tool.isort]
 profile = "black"
 line_length = 88
-known_first_party = ["orion", "core", "base", "v1"]
+known_first_party = ["orion", "core", "base", "v1", "auth", "tenant", "tenant_svc", "user", "integrations"]
+
+[tool.coverage.run]
+source = ["02-CORE", "03-MODELS", "04-SERVICES", "05-API"]
+omit = [
+    "*/__init__.py",
+    "**/wsgi.py",
+    "03-MODELS/base/mixins.py",
+    "**/tests/**",
+]
+relative_files = true
+
+[tool.coverage.report]
+precision = 1
+show_missing = true
+fail_under = 85
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "02-CORE/tests"]
-pythonpath = ["02-CORE", "03-MODELS", "04-SERVICES", "05-API"]
+pythonpath = [".", "02-CORE", "03-MODELS", "04-SERVICES", "05-API"]
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+    "unit: Pure logic — no route/HTTP.",
+    "integration: Full-stack checks on PostgreSQL (CHECK, FK, RLS).",
+    "external: Recorded or live third-party HTTP (VCR) — excluded from CI.",
+]
+addopts = "-ra"
 
 [tool.orion.file_length]
 default_max = 500

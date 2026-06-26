@@ -50,6 +50,10 @@ class TenantService:
         tenant.config = TenantConfig(business_name=name)
         db.session.add(tenant)
         db.session.commit()
+
+        from integrations.external_registry import register_tenant_subdomain
+
+        register_tenant_subdomain(slug=tenant.slug, tenant_id=tenant.id)
         return tenant
 
     def list_users_for_tenant(self, tenant_id: int):

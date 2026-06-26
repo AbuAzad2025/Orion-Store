@@ -6,6 +6,8 @@ import uuid
 
 from flask import Flask, g, request
 from sqlalchemy.orm import joinedload
+
+from core.exceptions import AuthenticationError, NotFoundError
 from orion.extensions import db
 from tenant.tenant import Tenant
 from user.user import User
@@ -39,7 +41,13 @@ def register_middleware(app: Flask) -> None:
 def _resolve_tenant_from_request() -> Tenant | None:
     header_id = request.headers.get("X-Tenant-ID")
     if header_id:
-        tenant = _tenant_query().filter_by(public_id=header_id).first()
+        tenant = None
+        try:
+            tenant = _tenant_query().filter_by(
+                public_id=uuid.UUID(header_id)
+            ).first()
+        except ValueError:
+            tenant = None
         if not tenant:
             tenant = _tenant_query().filter_by(slug=header_id).first()
         if tenant:

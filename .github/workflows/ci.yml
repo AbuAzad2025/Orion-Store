@@ -6,8 +6,13 @@ on:
   pull_request:
     branches: [main, develop]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint-and-test:
+  lint:
+    name: Lint & file limits
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +26,7 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Black
-        run: black --check 02-CORE 03-MODELS 04-SERVICES 05-API tests scripts db
+        run: black --check 02-CORE 03-MODELS 04-SERVICES 05-API tests scripts
 
       - name: isort
         run: isort --check-only 02-CORE 03-MODELS 04-SERVICES 05-API tests scripts
@@ -32,13 +37,100 @@ jobs:
       - name: File length check
         run: python scripts/check_file_length.py
 
-      - name: Pytest
+  test:
+    name: Tests, PostgreSQL & coverage ≥85%
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: azadexa
+          POSTGRES_PASSWORD: azadexa_test
+          POSTGRES_DB: azadexa_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U azadexa -d azadexa_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Pytest with PostgreSQL and coverage gate
         env:
           FLASK_ENV: testing
+          DATABASE_URL: postgresql://azadexa:azadexa_test@localhost:5432/azadexa_test
         run: |
           export ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
-          pytest -v
+          pytest -v -m "not external" \
+            --cov \
+            --cov-fail-under=85 \
+            --cov-report=term-missing \
+            --cov-report=json:coverage.json \
+            --cov-report=xml:coverage.xml
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage.json
+            coverage.xml
+          retention-days: 14
+
+  coverage-gate:
+    name: Per-file coverage gate
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt pyyaml
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+
+      - name: Enforce coverage manifest
+        run: |
+          ARGS="--coverage-json coverage.json"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch origin ${{ github.base_ref }} --depth=1
+            ARGS="$ARGS --diff-base origin/${{ github.base_ref }}"
+          fi
+          python scripts/check_coverage.py $ARGS
+
+  security:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
 
       - name: pip-audit
-        run: pip-audit
-        continue-on-error: true
+        run: pip-audit --strict

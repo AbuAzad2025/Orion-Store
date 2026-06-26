@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 0 مكتملة (§0.15)"
+status: "قيد التنفيذ — موجة 1 مكتملة | CI PostgreSQL + coverage ≥85% (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -18,8 +18,9 @@ database_tables: 144
 database_tables_mvp: 64
 database_tables_v2: 80
 implementation_wave: 1
-implementation_wave_status: "موجة 1 — مكتملة أساسياً (tenant + auth + عزل)"
+implementation_wave_status: "موجة 1 — مكتملة أساسياً (tenant + auth + عزل + CI)"
 implementation_updated: "2026-06-27"
+implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifest, pip-audit"
 ---
 
 # 🚀 Azadexa — منصة التجارة الإلكترونية SaaS متعدد المستأجرين
@@ -267,7 +268,7 @@ Route → Schema (validate) → Service → Model/Repository → DB
 | Lint | صفر warnings | flake8, black, isort |
 
 **PR لا يُدمج إلا إذا:**
-1. CI أخضر (lint + test + file-length + pip-audit)
+1. CI أخضر (lint + test + coverage manifest + file-length + pip-audit)
 2. مراجعة واحدة على الأقل (اثنتان للأمان/مدفوعات)
 3. وصف PR يذكر: الجداول، الـ routes، الشاشات المتأثرة
 4. migration مرفقة إن تغيّر schema
@@ -295,10 +296,11 @@ Route → Schema (validate) → Service → Model/Repository → DB
 | `flake8` + mccabe | lint + complexity | `.flake8` |
 | `djlint` | HTML/Jinja | `.djlintrc` |
 | `pre-commit` | قبل كل commit | `.pre-commit-config.yaml` |
-| `pytest` + coverage | اختبارات | `pytest.ini` |
-| `pip-audit` | ثغرات dependencies | CI |
+| `pytest` + coverage | اختبارات + تقرير JSON | `pyproject.toml` |
+| `check_coverage.py` | بوابة تغطية ملف-بملف (§0.8) | `scripts/` + `coverage_manifest.yaml` |
+| `pip-audit` | ثغرات dependencies | CI job `security` |
 | `check_file_length.py` | حدود §0.3 | `scripts/` |
-| GitHub Actions | CI كامل | `.github/workflows/ci.yml` |
+| GitHub Actions | CI: lint → test → coverage-gate + security | `.github/workflows/ci.yml` |
 
 ```yaml
 # .pre-commit-config.yaml (مختصر)
@@ -560,7 +562,7 @@ flowchart BT
 | الانتقال | معيار الجاهزية | الحالة |
 |----------|----------------|--------|
 | 0 → 1 | CI أخضر؛ `alembic upgrade head`؛ login يعمل | 🟡 CI+pytest ✅؛ migration schema ⬜ |
-| 1 → 2 | tenant A لا يرى B؛ `g.tenant_id` في كل request | ⬜ |
+| 1 → 2 | tenant A لا يرى B؛ `g.tenant_id` في كل request؛ CI per-file coverage | 🟡 عزل ✅؛ coverage manifest ✅ |
 | 2 → 3 | CRUD منتج عبر API؛ seed platform_settings | ⬜ |
 | 3 → 4 | checkout ينشئ order `pending` بدون دفع | ⬜ |
 | 4 → 5 | دفع تجريبي Stripe → financial_event + ledger + invoice PDF | ⬜ |
@@ -716,8 +718,9 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-26 | **الموجة الحالية:** 0 (مكتملة) → **التالي:** موجة 1  
-> **مرجع الكود:** جذر المستودع — `02-CORE/`, `03-MODELS/`, `05-API/`, `tests/`, `migrations/`
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 1 ✅ → **التالي:** موجة 2 (كتالوج)  
+> **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
+> **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
 #### مفتاح العلامات
 
@@ -747,16 +750,19 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 |-------|--------|--------|
 | `ORION-Project-Plan-Report.md` v1.10 | ✅ | مراجعة تقنية مدمجة |
 | `01-FOUNDATION/docs/schema-v2.md` | 📋 | 80 جدول v2 — لا Alembic |
-| `README.md` | ✅ | تشغيل موجة 0 |
-| GitHub `AbuAzad2025/Orion-Store` | ✅ | [github.com/AbuAzad2025/Orion-Store](https://github.com/AbuAzad2025/Orion-Store) |
-| `.env.example` | ✅ | بدون secrets |
+| `README.md` | ✅ | PostgreSQL + `docker-test-up` + CI |
+| GitHub `AbuAzad2025/Orion-Store` | ✅ | push/PR → CI أخضر مطلوب |
+| `.env.example` | ✅ | `DATABASE_URL` Postgres |
+| `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
+| `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
+| `tests/` (pytest + Postgres) | ✅ | ~40 اختبار؛ hybrid + عزل tenant |
 
 #### معايير الانتقال (§0.12.6)
 
 | الانتقال | الحالة | الفجوة المتبقية |
 |----------|--------|----------------|
-| **0 → 1** | 🟡 | pytest ✅ + عزل tenant ✅؛ JWT ⬜؛ `flask db upgrade` على PostgreSQL ⬜ |
-| 1 → 2 | ⬜ | — |
+| **0 → 1** | 🟡 | CI Postgres ✅؛ pytest+عزل ✅؛ JWT ⬜؛ Alembic schema migration ⬜ |
+| **1 → 2** | 🟡 | عزل ✅؛ CI coverage ≥85% ✅؛ JWT ⬜؛ `platform_settings` ⬜ |
 | 2 → 3 | ⬜ | — |
 | 3 → 4 | ⬜ | — |
 | 4 → 5 | ⬜ | — |
@@ -774,6 +780,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.13.2 `COMMISSION_FALLBACK_CHAIN` | 🟡 | `core/constants.py` — بدون `commission_service` |
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |
+| §0.8 coverage ملف-بملف + ≥85% | 🔒§0 | `coverage_manifest.yaml` + `--cov-fail-under=85` + CI |
+| §0.8 PostgreSQL في الاختبارات | 🔒§0 | `DATABASE_URL` + `docker-compose.test.yml` + CI service |
 
 ---
 
@@ -6049,7 +6057,7 @@ tenant: POST /api/v1/tenant/payments/{id}/refund
 
 | المهمة | التفاصيل | المخرجات | الحالة |
 |--------|----------|----------|--------|
-| إعداد GitHub Actions | Lint + test + file-length + pip-audit — §0.8 | `.github/workflows/ci.yml` | ✅ 🔒§0 |
+| إعداد GitHub Actions | lint → test → coverage-gate + security — §0.8 | `.github/workflows/ci.yml` | ✅ 🔒§0 |
 | Secrets management | `.env` + Vault/env vars | `SECURITY.md` | 🟡 `.env.example` |
 | Security headers | CSP, HSTS, X-Frame-Options | `security_middleware.py` | ⬜ |
 | API error standards | تنسيق موحّد JSON | `errors.py` | ⬜ |
@@ -7858,7 +7866,7 @@ sentry-sdk==1.40.0
 | 25 | سياسة الهندسة §0 — pre-commit + file limits | §0 | 1 | ✅ 🔒§0 |
 | 26 | Route → Service فقط (لا ORM في routes) | §0.4 | 1 | ✅ |
 | 27 | Tenant isolation tests | §0.8 | 2 | ✅ |
-| 28 | pip-audit + secrets scan | §0.5, §0.10 | 1 | 🟡 CI pip-audit |
+| 28 | pip-audit + secrets scan | §0.5, §0.10 | 1 | ✅ CI job `security` |
 | 29 | بناء حسب موجات §0.12 (لا قفز) | §0.12 | كل مرحلة | ✅ موجة 0 |
 | 30 | financial_events قبل payments migration | §0.12.3 موجة 4 | 6 | 📋 |
 | 31 | MVP migrations فقط (64 جدول) — v2 في schema-v2.md | §0.13.1 | 1 | ✅ 📋 |
@@ -7881,7 +7889,7 @@ sentry-sdk==1.40.0
 | 5 | Type hints على Services | mypy (optional v1.1) | 🟡 core فقط |
 | 6 | لا secrets في diff | git-secrets / manual | ✅ |
 | 7 | migration up/down | alembic | ⬜ لا migration بعد |
-| 8 | coverage ≥ 80% على الملفات المعدّلة | coverage | ⬜ |
+| 8 | coverage ≥ 85% إجمالي + manifest ملف-بملف | CI `--cov-fail-under=85` | ✅ 🔒§0 |
 | 9 | EXPLAIN على استعلام جديد | §0.6 | ⬜ |
 | 10 | PR ≤ 400 سطر diff | GitHub | ⬜ |
 | 11 | PR يُوسم بموجة §0.12 (wave-N) | GitHub label | ⬜ |
@@ -8018,7 +8026,7 @@ sentry-sdk==1.40.0
 - نقاط القوة **بدون تغيير:** financial_events، RLS، COMMISSION chain، document_renderer
 
 **الخطوة التالية:** **موجة 2** — `platform_settings` + كتالوج منتجات.  
-**مكتمل:** موجة 0–1 ✅ | 12 pytest | [Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
+**مكتمل:** موجة 0–1 ✅ | CI Postgres + ~40 pytest | [Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
 
 ---
 

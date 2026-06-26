@@ -1,0 +1,51 @@
+# Per-file coverage gates — grows wave-by-wave (§0.8, §33.9 #8).
+# Add every new production .py here when it ships; CI fails if a tracked file is missing.
+version: 1
+
+path_defaults:
+  "04-SERVICES/": 80
+  "02-CORE/core/": 75
+  "02-CORE/orion/": 70
+  "05-API/": 70
+  "03-MODELS/": 60
+
+exclude_from_scan:
+  - "**/__init__.py"
+  - "**/wsgi.py"
+  - "**/tests/**"
+  - "**/test_*.py"
+  - "03-MODELS/base/mixins.py"
+  - "migrations/**"
+
+# Explicit minimum % per file (overrides path_defaults when stricter).
+files:
+  # wave 0 — core
+  "02-CORE/core/constants.py": { wave: 0, min: 100 }
+  "02-CORE/core/crypto.py": { wave: 0, min: 80 }
+  "02-CORE/core/events.py": { wave: 0, min: 80 }
+  "02-CORE/core/exceptions.py": { wave: 0, min: 100 }
+  "02-CORE/core/utils.py": { wave: 0, min: 75 }
+  "02-CORE/orion/app.py": { wave: 0, min: 90 }
+  "02-CORE/orion/config.py": { wave: 0, min: 100 }
+  "02-CORE/orion/extensions.py": { wave: 0, min: 100 }
+  # wave 1 — tenancy & auth
+  "02-CORE/core/context.py": { wave: 1, min: 80 }
+  "02-CORE/core/middleware.py": { wave: 1, min: 75 }
+  "02-CORE/core/permissions.py": { wave: 1, min: 80 }
+  "03-MODELS/base/base_model.py": { wave: 0, min: 90 }
+  "03-MODELS/base/pk.py": { wave: 1, min: 100 }
+  "03-MODELS/base/types.py": { wave: 1, min: 100 }
+  "03-MODELS/tenant/tenant.py": { wave: 1, min: 90 }
+  "03-MODELS/tenant/tenant_config.py": { wave: 1, min: 100 }
+  "03-MODELS/user/user.py": { wave: 1, min: 90 }
+  "03-MODELS/user/role.py": { wave: 1, min: 80 }
+  "03-MODELS/user/permission.py": { wave: 1, min: 100 }
+  "04-SERVICES/auth/auth_service.py": { wave: 1, min: 80 }
+  "04-SERVICES/tenant_svc/tenant_service.py": { wave: 1, min: 80 }
+  "04-SERVICES/integrations/external_registry.py": { wave: 1, min: 80 }
+  "05-API/v1/routes.py": { wave: 0, min: 100 }
+  "05-API/v1/auth.py": { wave: 1, min: 70 }
+  "05-API/v1/tenants.py": { wave: 1, min: 70 }
+
+# PRs: changed production files must appear in `files` (or exclude_from_scan).
+pr_modified_min: 80
