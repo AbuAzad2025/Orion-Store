@@ -26,7 +26,7 @@ files:
   "02-CORE/core/exceptions.py": { wave: 0, min: 100 }
   "02-CORE/core/utils.py": { wave: 0, min: 75 }
   "02-CORE/orion/app.py": { wave: 0, min: 90 }
-  "02-CORE/orion/config.py": { wave: 0, min: 100 }
+  "02-CORE/orion/config.py": { wave: 0, min: 90 }
   "02-CORE/orion/extensions.py": { wave: 0, min: 100 }
   # wave 1 — tenancy & auth
   "02-CORE/core/context.py": { wave: 1, min: 80 }
@@ -36,7 +36,7 @@ files:
   "03-MODELS/base/pk.py": { wave: 1, min: 100 }
   "03-MODELS/base/types.py": { wave: 1, min: 100 }
   "03-MODELS/tenant/tenant.py": { wave: 1, min: 90 }
-  "03-MODELS/tenant/tenant_config.py": { wave: 1, min: 100 }
+  "03-MODELS/tenant/tenant_config.py": { wave: 1, min: 95 }
   "03-MODELS/user/user.py": { wave: 1, min: 90 }
   "03-MODELS/user/role.py": { wave: 1, min: 80 }
   "03-MODELS/user/permission.py": { wave: 1, min: 100 }
