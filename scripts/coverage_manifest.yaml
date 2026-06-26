@@ -31,6 +31,7 @@ files:
   # wave 1 — tenancy & auth
   "02-CORE/core/context.py": { wave: 1, min: 80 }
   "02-CORE/core/middleware.py": { wave: 1, min: 75 }
+  "02-CORE/core/jwt_auth.py": { wave: 1, min: 100 }
   "02-CORE/core/permissions.py": { wave: 1, min: 80 }
   "03-MODELS/base/base_model.py": { wave: 0, min: 90 }
   "03-MODELS/base/pk.py": { wave: 1, min: 100 }

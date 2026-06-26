@@ -10,7 +10,7 @@ from flask import Flask, jsonify
 from core.exceptions import OrionError
 from core.middleware import register_middleware
 from orion.config import config_by_name
-from orion.extensions import db, migrate
+from orion.extensions import db, jwt, migrate
 from v1.routes import register_blueprints
 
 
@@ -23,6 +23,7 @@ def create_app(config_name: str | None = None) -> Flask:
 
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt.init_app(app)
 
     import base.base_model  # noqa: F401
     import tenant.tenant  # noqa: F401

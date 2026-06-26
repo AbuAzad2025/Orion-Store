@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 
 from flask import Flask, g, request
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from sqlalchemy.orm import joinedload
 
 from core.exceptions import AuthenticationError, NotFoundError
@@ -27,7 +28,7 @@ def register_middleware(app: Flask) -> None:
             g.tenant_id = tenant.id
             g.tenant = tenant
 
-        _resolve_user_from_header()
+        _resolve_authenticated_user()
 
     @app.before_request
     def bind_tenant_rls() -> None:
@@ -69,10 +70,24 @@ def _tenant_query():
     return Tenant.query.options(joinedload(Tenant.config))
 
 
-def _resolve_user_from_header() -> None:
+def _resolve_authenticated_user() -> None:
+    """JWT (production) then X-User-ID (tests / dev tooling)."""
+    verify_jwt_in_request(optional=True, locations=["headers"])
+    identity = get_jwt_identity()
+    if identity:
+        _bind_user_to_context(str(identity))
+        return
+    _resolve_user_from_dev_header()
+
+
+def _resolve_user_from_dev_header() -> None:
     user_public_id = request.headers.get("X-User-ID")
     if not user_public_id:
         return
+    _bind_user_to_context(user_public_id)
+
+
+def _bind_user_to_context(user_public_id: str) -> None:
     try:
         uid = uuid.UUID(user_public_id)
     except ValueError:

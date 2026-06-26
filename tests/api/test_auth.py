@@ -29,7 +29,22 @@ def test_login_superuser(client, platform_admin):
         json={"email": "owner@azadexa.com", "password": "password123"},
     )
     assert response.status_code == 200
-    assert response.get_json()["user"]["is_superuser"] is True
+    data = response.get_json()
+    assert data["user"]["is_superuser"] is True
+    assert "access_token" in data
+    assert "refresh_token" in data
+
+
+def test_bearer_token_lists_tenants(client, platform_admin):
+    login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "owner@azadexa.com", "password": "password123"},
+    )
+    token = login.get_json()["access_token"]
+    from support.http import bearer_headers
+
+    response = client.get("/api/v1/tenants/", headers=bearer_headers(token))
+    assert response.status_code == 200
 
 
 def test_login_invalid_password(client, platform_admin):

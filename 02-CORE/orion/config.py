@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import timedelta
 
 # Production + testing target — PostgreSQL only (§0.8, §4.0).
 DEFAULT_DEV_DATABASE_URL = "postgresql://azadexa:azadexa_dev@localhost:5432/azadexa_dev"
@@ -27,6 +28,9 @@ def testing_database_uri() -> str:
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-change-me")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", DEFAULT_DEV_DATABASE_URL)
     REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")

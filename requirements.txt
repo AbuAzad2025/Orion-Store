@@ -6,4 +6,5 @@ redis==5.0.3
 requests==2.33.0
 python-dotenv==1.2.2
 cryptography==48.0.1
+Flask-JWT-Extended==4.7.1
 bcrypt==4.1.2

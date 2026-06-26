@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 1 مكتملة | CI PostgreSQL + coverage ≥85% (§0.15)"
+status: "قيد التنفيذ — موجة 1 مكتملة + فجوات 0→1 مغلقة | جاهز لموجة 2 (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -752,17 +752,17 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `01-FOUNDATION/docs/schema-v2.md` | 📋 | 80 جدول v2 — لا Alembic |
 | `README.md` | ✅ | PostgreSQL + `docker-test-up` + CI |
 | GitHub `AbuAzad2025/Orion-Store` | ✅ | push/PR → CI أخضر مطلوب |
-| `.env.example` | ✅ | `DATABASE_URL` Postgres |
+| `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~40 اختبار؛ hybrid + عزل tenant |
+| `tests/` (pytest + Postgres) | ✅ | ~36 اختبار؛ JWT + Alembic + عزل tenant |
 
 #### معايير الانتقال (§0.12.6)
 
 | الانتقال | الحالة | الفجوة المتبقية |
 |----------|--------|----------------|
-| **0 → 1** | 🟡 | CI Postgres ✅؛ pytest+عزل ✅؛ JWT ⬜؛ Alembic schema migration ⬜ |
-| **1 → 2** | 🟡 | عزل ✅؛ CI coverage ≥85% ✅؛ JWT ⬜؛ `platform_settings` ⬜ |
+| **0 → 1** | ✅ | CI Postgres ✅؛ pytest+عزل ✅؛ JWT ✅؛ Alembic `wave1_001`+`wave1_002` ✅ |
+| **1 → 2** | 🟡 | عزل ✅؛ CI coverage ≥85% ✅؛ JWT ✅؛ `platform_settings` ⬜ (بداية موجة 2) |
 | 2 → 3 | ⬜ | — |
 | 3 → 4 | ⬜ | — |
 | 4 → 5 | ⬜ | — |
@@ -776,7 +776,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.3 حدود حجم الملف | 🔒§0 | `scripts/check_file_length.py` + CI |
 | §0.4 Route → Service (لا ORM في routes) | ✅ | `routes.py` — status فقط، لا `db.session` |
 | §0.5 secrets في `.env` | ✅ | `.env.example`؛ `.gitignore` |
-| §0.12 لا قفز موجات | ✅ | موجة 0 فقط — لم يُبنَ catalog/checkout |
+| §0.12 لا قفز موجات | ✅ | موجتا 0–1 — التالي: كتالوج (موجة 2) |
 | §0.13.2 `COMMISSION_FALLBACK_CHAIN` | 🟡 | `core/constants.py` — بدون `commission_service` |
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |
