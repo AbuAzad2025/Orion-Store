@@ -12,6 +12,14 @@ def test_health_endpoint(client):
     assert "redis" in data
 
 
+def test_ready_endpoint(client):
+    response = client.get("/ready")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["status"] == "ready"
+    assert data["database"] is True
+
+
 def test_api_blueprints_registered(client):
     statuses = {
         "/api/v1/store/status": "active",

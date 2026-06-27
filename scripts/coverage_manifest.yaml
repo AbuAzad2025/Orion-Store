@@ -137,6 +137,9 @@ files:
   "02-CORE/core/rate_limit.py": { wave: 9, min: 75 }
   "02-CORE/core/redis_cache.py": { wave: 9, min: 75 }
   "04-SERVICES/notification_svc/notification_service.py": { wave: 9, min: 80 }
+  # phase 14 — monitoring
+  "02-CORE/core/logging_config.py": { wave: 14, min: 75 }
+  "02-CORE/core/monitoring.py": { wave: 14, min: 75 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

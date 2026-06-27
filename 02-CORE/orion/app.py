@@ -10,6 +10,7 @@ from flask import Flask, jsonify
 from core.event_handlers import register_domain_event_handlers
 from core.exceptions import OrionError
 from core.middleware import register_middleware
+from core.monitoring import register_monitoring
 from core.rate_limit import init_rate_limiter
 from core.redis_cache import RedisCache, ping_redis
 from core.security_headers import register_security_headers
@@ -70,6 +71,7 @@ def create_app(config_name: str | None = None) -> Flask:
     register_ui_blueprints(app)
     register_middleware(app)
     register_security_headers(app)
+    register_monitoring(app)
     init_rate_limiter(app)
     app.extensions["redis_cache"] = RedisCache(app.config.get("REDIS_URL"))
     register_domain_event_handlers()
@@ -86,6 +88,26 @@ def create_app(config_name: str | None = None) -> Flask:
                 }
             ),
             200,
+        )
+
+    @app.get("/ready")
+    def ready() -> tuple[dict, int]:
+        try:
+            db.session.execute(db.text("SELECT 1"))
+            db_ok = True
+        except Exception:
+            db_ok = False
+        redis_url = app.config.get("REDIS_URL")
+        redis_ok = ping_redis(redis_url) if redis_url else True
+        return (
+            jsonify(
+                {
+                    "status": "ready" if db_ok else "not_ready",
+                    "database": db_ok,
+                    "redis": redis_ok,
+                }
+            ),
+            200 if db_ok else 503,
         )
 
     @app.errorhandler(OrionError)

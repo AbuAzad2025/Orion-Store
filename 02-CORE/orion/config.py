@@ -37,6 +37,16 @@ class Config:
     RATELIMIT_DEFAULT = os.environ.get("RATELIMIT_DEFAULT", "300 per hour")
     RATELIMIT_STORAGE_URI = os.environ.get("RATELIMIT_STORAGE_URI", REDIS_URL)
     ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY", "")
+    SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+    SENTRY_ENVIRONMENT = os.environ.get("SENTRY_ENVIRONMENT", "")
+    SENTRY_TRACES_SAMPLE_RATE = os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.0")
+    PROMETHEUS_ENABLED = os.environ.get("PROMETHEUS_ENABLED", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+    LOG_JSON = os.environ.get("LOG_JSON", "false").lower() in ("1", "true", "yes")
 
 
 class DevelopmentConfig(Config):
@@ -51,6 +61,7 @@ class TestingConfig(Config):
     ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY", "")
     WTF_CSRF_ENABLED = False
     RATELIMIT_ENABLED = False
+    PROMETHEUS_ENABLED = False
 
 
 class ProductionConfig(Config):

@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 9 ✅ + MVP hardening — جاهز للمرحلة 14  
+> **آخر تحديث:** 2026-06-27 | **المرحلة الحالية:** 14 — مراقبة وإطلاق (قيد التنفيذ)  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -759,7 +759,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~136 اختبار؛ waves 0–9 + MVP hardening |
+| `tests/` (pytest + Postgres) | ✅ | ~154 اختبار؛ waves 0–9 + phase 14 monitoring |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -802,6 +802,17 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | اختبارات + manifest hardening | §0.8 | `test_mvp_hardening` + notification | ✅ |
 
 **مؤجَّل (v1.1+):** Celery workers، مزود بريد حقيقي، PalPay live SDK، `page_translations`، glossary.
+
+#### المرحلة 14 — الإطلاق (قيد التنفيذ)
+
+| البند | السياسة | الحل | الحالة |
+|--------|---------|------|--------|
+| Structured logging | §18 | `core/logging_config.py` | ✅ |
+| Sentry integration | §18 | `core/monitoring.py` + `SENTRY_DSN` | ✅ |
+| Prometheus `/metrics` | §18 | `prometheus-client` + counters | ✅ |
+| Readiness probe `/ready` | §18 | DB check + redis status | ✅ |
+| Staging scrape config | §18 | `01-FOUNDATION/staging/prometheus.yml` | ✅ |
+| Grafana / beta launch | §18 | ops — يدوي | ⬜ |
 
 #### موجة 8 — PayPal وBNPL (#62)
 
