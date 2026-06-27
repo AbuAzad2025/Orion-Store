@@ -5,14 +5,15 @@ from __future__ import annotations
 import uuid
 from decimal import Decimal
 
+from discount_svc.voucher_service import VoucherService
+from shipping_svc.shipping_service import ShippingService
+
 from core.exceptions import ValidationError
 from core.utils import utc_now
-from discount_svc.voucher_service import VoucherService
 from order.cart import Cart
 from order.order import Order, OrderEvent, OrderItem
 from order_svc.cart_service import CartService
 from orion.extensions import db
-from shipping_svc.shipping_service import ShippingService
 from tenant.tenant_config import TenantConfig
 
 

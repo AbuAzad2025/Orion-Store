@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from core.exceptions import NotFoundError, ValidationError
-from orion.extensions import db
 from shipping.shipping_method import ShippingMethod
 from shipping.shipping_rate import ShippingRate
 from shipping.shipping_zone import ShippingZone
+
+from core.exceptions import NotFoundError, ValidationError
+from orion.extensions import db
 
 
 class ShippingService:

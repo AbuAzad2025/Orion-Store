@@ -5,9 +5,9 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
+from shipping_svc.shipping_service import ShippingService
 
 from core.exceptions import NotFoundError
-from shipping_svc.shipping_service import ShippingService
 from tenant_svc.tenant_service import TenantService
 
 

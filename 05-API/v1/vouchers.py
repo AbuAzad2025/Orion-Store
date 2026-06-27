@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from discount_svc.voucher_service import VoucherService
 from flask import Blueprint, g, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin, require_tenant_context
 from core.pagination import paginate_query, paginated_payload, pagination_params
-from discount_svc.voucher_service import VoucherService
 
 vouchers_bp = Blueprint("vouchers", __name__)
 _vouchers = VoucherService()

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
+from shipping_svc.shipping_service import ShippingService
 
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
@@ -13,7 +14,6 @@ from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
 from payment_svc.payment_service import PaymentService
-from shipping_svc.shipping_service import ShippingService
 
 storefront_bp = Blueprint("storefront", __name__)
 _carts = CartService()

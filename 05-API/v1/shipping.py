@@ -5,10 +5,10 @@ from __future__ import annotations
 from decimal import Decimal
 
 from flask import Blueprint, g, jsonify, request
+from shipping_svc.shipping_service import ShippingService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin, require_tenant_context
-from shipping_svc.shipping_service import ShippingService
 
 shipping_bp = Blueprint("shipping", __name__)
 _shipping = ShippingService()

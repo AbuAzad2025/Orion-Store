@@ -5,9 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 
+from discount.voucher import Voucher
+
 from core.exceptions import NotFoundError, ValidationError
 from core.utils import utc_now
-from discount.voucher import Voucher
 from orion.extensions import db
 
 

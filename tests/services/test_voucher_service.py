@@ -5,9 +5,9 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
+from discount_svc.voucher_service import VoucherService
 
 from core.exceptions import NotFoundError, ValidationError
-from discount_svc.voucher_service import VoucherService
 from tenant_svc.tenant_service import TenantService
 
 

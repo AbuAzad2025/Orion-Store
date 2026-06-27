@@ -27,16 +27,17 @@ def create_app(config_name: str | None = None) -> Flask:
     migrate.init_app(app, db)
     jwt.init_app(app)
 
+    import discount.voucher  # noqa: F401
+    import shipping.shipping_method  # noqa: F401
+    import shipping.shipping_rate  # noqa: F401
+    import shipping.shipping_zone  # noqa: F401
+
     import base.base_model  # noqa: F401
     import catalog.brand  # noqa: F401
     import catalog.category  # noqa: F401
     import catalog.product  # noqa: F401
     import order.cart  # noqa: F401
     import order.order  # noqa: F401
-    import discount.voucher  # noqa: F401
-    import shipping.shipping_method  # noqa: F401
-    import shipping.shipping_rate  # noqa: F401
-    import shipping.shipping_zone  # noqa: F401
     import payment.payment  # noqa: F401
     import payment.refund  # noqa: F401
     import platform_models.commission_ledger  # noqa: F401
