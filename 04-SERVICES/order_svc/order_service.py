@@ -19,6 +19,15 @@ class OrderService:
             raise NotFoundError("Order not found.")
         return order
 
+    def mark_paid(self, order: Order) -> Order:
+        order.payment_status = "paid"
+        order.status = "paid"
+        order.version += 1
+        from orion.extensions import db
+
+        db.session.commit()
+        return order
+
     def list_for_tenant(self, tenant_id: int) -> list[Order]:
         return (
             Order.query.filter_by(tenant_id=tenant_id)

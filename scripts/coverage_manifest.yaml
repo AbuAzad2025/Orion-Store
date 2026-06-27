@@ -69,6 +69,19 @@ files:
   # wave 4 — financial events
   "03-MODELS/platform_models/financial_event.py": { wave: 4, min: 85 }
   "04-SERVICES/platform_svc/financial_events_service.py": { wave: 4, min: 80 }
+  "04-SERVICES/platform_svc/commission_service.py": { wave: 4, min: 80 }
+  "04-SERVICES/platform_svc/document_renderer.py": { wave: 4, min: 80 }
+  "04-SERVICES/platform_svc/reconciliation_service.py": { wave: 4, min: 75 }
+  "04-SERVICES/payment_svc/payment_service.py": { wave: 4, min: 80 }
+  "04-SERVICES/tenant_gateway_svc/gateway_service.py": { wave: 4, min: 80 }
+  "04-SERVICES/integrations/payments/stripe_connect.py": { wave: 4, min: 80 }
+  "03-MODELS/payment/payment.py": { wave: 4, min: 85 }
+  "03-MODELS/payment/refund.py": { wave: 4, min: 60 }
+  "03-MODELS/platform_models/commission_ledger.py": { wave: 4, min: 60 }
+  "03-MODELS/platform_models/tenant_gateway.py": { wave: 4, min: 85 }
+  "03-MODELS/platform_models/invoice.py": { wave: 4, min: 85 }
+  "05-API/v1/payments.py": { wave: 4, min: 70 }
+  "05-API/v1/webhooks.py": { wave: 4, min: 70 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

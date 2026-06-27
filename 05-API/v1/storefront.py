@@ -9,11 +9,13 @@ from core.middleware import require_tenant_context
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
+from payment_svc.payment_service import PaymentService
 
 storefront_bp = Blueprint("storefront", __name__)
 _carts = CartService()
 _checkout = CheckoutService()
 _orders = OrderService()
+_payments = PaymentService()
 
 
 @storefront_bp.get("/status")
@@ -77,6 +79,21 @@ def checkout():
         return jsonify({"error": exc.message}), exc.status_code
     except KeyError:
         return jsonify({"error": "Missing required fields."}), 400
+
+
+@storefront_bp.post("/orders/<public_id>/pay")
+def pay_order(public_id: str):
+    try:
+        tenant = require_tenant_context()
+        data = request.get_json(silent=True) or {}
+        result = _payments.pay_order(
+            tenant_id=tenant.id,
+            order_public_id=public_id,
+            payment_method=data.get("payment_method", "cod"),
+        )
+        return jsonify(result), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @storefront_bp.get("/orders/<public_id>")

@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 3 مكتملة | التالي: موجة 4 مالية وبوابات (§0.15)"
+status: "قيد التنفيذ — موجة 4 مكتملة | التالي: موجة 5 واجهات (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -30,7 +30,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجات 0–3 ✅ | موجة 4 🟡** (§0.15)
+**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجات 0–4 ✅ | موجة 5 ⬜** (§0.15)
 
 ---
 
@@ -548,12 +548,12 @@ flowchart BT
 | القرار | متى يُقفل | المرجع | الحالة |
 |--------|-----------|--------|--------|
 | `tenant_id` على كل جدول | موجة 1 | §3.3 | ✅ models |
-| `financial_events` كجدول مركزي للمال | موجة 4 #33 | §4.49 | 📋 |
+| `financial_events` كجدول مركزي للمال | موجة 4 #33 | §4.49 | ✅ |
 | Route → Service → Model | موجة 0 | §0.4 | ✅ |
 | Blueprint prefixes (`/store`, `/tenant`, `/platform`) | موجة 0 #8 | §3.9 | ✅ |
 | `public_id` UUID على orders/products | موجة 3 | §4.1 | 🟡 BaseModel mixin |
-| Azadexa footer immutable | موجة 4 #46 | §1.5 | 📋 |
-| عمولة 1% على كل event_type | موجة 4 #39 | §1.6 | 🟡 constants |
+| Azadexa footer immutable | موجة 4 #46 | §1.5 | ✅ |
+| عمولة 1% على كل event_type | موجة 4 #39 | §1.6 | ✅ |
 
 ---
 
@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 3 ✅ → **التالي:** موجة 4 (مالية وبوابات)  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 4 ✅ → **التالي:** موجة 5 (واجهات)  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -740,7 +740,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **1** — Tenant + Auth | ✅ | 10/10 | 2026-06-27 — انظر §0.12.3 |
 | **2** — كتالوج | ✅ | 7/7 | 2026-06-27 — platform_settings + products API |
 | **3** — سلة وطلبات | ✅ | 7/7 | 2026-06-27 — cart + checkout بدون دفع |
-| **4** — مالية وبوابات | 🟡 | 3/17 | `financial_events` ✅ — payments قيد التنفيذ |
+| **4** — مالية وبوابات | ✅ | 17/17 | 2026-06-27 — COD/Stripe sandbox، عمولة 1%، فواتير Azadexa |
 | **5** — واجهات | ⬜ | 0/8 | — |
 | **6+** — ما بعد MVP | ⬜ | — | Release Train |
 
@@ -755,7 +755,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~48 اختبار؛ waves 0–3 + financial_events |
+| `tests/` (pytest + Postgres) | ✅ | ~75 اختبار؛ waves 0–4 + manifest أخضر |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -764,8 +764,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **0 → 1** | ✅ | CI Postgres ✅؛ pytest+عزل ✅؛ JWT ✅؛ Alembic `wave1_001`+`wave1_002` ✅ |
 | **1 → 2** | ✅ | عزل ✅؛ JWT ✅؛ `platform_settings` seed ✅؛ product CRUD API ✅ |
 | **2 → 3** | ✅ | carts/orders migration ✅؛ checkout API ✅ (بدون pay) |
-| **3 → 4** | 🟡 | checkout ✅؛ `financial_events` + payments ⬜ (بداية موجة 4) |
-| 4 → 5 | ⬜ | — |
+| **3 → 4** | ✅ | checkout ✅؛ `financial_events` + payments + commission + invoices ✅ |
+| **4 → 5** | 🟡 | APIs دفع/بوابات ✅؛ واجهات admin/storefront ⬜ |
 | 5 → MVP | ⬜ | — |
 
 #### الالتزام بسياسة §0 (ملخص)
@@ -776,7 +776,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.3 حدود حجم الملف | 🔒§0 | `scripts/check_file_length.py` + CI |
 | §0.4 Route → Service (لا ORM في routes) | ✅ | `routes.py` — status فقط، لا `db.session` |
 | §0.5 secrets في `.env` | ✅ | `.env.example`؛ `.gitignore` |
-| §0.12 لا قفز موجات | ✅ | موجات 0–3 ✅؛ موجة 4 قيد التنفيذ |
+| §0.12 لا قفز موجات | ✅ | موجات 0–4 ✅؛ موجة 5 التالي |
 | §0.13.2 `COMMISSION_FALLBACK_CHAIN` | ✅ | `constants.py` + `financial_events_service` |
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |
@@ -7868,7 +7868,7 @@ sentry-sdk==1.40.0
 | 27 | Tenant isolation tests | §0.8 | 2 | ✅ |
 | 28 | pip-audit + secrets scan | §0.5, §0.10 | 1 | ✅ CI job `security` |
 | 29 | بناء حسب موجات §0.12 (لا قفز) | §0.12 | كل مرحلة | ✅ موجة 0 |
-| 30 | financial_events قبل payments migration | §0.12.3 موجة 4 | 6 | 📋 |
+| 30 | financial_events قبل payments migration | §0.12.3 موجة 4 | 6 | ✅ |
 | 31 | MVP migrations فقط (64 جدول) — v2 في schema-v2.md | §0.13.1 | 1 | ✅ 📋 |
 | 32 | COMMISSION_FALLBACK_CHAIN موحّد (3 مستويات) | §0.13.2 | 6 | 🟡 constants |
 | 33 | `crypto.py` في موجة 0 (Fernet) | §0.12, §3.2 | 1 | ✅ |

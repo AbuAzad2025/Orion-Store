@@ -33,6 +33,8 @@ def test_alembic_upgrade_and_downgrade(app):
         assert "carts" in tables
         assert "orders" in tables
         assert "financial_events" in tables
+        assert "payments" in tables
+        assert "invoices" in tables
         command.downgrade(cfg, "base")
         tables_after = set(inspect(db.engine).get_table_names())
         assert "tenants" not in tables_after

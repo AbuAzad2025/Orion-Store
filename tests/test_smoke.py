@@ -15,7 +15,7 @@ def test_api_blueprints_registered(client):
     statuses = {
         "/api/v1/store/status": "active",
         "/api/v1/platform/status": "pending",
-        "/webhooks/status": "pending",
+        "/webhooks/status": "active",
     }
     for path, expected in statuses.items():
         response = client.get(path)

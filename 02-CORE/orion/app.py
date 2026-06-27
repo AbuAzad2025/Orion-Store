@@ -31,8 +31,13 @@ def create_app(config_name: str | None = None) -> Flask:
     import catalog.product  # noqa: F401
     import order.cart  # noqa: F401
     import order.order  # noqa: F401
+    import payment.payment  # noqa: F401
+    import payment.refund  # noqa: F401
+    import platform_models.commission_ledger  # noqa: F401
     import platform_models.financial_event  # noqa: F401
+    import platform_models.invoice  # noqa: F401
     import platform_models.platform_settings  # noqa: F401
+    import platform_models.tenant_gateway  # noqa: F401
     import tenant.tenant  # noqa: F401
     import tenant.tenant_config  # noqa: F401
     import user.role  # noqa: F401
