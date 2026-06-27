@@ -829,7 +829,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.3 حدود حجم الملف | 🔒§0 | `scripts/check_file_length.py` + CI |
 | §0.4 Route → Service (لا ORM في routes) | ✅ | `routes.py` — status فقط، لا `db.session` |
 | §0.5 secrets في `.env` | ✅ | `.env.example`؛ `.gitignore` |
-| §0.12 لا قفز موجات | ✅ | موجات 0–6 ✅؛ #60+ التالي |
+| §0.12 لا قفز موجات | ✅ | موجات 0–7 ✅؛ #62+ التالي |
 | §0.13.2 `COMMISSION_FALLBACK_CHAIN` | ✅ | `constants.py` + `financial_events_service` |
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |
