@@ -101,6 +101,52 @@ def test_bnpl_upsert_and_charge(app):
     assert "external_transaction_id" in result
 
 
+def test_bnpl_live_charge_with_credentials(app):
+    from bnpl.bnpl_provider import BnplProvider
+
+    row = BnplProvider(
+        tenant_id=1,
+        provider="tamara",
+        is_enabled=True,
+        api_credentials_encrypted="enc",
+        config={"is_sandbox": False},
+    )
+    order = Order(
+        tenant_id=1,
+        order_number="ORD-BNPL-LIVE",
+        customer_email="l@test.com",
+        shipping_address={},
+        subtotal="80",
+        total="80",
+    )
+    order.id = 88
+    result = charge_bnpl(order=order, provider_row=row, amount="80.00")
+    assert result["success"] is True
+    assert "bnpl_live_" in result["external_transaction_id"]
+
+
+def test_bnpl_missing_credentials(app):
+    from bnpl.bnpl_provider import BnplProvider
+
+    row = BnplProvider(
+        tenant_id=1,
+        provider="tabby",
+        is_enabled=True,
+        config={"is_sandbox": False},
+    )
+    order = Order(
+        tenant_id=1,
+        order_number="ORD-BNPL-FAIL",
+        customer_email="f@test.com",
+        shipping_address={},
+        subtotal="20",
+        total="20",
+    )
+    order.id = 89
+    result = charge_bnpl(order=order, provider_row=row, amount="20.00")
+    assert result["success"] is False
+
+
 def test_bnpl_get_enabled_missing(app):
     tenant = TenantService().create_tenant(
         name="BNPL Off", slug="bnpl-off", email="boff@test.com"
