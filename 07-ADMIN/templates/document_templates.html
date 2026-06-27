@@ -1,0 +1,10 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div id="templates-list" class="mb-6 text-gray-500">جاري التحميل...</div>
+<label class="block text-sm font-medium mb-2" for="invoice-body">قالب الفاتورة (HTML)</label>
+<textarea id="invoice-body" rows="6" class="w-full rounded border p-2 mb-4 font-mono text-sm"></textarea>
+<button id="save-invoice-template" class="rounded bg-blue-600 px-4 py-2 text-white text-sm">حفظ القالب</button>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/tenant_admin.js') }}"></script>
+{% endblock %}

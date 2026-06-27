@@ -1,0 +1,10 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<table class="w-full bg-white rounded shadow text-sm">
+  <thead><tr class="border-b text-right"><th class="p-3">المتجر</th><th class="p-3">Slug</th><th class="p-3">إجراء</th></tr></thead>
+  <tbody id="platform-tenants"><tr><td colspan="3" class="p-3">جاري التحميل...</td></tr></tbody>
+</table>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/platform_admin.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">سلة التسوق</h1>
+<div id="cart-items" class="bg-white rounded shadow p-4 mb-4">جاري التحميل...</div>
+<div id="cart-summary"></div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>
+{% endblock %}

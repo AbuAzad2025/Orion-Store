@@ -1,0 +1,7 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div id="tenant-stats" class="text-gray-500">جاري التحميل...</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/tenant_admin.js') }}"></script>
+{% endblock %}

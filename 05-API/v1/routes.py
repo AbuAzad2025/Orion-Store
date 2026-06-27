@@ -8,8 +8,10 @@ from v1.auth import auth_bp
 from v1.categories import categories_bp
 from v1.payments import payments_bp
 from v1.platform_settings import platform_settings_bp
+from v1.platform_stores import register_platform_store_routes
 from v1.products import products_bp
 from v1.storefront import storefront_bp
+from v1.tenant_portal import tenant_portal_bp
 from v1.tenants import tenant_bp
 from v1.webhooks import webhooks_bp
 
@@ -29,5 +31,21 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(payments_bp, url_prefix="/api/v1/payments")
     app.register_blueprint(platform_settings_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(storefront_bp, url_prefix="/api/v1/store")
+    app.register_blueprint(tenant_portal_bp, url_prefix="/api/v1/tenant")
+    register_platform_store_routes(platform_bp)
     app.register_blueprint(platform_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(webhooks_bp, url_prefix="/webhooks")
+
+
+def register_ui_blueprints(app: Flask) -> None:
+    from admin_assets import admin_assets_bp
+    from engine.routes import storefront_ui_bp
+    from engine.storefront_assets import storefront_assets_bp
+    from platform_admin.routes import platform_admin_bp
+    from tenant_admin.routes import tenant_admin_bp
+
+    app.register_blueprint(admin_assets_bp)
+    app.register_blueprint(tenant_admin_bp, url_prefix="/admin/store")
+    app.register_blueprint(platform_admin_bp, url_prefix="/admin/platform")
+    app.register_blueprint(storefront_assets_bp)
+    app.register_blueprint(storefront_ui_bp)

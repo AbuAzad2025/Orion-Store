@@ -82,6 +82,12 @@ files:
   "03-MODELS/platform_models/invoice.py": { wave: 4, min: 85 }
   "05-API/v1/payments.py": { wave: 4, min: 70 }
   "05-API/v1/webhooks.py": { wave: 4, min: 70 }
+  # wave 5 — admin + storefront APIs
+  "04-SERVICES/platform_svc/document_template_service.py": { wave: 5, min: 80 }
+  "04-SERVICES/platform_svc/store_financial_service.py": { wave: 5, min: 80 }
+  "05-API/v1/tenant_portal.py": { wave: 5, min: 70 }
+  "05-API/v1/platform_stores.py": { wave: 5, min: 70 }
+  "05-API/v1/storefront.py": { wave: 5, min: 70 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

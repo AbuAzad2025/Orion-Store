@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">إتمام الطلب</h1>
+<form id="checkout-form" class="max-w-md bg-white rounded shadow p-6 space-y-4">
+  <div>
+    <label class="block text-sm mb-1" for="customer-email">البريد الإلكتروني</label>
+    <input id="customer-email" type="email" required class="w-full border rounded px-3 py-2">
+  </div>
+  <div>
+    <label class="block text-sm mb-1" for="shipping-city">المدينة</label>
+    <input id="shipping-city" type="text" required class="w-full border rounded px-3 py-2">
+  </div>
+  <div>
+    <label class="block text-sm mb-1" for="payment-method">طريقة الدفع</label>
+    <select id="payment-method" class="w-full border rounded px-3 py-2">
+      <option value="cod">الدفع عند الاستلام</option>
+      <option value="stripe">Stripe (تجريبي)</option>
+    </select>
+  </div>
+  <button type="submit" class="w-full rounded bg-emerald-600 py-2 text-white font-medium">ادفع الآن</button>
+</form>
+<div id="checkout-result" class="mt-4 text-sm"></div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('storefront_assets.static', filename='js/checkout.js') }}"></script>
+{% endblock %}

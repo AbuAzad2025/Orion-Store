@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 4 مكتملة | التالي: موجة 5 واجهات (§0.15)"
+status: "قيد التنفيذ — موجة 5 مكتملة | التالي: موجة 6+ (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -30,7 +30,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجات 0–4 ✅ | موجة 5 ⬜** (§0.15)
+**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجات 0–5 ✅ | موجة 6+ ⬜** (§0.15)
 
 ---
 
@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 4 ✅ → **التالي:** موجة 5 (واجهات)  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 5 ✅ → **التالي:** موجة 6+ (شحن، خصومات…)  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -741,7 +741,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **2** — كتالوج | ✅ | 7/7 | 2026-06-27 — platform_settings + products API |
 | **3** — سلة وطلبات | ✅ | 7/7 | 2026-06-27 — cart + checkout بدون دفع |
 | **4** — مالية وبوابات | ✅ | 17/17 | 2026-06-27 — COD/Stripe sandbox، عمولة 1%، فواتير Azadexa |
-| **5** — واجهات | ⬜ | 0/8 | — |
+| **5** — واجهات | ✅ | 8/8 | 2026-06-27 — admin + storefront + checkout.js |
 | **6+** — ما بعد MVP | ⬜ | — | Release Train |
 
 #### التوثيق والمخطط
@@ -755,7 +755,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~75 اختبار؛ waves 0–4 + manifest أخضر |
+| `tests/` (pytest + Postgres) | ✅ | ~85 اختبار؛ waves 0–5 + manifest أخضر |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -765,8 +765,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **1 → 2** | ✅ | عزل ✅؛ JWT ✅؛ `platform_settings` seed ✅؛ product CRUD API ✅ |
 | **2 → 3** | ✅ | carts/orders migration ✅؛ checkout API ✅ (بدون pay) |
 | **3 → 4** | ✅ | checkout ✅؛ `financial_events` + payments + commission + invoices ✅ |
-| **4 → 5** | 🟡 | APIs دفع/بوابات ✅؛ واجهات admin/storefront ⬜ |
-| 5 → MVP | ⬜ | — |
+| **4 → 5** | ✅ | admin HTML + storefront + checkout.js pay ✅ |
+| **5 → MVP** | 🟡 | واجهات أساسية ✅؛ ميزات مرحلة 6+ ⬜ |
 
 #### الالتزام بسياسة §0 (ملخص)
 
@@ -776,7 +776,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.3 حدود حجم الملف | 🔒§0 | `scripts/check_file_length.py` + CI |
 | §0.4 Route → Service (لا ORM في routes) | ✅ | `routes.py` — status فقط، لا `db.session` |
 | §0.5 secrets في `.env` | ✅ | `.env.example`؛ `.gitignore` |
-| §0.12 لا قفز موجات | ✅ | موجات 0–4 ✅؛ موجة 5 التالي |
+| §0.12 لا قفز موجات | ✅ | موجات 0–5 ✅؛ موجة 6+ التالي |
 | §0.13.2 `COMMISSION_FALLBACK_CHAIN` | ✅ | `constants.py` + `financial_events_service` |
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |

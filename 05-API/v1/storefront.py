@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
 
+from catalog_svc.product_service import ProductService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
 from order_svc.cart_service import CartService
@@ -16,6 +17,27 @@ _carts = CartService()
 _checkout = CheckoutService()
 _orders = OrderService()
 _payments = PaymentService()
+_products = ProductService()
+
+
+@storefront_bp.get("/products")
+def list_products():
+    try:
+        tenant = require_tenant_context()
+        items = [_p.to_dict() for _p in _products.list_published(tenant.id)]
+        return jsonify({"products": items}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@storefront_bp.get("/products/<slug>")
+def get_product(slug: str):
+    try:
+        tenant = require_tenant_context()
+        product = _products.get_by_slug(tenant.id, slug)
+        return jsonify({"product": product.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @storefront_bp.get("/status")

@@ -11,7 +11,7 @@ from core.exceptions import OrionError
 from core.middleware import register_middleware
 from orion.config import config_by_name
 from orion.extensions import db, jwt, migrate
-from v1.routes import register_blueprints
+from v1.routes import register_blueprints, register_ui_blueprints
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -44,6 +44,7 @@ def create_app(config_name: str | None = None) -> Flask:
     import user.user  # noqa: F401
 
     register_blueprints(app)
+    register_ui_blueprints(app)
     register_middleware(app)
 
     @app.get("/health")

@@ -18,6 +18,23 @@ class ProductService:
             .all()
         )
 
+    def list_published(self, tenant_id: int) -> list[Product]:
+        return (
+            Product.query.filter_by(
+                tenant_id=tenant_id, deleted_at=None, is_published=True
+            )
+            .order_by(Product.created_at.desc())
+            .all()
+        )
+
+    def get_by_slug(self, tenant_id: int, slug: str) -> Product:
+        product = Product.query.filter_by(
+            tenant_id=tenant_id, slug=slug, deleted_at=None, is_published=True
+        ).first()
+        if not product:
+            raise NotFoundError("Product not found.")
+        return product
+
     def get_by_public_id(self, tenant_id: int, public_id: str) -> Product:
         try:
             pid = uuid.UUID(public_id)

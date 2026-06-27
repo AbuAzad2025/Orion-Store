@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page_title }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/main.css') }}">
+</head>
+<body class="bg-gray-50 min-h-screen" data-tenant-id="{{ tenant.slug }}">
+  {% include "components/header.html" %}
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    {% block content %}{% endblock %}
+  </main>
+  {% include "components/footer.html" %}
+  <script src="{{ url_for('storefront_assets.static', filename='js/store_api.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
