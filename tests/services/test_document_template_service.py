@@ -12,7 +12,7 @@ def test_document_template_upsert(app):
     )
     svc = DocumentTemplateService()
     valid = (
-        '<div>Test</div>'
+        "<div>Test</div>"
         '<footer id="azadexa-platform-footer" data-immutable="true"></footer>'
     )
     row = svc.upsert(

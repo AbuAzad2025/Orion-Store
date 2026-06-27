@@ -49,4 +49,3 @@ def test_get_by_slug(app):
     assert found.name == "Shoes"
     with pytest.raises(NotFoundError):
         categories.get_by_slug(tenant.id, "missing")
-
