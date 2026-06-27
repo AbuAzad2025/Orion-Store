@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 8 (#62) ✅ | التالي: #63 RMA/B2B (§0.15)"
+status: "قيد التنفيذ — موجة 9 (#63) ✅ | Release Train 6+ مكتمل"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -17,8 +17,8 @@ duration_weeks_full: 68
 database_tables: 144
 database_tables_mvp: 64
 database_tables_v2: 80
-implementation_wave: 8
-implementation_wave_status: "موجة 8 — PayPal + BNPL ✅ | التالي: #63 RMA/B2B"
+implementation_wave: 9
+implementation_wave_status: "موجة 9 — RMA + B2B + OMS ✅"
 implementation_updated: "2026-06-27"
 implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifest, pip-audit"
 ---
