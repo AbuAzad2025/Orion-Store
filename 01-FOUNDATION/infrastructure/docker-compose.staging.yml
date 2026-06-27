@@ -1,0 +1,90 @@
+# Staging stack — Orion MVP (§18 phase 14)
+# Usage:
+#   copy .env.staging.example to .env.staging and set secrets
+#   docker compose --env-file .env.staging -f 01-FOUNDATION/infrastructure/docker-compose.staging.yml up -d --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: azadexa-postgres-staging
+    environment:
+      POSTGRES_USER: azadexa
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-azadexa_staging}
+      POSTGRES_DB: azadexa_staging
+    volumes:
+      - staging_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U azadexa -d azadexa_staging"]
+      interval: 5s
+      timeout: 5s
+      retries: 8
+
+  redis:
+    image: redis:7-alpine
+    container_name: azadexa-redis-staging
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 8
+
+  orion-api:
+    build:
+      context: ../..
+      dockerfile: 01-FOUNDATION/infrastructure/Dockerfile
+    container_name: azadexa-orion-staging
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://azadexa:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env.staging}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env.staging}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: staging
+      PROMETHEUS_ENABLED: "true"
+      CACHE_ENABLED: "true"
+      LOG_JSON: "true"
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:5000/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: azadexa-prometheus-staging
+    volumes:
+      - ../staging/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../staging/alerts:/etc/prometheus/alerts:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      orion-api:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: azadexa-grafana-staging
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ../staging/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../staging/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  staging_postgres:

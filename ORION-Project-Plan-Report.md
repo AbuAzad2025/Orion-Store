@@ -758,8 +758,9 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | GitHub `AbuAzad2025/Orion-Store` | ✅ | push/PR → CI أخضر مطلوب |
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
+| `docker-compose.staging.yml` | ✅ | API + Postgres + Redis + Prometheus + Grafana |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~161 اختبار؛ waves 0–9 + phase 14 |
+| `tests/` (pytest + Postgres) | ✅ | ~165 اختبار؛ waves 0–9 + phase 14 |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -812,9 +813,13 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | Prometheus `/metrics` | §18 | `prometheus-client` + counters | ✅ |
 | Readiness probe `/ready` | §18 | DB check + redis status | ✅ |
 | Staging scrape config | §18 | `01-FOUNDATION/staging/prometheus.yml` | ✅ |
-| Grafana / beta launch | §18 | ops — يدوي | ⬜ |
+| Grafana / beta launch | §18 | Grafana ✅ — beta يدوي | 🟡 |
 | Catalog cache + query trim | §18 | `caching.py` + storefront read-through | ✅ |
 | Lazy load + DB indexes | §18 | `lazy_load.py/js` + migration `wave14_001` | ✅ |
+| Staging stack (Docker) | §18 | `docker-compose.staging.yml` + Dockerfile | ✅ |
+| Grafana dashboard | §18 | `staging/grafana/dashboards/orion-overview.json` | ✅ |
+| Prometheus alerts | §18 | `staging/alerts/alert_rules.yml` | ✅ |
+| Beta launch (10–20 متجر) | §18 | ops — يدوي | ⬜ |
 
 #### موجة 8 — PayPal وBNPL (#62)
 
