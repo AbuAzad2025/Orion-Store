@@ -47,6 +47,12 @@ services:
       LOG_JSON: "true"
       BETA_MODE: ${BETA_MODE:-true}
       BETA_TENANT_SLUGS: ${BETA_TENANT_SLUGS:-}
+      CELERY_BROKER_URL: redis://redis:6379/1
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     ports:
       - "5000:5000"
     depends_on:
@@ -87,6 +93,28 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+
+  celery-worker:
+    build:
+      context: ../..
+      dockerfile: 01-FOUNDATION/infrastructure/Dockerfile
+    container_name: azadexa-celery-staging
+    command: celery -A orion.celery_app.celery_app worker --loglevel=info
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://azadexa:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env.staging}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env.staging}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+    depends_on:
+      orion-api:
+        condition: service_healthy
 
 volumes:
   staging_postgres:

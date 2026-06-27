@@ -55,6 +55,21 @@ class Config:
     CACHE_TTL_SECONDS = int(os.environ.get("CACHE_TTL_SECONDS", "300"))
     BETA_MODE = os.environ.get("BETA_MODE", "false").lower() in ("1", "true", "yes")
     BETA_TENANT_SLUGS = os.environ.get("BETA_TENANT_SLUGS", "")
+    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", REDIS_URL)
+    CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
+    CELERY_TASK_ALWAYS_EAGER = os.environ.get(
+        "CELERY_TASK_ALWAYS_EAGER", "false"
+    ).lower() in ("1", "true", "yes")
+    SMTP_HOST = os.environ.get("SMTP_HOST", "")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+    SMTP_USER = os.environ.get("SMTP_USER", "")
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+    SMTP_FROM = os.environ.get("SMTP_FROM", "")
+    SMTP_USE_TLS = os.environ.get("SMTP_USE_TLS", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
 
 
 class DevelopmentConfig(Config):
@@ -71,6 +86,7 @@ class TestingConfig(Config):
     RATELIMIT_ENABLED = False
     PROMETHEUS_ENABLED = False
     CACHE_ENABLED = False
+    CELERY_TASK_ALWAYS_EAGER = True
 
 
 class ProductionConfig(Config):

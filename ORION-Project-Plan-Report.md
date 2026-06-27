@@ -580,7 +580,7 @@ flowchart BT
 | 3 | 4–5 | المرحلة 4–5 | ✅ |
 | 4 | 6–8 | المرحلة 6 | ✅ |
 | 5 | 9–14 | المراحل 7–12 (واجهات تدريجياً) | ✅ |
-| MVP | 20 | المرحلة 14 | ⬜ |
+| MVP | 20 | المرحلة 14 | ✅ |
 
 > كل مهمة في §5–§18 يجب أن تُوسم بموجة §0.12 في وصف PR: `feat(wave-4): financial_events migration`.
 
@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **المرحلة الحالية:** 14 — مراقبة وإطلاق (قيد التنفيذ)  
+> **آخر تحديث:** 2026-06-27 | **المرحلة الحالية:** 14 ✅ — موجة 15 إغلاق فجوات الإطلاق  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -760,7 +760,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `docker-compose.staging.yml` | ✅ | API + Postgres + Redis + Prometheus + Grafana |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~165 اختبار؛ waves 0–9 + phase 14 |
+| `tests/` (pytest + Postgres) | ✅ | ~184 اختبار؛ waves 0–15 + إطلاق MVP |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -820,6 +820,21 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | Grafana dashboard | §18 | `staging/grafana/dashboards/orion-overview.json` | ✅ |
 | Prometheus alerts | §18 | `staging/alerts/alert_rules.yml` | ✅ |
 | Beta launch (10–20 متجر) | §18 | `beta_gate.py` + `seed_beta.py` | ✅ |
+
+#### موجة 15 — إغلاق فجوات الإطلاق النهائية
+
+| البند | الحل | الحالة |
+|--------|------|--------|
+| SMTP بريد transactional | `email_sender.py` + Celery task | ✅ |
+| Celery workers | `orion/celery_app.py` + docker worker | ✅ |
+| PalPay gateway | `integrations/payments/palpay.py` | ✅ |
+| CMS pages + glossary | `cms_page` + `PageService` + `/i18n/pages` | ✅ |
+| JWT حساب عميل | `store_account.py` + `account.js` | ✅ |
+| Audit log | `audit_log.py` + migration | ✅ |
+| Production stack | `docker-compose.prod.yml` + `launch_verify.py` | ✅ |
+| DB backup script | `scripts/backup_db.ps1` | ✅ |
+
+**مؤجَّل v2+ فقط:** subscriptions، draft_orders، store_credit، inventory_transfers، ثيمات إضافية.
 
 #### موجة 8 — PayPal وBNPL (#62)
 

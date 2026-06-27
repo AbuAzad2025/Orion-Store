@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="text-2xl font-bold mb-4">حسابي</h1>
-<p class="text-gray-600 mb-6">تسجيل الدخول وعرض الطلبات — قريباً عبر JWT.</p>
-<a href="/cart" class="text-emerald-700 underline">السلة</a>
+<section id="account-guest" class="max-w-md space-y-3">
+  <h2 class="font-semibold">تسجيل الدخول</h2>
+  <form id="login-form" class="grid gap-2 text-sm">
+    <input name="email" type="email" placeholder="البريد" class="border rounded px-3 py-2" required>
+    <input name="password" type="password" placeholder="كلمة المرور" class="border rounded px-3 py-2" required>
+    <button type="submit" class="rounded bg-emerald-600 py-2 text-white">دخول</button>
+  </form>
+  <h2 class="font-semibold pt-4">حساب جديد</h2>
+  <form id="register-form" class="grid gap-2 text-sm">
+    <input name="first_name" type="text" placeholder="الاسم" class="border rounded px-3 py-2">
+    <input name="email" type="email" placeholder="البريد" class="border rounded px-3 py-2" required>
+    <input name="password" type="password" placeholder="كلمة المرور" class="border rounded px-3 py-2" required>
+    <button type="submit" class="rounded bg-blue-600 py-2 text-white">تسجيل</button>
+  </form>
+  <p id="account-error" class="text-red-600 text-sm hidden"></p>
+</section>
+<section id="account-user" class="hidden">
+  <p class="mb-4 text-gray-600" id="account-email"></p>
+  <h2 class="font-semibold mb-2">طلباتي</h2>
+  <div id="account-orders" class="text-sm text-gray-600">جاري التحميل...</div>
+  <button id="logout-btn" class="mt-4 text-sm text-red-700 underline">خروج</button>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('storefront_assets.static', filename='js/account.js') }}"></script>
 {% endblock %}

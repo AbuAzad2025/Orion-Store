@@ -1,6 +1,6 @@
 # Azadexa local development helpers (Windows PowerShell)
 param(
-    [ValidateSet("test", "run", "docker-up", "docker-down", "docker-test-up", "docker-test-down", "docker-staging-up", "docker-staging-down", "migrate")]
+    [ValidateSet("test", "run", "docker-up", "docker-down", "docker-test-up", "docker-test-down", "docker-staging-up", "docker-staging-down", "docker-prod-up", "docker-prod-down", "backup-db", "launch-verify", "migrate")]
     [string]$Action = "test"
 )
 
@@ -47,6 +47,22 @@ switch ($Action) {
     }
     "docker-staging-down" {
         docker compose --env-file .env.staging -f 01-FOUNDATION/infrastructure/docker-compose.staging.yml down
+    }
+    "docker-prod-up" {
+        if (-not (Test-Path ".env.production")) {
+            Copy-Item ".env.production.example" ".env.production"
+            Write-Host "Created .env.production — set all secrets before go-live."
+        }
+        docker compose --env-file .env.production -f 01-FOUNDATION/infrastructure/docker-compose.prod.yml up -d --build
+    }
+    "docker-prod-down" {
+        docker compose --env-file .env.production -f 01-FOUNDATION/infrastructure/docker-compose.prod.yml down
+    }
+    "backup-db" {
+        .\scripts\backup_db.ps1
+    }
+    "launch-verify" {
+        python scripts/launch_verify.py
     }
     "migrate" {
         flask db upgrade

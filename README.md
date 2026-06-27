@@ -13,6 +13,7 @@ Multi-tenant e-commerce SaaS — **wave 0–1** foundation.
 | Development | `docker-compose.dev.yml` | 5432 | `azadexa_dev` |
 | Tests | `docker-compose.test.yml` | 5433 | `azadexa_test` |
 | Staging | `docker-compose.staging.yml` | 5000 / 9090 / 3000 | `azadexa_staging` |
+| Production | `docker-compose.prod.yml` | 5000 | `azadexa_prod` |
 | CI (GitHub Actions) | Postgres 16 service | 5432 | `azadexa_test` |
 
 ## Quick start
@@ -22,7 +23,9 @@ Multi-tenant e-commerce SaaS — **wave 0–1** foundation.
 .\scripts\dev.ps1 docker-test-up   # PostgreSQL test DB (required before pytest)
 .\scripts\dev.ps1 test           # pytest on PostgreSQL, coverage ≥85%
 .\scripts\dev.ps1 docker-staging-up   # full staging stack (API + Prometheus + Grafana)
-.\scripts\dev.ps1 docker-staging-down
+.\scripts\dev.ps1 docker-prod-up      # production stack
+.\scripts\dev.ps1 launch-verify     # health + env check
+.\scripts\dev.ps1 backup-db         # PostgreSQL dump
 ```
 
 Health check: `GET http://127.0.0.1:5000/health`

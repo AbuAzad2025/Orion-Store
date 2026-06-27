@@ -7,6 +7,7 @@ from decimal import Decimal
 from core.events import publish
 from core.exceptions import NotFoundError, ValidationError
 from integrations.payments.bnpl import charge_bnpl
+from integrations.payments.palpay import charge_palpay
 from integrations.payments.paypal import charge_paypal
 from integrations.payments.stripe_connect import charge_stripe
 from order.order import Order
@@ -153,6 +154,10 @@ class PaymentService:
             )
         if gateway.provider == "paypal":
             return charge_paypal(
+                order=order, gateway=gateway, amount=Decimal(str(payment.amount))
+            )
+        if gateway.provider == "palpay":
+            return charge_palpay(
                 order=order, gateway=gateway, amount=Decimal(str(payment.amount))
             )
         if gateway.provider.startswith(BNPL_GATEWAY_PREFIX):

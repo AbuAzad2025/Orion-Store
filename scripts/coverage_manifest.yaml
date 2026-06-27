@@ -143,6 +143,20 @@ files:
   "02-CORE/core/caching.py": { wave: 14, min: 75 }
   "02-CORE/core/lazy_load.py": { wave: 14, min: 90 }
   "02-CORE/core/beta_gate.py": { wave: 14, min: 75 }
+  # wave 15 — launch completion
+  "02-CORE/core/audit_log.py": { wave: 15, min: 75 }
+  "02-CORE/orion/celery_app.py": { wave: 15, min: 75 }
+  "03-MODELS/i18n/cms_page.py": { wave: 15, min: 60 }
+  "03-MODELS/i18n/page_translation.py": { wave: 15, min: 60 }
+  "03-MODELS/i18n/translation_glossary.py": { wave: 15, min: 60 }
+  "03-MODELS/platform_models/audit_log.py": { wave: 15, min: 60 }
+  "04-SERVICES/i18n_svc/page_service.py": { wave: 15, min: 80 }
+  "04-SERVICES/i18n_svc/glossary_service.py": { wave: 15, min: 80 }
+  "04-SERVICES/notification_svc/email_sender.py": { wave: 15, min: 75 }
+  "04-SERVICES/notification_svc/tasks.py": { wave: 15, min: 75 }
+  "04-SERVICES/integrations/payments/palpay.py": { wave: 15, min: 80 }
+  "05-API/v1/store_account.py": { wave: 15, min: 70 }
+  "05-API/v1/i18n.py": { wave: 15, min: 70 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

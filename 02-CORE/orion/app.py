@@ -34,8 +34,11 @@ def create_app(config_name: str | None = None) -> Flask:
     import feature_flag.feature_flag  # noqa: F401
     import feature_flag.feature_flag_override  # noqa: F401
     import i18n.category_translation  # noqa: F401
+    import i18n.cms_page  # noqa: F401
     import i18n.locale  # noqa: F401
+    import i18n.page_translation  # noqa: F401
     import i18n.product_translation  # noqa: F401
+    import i18n.translation_glossary  # noqa: F401
     import shipping.shipping_method  # noqa: F401
     import shipping.shipping_rate  # noqa: F401
     import shipping.shipping_zone  # noqa: F401
@@ -55,6 +58,7 @@ def create_app(config_name: str | None = None) -> Flask:
     import order.order  # noqa: F401
     import payment.payment  # noqa: F401
     import payment.refund  # noqa: F401
+    import platform_models.audit_log  # noqa: F401
     import platform_models.commission_ledger  # noqa: F401
     import platform_models.financial_event  # noqa: F401
     import platform_models.invoice  # noqa: F401
@@ -74,6 +78,9 @@ def create_app(config_name: str | None = None) -> Flask:
     register_monitoring(app)
     init_rate_limiter(app)
     app.extensions["redis_cache"] = RedisCache(app.config.get("REDIS_URL"))
+    from orion.celery_app import init_celery
+
+    init_celery(app)
     register_domain_event_handlers()
 
     @app.get("/health")
