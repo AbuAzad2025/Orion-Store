@@ -37,12 +37,17 @@ def create_app(config_name: str | None = None) -> Flask:
     import shipping.shipping_rate  # noqa: F401
     import shipping.shipping_zone  # noqa: F401
 
+    import b2b.customer_group  # noqa: F401
+    import b2b.price_list  # noqa: F401
+    import b2b.quote  # noqa: F401
     import base.base_model  # noqa: F401
     import bnpl.bnpl_provider  # noqa: F401
     import bnpl.bnpl_transaction  # noqa: F401
     import catalog.brand  # noqa: F401
     import catalog.category  # noqa: F401
     import catalog.product  # noqa: F401
+    import oms.fulfillment  # noqa: F401
+    import oms.warehouse  # noqa: F401
     import order.cart  # noqa: F401
     import order.order  # noqa: F401
     import payment.payment  # noqa: F401
@@ -52,6 +57,8 @@ def create_app(config_name: str | None = None) -> Flask:
     import platform_models.invoice  # noqa: F401
     import platform_models.platform_settings  # noqa: F401
     import platform_models.tenant_gateway  # noqa: F401
+    import returns.merchandise_return  # noqa: F401
+    import returns.return_reason  # noqa: F401
     import tenant.tenant  # noqa: F401
     import tenant.tenant_config  # noqa: F401
     import user.role  # noqa: F401

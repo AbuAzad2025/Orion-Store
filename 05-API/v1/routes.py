@@ -5,13 +5,16 @@ from __future__ import annotations
 from flask import Blueprint, Flask
 
 from v1.auth import auth_bp
+from v1.b2b import b2b_bp
 from v1.categories import categories_bp
 from v1.i18n import i18n_bp
+from v1.oms import oms_bp
 from v1.payments import payments_bp
 from v1.platform_reconciliation import register_platform_reconciliation_routes
 from v1.platform_settings import platform_settings_bp
 from v1.platform_stores import register_platform_store_routes
 from v1.products import products_bp
+from v1.returns import returns_bp
 from v1.shipping import shipping_bp
 from v1.storefront import storefront_bp
 from v1.tenant_portal import tenant_portal_bp
@@ -38,6 +41,9 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(i18n_bp, url_prefix="/api/v1/i18n")
     app.register_blueprint(shipping_bp, url_prefix="/api/v1/shipping")
     app.register_blueprint(vouchers_bp, url_prefix="/api/v1/vouchers")
+    app.register_blueprint(returns_bp, url_prefix="/api/v1/returns")
+    app.register_blueprint(b2b_bp, url_prefix="/api/v1/b2b")
+    app.register_blueprint(oms_bp, url_prefix="/api/v1/oms")
     app.register_blueprint(tenant_portal_bp, url_prefix="/api/v1/tenant")
     register_platform_store_routes(platform_bp)
     register_platform_reconciliation_routes(platform_bp)

@@ -118,6 +118,20 @@ files:
   "03-MODELS/bnpl/bnpl_transaction.py": { wave: 8, min: 60 }
   "04-SERVICES/bnpl_svc/bnpl_service.py": { wave: 8, min: 80 }
   "04-SERVICES/integrations/payments/paypal.py": { wave: 8, min: 80 }
+  # wave 9 — RMA + B2B + OMS
+  "03-MODELS/returns/return_reason.py": { wave: 9, min: 60 }
+  "03-MODELS/returns/merchandise_return.py": { wave: 9, min: 60 }
+  "03-MODELS/b2b/customer_group.py": { wave: 9, min: 60 }
+  "03-MODELS/b2b/price_list.py": { wave: 9, min: 60 }
+  "03-MODELS/b2b/quote.py": { wave: 9, min: 60 }
+  "03-MODELS/oms/warehouse.py": { wave: 9, min: 60 }
+  "03-MODELS/oms/fulfillment.py": { wave: 9, min: 60 }
+  "04-SERVICES/rma_svc/rma_service.py": { wave: 9, min: 80 }
+  "04-SERVICES/b2b_svc/b2b_service.py": { wave: 9, min: 80 }
+  "04-SERVICES/oms_svc/oms_service.py": { wave: 9, min: 80 }
+  "05-API/v1/returns.py": { wave: 9, min: 70 }
+  "05-API/v1/b2b.py": { wave: 9, min: 70 }
+  "05-API/v1/oms.py": { wave: 9, min: 70 }
   "04-SERVICES/integrations/payments/bnpl.py": { wave: 8, min: 80 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).

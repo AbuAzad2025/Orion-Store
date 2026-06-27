@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 8 ✅ (#62 PayPal/BNPL) → **التالي:** #63 RMA/B2B  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 9 ✅ (#63 RMA/B2B/OMS) — Release Train 6+ مكتمل  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -745,7 +745,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **6** — شحن + خصومات | ✅ | 2/2 | 2026-06-27 — #58 shipping + #59 vouchers |
 | **7** — i18n + flags | ✅ | 2/2 | 2026-06-27 — #60 محتوى + #61 feature flags UI |
 | **8** — PayPal + BNPL | ✅ | 1/1 | 2026-06-27 — #62 بوابات إضافية |
-| **6+** — ما بعد MVP | 🟡 | 5/6 | #63 متبقية (Release Train) |
+| **9** — RMA + B2B + OMS | ✅ | 1/1 | 2026-06-27 — #63 Release Train |
+| **6+** — ما بعد MVP | ✅ | 6/6 | مكتمل |
 
 #### التوثيق والمخطط
 
@@ -758,7 +759,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~115 اختبار؛ waves 0–8 + manifest |
+| `tests/` (pytest + Postgres) | ✅ | ~128 اختبار؛ waves 0–9 + manifest |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -773,6 +774,22 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **6 → 6+** | ✅ | shipping methods/zones + vouchers + checkout totals + APIs + UI |
 | **7 → 7+** | ✅ | i18n translations + locale middleware + feature flags + admin UI |
 | **8 → 8+** | ✅ | PayPal gateway + BNPL providers/transactions + checkout + webhooks |
+| **9 → 9+** | ✅ | RMA + B2B quotes + OMS fulfillment |
+
+#### موجة 9 — RMA وB2B وOMS (#63)
+
+| البند | السياسة | الحل | الحالة |
+|--------|---------|------|--------|
+| جداول RMA (reasons/returns/items) | §4.16 | migration `wave9_001` + RLS | ✅ |
+| جداول B2B (groups/price_lists/quotes) | §4.18 | migration `wave9_002` | ✅ |
+| جداول OMS (warehouses/inventory/fulfillments) | §4.21 | migration `wave9_003` | ✅ |
+| `rma_service` طلب/موافقة/استرداد | §15 | `rma_svc` + refund عبر `PaymentService` | ✅ |
+| `b2b_service` مجموعات + عروض + تحويل طلب | §16 | `b2b_svc` | ✅ |
+| `oms_service` مستودعات + تنفيذ + شحن | §18 | `oms_svc` | ✅ |
+| APIs `/returns`, `/b2b`, `/oms` | §3.9 | blueprints v1 | ✅ |
+| اختبارات + manifest wave 9 | §0.8 | 128 pytest | ✅ |
+
+**مؤجَّل (v2+):** draft_orders، inventory_transfers، store_credit، ملصقات شحن، subscriptions.
 
 #### موجة 8 — PayPal وBNPL (#62)
 
