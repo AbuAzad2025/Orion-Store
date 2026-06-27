@@ -34,6 +34,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", DEFAULT_DEV_DATABASE_URL)
     REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    RATELIMIT_DEFAULT = os.environ.get("RATELIMIT_DEFAULT", "300 per hour")
+    RATELIMIT_STORAGE_URI = os.environ.get("RATELIMIT_STORAGE_URI", REDIS_URL)
     ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY", "")
 
 
@@ -48,6 +50,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = testing_database_uri()
     ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY", "")
     WTF_CSRF_ENABLED = False
+    RATELIMIT_ENABLED = False
 
 
 class ProductionConfig(Config):

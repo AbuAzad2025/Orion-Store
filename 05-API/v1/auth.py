@@ -8,6 +8,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from auth.auth_service import AuthService
 from core.exceptions import OrionError
 from core.jwt_auth import issue_tokens_for_user
+from core.rate_limit import limiter
 
 auth_bp = Blueprint("auth", __name__)
 _auth = AuthService()
@@ -25,6 +26,7 @@ def _resolve_tenant_id(tenant_ref: str | int | None) -> int | None:
 
 
 @auth_bp.post("/login")
+@limiter.limit("20 per minute")
 def login():
     data = request.get_json(silent=True) or {}
     email = data.get("email", "").strip().lower()

@@ -10,6 +10,8 @@ from flask import Flask, jsonify
 from core.event_handlers import register_domain_event_handlers
 from core.exceptions import OrionError
 from core.middleware import register_middleware
+from core.rate_limit import init_rate_limiter
+from core.redis_cache import RedisCache, ping_redis
 from core.security_headers import register_security_headers
 from orion.config import config_by_name
 from orion.extensions import db, jwt, migrate
@@ -68,11 +70,23 @@ def create_app(config_name: str | None = None) -> Flask:
     register_ui_blueprints(app)
     register_middleware(app)
     register_security_headers(app)
+    init_rate_limiter(app)
+    app.extensions["redis_cache"] = RedisCache(app.config.get("REDIS_URL"))
     register_domain_event_handlers()
 
     @app.get("/health")
     def health() -> tuple[dict, int]:
-        return jsonify({"status": "ok", "service": "azadexa-orion"}), 200
+        redis_url = app.config.get("REDIS_URL")
+        return (
+            jsonify(
+                {
+                    "status": "ok",
+                    "service": "azadexa-orion",
+                    "redis": ping_redis(redis_url),
+                }
+            ),
+            200,
+        )
 
     @app.errorhandler(OrionError)
     def handle_orion_error(exc: OrionError):

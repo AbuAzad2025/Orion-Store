@@ -133,6 +133,10 @@ files:
   "05-API/v1/b2b.py": { wave: 9, min: 70 }
   "05-API/v1/oms.py": { wave: 9, min: 70 }
   "04-SERVICES/integrations/payments/bnpl.py": { wave: 8, min: 80 }
+  # MVP hardening — rate limit, cache, notifications
+  "02-CORE/core/rate_limit.py": { wave: 9, min: 75 }
+  "02-CORE/core/redis_cache.py": { wave: 9, min: 75 }
+  "04-SERVICES/notification_svc/notification_service.py": { wave: 9, min: 80 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

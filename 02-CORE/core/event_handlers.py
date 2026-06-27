@@ -19,6 +19,9 @@ def _on_order_paid(order_id: int, tenant_id: int, **_: object) -> None:
     if order.fulfillment_status == "unfulfilled":
         order.fulfillment_status = "paid_unfulfilled"
         db.session.commit()
+    from notification_svc.notification_service import NotificationService
+
+    NotificationService().send_order_confirmation(order)
 
 
 def _on_payment_refunded(

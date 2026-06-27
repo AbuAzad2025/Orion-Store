@@ -71,3 +71,42 @@ def tenant_feature_flags():
         page_title="ميزات المتجر",
         active_nav="feature_flags",
     )
+
+
+@tenant_admin_bp.get("/returns")
+def tenant_returns():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "returns_management.html",
+        tenant=tenant,
+        page_title="المرتجعات",
+        active_nav="returns",
+    )
+
+
+@tenant_admin_bp.get("/b2b")
+def tenant_b2b():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "b2b_management.html",
+        tenant=tenant,
+        page_title="B2B — الجملة",
+        active_nav="b2b",
+    )
+
+
+@tenant_admin_bp.get("/oms")
+def tenant_oms():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "oms_management.html",
+        tenant=tenant,
+        page_title="المستودعات والتنفيذ",
+        active_nav="oms",
+    )

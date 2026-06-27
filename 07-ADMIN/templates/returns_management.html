@@ -1,0 +1,13 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">طلبات الإرجاع</h2>
+    <div id="returns-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/tenant_ops.js') }}"></script>
+<script>OrionTenantOps.initReturns();</script>
+{% endblock %}

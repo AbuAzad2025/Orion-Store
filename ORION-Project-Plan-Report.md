@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 9 ✅ (#63 RMA/B2B/OMS) — Release Train 6+ مكتمل  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 9 ✅ + MVP hardening — جاهز للمرحلة 14  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -759,7 +759,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~128 اختبار؛ waves 0–9 + manifest |
+| `tests/` (pytest + Postgres) | ✅ | ~136 اختبار؛ waves 0–9 + MVP hardening |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -790,6 +790,18 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | اختبارات + manifest wave 9 | §0.8 | 128 pytest | ✅ |
 
 **مؤجَّل (v2+):** draft_orders، inventory_transfers، store_credit، ملصقات شحن، subscriptions.
+
+#### إغلاق فجوات الإطلاق — MVP hardening (2026-06-27)
+
+| البند | السياسة | الحل | الحالة |
+|--------|---------|------|--------|
+| Rate limiting (login + افتراضي) | §0.5 | `Flask-Limiter` + `core/rate_limit.py` | ✅ |
+| Redis cache boundary + `/health` | §18 | `core/redis_cache.py` + `redis` في health | ✅ |
+| إشعارات transactional (stub) | §18 | `notification_svc` + `order.paid` | ✅ |
+| لوحة admin: مرتجعات / B2B / OMS | موجة 9 | `returns_management.html` + `tenant_ops.js` | ✅ |
+| اختبارات + manifest hardening | §0.8 | `test_mvp_hardening` + notification | ✅ |
+
+**مؤجَّل (v1.1+):** Celery workers، مزود بريد حقيقي، PalPay live SDK، `page_translations`، glossary.
 
 #### موجة 8 — PayPal وBNPL (#62)
 

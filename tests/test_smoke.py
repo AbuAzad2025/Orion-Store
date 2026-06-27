@@ -9,6 +9,7 @@ def test_health_endpoint(client):
     data = response.get_json()
     assert data["status"] == "ok"
     assert data["service"] == "azadexa-orion"
+    assert "redis" in data
 
 
 def test_api_blueprints_registered(client):

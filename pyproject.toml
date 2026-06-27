@@ -10,6 +10,7 @@ dependencies = [
     "Flask-Migrate==4.0.7",
     "psycopg2-binary==2.9.9",
     "redis==5.0.3",
+    "Flask-Limiter==3.8.0",
     "python-dotenv==1.2.2",
     "cryptography==48.0.1",
     "requests==2.33.0",
@@ -40,7 +41,7 @@ target-version = ["py311"]
 [tool.isort]
 profile = "black"
 line_length = 88
-known_first_party = ["orion", "core", "base", "v1", "auth", "tenant", "tenant_svc", "user", "integrations", "catalog", "catalog_svc", "platform_models", "platform_svc", "order", "order_svc", "payment", "payment_svc", "tenant_gateway_svc", "bnpl", "bnpl_svc", "returns", "rma_svc", "b2b", "b2b_svc", "oms", "oms_svc", "engine", "tenant_admin", "platform_admin", "admin_assets"]
+known_first_party = ["orion", "core", "base", "v1", "auth", "tenant", "tenant_svc", "user", "integrations", "catalog", "catalog_svc", "platform_models", "platform_svc", "order", "order_svc", "payment", "payment_svc", "tenant_gateway_svc", "bnpl", "bnpl_svc", "returns", "rma_svc", "b2b", "b2b_svc", "oms", "oms_svc", "notification_svc", "engine", "tenant_admin", "platform_admin", "admin_assets"]
 
 [tool.coverage.run]
 source = ["02-CORE", "03-MODELS", "04-SERVICES", "05-API"]
