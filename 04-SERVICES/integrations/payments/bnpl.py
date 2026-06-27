@@ -5,7 +5,6 @@ from __future__ import annotations
 from decimal import Decimal
 
 from bnpl.bnpl_provider import BnplProvider
-
 from order.order import Order
 
 

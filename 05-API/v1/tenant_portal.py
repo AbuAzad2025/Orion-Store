@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from bnpl_svc.bnpl_service import BnplService
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 from flask import Blueprint, g, jsonify, request
 from i18n_svc.translation_service import TranslationService
 
+from bnpl_svc.bnpl_service import BnplService
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
 from core.exceptions import NotFoundError, OrionError

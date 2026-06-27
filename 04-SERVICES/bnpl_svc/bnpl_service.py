@@ -6,7 +6,6 @@ from decimal import Decimal
 
 from bnpl.bnpl_provider import BnplProvider
 from bnpl.bnpl_transaction import BnplTransaction
-
 from core.crypto import CryptoService
 from core.exceptions import NotFoundError, ValidationError
 from core.utils import utc_now

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
-from bnpl_svc.bnpl_service import BnplService
 
+from bnpl_svc.bnpl_service import BnplService
 from core.exceptions import NotFoundError, ValidationError
 from integrations.payments.bnpl import charge_bnpl
 from integrations.payments.paypal import charge_paypal

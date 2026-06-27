@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from bnpl_svc.bnpl_service import BnplService
 from support.http import tenant_headers
 
+from bnpl_svc.bnpl_service import BnplService
 from catalog_svc.product_service import ProductService
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
