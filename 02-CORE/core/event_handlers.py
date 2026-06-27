@@ -17,7 +17,7 @@ def _on_order_paid(order_id: int, tenant_id: int, **_: object) -> None:
     if not order:
         return
     if order.fulfillment_status == "unfulfilled":
-        order.fulfillment_status = "paid_pending_fulfillment"
+        order.fulfillment_status = "paid_unfulfilled"
         db.session.commit()
 
 

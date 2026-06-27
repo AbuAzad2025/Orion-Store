@@ -56,7 +56,7 @@ def test_storefront_e2e_browse_cart_checkout_pay_invoice(client, app):
     assert "azadexa-platform-footer" in inv.get_json()["rendered_html"]
 
     order_row = Order.query.filter_by(id=order.id).first()
-    assert order_row.fulfillment_status == "paid_pending_fulfillment"
+    assert order_row.fulfillment_status == "paid_unfulfilled"
 
 
 def test_refund_flow(client, app):
