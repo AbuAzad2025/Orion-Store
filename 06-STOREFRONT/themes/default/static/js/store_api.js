@@ -34,12 +34,32 @@ const StoreAPI = {
       quantity: quantity || 1,
     });
   },
-  checkout(cartToken, customerEmail, shippingAddress) {
-    return this.request("POST", "/checkout", {
+  checkout(cartToken, customerEmail, shippingAddress, extras) {
+    const body = {
       cart_token: cartToken,
       customer_email: customerEmail,
       shipping_address: shippingAddress || {},
-    });
+    };
+    if (extras) {
+      if (extras.shipping_method_code) {
+        body.shipping_method_code = extras.shipping_method_code;
+      }
+      if (extras.voucher_code) body.voucher_code = extras.voucher_code;
+    }
+    return this.request("POST", "/checkout", body);
+  },
+  listShippingMethods() {
+    return this.request("GET", "/shipping/methods");
+  },
+  validateVoucher(code, subtotal) {
+    return fetch(
+      `/api/v1/vouchers/${encodeURIComponent(code)}/validate?subtotal=${subtotal}`,
+      { headers: this.headers() }
+    )
+      .then((res) => res.json().then((data) => {
+        if (!res.ok) throw new Error(data.error || res.statusText);
+        return data;
+      }));
   },
   payOrder(publicId, paymentMethod) {
     return this.request("POST", `/orders/${publicId}/pay`, {

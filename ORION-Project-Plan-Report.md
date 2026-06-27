@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — فجوات 0–5 مُغلقة | التالي: موجة 6+ (§0.15)"
+status: "قيد التنفيذ — موجة 6 (#58–59) ✅ | التالي: i18n + flags (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -18,7 +18,7 @@ database_tables: 144
 database_tables_mvp: 64
 database_tables_v2: 80
 implementation_wave: 6
-implementation_wave_status: "موجات 0–5 + إغلاق الفجوات ✅ | التالي: موجة 6+ (شحن، خصومات…)"
+implementation_wave_status: "موجة 6 — شحن + خصومات ✅ | التالي: #60 i18n محتوى"
 implementation_updated: "2026-06-27"
 implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifest, pip-audit"
 ---
@@ -30,7 +30,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — فجوات موجات 0–5 ✅ مُغلقة | موجة 6+ ⬜** (§0.15)
+**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 6 (#58–59) ✅ | #60+ ⬜** (§0.15)
 
 ---
 
@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 5 ✅ → **التالي:** موجة 6+ (شحن، خصومات…)  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 6 ✅ (#58–59) → **التالي:** #60 i18n محتوى  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -742,7 +742,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **3** — سلة وطلبات | ✅ | 7/7 | 2026-06-27 — cart + checkout بدون دفع |
 | **4** — مالية وبوابات | ✅ | 17/17 | 2026-06-27 — COD/Stripe sandbox، عمولة 1%، فواتير Azadexa |
 | **5** — واجهات | ✅ | 8/8 | 2026-06-27 — admin + storefront + checkout.js |
-| **6+** — ما بعد MVP | ⬜ | — | Release Train |
+| **6** — شحن + خصومات | ✅ | 2/2 | 2026-06-27 — #58 shipping + #59 vouchers |
+| **6+** — ما بعد MVP | 🟡 | 2/6 | #60–63 متبقية (Release Train) |
 
 #### التوثيق والمخطط
 
@@ -755,7 +756,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~90 اختبار؛ waves 0–5 + gap closure + manifest |
+| `tests/` (pytest + Postgres) | ✅ | ~101 اختبار؛ waves 0–6 + manifest |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -767,6 +768,22 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **3 → 4** | ✅ | checkout ✅؛ `financial_events` + payments + commission + invoices ✅ |
 | **4 → 5** | ✅ | admin HTML + storefront + checkout.js pay ✅ |
 | **5 → MVP** | ✅ | E2E + pagination + refund + admin auth + reconciliation UI |
+| **6 → 6+** | ✅ | shipping methods/zones + vouchers + checkout totals + APIs + UI |
+
+#### موجة 6 — شحن وخصومات (#58–59)
+
+| البند | السياسة | الحل | الحالة |
+|--------|---------|------|--------|
+| جداول shipping_methods/zones/rates | §4.7 | migration `wave6_001` + RLS | ✅ |
+| جدول vouchers | §4.8 | migration `wave6_001` | ✅ |
+| حساب الشحن flat-rate + عتبة مجاني | §10.5 | `shipping_svc/shipping_service.py` | ✅ |
+| محرك خصومات (نسبة/ثابت + شحن مجاني) | §11.3 | `discount_svc/voucher_service.py` | ✅ |
+| checkout: subtotal − خصم + شحن + ضريبة | §0.4 | `checkout_service.py` | ✅ |
+| APIs `/api/v1/shipping/*` + `/api/v1/vouchers/*` | §3.9 | `shipping.py`, `vouchers.py` | ✅ |
+| Storefront: اختيار شحن + كوبون | موجة 5–6 | `checkout.html`, `checkout.js` | ✅ |
+| اختبارات + manifest wave 6 | §0.8 | 101 pytest، cov ~90.5% | ✅ |
+
+**مؤجَّل (#60+):** Redis cache، Celery، Rate limiting، PalPay/BNPL، ثيمات إضافية، JWT account كامل، deliveries/تتبع، sales/promotions.
 
 #### إغلاق فجوات موجات 0–5 (2026-06-27)
 
@@ -793,7 +810,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.3 حدود حجم الملف | 🔒§0 | `scripts/check_file_length.py` + CI |
 | §0.4 Route → Service (لا ORM في routes) | ✅ | `routes.py` — status فقط، لا `db.session` |
 | §0.5 secrets في `.env` | ✅ | `.env.example`؛ `.gitignore` |
-| §0.12 لا قفز موجات | ✅ | موجات 0–5 ✅؛ موجة 6+ التالي |
+| §0.12 لا قفز موجات | ✅ | موجات 0–6 ✅؛ #60+ التالي |
 | §0.13.2 `COMMISSION_FALLBACK_CHAIN` | ✅ | `constants.py` + `financial_events_service` |
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |

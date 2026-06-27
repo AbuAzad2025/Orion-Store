@@ -51,9 +51,14 @@ class Order(db.Model, TimestampMixin, VersionMixin):
     customer_last_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     is_guest: Mapped[bool] = mapped_column(Boolean, default=True)
     shipping_address: Mapped[dict] = mapped_column(db.JSON, default=dict)
+    shipping_method_code: Mapped[str | None] = mapped_column(String(50), nullable=True)
     subtotal: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=Decimal("0"))
     tax_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=Decimal("0"))
     shipping_cost: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=Decimal("0"))
+    discount_amount: Mapped[Decimal] = mapped_column(
+        Numeric(10, 2), default=Decimal("0")
+    )
+    discount_code: Mapped[str | None] = mapped_column(String(100), nullable=True)
     total: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=Decimal("0"))
     idempotency_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
@@ -63,6 +68,12 @@ class Order(db.Model, TimestampMixin, VersionMixin):
             "order_number": self.order_number,
             "status": self.status,
             "payment_status": self.payment_status,
+            "subtotal": str(self.subtotal),
+            "tax_amount": str(self.tax_amount),
+            "shipping_cost": str(self.shipping_cost),
+            "discount_amount": str(self.discount_amount),
+            "discount_code": self.discount_code,
+            "shipping_method_code": self.shipping_method_code,
             "total": str(self.total),
             "customer_email": self.customer_email,
         }

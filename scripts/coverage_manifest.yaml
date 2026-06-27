@@ -93,6 +93,15 @@ files:
   "02-CORE/core/pagination.py": { wave: 5, min: 80 }
   "02-CORE/core/event_handlers.py": { wave: 5, min: 80 }
   "04-SERVICES/platform_svc/pdf_service.py": { wave: 5, min: 80 }
+  # wave 6 — shipping + vouchers
+  "03-MODELS/shipping/shipping_method.py": { wave: 6, min: 60 }
+  "03-MODELS/shipping/shipping_zone.py": { wave: 6, min: 60 }
+  "03-MODELS/shipping/shipping_rate.py": { wave: 6, min: 60 }
+  "03-MODELS/discount/voucher.py": { wave: 6, min: 60 }
+  "04-SERVICES/shipping_svc/shipping_service.py": { wave: 6, min: 80 }
+  "04-SERVICES/discount_svc/voucher_service.py": { wave: 6, min: 80 }
+  "05-API/v1/shipping.py": { wave: 6, min: 70 }
+  "05-API/v1/vouchers.py": { wave: 6, min: 70 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

@@ -13,6 +13,7 @@ from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
 from payment_svc.payment_service import PaymentService
+from shipping_svc.shipping_service import ShippingService
 
 storefront_bp = Blueprint("storefront", __name__)
 _carts = CartService()
@@ -21,6 +22,7 @@ _orders = OrderService()
 _payments = PaymentService()
 _products = ProductService()
 _categories = CategoryService()
+_shipping = ShippingService()
 
 
 @storefront_bp.get("/products")
@@ -121,6 +123,16 @@ def add_cart_item(cart_token: str):
         return jsonify({"error": "Invalid request."}), 400
 
 
+@storefront_bp.get("/shipping/methods")
+def list_shipping_methods():
+    try:
+        tenant = require_tenant_context()
+        methods = _shipping.list_methods(tenant.id)
+        return jsonify({"methods": [m.to_dict() for m in methods]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
 @storefront_bp.post("/checkout")
 def checkout():
     try:
@@ -132,6 +144,8 @@ def checkout():
             customer_email=data["customer_email"],
             shipping_address=data.get("shipping_address", {}),
             idempotency_key=data.get("idempotency_key"),
+            shipping_method_code=data.get("shipping_method_code"),
+            voucher_code=data.get("voucher_code"),
         )
         return jsonify({"order": order.to_dict()}), 201
     except OrionError as exc:
