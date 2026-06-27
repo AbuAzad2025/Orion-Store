@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resultEl = document.getElementById("checkout-result");
   const summaryEl = document.getElementById("checkout-summary");
   const methodSelect = document.getElementById("shipping-method");
+  const paymentSelect = document.getElementById("payment-method");
   if (!form) return;
 
   let cartSubtotal = 0;
@@ -16,7 +17,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         0
       );
     }
-    const methodsRes = await StoreAPI.listShippingMethods();
+    const [methodsRes, payRes] = await Promise.all([
+      StoreAPI.listShippingMethods(),
+      StoreAPI.listPaymentMethods(),
+    ]);
     methodSelect.innerHTML = "";
     (methodsRes.methods || []).forEach((m) => {
       const opt = document.createElement("option");
@@ -27,8 +31,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!methodsRes.methods || !methodsRes.methods.length) {
       methodSelect.innerHTML = '<option value="">لا توجد طرق شحن</option>';
     }
+    if (paymentSelect) {
+      paymentSelect.innerHTML = "";
+      (payRes.payment_methods || []).forEach((pm) => {
+        const opt = document.createElement("option");
+        opt.value = pm.code;
+        opt.textContent = pm.label;
+        paymentSelect.appendChild(opt);
+      });
+      if (!payRes.payment_methods || !payRes.payment_methods.length) {
+        paymentSelect.innerHTML = '<option value="cod">الدفع عند الاستلام</option>';
+      }
+    }
   } catch (err) {
     methodSelect.innerHTML = '<option value="">تعذر تحميل الشحن</option>';
+    if (paymentSelect) {
+      paymentSelect.innerHTML = '<option value="cod">الدفع عند الاستلام</option>';
+    }
   }
 
   form.addEventListener("submit", async (ev) => {

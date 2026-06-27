@@ -47,6 +47,76 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const paypalBtn = document.getElementById("connect-paypal");
+  if (paypalBtn) {
+    paypalBtn.addEventListener("click", () => {
+      const clientId = document.getElementById("paypal-client-id").value.trim();
+      const clientSecret = document.getElementById("paypal-client-secret").value.trim();
+      const isSandbox = document.getElementById("paypal-sandbox").checked;
+      OrionAPI.post("/tenant/gateways/paypal", {
+        client_id: clientId,
+        client_secret: clientSecret,
+        is_sandbox: isSandbox,
+        is_enabled: true,
+      })
+        .then(() => {
+          alert("تم ربط PayPal");
+          location.reload();
+        })
+        .catch((err) => alert(err.message));
+    });
+  }
+
+  const bnplEl = document.getElementById("bnpl-providers-list");
+  if (bnplEl) {
+    OrionAPI.get("/tenant/bnpl/providers")
+      .then((data) => {
+        bnplEl.innerHTML = (data.providers || [])
+          .map(
+            (p) => `
+          <div class="rounded border p-3 mb-3 bg-gray-50" data-bnpl="${p.provider}">
+            <div class="flex justify-between items-center mb-2">
+              <strong>${p.provider}</strong>
+              <span class="text-xs ${p.is_enabled ? "text-green-700" : "text-gray-500"}">
+                ${p.is_enabled ? "مفعّل" : "معطّل"}
+              </span>
+            </div>
+            <input type="text" class="bnpl-merchant border rounded px-2 py-1 text-sm w-full mb-2"
+              placeholder="Merchant ID" value="${p.merchant_id || ""}">
+            <input type="password" class="bnpl-key border rounded px-2 py-1 text-sm w-full mb-2"
+              placeholder="API Key (اتركه فارغاً للإبقاء)">
+            <label class="inline-flex items-center gap-2 text-sm mb-2">
+              <input type="checkbox" class="bnpl-sandbox" ${(p.config || {}).is_sandbox !== false ? "checked" : ""}>
+              Sandbox
+            </label>
+            <button type="button" class="bnpl-save rounded bg-indigo-600 px-3 py-1 text-white text-sm"
+              data-provider="${p.provider}">حفظ</button>
+          </div>`
+          )
+          .join("");
+        bnplEl.querySelectorAll(".bnpl-save").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const code = btn.getAttribute("data-provider");
+            const wrap = btn.closest(`[data-bnpl="${code}"]`);
+            OrionAPI.put(`/tenant/bnpl/providers/${code}`, {
+              merchant_id: wrap.querySelector(".bnpl-merchant").value.trim(),
+              api_key: wrap.querySelector(".bnpl-key").value.trim() || undefined,
+              is_enabled: true,
+              is_sandbox: wrap.querySelector(".bnpl-sandbox").checked,
+            })
+              .then(() => {
+                alert("تم الحفظ");
+                location.reload();
+              })
+              .catch((err) => alert(err.message));
+          });
+        });
+      })
+      .catch((err) => {
+        bnplEl.textContent = err.message;
+      });
+  }
+
   const templatesEl = document.getElementById("templates-list");
   if (templatesEl) {
     OrionAPI.get("/tenant/document-templates")

@@ -113,6 +113,12 @@ files:
   "04-SERVICES/feature_flag_svc/feature_flag_service.py": { wave: 7, min: 80 }
   "04-SERVICES/feature_flag_svc/feature_flag_evaluator.py": { wave: 7, min: 80 }
   "05-API/v1/i18n.py": { wave: 7, min: 70 }
+  # wave 8 — PayPal + BNPL
+  "03-MODELS/bnpl/bnpl_provider.py": { wave: 8, min: 60 }
+  "03-MODELS/bnpl/bnpl_transaction.py": { wave: 8, min: 60 }
+  "04-SERVICES/bnpl_svc/bnpl_service.py": { wave: 8, min: 80 }
+  "04-SERVICES/integrations/payments/paypal.py": { wave: 8, min: 80 }
+  "04-SERVICES/integrations/payments/bnpl.py": { wave: 8, min: 80 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

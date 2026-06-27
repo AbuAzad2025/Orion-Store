@@ -51,6 +51,9 @@ const StoreAPI = {
   listShippingMethods() {
     return this.request("GET", "/shipping/methods");
   },
+  listPaymentMethods() {
+    return this.request("GET", "/payment-methods");
+  },
   validateVoucher(code, subtotal) {
     return fetch(
       `/api/v1/vouchers/${encodeURIComponent(code)}/validate?subtotal=${subtotal}`,

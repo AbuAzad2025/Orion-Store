@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 7 (#60–61) ✅ | التالي: #62 PayPal/BNPL (§0.15)"
+status: "قيد التنفيذ — موجة 8 (#62) ✅ | التالي: #63 RMA/B2B (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -17,8 +17,8 @@ duration_weeks_full: 68
 database_tables: 144
 database_tables_mvp: 64
 database_tables_v2: 80
-implementation_wave: 7
-implementation_wave_status: "موجة 7 — i18n + feature flags ✅ | التالي: #62 بوابات إضافية"
+implementation_wave: 8
+implementation_wave_status: "موجة 8 — PayPal + BNPL ✅ | التالي: #63 RMA/B2B"
 implementation_updated: "2026-06-27"
 implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifest, pip-audit"
 ---
@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 7 ✅ (#60–61) → **التالي:** #62 PayPal/BNPL  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 8 ✅ (#62 PayPal/BNPL) → **التالي:** #63 RMA/B2B  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -744,7 +744,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **5** — واجهات | ✅ | 8/8 | 2026-06-27 — admin + storefront + checkout.js |
 | **6** — شحن + خصومات | ✅ | 2/2 | 2026-06-27 — #58 shipping + #59 vouchers |
 | **7** — i18n + flags | ✅ | 2/2 | 2026-06-27 — #60 محتوى + #61 feature flags UI |
-| **6+** — ما بعد MVP | 🟡 | 4/6 | #62–63 متبقية (Release Train) |
+| **8** — PayPal + BNPL | ✅ | 1/1 | 2026-06-27 — #62 بوابات إضافية |
+| **6+** — ما بعد MVP | 🟡 | 5/6 | #63 متبقية (Release Train) |
 
 #### التوثيق والمخطط
 
@@ -757,7 +758,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~110 اختبار؛ waves 0–7 + manifest |
+| `tests/` (pytest + Postgres) | ✅ | ~115 اختبار؛ waves 0–8 + manifest |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -771,6 +772,23 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **5 → MVP** | ✅ | E2E + pagination + refund + admin auth + reconciliation UI |
 | **6 → 6+** | ✅ | shipping methods/zones + vouchers + checkout totals + APIs + UI |
 | **7 → 7+** | ✅ | i18n translations + locale middleware + feature flags + admin UI |
+| **8 → 8+** | ✅ | PayPal gateway + BNPL providers/transactions + checkout + webhooks |
+
+#### موجة 8 — PayPal وBNPL (#62)
+
+| البند | السياسة | الحل | الحالة |
+|--------|---------|------|--------|
+| جداول bnpl_providers + bnpl_transactions | §4.23 | migration `wave8_001` + RLS | ✅ |
+| تكامل PayPal sandbox | §1.6 | `integrations/payments/paypal.py` | ✅ |
+| تكامل BNPL Tabby/Tamara | §4.23 | `bnpl_service` + `integrations/payments/bnpl.py` | ✅ |
+| `PaymentService` يدعم paypal + bnpl_capture | §0.4 | `_charge_external_gateway` موسّع | ✅ |
+| APIs tenant: PayPal connect + BNPL config | §3.9 | `tenant_portal` | ✅ |
+| Storefront: `GET /payment-methods` | موجة 5–8 | `checkout.js` ديناميكي | ✅ |
+| Webhooks PayPal + BNPL | §3.8 | `webhooks.py` | ✅ |
+| لوحة admin بوابات + BNPL | #62 | `tenant_gateways.html` | ✅ |
+| اختبارات + manifest wave 8 | §0.8 | 115 pytest | ✅ |
+
+**مؤجَّل (#63+):** RMA/B2B/OMS، page_translations، glossary، Redis/Celery.
 
 #### موجة 7 — i18n وFeature Flags (#60–61)
 
@@ -787,7 +805,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | لوحة admin ميزات المتجر | #61 | `feature_flags_management.html` | ✅ |
 | اختبارات + manifest wave 7 | §0.8 | 110 pytest، cov ~90% | ✅ |
 
-**مؤجَّل (#62+):** PayPal/BNPL، page_translations (يحتاج `pages`)، glossary، currency_rates، rollout %، Redis/Celery.
+**مؤجَّل (#63+):** RMA/B2B/OMS، page_translations (يحتاج `pages`)، glossary، currency_rates، rollout %، Redis/Celery.
 
 #### موجة 6 — شحن وخصومات (#58–59)
 

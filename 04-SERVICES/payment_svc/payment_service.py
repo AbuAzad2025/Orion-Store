@@ -6,6 +6,8 @@ from decimal import Decimal
 
 from core.events import publish
 from core.exceptions import NotFoundError, ValidationError
+from integrations.payments.bnpl import charge_bnpl
+from integrations.payments.paypal import charge_paypal
 from integrations.payments.stripe_connect import charge_stripe
 from order.order import Order
 from order_svc.order_service import OrderService
@@ -17,6 +19,8 @@ from platform_svc.document_renderer import DocumentRenderer
 from platform_svc.financial_events_service import FinancialEventsService
 from tenant_gateway_svc.gateway_service import GatewayService
 
+BNPL_GATEWAY_PREFIX = "bnpl_"
+
 
 class PaymentService:
     def __init__(self) -> None:
@@ -25,6 +29,14 @@ class PaymentService:
         self._financial = FinancialEventsService()
         self._commission = CommissionService()
         self._documents = DocumentRenderer()
+        self._bnpl = None
+
+    def _bnpl_service(self):
+        if self._bnpl is None:
+            from bnpl_svc.bnpl_service import BnplService
+
+            self._bnpl = BnplService()
+        return self._bnpl
 
     def pay_order(
         self,
@@ -48,7 +60,10 @@ class PaymentService:
         payment.provider_payment_id = charge.get("provider_payment_id")
         payment.status = "completed"
         db.session.commit()
-        return self._on_payment_success(order, payment)
+        event_type = charge.get("event_type", "order.payment")
+        return self._on_payment_success(
+            order, payment, event_type=event_type, bnpl_txn=charge.get("bnpl_txn")
+        )
 
     def refund(
         self,
@@ -136,13 +151,49 @@ class PaymentService:
             return charge_stripe(
                 order=order, gateway=gateway, amount=Decimal(str(payment.amount))
             )
+        if gateway.provider == "paypal":
+            return charge_paypal(
+                order=order, gateway=gateway, amount=Decimal(str(payment.amount))
+            )
+        if gateway.provider.startswith(BNPL_GATEWAY_PREFIX):
+            provider_code = gateway.provider[len(BNPL_GATEWAY_PREFIX) :]
+            bnpl_row = self._bnpl_service().get_enabled(order.tenant_id, provider_code)
+            result = charge_bnpl(
+                order=order,
+                provider_row=bnpl_row,
+                amount=Decimal(str(payment.amount)),
+            )
+            if not result.get("success"):
+                return result
+            txn = self._bnpl_service().create_transaction(
+                tenant_id=order.tenant_id,
+                order_id=order.id,
+                provider=provider_code,
+                external_id=result["external_transaction_id"],
+                amount=Decimal(str(payment.amount)),
+                installment_plan=result.get("installment_plan"),
+            )
+            db.session.commit()
+            return {
+                "success": True,
+                "provider_payment_id": result["external_transaction_id"],
+                "event_type": "bnpl_capture",
+                "bnpl_txn": txn,
+            }
         return {"success": False, "error": "unsupported_provider"}
 
-    def _on_payment_success(self, order: Order, payment: Payment) -> dict:
+    def _on_payment_success(
+        self,
+        order: Order,
+        payment: Payment,
+        *,
+        event_type: str = "order.payment",
+        bnpl_txn=None,
+    ) -> dict:
         event = self._financial.record_inbound(
             tenant_id=order.tenant_id,
             amount=payment.amount,
-            event_type="order.payment",
+            event_type=event_type,
             source_entity="payment",
             source_id=payment.id,
         )
@@ -155,10 +206,13 @@ class PaymentService:
             order=order, payment=payment, financial_event=event
         )
         publish("order.paid", order_id=order.id, tenant_id=order.tenant_id)
-        return {
+        payload = {
             "payment": payment.to_dict(),
             "order": order.to_dict(),
             "financial_event": event.to_dict(),
             "commission_ledger_id": ledger.id if ledger else None,
             "invoice": invoice.to_dict(),
         }
+        if bnpl_txn is not None:
+            payload["bnpl_transaction"] = bnpl_txn.to_dict()
+        return payload

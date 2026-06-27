@@ -16,6 +16,7 @@ from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
 from payment_svc.payment_service import PaymentService
+from tenant_gateway_svc.gateway_service import GatewayService
 
 storefront_bp = Blueprint("storefront", __name__)
 _carts = CartService()
@@ -26,6 +27,7 @@ _products = ProductService()
 _categories = CategoryService()
 _shipping = ShippingService()
 _translations = TranslationService()
+_gateways = GatewayService()
 
 
 def _locale() -> str:
@@ -179,6 +181,16 @@ def checkout():
         return jsonify({"error": exc.message}), exc.status_code
     except KeyError:
         return jsonify({"error": "Missing required fields."}), 400
+
+
+@storefront_bp.get("/payment-methods")
+def list_payment_methods():
+    try:
+        tenant = require_tenant_context()
+        methods = _gateways.list_enabled_for_checkout(tenant.id)
+        return jsonify({"payment_methods": methods}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @storefront_bp.post("/orders/<public_id>/pay")

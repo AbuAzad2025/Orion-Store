@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from bnpl_svc.bnpl_service import BnplService
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 from flask import Blueprint, g, jsonify, request
 from i18n_svc.translation_service import TranslationService
@@ -26,6 +27,7 @@ _categories = CategoryService()
 _translations = TranslationService()
 _flags = FeatureFlagService()
 _payments = PaymentService()
+_bnpl = BnplService()
 
 _VALID_TEMPLATE = (
     "<div>{{order_number}}</div>"
@@ -96,6 +98,56 @@ def ensure_cod_gateway():
         require_tenant_admin()
         gateway = _gateways.ensure_cod_gateway(g.tenant_id)
         return jsonify({"gateway": gateway.to_dict()}), 201
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.post("/gateways/paypal")
+def connect_paypal_gateway():
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        gateway = _gateways.upsert_paypal(
+            tenant_id=g.tenant_id,
+            client_id=data.get("client_id", ""),
+            client_secret=data.get("client_secret", ""),
+            webhook_secret=data.get("webhook_secret"),
+            is_sandbox=bool(data.get("is_sandbox", True)),
+            is_enabled=bool(data.get("is_enabled", True)),
+        )
+        return jsonify({"gateway": gateway.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.get("/bnpl/providers")
+def list_bnpl_providers():
+    try:
+        require_tenant_admin()
+        providers = _bnpl.list_providers(g.tenant_id)
+        return (
+            jsonify({"providers": [row.to_dict() for row in providers]}),
+            200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.put("/bnpl/providers/<provider>")
+def upsert_bnpl_provider(provider: str):
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        row = _bnpl.upsert_provider(
+            tenant_id=g.tenant_id,
+            provider=provider,
+            merchant_id=data.get("merchant_id"),
+            api_key=data.get("api_key"),
+            is_enabled=bool(data.get("is_enabled", True)),
+            is_sandbox=bool(data.get("is_sandbox", True)),
+            config=data.get("config"),
+        )
+        return jsonify({"provider": row.to_dict()}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

@@ -27,6 +27,8 @@ def create_app(config_name: str | None = None) -> Flask:
     migrate.init_app(app, db)
     jwt.init_app(app)
 
+    import bnpl.bnpl_provider  # noqa: F401
+    import bnpl.bnpl_transaction  # noqa: F401
     import discount.voucher  # noqa: F401
     import feature_flag.feature_flag  # noqa: F401
     import feature_flag.feature_flag_override  # noqa: F401
