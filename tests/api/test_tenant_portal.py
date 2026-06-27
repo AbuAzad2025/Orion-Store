@@ -46,7 +46,13 @@ def test_tenant_gateways_and_templates(client, tenant_admin_store):
     save = client.put(
         "/api/v1/tenant/document-templates/invoice",
         headers=headers,
-        json={"body_html": "<p>Invoice</p>", "locale": "ar"},
+        json={
+            "body_html": (
+                "<div>{{order_number}}</div>"
+                '<footer id="azadexa-platform-footer" data-immutable="true"></footer>'
+            ),
+            "locale": "ar",
+        },
     )
     assert save.status_code == 200
 

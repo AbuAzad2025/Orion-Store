@@ -36,3 +36,17 @@ def test_parent_not_found_raises(app):
     )
     with pytest.raises(NotFoundError):
         categories.create(tenant_id=tenant.id, name="X", slug="x", parent_id=99999)
+
+
+def test_get_by_slug(app):
+    tenants = TenantService()
+    categories = CategoryService()
+    tenant = tenants.create_tenant(
+        name="Slug Cat", slug="slug-cat", email="slug@test.com"
+    )
+    categories.create(tenant_id=tenant.id, name="Shoes", slug="shoes")
+    found = categories.get_by_slug(tenant.id, "shoes")
+    assert found.name == "Shoes"
+    with pytest.raises(NotFoundError):
+        categories.get_by_slug(tenant.id, "missing")
+

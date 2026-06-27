@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
 
+from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
+from core.pagination import paginate_query, paginated_payload, pagination_params
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
@@ -18,14 +20,49 @@ _checkout = CheckoutService()
 _orders = OrderService()
 _payments = PaymentService()
 _products = ProductService()
+_categories = CategoryService()
 
 
 @storefront_bp.get("/products")
 def list_products():
     try:
         tenant = require_tenant_context()
-        items = [_p.to_dict() for _p in _products.list_published(tenant.id)]
-        return jsonify({"products": items}), 200
+        page, per_page = pagination_params()
+        items, meta = paginate_query(
+            _products.query_published(tenant.id), page, per_page
+        )
+        return (
+            jsonify(paginated_payload("products", items, meta, lambda p: p.to_dict())),
+            200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@storefront_bp.get("/categories")
+def list_categories():
+    try:
+        tenant = require_tenant_context()
+        page, per_page = pagination_params()
+        items, meta = paginate_query(
+            _categories.query_for_tenant(tenant.id), page, per_page
+        )
+        return (
+            jsonify(
+                paginated_payload("categories", items, meta, lambda c: c.to_dict())
+            ),
+            200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@storefront_bp.get("/categories/<slug>")
+def get_category(slug: str):
+    try:
+        tenant = require_tenant_context()
+        category = _categories.get_by_slug(tenant.id, slug)
+        return jsonify({"category": category.to_dict()}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -124,5 +161,30 @@ def get_order(public_id: str):
         tenant = require_tenant_context()
         order = _orders.get_by_public_id(tenant.id, public_id)
         return jsonify({"order": order.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@storefront_bp.get("/orders/<public_id>/invoice")
+def get_order_invoice(public_id: str):
+    try:
+        from platform_models.invoice import Invoice
+
+        tenant = require_tenant_context()
+        order = _orders.get_by_public_id(tenant.id, public_id)
+        invoice = Invoice.query.filter_by(
+            tenant_id=tenant.id, order_id=order.id
+        ).first()
+        if not invoice:
+            return jsonify({"error": "Invoice not found."}), 404
+        return (
+            jsonify(
+                {
+                    "invoice": invoice.to_dict(),
+                    "rendered_html": invoice.rendered_html,
+                }
+            ),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

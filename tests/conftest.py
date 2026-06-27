@@ -128,6 +128,9 @@ def app(fernet_key: str, database_url: str) -> Generator[Flask, None, None]:
 @pytest.fixture(autouse=True)
 def _isolated_event_bus() -> Generator[None, None, None]:
     clear_subscribers()
+    from core.event_handlers import register_domain_event_handlers
+
+    register_domain_event_handlers()
     yield
     clear_subscribers()
 

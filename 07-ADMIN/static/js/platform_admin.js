@@ -42,4 +42,29 @@ document.addEventListener("DOMContentLoaded", () => {
         reportEl.textContent = err.message;
       });
   }
+
+  const reconEl = document.getElementById("reconciliation-status");
+  if (reconEl) {
+    OrionAPI.get("/platform/reconciliation")
+      .then((data) => {
+        reconEl.innerHTML = `
+          <div class="grid grid-cols-3 gap-4">
+            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">عمولات معلقة</p><p class="text-xl font-bold">${data.pending_commission_entries}</p></div>
+            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">عمولات مسوّاة</p><p class="text-xl font-bold">${data.settled_commission_entries}</p></div>
+            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">أحداث مالية</p><p class="text-xl font-bold">${data.financial_events_total}</p></div>
+          </div>`;
+      })
+      .catch((err) => {
+        reconEl.textContent = err.message;
+      });
+  }
+
+  const runBtn = document.getElementById("run-reconciliation");
+  if (runBtn) {
+    runBtn.addEventListener("click", () => {
+      OrionAPI.post("/platform/reconciliation/run", {})
+        .then(() => location.reload())
+        .catch((err) => alert(err.message));
+    });
+  }
 });

@@ -25,3 +25,18 @@ def pay_order(order_public_id: str):
         return jsonify(result), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
+
+
+@payments_bp.post("/<payment_public_id>/refund")
+def refund_payment(payment_public_id: str):
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        result = _payments.refund(
+            tenant_id=g.tenant_id,
+            payment_public_id=payment_public_id,
+            reason=data.get("reason"),
+        )
+        return jsonify(result), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code

@@ -61,3 +61,43 @@ class FinancialEventsService:
         db.session.add(event)
         db.session.commit()
         return event
+
+    def record_outbound(
+        self,
+        *,
+        tenant_id: int,
+        amount: Decimal | str,
+        event_type: str,
+        source_entity: str,
+        source_id: int,
+        currency: str = "ILS",
+        description: str | None = None,
+        apply_commission: bool = True,
+    ) -> FinancialEvent:
+        value = Decimal(str(amount))
+        if value <= 0:
+            raise ValueError("amount must be positive")
+        percent = (
+            self.resolve_commission_percent(tenant_id) if apply_commission else None
+        )
+        commission_amount = (
+            (value * percent).quantize(Decimal("0.01")) if percent is not None else None
+        )
+        event = FinancialEvent(
+            tenant_id=tenant_id,
+            direction="outbound",
+            event_type=event_type,
+            amount=value,
+            currency=currency,
+            source_entity=source_entity,
+            source_id=source_id,
+            description=description,
+            commission_applied=apply_commission,
+            commission_percent=percent,
+            commission_amount=commission_amount,
+            status="completed",
+            completed_at=utc_now(),
+        )
+        db.session.add(event)
+        db.session.commit()
+        return event

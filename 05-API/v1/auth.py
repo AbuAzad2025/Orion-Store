@@ -13,12 +13,24 @@ auth_bp = Blueprint("auth", __name__)
 _auth = AuthService()
 
 
+def _resolve_tenant_id(tenant_ref: str | int | None) -> int | None:
+    if tenant_ref is None:
+        return None
+    if isinstance(tenant_ref, int):
+        return tenant_ref
+    from tenant.tenant import Tenant
+
+    tenant = Tenant.query.filter_by(slug=str(tenant_ref)).first()
+    return tenant.id if tenant else None
+
+
 @auth_bp.post("/login")
 def login():
     data = request.get_json(silent=True) or {}
     email = data.get("email", "").strip().lower()
     password = data.get("password", "")
-    tenant_id = data.get("tenant_id")
+    tenant_ref = data.get("tenant_id")
+    tenant_id = _resolve_tenant_id(tenant_ref)
     try:
         user = _auth.authenticate(email=email, password=password, tenant_id=tenant_id)
         tokens = issue_tokens_for_user(user)

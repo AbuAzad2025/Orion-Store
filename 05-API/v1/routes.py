@@ -7,6 +7,7 @@ from flask import Blueprint, Flask
 from v1.auth import auth_bp
 from v1.categories import categories_bp
 from v1.payments import payments_bp
+from v1.platform_reconciliation import register_platform_reconciliation_routes
 from v1.platform_settings import platform_settings_bp
 from v1.platform_stores import register_platform_store_routes
 from v1.products import products_bp
@@ -33,11 +34,14 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(storefront_bp, url_prefix="/api/v1/store")
     app.register_blueprint(tenant_portal_bp, url_prefix="/api/v1/tenant")
     register_platform_store_routes(platform_bp)
+    register_platform_reconciliation_routes(platform_bp)
     app.register_blueprint(platform_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(webhooks_bp, url_prefix="/webhooks")
 
 
 def register_ui_blueprints(app: Flask) -> None:
+    from admin_auth import admin_auth_bp
+
     from admin_assets import admin_assets_bp
     from engine.routes import storefront_ui_bp
     from engine.storefront_assets import storefront_assets_bp
@@ -45,6 +49,7 @@ def register_ui_blueprints(app: Flask) -> None:
     from tenant_admin.routes import tenant_admin_bp
 
     app.register_blueprint(admin_assets_bp)
+    app.register_blueprint(admin_auth_bp, url_prefix="/admin")
     app.register_blueprint(tenant_admin_bp, url_prefix="/admin/store")
     app.register_blueprint(platform_admin_bp, url_prefix="/admin/platform")
     app.register_blueprint(storefront_assets_bp)

@@ -7,6 +7,8 @@ from flask import Blueprint, g, jsonify, request
 from auth.auth_service import AuthService
 from core.exceptions import OrionError
 from core.middleware import require_platform_admin
+from core.pagination import paginate_query, paginated_payload, pagination_params
+from tenant.tenant import Tenant
 from tenant_svc.tenant_service import TenantService
 
 tenant_bp = Blueprint("tenants", __name__)
@@ -18,8 +20,14 @@ _auth = AuthService()
 def list_tenants():
     try:
         require_platform_admin()
-        items = [_t.to_dict() for _t in _tenants.list_tenants()]
-        return jsonify({"tenants": items}), 200
+        page, per_page = pagination_params()
+        items, meta = paginate_query(
+            Tenant.query.order_by(Tenant.created_at.desc()), page, per_page
+        )
+        return (
+            jsonify(paginated_payload("tenants", items, meta, lambda t: t.to_dict())),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

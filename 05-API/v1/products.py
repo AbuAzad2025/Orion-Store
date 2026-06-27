@@ -7,6 +7,7 @@ from flask import Blueprint, g, jsonify, request
 from catalog_svc.product_service import ProductService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
+from core.pagination import paginate_query, paginated_payload, pagination_params
 
 products_bp = Blueprint("products", __name__)
 _products = ProductService()
@@ -16,8 +17,14 @@ _products = ProductService()
 def list_products():
     try:
         require_tenant_admin()
-        items = [_p.to_dict() for _p in _products.list_for_tenant(g.tenant_id)]
-        return jsonify({"products": items}), 200
+        page, per_page = pagination_params()
+        items, meta = paginate_query(
+            _products.query_for_tenant(g.tenant_id), page, per_page
+        )
+        return (
+            jsonify(paginated_payload("products", items, meta, lambda p: p.to_dict())),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 5 مكتملة | التالي: موجة 6+ (§0.15)"
+status: "قيد التنفيذ — فجوات 0–5 مُغلقة | التالي: موجة 6+ (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -17,8 +17,8 @@ duration_weeks_full: 68
 database_tables: 144
 database_tables_mvp: 64
 database_tables_v2: 80
-implementation_wave: 1
-implementation_wave_status: "موجة 1 — مكتملة أساسياً (tenant + auth + عزل + CI)"
+implementation_wave: 6
+implementation_wave_status: "موجات 0–5 + إغلاق الفجوات ✅ | التالي: موجة 6+ (شحن، خصومات…)"
 implementation_updated: "2026-06-27"
 implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifest, pip-audit"
 ---
@@ -30,7 +30,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجات 0–5 ✅ | موجة 6+ ⬜** (§0.15)
+**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — فجوات موجات 0–5 ✅ مُغلقة | موجة 6+ ⬜** (§0.15)
 
 ---
 
@@ -551,7 +551,7 @@ flowchart BT
 | `financial_events` كجدول مركزي للمال | موجة 4 #33 | §4.49 | ✅ |
 | Route → Service → Model | موجة 0 | §0.4 | ✅ |
 | Blueprint prefixes (`/store`, `/tenant`, `/platform`) | موجة 0 #8 | §3.9 | ✅ |
-| `public_id` UUID على orders/products | موجة 3 | §4.1 | 🟡 BaseModel mixin |
+| `public_id` UUID على orders/products | موجة 3 | §4.1 | ✅ |
 | Azadexa footer immutable | موجة 4 #46 | §1.5 | ✅ |
 | عمولة 1% على كل event_type | موجة 4 #39 | §1.6 | ✅ |
 
@@ -565,8 +565,8 @@ flowchart BT
 | 1 → 2 | tenant A لا يرى B؛ `g.tenant_id`؛ CI per-file coverage | ✅ |
 | 2 → 3 | CRUD منتج عبر API؛ seed platform_settings | ✅ |
 | 3 → 4 | checkout ينشئ order `pending` بدون دفع | ✅ |
-| 4 → 5 | دفع تجريبي Stripe → financial_event + ledger + invoice PDF | ⬜ |
-| 5 → MVP | storefront E2E: تصفح → سلة → دفع → إيصال | ⬜ |
+| 4 → 5 | دفع تجريبي COD/Stripe → financial_event + ledger + invoice PDF | ✅ |
+| 5 → MVP | storefront E2E: تصفح → سلة → دفع → إيصال + refund | ✅ |
 
 ---
 
@@ -575,11 +575,11 @@ flowchart BT
 | الموجة | أسابيع | مراحل الخطة | الحالة |
 |--------|--------|-------------|--------|
 | **0** | 1 | المرحلة 1 (بداية) | ✅ |
-| **0–1** | 1–2 | المرحلة 1 (جزء) + المرحلة 2 (بداية) | 🟡 موجة 0 فقط |
-| 2 | 2–3 | المرحلة 2–3 | ⬜ |
-| 3 | 4–5 | المرحلة 4–5 | ⬜ |
-| 4 | 6–8 | المرحلة 6 | ⬜ |
-| 5 | 9–14 | المراحل 7–12 (واجهات تدريجياً) | ⬜ |
+| **0–1** | 1–2 | المرحلة 1 (جزء) + المرحلة 2 (بداية) | ✅ |
+| 2 | 2–3 | المرحلة 2–3 | ✅ |
+| 3 | 4–5 | المرحلة 4–5 | ✅ |
+| 4 | 6–8 | المرحلة 6 | ✅ |
+| 5 | 9–14 | المراحل 7–12 (واجهات تدريجياً) | ✅ |
 | MVP | 20 | المرحلة 14 | ⬜ |
 
 > كل مهمة في §5–§18 يجب أن تُوسم بموجة §0.12 في وصف PR: `feat(wave-4): financial_events migration`.
@@ -755,7 +755,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~85 اختبار؛ waves 0–5 + manifest أخضر |
+| `tests/` (pytest + Postgres) | ✅ | ~90 اختبار؛ waves 0–5 + gap closure + manifest |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -766,7 +766,24 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **2 → 3** | ✅ | carts/orders migration ✅؛ checkout API ✅ (بدون pay) |
 | **3 → 4** | ✅ | checkout ✅؛ `financial_events` + payments + commission + invoices ✅ |
 | **4 → 5** | ✅ | admin HTML + storefront + checkout.js pay ✅ |
-| **5 → MVP** | 🟡 | واجهات أساسية ✅؛ ميزات مرحلة 6+ ⬜ |
+| **5 → MVP** | ✅ | E2E + pagination + refund + admin auth + reconciliation UI |
+
+#### إغلاق فجوات موجات 0–5 (2026-06-27)
+
+| الفجوة | السياسة | الحل | الحالة |
+|--------|---------|------|--------|
+| Pagination على list APIs | §0.6 | `core/pagination.py` — tenants, products, categories, storefront, tenant portal | ✅ |
+| Headers أمنية (CSP, X-Frame…) | §0.5 | `core/security_headers.py` | ✅ |
+| Event handlers (`order.paid`, `payment.refunded`) | §3.8 | `core/event_handlers.py` + تسجيل في `app.py` و `conftest` | ✅ |
+| Refund + outbound financial events | §4.49 | `payment_service.refund()` + APIs | ✅ |
+| `document_renderer` + PDF فواتير | §0.13.6 | `validate_template` + `pdf_service.py` (fpdf2) + migration `gap5_001` | ✅ |
+| Reconciliation API + لوحة admin | §3.8 | `platform_reconciliation.py` + `reconciliation_dashboard.html` | ✅ |
+| Admin login + حماية HTML | §0.5 | `admin_auth.py` + `guard_admin_html` | ✅ |
+| Storefront: category, account, RTL, theme.json | موجة 5 | routes + templates + `rtl.css` | ✅ |
+| Auth login بـ tenant slug | موجة 1 | `_resolve_tenant_id()` في `auth.py` | ✅ |
+| E2E gap closure | §0.12.6 | `tests/integration/test_gap_closure_e2e.py` — 90 اختبار، cov ~91% | ✅ |
+
+**مؤجَّل لموجة 6+ (خارج نطاق الإغلاق):** Redis cache، Celery ليلي، Rate limiting، PalPay/BNPL، ثيمات `modern`/`luxury`، JWT كامل في storefront account، جداول `financial_reconciliation_runs` v2.
 
 #### الالتزام بسياسة §0 (ملخص)
 
@@ -781,6 +798,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |
 | §0.8 coverage ملف-بملف + ≥85% | 🔒§0 | `coverage_manifest.yaml` + `--cov-fail-under=85` + CI |
+| §0.6 Pagination على list APIs | ✅ | `core/pagination.py` + كل list endpoints |
+| §0.5 Headers أمنية | ✅ | `core/security_headers.py` |
 | §0.8 PostgreSQL في الاختبارات | 🔒§0 | `DATABASE_URL` + `docker-compose.test.yml` + CI service |
 
 ---

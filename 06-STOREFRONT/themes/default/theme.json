@@ -1,0 +1,11 @@
+{
+  "name": "default",
+  "version": "1.0.0",
+  "author": "Azadexa",
+  "locales": ["ar", "en", "he", "fr"],
+  "rtl_locales": ["ar", "he"],
+  "assets": {
+    "css": ["css/main.css", "css/rtl.css"],
+    "js": ["js/store_api.js", "js/cart.js", "js/checkout.js"]
+  }
+}

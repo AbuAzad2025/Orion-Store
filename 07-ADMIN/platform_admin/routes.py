@@ -24,6 +24,15 @@ def platform_dashboard():
     )
 
 
+@platform_admin_bp.get("/reconciliation")
+def reconciliation_dashboard():
+    return render_template(
+        "reconciliation_dashboard.html",
+        page_title="التسوية المالية",
+        active_nav="reconciliation",
+    )
+
+
 @platform_admin_bp.get("/stores/<int:tenant_id>/finance")
 def store_financial_report(tenant_id: int):
     return render_template(

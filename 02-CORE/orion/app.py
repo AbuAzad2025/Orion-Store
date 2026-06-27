@@ -7,8 +7,10 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify
 
+from core.event_handlers import register_domain_event_handlers
 from core.exceptions import OrionError
 from core.middleware import register_middleware
+from core.security_headers import register_security_headers
 from orion.config import config_by_name
 from orion.extensions import db, jwt, migrate
 from v1.routes import register_blueprints, register_ui_blueprints
@@ -46,6 +48,8 @@ def create_app(config_name: str | None = None) -> Flask:
     register_blueprints(app)
     register_ui_blueprints(app)
     register_middleware(app)
+    register_security_headers(app)
+    register_domain_event_handlers()
 
     @app.get("/health")
     def health() -> tuple[dict, int]:

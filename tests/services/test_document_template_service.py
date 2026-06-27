@@ -11,10 +11,14 @@ def test_document_template_upsert(app):
         name="Doc", slug="doc-store", email="doc@test.com"
     )
     svc = DocumentTemplateService()
+    valid = (
+        '<div>Test</div>'
+        '<footer id="azadexa-platform-footer" data-immutable="true"></footer>'
+    )
     row = svc.upsert(
         tenant_id=tenant.id,
         document_type="invoice",
-        body_html="<p>Test</p>",
+        body_html=valid,
     )
     assert row.id is not None
     rows = svc.list_for_tenant(tenant.id)
@@ -22,6 +26,6 @@ def test_document_template_upsert(app):
     updated = svc.upsert(
         tenant_id=tenant.id,
         document_type="invoice",
-        body_html="<p>Updated</p>",
+        body_html=valid.replace("Test", "Updated"),
     )
-    assert updated.body_html == "<p>Updated</p>"
+    assert "Updated" in updated.body_html

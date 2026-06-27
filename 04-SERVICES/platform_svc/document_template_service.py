@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from orion.extensions import db
 from platform_models.invoice import TenantDocumentTemplate
+from platform_svc.document_renderer import DocumentRenderer
 
 
 class DocumentTemplateService:
@@ -23,6 +24,8 @@ class DocumentTemplateService:
         body_html: str | None = None,
         is_active: bool = True,
     ) -> TenantDocumentTemplate:
+        if body_html:
+            DocumentRenderer().validate_template(body_html)
         row = TenantDocumentTemplate.query.filter_by(
             tenant_id=tenant_id,
             document_type=document_type,

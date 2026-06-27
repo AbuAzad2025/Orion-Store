@@ -23,9 +23,9 @@ class PlatformSettingsService:
         row = PlatformSettings(
             platform_name="Azadexa",
             footer_html=(
-                '<footer class="azadexa-footer">'
-                "Powered by Azadexa &mdash; Ahmad Ghannam"
-                "</footer>"
+                '<footer id="azadexa-platform-footer" '
+                'class="azadexa-platform-footer" data-immutable="true">'
+                "Powered by Azadexa &mdash; Ahmad Ghannam</footer>"
             ),
             owner_name="Ahmad Ghannam",
             owner_phone="0562150193",

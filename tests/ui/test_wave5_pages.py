@@ -23,7 +23,7 @@ def test_storefront_pages(client, app):
     )
     headers = tenant_headers(tenant.slug)
 
-    for path in ("/", "/product/widget", "/cart", "/checkout"):
+    for path in ("/", "/product/widget", "/cart", "/checkout", "/account"):
         resp = client.get(path, headers=headers)
         assert resp.status_code == 200
         assert b"Azadexa" in resp.data or tenant.name.encode() in resp.data

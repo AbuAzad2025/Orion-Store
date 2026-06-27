@@ -1,0 +1,8 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div id="reconciliation-status" class="mb-6 text-gray-500">جاري التحميل...</div>
+<button id="run-reconciliation" class="rounded bg-blue-600 px-4 py-2 text-white text-sm">تشغيل التسوية</button>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/platform_admin.js') }}"></script>
+{% endblock %}

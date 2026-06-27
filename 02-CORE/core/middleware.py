@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from flask import Flask, g, request
+from flask import Flask, g, redirect, request
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from sqlalchemy.orm import joinedload
 
@@ -37,6 +37,28 @@ def register_middleware(app: Flask) -> None:
                 db.text("SELECT set_config('app.tenant_id', :tid, true)"),
                 {"tid": str(g.tenant_id)},
             )
+
+    @app.before_request
+    def guard_admin_html():
+        path = request.path
+        if not path.startswith("/admin"):
+            return None
+        if path.startswith("/admin/static") or path == "/admin/login":
+            return None
+        if path.startswith("/admin/platform"):
+            if not g.user or not g.is_platform_admin:
+                return redirect("/admin/login")
+            return None
+        if path.startswith("/admin/store"):
+            if not g.tenant_id:
+                return ("Tenant context required (X-Tenant-ID).", 404)
+            if not g.user:
+                return redirect("/admin/login")
+            if not g.is_platform_admin and (
+                not g.user.is_admin or g.user.tenant_id != g.tenant_id
+            ):
+                return ("Forbidden", 403)
+        return None
 
 
 def _resolve_tenant_from_request() -> Tenant | None:
@@ -72,7 +94,7 @@ def _tenant_query():
 
 def _resolve_authenticated_user() -> None:
     """JWT (production) then X-User-ID (tests / dev tooling)."""
-    if request.path == "/api/v1/auth/refresh":
+    if request.path in ("/api/v1/auth/refresh", "/admin/login"):
         return
     verify_jwt_in_request(optional=True, locations=["headers"])
     identity = get_jwt_identity()

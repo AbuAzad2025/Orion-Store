@@ -6,6 +6,7 @@
   <title>{{ page_title }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/main.css') }}">
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/rtl.css') }}">
 </head>
 <body class="bg-gray-50 min-h-screen" data-tenant-id="{{ tenant.slug }}">
   {% include "components/header.html" %}

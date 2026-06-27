@@ -37,3 +37,7 @@ class AuthorizationError(OrionError):
 class CryptoError(OrionError):
     status_code = 500
     message = "Encryption operation failed."
+
+
+class TemplateValidationError(ValidationError):
+    message = "Document template validation failed."

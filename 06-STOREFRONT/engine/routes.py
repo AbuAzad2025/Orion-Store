@@ -6,6 +6,7 @@ from pathlib import Path
 
 from flask import Blueprint, g
 
+from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
 from engine.theme_engine import ThemeEngine
 
@@ -18,6 +19,7 @@ storefront_ui_bp = Blueprint(
 )
 _engine = ThemeEngine()
 _products = ProductService()
+_categories = CategoryService()
 
 
 def _tenant_or_404():
@@ -52,6 +54,32 @@ def store_product(slug: str):
         product=product,
         page_title=product.name,
     )
+
+
+@storefront_ui_bp.get("/category/<slug>")
+def store_category(slug: str):
+    tenant = _tenant_or_404()
+    if not tenant:
+        return "Store not found.", 404
+    category = _categories.get_by_slug(tenant.id, slug)
+    products = [
+        p for p in _products.list_published(tenant.id) if p.category_id == category.id
+    ]
+    return _engine.render(
+        "category.html",
+        tenant=tenant,
+        category=category,
+        products=products,
+        page_title=category.name,
+    )
+
+
+@storefront_ui_bp.get("/account")
+def store_account():
+    tenant = _tenant_or_404()
+    if not tenant:
+        return "Store not found.", 404
+    return _engine.render("account.html", tenant=tenant, page_title="حسابي")
 
 
 @storefront_ui_bp.get("/cart")

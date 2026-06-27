@@ -5,12 +5,13 @@ from __future__ import annotations
 from decimal import Decimal
 
 from core.events import publish
-from core.exceptions import ValidationError
+from core.exceptions import NotFoundError, ValidationError
 from integrations.payments.stripe_connect import charge_stripe
 from order.order import Order
 from order_svc.order_service import OrderService
 from orion.extensions import db
 from payment.payment import Payment
+from payment.refund import Refund
 from platform_svc.commission_service import CommissionService
 from platform_svc.document_renderer import DocumentRenderer
 from platform_svc.financial_events_service import FinancialEventsService
@@ -48,6 +49,63 @@ class PaymentService:
         payment.status = "completed"
         db.session.commit()
         return self._on_payment_success(order, payment)
+
+    def refund(
+        self,
+        *,
+        tenant_id: int,
+        payment_public_id: str,
+        reason: str | None = None,
+    ) -> dict:
+        import uuid
+
+        try:
+            pid = uuid.UUID(payment_public_id)
+        except ValueError as exc:
+            raise NotFoundError("Payment not found.") from exc
+        payment = Payment.query.filter_by(tenant_id=tenant_id, public_id=pid).first()
+        if not payment:
+            raise NotFoundError("Payment not found.")
+        if payment.status != "completed":
+            raise ValidationError("Only completed payments can be refunded.")
+        refund_row = Refund(
+            tenant_id=tenant_id,
+            payment_id=payment.id,
+            amount=payment.amount,
+            currency=payment.currency,
+            status="completed",
+            reason=reason,
+        )
+        db.session.add(refund_row)
+        db.session.flush()
+        outbound = self._financial.record_outbound(
+            tenant_id=tenant_id,
+            amount=payment.amount,
+            event_type="payment.refund",
+            source_entity="refund",
+            source_id=refund_row.id,
+        )
+        refund_row.financial_event_id = outbound.id
+        ledger = self._commission.apply_from_event(
+            outbound, payment_id=payment.id, order_id=payment.order_id
+        )
+        payment.status = "refunded"
+        db.session.commit()
+        publish(
+            "payment.refunded",
+            order_id=payment.order_id,
+            tenant_id=tenant_id,
+            refund_id=refund_row.id,
+        )
+        return {
+            "refund": {
+                "id": refund_row.id,
+                "amount": str(refund_row.amount),
+                "status": refund_row.status,
+            },
+            "financial_event": outbound.to_dict(),
+            "commission_ledger_id": ledger.id if ledger else None,
+        }
 
     def _validate_payment_request(self, order: Order) -> None:
         if order.payment_status == "paid":

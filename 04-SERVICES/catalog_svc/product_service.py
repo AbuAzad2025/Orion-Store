@@ -12,20 +12,20 @@ from orion.extensions import db
 
 class ProductService:
     def list_for_tenant(self, tenant_id: int) -> list[Product]:
-        return (
-            Product.query.filter_by(tenant_id=tenant_id, deleted_at=None)
-            .order_by(Product.created_at.desc())
-            .all()
+        return self.query_for_tenant(tenant_id).all()
+
+    def query_for_tenant(self, tenant_id: int):
+        return Product.query.filter_by(tenant_id=tenant_id, deleted_at=None).order_by(
+            Product.created_at.desc()
         )
 
     def list_published(self, tenant_id: int) -> list[Product]:
-        return (
-            Product.query.filter_by(
-                tenant_id=tenant_id, deleted_at=None, is_published=True
-            )
-            .order_by(Product.created_at.desc())
-            .all()
-        )
+        return self.query_published(tenant_id).all()
+
+    def query_published(self, tenant_id: int):
+        return Product.query.filter_by(
+            tenant_id=tenant_id, deleted_at=None, is_published=True
+        ).order_by(Product.created_at.desc())
 
     def get_by_slug(self, tenant_id: int, slug: str) -> Product:
         product = Product.query.filter_by(

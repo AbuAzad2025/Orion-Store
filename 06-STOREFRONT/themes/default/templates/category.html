@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">{{ category.name }}</h1>
+{% if products %}
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+  {% for product in products %}
+    {% include "components/product_card.html" %}
+  {% endfor %}
+</div>
+{% else %}
+<p class="text-gray-500">لا توجد منتجات في هذا التصنيف.</p>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>
+{% endblock %}
