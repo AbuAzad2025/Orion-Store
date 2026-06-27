@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from catalog_svc.category_service import CategoryService
-from catalog_svc.product_service import ProductService
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 from i18n_svc.i18n_service import I18nService
 from i18n_svc.translation_service import TranslationService
+
+from catalog_svc.category_service import CategoryService
+from catalog_svc.product_service import ProductService
 from tenant_svc.tenant_service import TenantService
 
 
@@ -40,9 +41,7 @@ def test_category_localized_slug(app):
     tenant = TenantService().create_tenant(
         name="Cat Loc", slug="cat-loc", email="cl@test.com"
     )
-    category = CategoryService().create(
-        tenant_id=tenant.id, name="فئة", slug="cat-ar"
-    )
+    category = CategoryService().create(tenant_id=tenant.id, name="فئة", slug="cat-ar")
     translations = TranslationService()
     translations.upsert_category_translation(
         tenant_id=tenant.id,
