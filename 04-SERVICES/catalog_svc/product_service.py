@@ -5,9 +5,26 @@ from __future__ import annotations
 import uuid
 from decimal import Decimal
 
+from sqlalchemy.orm import load_only
+
 from catalog.product import Product
+from core.caching import invalidate_tenant_catalog
 from core.exceptions import NotFoundError, ValidationError
 from orion.extensions import db
+
+_PUBLISHED_COLUMNS = load_only(
+    Product.id,
+    Product.public_id,
+    Product.tenant_id,
+    Product.name,
+    Product.slug,
+    Product.sku,
+    Product.price,
+    Product.quantity,
+    Product.is_published,
+    Product.category_id,
+    Product.brand_id,
+)
 
 
 class ProductService:
@@ -23,9 +40,13 @@ class ProductService:
         return self.query_published(tenant_id).all()
 
     def query_published(self, tenant_id: int):
-        return Product.query.filter_by(
-            tenant_id=tenant_id, deleted_at=None, is_published=True
-        ).order_by(Product.created_at.desc())
+        return (
+            Product.query.filter_by(
+                tenant_id=tenant_id, deleted_at=None, is_published=True
+            )
+            .options(_PUBLISHED_COLUMNS)
+            .order_by(Product.created_at.desc())
+        )
 
     def get_by_slug(self, tenant_id: int, slug: str) -> Product:
         product = Product.query.filter_by(
@@ -75,6 +96,7 @@ class ProductService:
         )
         db.session.add(product)
         db.session.commit()
+        invalidate_tenant_catalog(tenant_id)
         return product
 
     def update(self, product: Product, **fields) -> Product:
@@ -91,6 +113,7 @@ class ProductService:
                 setattr(product, key, value)
         product.version += 1
         db.session.commit()
+        invalidate_tenant_catalog(product.tenant_id)
         return product
 
     def soft_delete(self, product: Product) -> None:
@@ -99,3 +122,4 @@ class ProductService:
         product.deleted_at = utc_now()
         product.is_active = False
         db.session.commit()
+        invalidate_tenant_catalog(product.tenant_id)

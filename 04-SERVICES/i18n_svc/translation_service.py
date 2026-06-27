@@ -8,6 +8,7 @@ from i18n_svc.i18n_service import I18nService
 
 from catalog.category import Category
 from catalog.product import Product
+from core.caching import invalidate_tenant_catalog
 from core.exceptions import NotFoundError, ValidationError
 from orion.extensions import db
 
@@ -55,6 +56,7 @@ class TranslationService:
         row.meta_title = meta_title
         row.meta_description = meta_description
         db.session.commit()
+        invalidate_tenant_catalog(tenant_id)
         return row
 
     def upsert_category_translation(
@@ -94,6 +96,7 @@ class TranslationService:
         row.description = description
         row.slug = slug
         db.session.commit()
+        invalidate_tenant_catalog(tenant_id)
         return row
 
     def merge_product(self, product: Product, locale: str) -> dict:

@@ -47,6 +47,12 @@ class Config:
     )
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
     LOG_JSON = os.environ.get("LOG_JSON", "false").lower() in ("1", "true", "yes")
+    CACHE_ENABLED = os.environ.get("CACHE_ENABLED", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    CACHE_TTL_SECONDS = int(os.environ.get("CACHE_TTL_SECONDS", "300"))
 
 
 class DevelopmentConfig(Config):
@@ -62,6 +68,7 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False
     RATELIMIT_ENABLED = False
     PROMETHEUS_ENABLED = False
+    CACHE_ENABLED = False
 
 
 class ProductionConfig(Config):

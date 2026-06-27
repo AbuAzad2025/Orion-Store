@@ -49,3 +49,8 @@ class RedisCache:
         if not self._client:
             return
         self._client.delete(key)
+
+    def incr(self, key: str) -> int | None:
+        if not self._client:
+            return None
+        return int(self._client.incr(key))

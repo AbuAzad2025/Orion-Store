@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from catalog.category import Category
+from core.caching import invalidate_tenant_catalog
 from core.exceptions import NotFoundError, ValidationError
 from orion.extensions import db
 
@@ -54,4 +55,5 @@ class CategoryService:
         )
         db.session.add(category)
         db.session.commit()
+        invalidate_tenant_catalog(tenant_id)
         return category

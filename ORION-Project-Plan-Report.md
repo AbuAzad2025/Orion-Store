@@ -759,7 +759,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~154 اختبار؛ waves 0–9 + phase 14 monitoring |
+| `tests/` (pytest + Postgres) | ✅ | ~158 اختبار؛ waves 0–9 + phase 14 |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -813,6 +813,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | Readiness probe `/ready` | §18 | DB check + redis status | ✅ |
 | Staging scrape config | §18 | `01-FOUNDATION/staging/prometheus.yml` | ✅ |
 | Grafana / beta launch | §18 | ops — يدوي | ⬜ |
+| Catalog cache + query trim | §18 | `caching.py` + storefront read-through | ✅ |
 
 #### موجة 8 — PayPal وBNPL (#62)
 

@@ -8,6 +8,12 @@ from shipping_svc.shipping_service import ShippingService
 
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
+from core.caching import (
+    read_through_json,
+    store_categories_list_key,
+    store_product_detail_key,
+    store_products_list_key,
+)
 from core.context import get_locale
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
@@ -39,20 +45,21 @@ def list_products():
     try:
         tenant = require_tenant_context()
         page, per_page = pagination_params()
-        items, meta = paginate_query(
-            _products.query_published(tenant.id), page, per_page
-        )
-        return (
-            jsonify(
-                paginated_payload(
-                    "products",
-                    items,
-                    meta,
-                    lambda p: _translations.merge_product(p, _locale()),
-                )
-            ),
-            200,
-        )
+        locale = _locale()
+        key = store_products_list_key(tenant.id, page, per_page, locale)
+
+        def build():
+            items, meta = paginate_query(
+                _products.query_published(tenant.id), page, per_page
+            )
+            return paginated_payload(
+                "products",
+                items,
+                meta,
+                lambda p: _translations.merge_product(p, locale),
+            )
+
+        return jsonify(read_through_json(key, build)), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -62,20 +69,21 @@ def list_categories():
     try:
         tenant = require_tenant_context()
         page, per_page = pagination_params()
-        items, meta = paginate_query(
-            _categories.query_for_tenant(tenant.id), page, per_page
-        )
-        return (
-            jsonify(
-                paginated_payload(
-                    "categories",
-                    items,
-                    meta,
-                    lambda c: _translations.merge_category(c, _locale()),
-                )
-            ),
-            200,
-        )
+        locale = _locale()
+        key = store_categories_list_key(tenant.id, page, per_page, locale)
+
+        def build():
+            items, meta = paginate_query(
+                _categories.query_for_tenant(tenant.id), page, per_page
+            )
+            return paginated_payload(
+                "categories",
+                items,
+                meta,
+                lambda c: _translations.merge_category(c, locale),
+            )
+
+        return jsonify(read_through_json(key, build)), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -99,11 +107,14 @@ def get_category(slug: str):
 def get_product(slug: str):
     try:
         tenant = require_tenant_context()
-        product = _products.get_by_slug(tenant.id, slug)
-        return (
-            jsonify({"product": _translations.merge_product(product, _locale())}),
-            200,
-        )
+        locale = _locale()
+        key = store_product_detail_key(tenant.id, slug, locale)
+
+        def build():
+            product = _products.get_by_slug(tenant.id, slug)
+            return {"product": _translations.merge_product(product, locale)}
+
+        return jsonify(read_through_json(key, build)), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
