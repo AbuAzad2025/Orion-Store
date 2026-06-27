@@ -137,9 +137,11 @@ def test_document_renderer_validation(app):
     except Exception:
         raised = True
     assert raised
-    renderer.validate_template(
-        '<div></div><footer id="azadexa-platform-footer" data-immutable="true"></footer>'
+    footer = (
+        '<div></div><footer id="azadexa-platform-footer" '
+        'data-immutable="true"></footer>'
     )
+    renderer.validate_template(footer)
 
 
 def test_reconciliation_api(client, platform_admin_headers):
