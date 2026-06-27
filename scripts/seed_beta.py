@@ -13,11 +13,7 @@ for sub in ("02-CORE", "03-MODELS", "04-SERVICES", "05-API"):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from auth.auth_service import AuthService  # noqa: E402
 from orion.app import create_app  # noqa: E402
-from platform_svc.platform_settings_service import PlatformSettingsService  # noqa: E402
-from tenant.tenant import Tenant  # noqa: E402
-from tenant_svc.tenant_service import TenantService  # noqa: E402
 
 BETA_STORES: list[tuple[str, str, str]] = [
     ("متجر رام الله", "beta-ramallah", "ramallah@beta.azadexa.com"),
@@ -35,6 +31,11 @@ DEFAULT_ADMIN_PASSWORD = "BetaStore2026!"
 
 
 def main() -> None:
+    from auth.auth_service import AuthService
+    from platform_svc.platform_settings_service import PlatformSettingsService
+    from tenant.tenant import Tenant
+    from tenant_svc.tenant_service import TenantService
+
     os.environ.setdefault("FLASK_ENV", "development")
     app = create_app()
     slugs: list[str] = []
