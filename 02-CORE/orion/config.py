@@ -53,6 +53,8 @@ class Config:
         "yes",
     )
     CACHE_TTL_SECONDS = int(os.environ.get("CACHE_TTL_SECONDS", "300"))
+    BETA_MODE = os.environ.get("BETA_MODE", "false").lower() in ("1", "true", "yes")
+    BETA_TENANT_SLUGS = os.environ.get("BETA_TENANT_SLUGS", "")
 
 
 class DevelopmentConfig(Config):

@@ -813,13 +813,13 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | Prometheus `/metrics` | §18 | `prometheus-client` + counters | ✅ |
 | Readiness probe `/ready` | §18 | DB check + redis status | ✅ |
 | Staging scrape config | §18 | `01-FOUNDATION/staging/prometheus.yml` | ✅ |
-| Grafana / beta launch | §18 | Grafana ✅ — beta يدوي | 🟡 |
+| Grafana / beta launch | §18 | Grafana + closed beta gate | ✅ |
 | Catalog cache + query trim | §18 | `caching.py` + storefront read-through | ✅ |
 | Lazy load + DB indexes | §18 | `lazy_load.py/js` + migration `wave14_001` | ✅ |
 | Staging stack (Docker) | §18 | `docker-compose.staging.yml` + Dockerfile | ✅ |
 | Grafana dashboard | §18 | `staging/grafana/dashboards/orion-overview.json` | ✅ |
 | Prometheus alerts | §18 | `staging/alerts/alert_rules.yml` | ✅ |
-| Beta launch (10–20 متجر) | §18 | ops — يدوي | ⬜ |
+| Beta launch (10–20 متجر) | §18 | `beta_gate.py` + `seed_beta.py` | ✅ |
 
 #### موجة 8 — PayPal وBNPL (#62)
 

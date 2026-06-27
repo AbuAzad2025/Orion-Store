@@ -8,6 +8,11 @@ from flask import Flask, g, redirect, request
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from sqlalchemy.orm import joinedload
 
+from core.beta_gate import (
+    beta_mode_enabled,
+    enforce_beta_tenant_access,
+    is_beta_gated_path,
+)
 from core.exceptions import AuthenticationError, AuthorizationError, NotFoundError
 from orion.extensions import db
 from tenant.tenant import Tenant
@@ -38,6 +43,20 @@ def register_middleware(app: Flask) -> None:
                 db.text("SELECT set_config('app.tenant_id', :tid, true)"),
                 {"tid": str(g.tenant_id)},
             )
+
+    @app.before_request
+    def guard_beta_program() -> None:
+        if not beta_mode_enabled() or not is_beta_gated_path(request.path):
+            return None
+        if g.is_platform_admin:
+            return None
+        try:
+            enforce_beta_tenant_access(g.tenant.slug if g.tenant else None)
+        except AuthorizationError as exc:
+            from flask import jsonify
+
+            return jsonify({"error": exc.message}), exc.status_code
+        return None
 
     @app.before_request
     def guard_admin_html():

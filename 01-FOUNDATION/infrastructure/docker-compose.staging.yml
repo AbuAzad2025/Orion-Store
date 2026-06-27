@@ -45,6 +45,8 @@ services:
       PROMETHEUS_ENABLED: "true"
       CACHE_ENABLED: "true"
       LOG_JSON: "true"
+      BETA_MODE: ${BETA_MODE:-true}
+      BETA_TENANT_SLUGS: ${BETA_TENANT_SLUGS:-}
     ports:
       - "5000:5000"
     depends_on:
