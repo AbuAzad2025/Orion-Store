@@ -141,6 +141,7 @@ files:
   "02-CORE/core/logging_config.py": { wave: 14, min: 75 }
   "02-CORE/core/monitoring.py": { wave: 14, min: 75 }
   "02-CORE/core/caching.py": { wave: 14, min: 75 }
+  "02-CORE/core/lazy_load.py": { wave: 14, min: 90 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

@@ -55,6 +55,16 @@ def test_tenant_admin_pages(client, app):
         assert b"api_client.js" in resp.data
 
 
+def test_storefront_includes_lazy_load(client, app):
+    tenant = TenantService().create_tenant(
+        name="Lazy UI", slug="lazy-ui", email="lazy@test.com"
+    )
+    headers = tenant_headers(tenant.slug)
+    resp = client.get("/", headers=headers)
+    assert resp.status_code == 200
+    assert b"lazy_load.js" in resp.data
+
+
 def test_platform_admin_pages(client, app, platform_admin_headers):
     tenant = TenantService().create_tenant(
         name="Plat UI", slug="plat-ui", email="plat@test.com"

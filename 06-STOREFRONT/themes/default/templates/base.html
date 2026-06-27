@@ -15,6 +15,7 @@
   </main>
   {% include "components/footer.html" %}
   <script src="{{ url_for('storefront_assets.static', filename='js/store_api.js') }}"></script>
+  <script src="{{ url_for('storefront_assets.static', filename='js/lazy_load.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>
