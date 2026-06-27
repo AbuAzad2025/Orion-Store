@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from support.http import tenant_headers
 
 from core.beta_gate import (
     beta_allowlist,
@@ -11,8 +12,6 @@ from core.beta_gate import (
     is_tenant_beta_allowed,
 )
 from core.exceptions import AuthorizationError
-from support.http import tenant_headers
-
 from tenant_svc.tenant_service import TenantService
 
 
