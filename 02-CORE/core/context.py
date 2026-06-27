@@ -20,6 +20,10 @@ def get_user() -> User | None:
     return getattr(g, "user", None)
 
 
+def get_locale() -> str:
+    return getattr(g, "locale", "ar")
+
+
 def is_platform_admin() -> bool:
     user = get_user()
     return bool(user and user.is_superuser)

@@ -102,6 +102,17 @@ files:
   "04-SERVICES/discount_svc/voucher_service.py": { wave: 6, min: 80 }
   "05-API/v1/shipping.py": { wave: 6, min: 70 }
   "05-API/v1/vouchers.py": { wave: 6, min: 70 }
+  # wave 7 — i18n + feature flags
+  "03-MODELS/i18n/locale.py": { wave: 7, min: 60 }
+  "03-MODELS/i18n/product_translation.py": { wave: 7, min: 60 }
+  "03-MODELS/i18n/category_translation.py": { wave: 7, min: 60 }
+  "03-MODELS/feature_flag/feature_flag.py": { wave: 7, min: 60 }
+  "03-MODELS/feature_flag/feature_flag_override.py": { wave: 7, min: 60 }
+  "04-SERVICES/i18n_svc/i18n_service.py": { wave: 7, min: 80 }
+  "04-SERVICES/i18n_svc/translation_service.py": { wave: 7, min: 80 }
+  "04-SERVICES/feature_flag_svc/feature_flag_service.py": { wave: 7, min: 80 }
+  "04-SERVICES/feature_flag_svc/feature_flag_evaluator.py": { wave: 7, min: 80 }
+  "05-API/v1/i18n.py": { wave: 7, min: 70 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

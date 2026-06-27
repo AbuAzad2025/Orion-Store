@@ -76,4 +76,37 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch((err) => alert(err.message));
     });
   }
+
+  const flagsEl = document.getElementById("feature-flags-list");
+  if (flagsEl) {
+    OrionAPI.get("/tenant/feature-flags")
+      .then((data) => {
+        flagsEl.innerHTML = data.flags
+          .map(
+            (f) => `
+          <div class="flex items-center justify-between rounded border p-3 bg-white">
+            <div>
+              <strong>${f.name}</strong>
+              <p class="text-xs text-gray-500">${f.code} — ${f.description || ""}</p>
+            </div>
+            <label class="inline-flex items-center gap-2">
+              <input type="checkbox" data-flag-code="${f.code}" ${f.value ? "checked" : ""}>
+              <span class="text-sm">${f.value ? "مفعّل" : "معطّل"}</span>
+            </label>
+          </div>`
+          )
+          .join("");
+        flagsEl.querySelectorAll("input[data-flag-code]").forEach((input) => {
+          input.addEventListener("change", () => {
+            const code = input.getAttribute("data-flag-code");
+            OrionAPI.put(`/tenant/feature-flags/${code}`, { value: input.checked })
+              .then(() => location.reload())
+              .catch((err) => alert(err.message));
+          });
+        });
+      })
+      .catch((err) => {
+        flagsEl.textContent = err.message;
+      });
+  }
 });

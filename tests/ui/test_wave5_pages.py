@@ -45,6 +45,7 @@ def test_tenant_admin_pages(client, app):
         "/admin/store/dashboard",
         "/admin/store/gateways",
         "/admin/store/documents",
+        "/admin/store/feature-flags",
     ):
         resp = client.get(path, headers=headers)
         assert resp.status_code == 200

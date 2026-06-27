@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.10"
 date: "2026-06-26"
 language: "ar"
-status: "قيد التنفيذ — موجة 6 (#58–59) ✅ | التالي: i18n + flags (§0.15)"
+status: "قيد التنفيذ — موجة 7 (#60–61) ✅ | التالي: #62 PayPal/BNPL (§0.15)"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -17,8 +17,8 @@ duration_weeks_full: 68
 database_tables: 144
 database_tables_mvp: 64
 database_tables_v2: 80
-implementation_wave: 6
-implementation_wave_status: "موجة 6 — شحن + خصومات ✅ | التالي: #60 i18n محتوى"
+implementation_wave: 7
+implementation_wave_status: "موجة 7 — i18n + feature flags ✅ | التالي: #62 بوابات إضافية"
 implementation_updated: "2026-06-27"
 implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifest, pip-audit"
 ---
@@ -30,7 +30,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 6 (#58–59) ✅ | #60+ ⬜** (§0.15)
+**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 7 (#60–61) ✅ | #62+ ⬜** (§0.15)
 
 ---
 
@@ -718,7 +718,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 6 ✅ (#58–59) → **التالي:** #60 i18n محتوى  
+> **آخر تحديث:** 2026-06-27 | **الموجة الحالية:** 7 ✅ (#60–61) → **التالي:** #62 PayPal/BNPL  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -743,7 +743,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **4** — مالية وبوابات | ✅ | 17/17 | 2026-06-27 — COD/Stripe sandbox، عمولة 1%، فواتير Azadexa |
 | **5** — واجهات | ✅ | 8/8 | 2026-06-27 — admin + storefront + checkout.js |
 | **6** — شحن + خصومات | ✅ | 2/2 | 2026-06-27 — #58 shipping + #59 vouchers |
-| **6+** — ما بعد MVP | 🟡 | 2/6 | #60–63 متبقية (Release Train) |
+| **7** — i18n + flags | ✅ | 2/2 | 2026-06-27 — #60 محتوى + #61 feature flags UI |
+| **6+** — ما بعد MVP | 🟡 | 4/6 | #62–63 متبقية (Release Train) |
 
 #### التوثيق والمخطط
 
@@ -756,7 +757,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~101 اختبار؛ waves 0–6 + manifest |
+| `tests/` (pytest + Postgres) | ✅ | ~110 اختبار؛ waves 0–7 + manifest |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -769,6 +770,24 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **4 → 5** | ✅ | admin HTML + storefront + checkout.js pay ✅ |
 | **5 → MVP** | ✅ | E2E + pagination + refund + admin auth + reconciliation UI |
 | **6 → 6+** | ✅ | shipping methods/zones + vouchers + checkout totals + APIs + UI |
+| **7 → 7+** | ✅ | i18n translations + locale middleware + feature flags + admin UI |
+
+#### موجة 7 — i18n وFeature Flags (#60–61)
+
+| البند | السياسة | الحل | الحالة |
+|--------|---------|------|--------|
+| نماذج locales + ترجمات منتج/فئة | §4.15 | `03-MODELS/i18n/*` | ✅ |
+| RLS على جداول الترجمة | §3.3 | migration `wave7_001` | ✅ |
+| `g.locale` + سلسلة fallback | §3.5 | `i18n_service` + middleware | ✅ |
+| دمج ترجمات في storefront | #60 | `translation_service` + `?locale=` | ✅ |
+| APIs ترجمة tenant + `/api/v1/i18n/languages` | §14 | `tenant_portal` + `i18n.py` | ✅ |
+| `multi_language` يتحكم باللغات | #61 | `feature_flag_evaluator` | ✅ |
+| جداول feature_flags + overrides | §4.13 | migration `wave7_002` | ✅ |
+| 3 flags MVP + tenant overrides | §16.4 | `ai_enabled`, `booking_enabled`, `multi_language` | ✅ |
+| لوحة admin ميزات المتجر | #61 | `feature_flags_management.html` | ✅ |
+| اختبارات + manifest wave 7 | §0.8 | 110 pytest، cov ~90% | ✅ |
+
+**مؤجَّل (#62+):** PayPal/BNPL، page_translations (يحتاج `pages`)، glossary، currency_rates، rollout %، Redis/Celery.
 
 #### موجة 6 — شحن وخصومات (#58–59)
 

@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+from feature_flag_svc.feature_flag_service import FeatureFlagService
 from flask import Blueprint, g, jsonify, request
+from i18n_svc.translation_service import TranslationService
 
+from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
-from core.exceptions import OrionError
+from core.exceptions import NotFoundError, OrionError
 from core.middleware import require_tenant_admin
 from core.pagination import paginate_query, paginated_payload, pagination_params
 from order_svc.order_service import OrderService
@@ -19,6 +22,9 @@ _gateways = GatewayService()
 _templates = DocumentTemplateService()
 _orders = OrderService()
 _products = ProductService()
+_categories = CategoryService()
+_translations = TranslationService()
+_flags = FeatureFlagService()
 _payments = PaymentService()
 
 _VALID_TEMPLATE = (
@@ -149,3 +155,95 @@ def refund_payment(payment_public_id: str):
         return jsonify(result), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.get("/feature-flags")
+def list_feature_flags():
+    try:
+        require_tenant_admin()
+        return jsonify({"flags": _flags.list_for_tenant(g.tenant_id)}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.put("/feature-flags/<code>")
+def set_feature_flag(code: str):
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        result = _flags.set_tenant_override(
+            tenant_id=g.tenant_id,
+            code=code,
+            value=bool(data.get("value", False)),
+            reason=data.get("reason"),
+            set_by=g.user.id if g.user else None,
+        )
+        return jsonify({"flag": result}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.get("/products/<public_id>/translations")
+def list_product_translations(public_id: str):
+    try:
+        require_tenant_admin()
+        product = _products.get_by_public_id(g.tenant_id, public_id)
+        rows = _translations.list_product_translations(g.tenant_id, product.id)
+        return (
+            jsonify(
+                {
+                    "product_id": product.id,
+                    "translations": [r.to_dict() for r in rows],
+                }
+            ),
+            200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.put("/products/<public_id>/translations/<locale>")
+def upsert_product_translation(public_id: str, locale: str):
+    try:
+        require_tenant_admin()
+        product = _products.get_by_public_id(g.tenant_id, public_id)
+        data = request.get_json(silent=True) or {}
+        row = _translations.upsert_product_translation(
+            tenant_id=g.tenant_id,
+            product=product,
+            locale=locale,
+            name=data["name"],
+            description=data.get("description"),
+            meta_title=data.get("meta_title"),
+            meta_description=data.get("meta_description"),
+        )
+        return jsonify({"translation": row.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except KeyError:
+        return jsonify({"error": "Missing name."}), 400
+
+
+@tenant_portal_bp.put("/categories/<int:category_id>/translations/<locale>")
+def upsert_category_translation(category_id: int, locale: str):
+    try:
+        require_tenant_admin()
+        category = (
+            _categories.query_for_tenant(g.tenant_id).filter_by(id=category_id).first()
+        )
+        if not category:
+            raise NotFoundError("Category not found.")
+        data = request.get_json(silent=True) or {}
+        row = _translations.upsert_category_translation(
+            tenant_id=g.tenant_id,
+            category=category,
+            locale=locale,
+            name=data["name"],
+            description=data.get("description"),
+            slug=data.get("slug"),
+        )
+        return jsonify({"translation": row.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except KeyError:
+        return jsonify({"error": "Missing name."}), 400

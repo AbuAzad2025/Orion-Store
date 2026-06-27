@@ -29,6 +29,7 @@ def register_middleware(app: Flask) -> None:
             g.tenant = tenant
 
         _resolve_authenticated_user()
+        _resolve_request_locale()
 
     @app.before_request
     def bind_tenant_rls() -> None:
@@ -59,6 +60,12 @@ def register_middleware(app: Flask) -> None:
             ):
                 return ("Forbidden", 403)
         return None
+
+
+def _resolve_request_locale() -> None:
+    from i18n_svc.i18n_service import I18nService
+
+    I18nService().bind_request_locale()
 
 
 def _resolve_tenant_from_request() -> Tenant | None:

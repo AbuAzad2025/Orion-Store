@@ -6,6 +6,7 @@ from flask import Blueprint, Flask
 
 from v1.auth import auth_bp
 from v1.categories import categories_bp
+from v1.i18n import i18n_bp
 from v1.payments import payments_bp
 from v1.platform_reconciliation import register_platform_reconciliation_routes
 from v1.platform_settings import platform_settings_bp
@@ -34,6 +35,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(payments_bp, url_prefix="/api/v1/payments")
     app.register_blueprint(platform_settings_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(storefront_bp, url_prefix="/api/v1/store")
+    app.register_blueprint(i18n_bp, url_prefix="/api/v1/i18n")
     app.register_blueprint(shipping_bp, url_prefix="/api/v1/shipping")
     app.register_blueprint(vouchers_bp, url_prefix="/api/v1/vouchers")
     app.register_blueprint(tenant_portal_bp, url_prefix="/api/v1/tenant")

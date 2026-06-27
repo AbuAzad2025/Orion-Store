@@ -58,3 +58,16 @@ def tenant_documents():
         page_title="قوالب المستندات",
         active_nav="documents",
     )
+
+
+@tenant_admin_bp.get("/feature-flags")
+def tenant_feature_flags():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "feature_flags_management.html",
+        tenant=tenant,
+        page_title="ميزات المتجر",
+        active_nav="feature_flags",
+    )

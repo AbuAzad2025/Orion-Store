@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
+from i18n_svc.translation_service import TranslationService
 from shipping_svc.shipping_service import ShippingService
 
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
+from core.context import get_locale
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
 from core.pagination import paginate_query, paginated_payload, pagination_params
@@ -23,6 +25,11 @@ _payments = PaymentService()
 _products = ProductService()
 _categories = CategoryService()
 _shipping = ShippingService()
+_translations = TranslationService()
+
+
+def _locale() -> str:
+    return get_locale()
 
 
 @storefront_bp.get("/products")
@@ -34,7 +41,14 @@ def list_products():
             _products.query_published(tenant.id), page, per_page
         )
         return (
-            jsonify(paginated_payload("products", items, meta, lambda p: p.to_dict())),
+            jsonify(
+                paginated_payload(
+                    "products",
+                    items,
+                    meta,
+                    lambda p: _translations.merge_product(p, _locale()),
+                )
+            ),
             200,
         )
     except OrionError as exc:
@@ -51,7 +65,12 @@ def list_categories():
         )
         return (
             jsonify(
-                paginated_payload("categories", items, meta, lambda c: c.to_dict())
+                paginated_payload(
+                    "categories",
+                    items,
+                    meta,
+                    lambda c: _translations.merge_category(c, _locale()),
+                )
             ),
             200,
         )
@@ -63,8 +82,13 @@ def list_categories():
 def get_category(slug: str):
     try:
         tenant = require_tenant_context()
-        category = _categories.get_by_slug(tenant.id, slug)
-        return jsonify({"category": category.to_dict()}), 200
+        category = _translations.get_category_by_localized_slug(
+            tenant.id, slug, _locale()
+        )
+        return (
+            jsonify({"category": _translations.merge_category(category, _locale())}),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -74,7 +98,10 @@ def get_product(slug: str):
     try:
         tenant = require_tenant_context()
         product = _products.get_by_slug(tenant.id, slug)
-        return jsonify({"product": product.to_dict()}), 200
+        return (
+            jsonify({"product": _translations.merge_product(product, _locale())}),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

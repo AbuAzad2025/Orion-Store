@@ -28,6 +28,11 @@ def create_app(config_name: str | None = None) -> Flask:
     jwt.init_app(app)
 
     import discount.voucher  # noqa: F401
+    import feature_flag.feature_flag  # noqa: F401
+    import feature_flag.feature_flag_override  # noqa: F401
+    import i18n.category_translation  # noqa: F401
+    import i18n.locale  # noqa: F401
+    import i18n.product_translation  # noqa: F401
     import shipping.shipping_method  # noqa: F401
     import shipping.shipping_rate  # noqa: F401
     import shipping.shipping_zone  # noqa: F401
