@@ -125,10 +125,7 @@ def list_bnpl_providers():
     try:
         require_tenant_admin()
         providers = _bnpl.list_providers(g.tenant_id)
-        return (
-            jsonify({"providers": [row.to_dict() for row in providers]}),
-            200,
-        )
+        return jsonify({"providers": [row.to_dict() for row in providers]}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
