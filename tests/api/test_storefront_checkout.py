@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from support.http import tenant_headers
 
 from catalog_svc.product_service import ProductService
-from support.http import tenant_headers
 from tenant_svc.tenant_service import TenantService
 
 

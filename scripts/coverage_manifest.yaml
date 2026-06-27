@@ -66,6 +66,9 @@ files:
   "04-SERVICES/order_svc/checkout_service.py": { wave: 3, min: 80 }
   "04-SERVICES/order_svc/order_service.py": { wave: 3, min: 80 }
   "05-API/v1/storefront.py": { wave: 3, min: 70 }
+  # wave 4 — financial events
+  "03-MODELS/platform_models/financial_event.py": { wave: 4, min: 85 }
+  "04-SERVICES/platform_svc/financial_events_service.py": { wave: 4, min: 80 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

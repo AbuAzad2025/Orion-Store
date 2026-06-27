@@ -47,6 +47,20 @@ def test_bearer_token_lists_tenants(client, platform_admin):
     assert response.status_code == 200
 
 
+def test_refresh_token(client, platform_admin):
+    login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "owner@azadexa.com", "password": "password123"},
+    )
+    refresh = login.get_json()["refresh_token"]
+    response = client.post(
+        "/api/v1/auth/refresh",
+        headers={"Authorization": f"Bearer {refresh}"},
+    )
+    assert response.status_code == 200
+    assert "access_token" in response.get_json()
+
+
 def test_login_invalid_password(client, platform_admin):
     response = client.post(
         "/api/v1/auth/login",

@@ -72,6 +72,8 @@ def _tenant_query():
 
 def _resolve_authenticated_user() -> None:
     """JWT (production) then X-User-ID (tests / dev tooling)."""
+    if request.path == "/api/v1/auth/refresh":
+        return
     verify_jwt_in_request(optional=True, locations=["headers"])
     identity = get_jwt_identity()
     if identity:

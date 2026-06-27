@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import uuid
-from decimal import Decimal
 
 from core.exceptions import ValidationError
 from core.utils import utc_now

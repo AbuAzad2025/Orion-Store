@@ -30,7 +30,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.10 | **التاريخ:** 26 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 1 ✅ | موجة 2 ⬜** (§0.15)
+**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجات 0–3 ✅ | موجة 4 🟡** (§0.15)
 
 ---
 
@@ -561,10 +561,10 @@ flowchart BT
 
 | الانتقال | معيار الجاهزية | الحالة |
 |----------|----------------|--------|
-| 0 → 1 | CI أخضر؛ `alembic upgrade head`؛ login يعمل | 🟡 CI+pytest ✅؛ migration schema ⬜ |
-| 1 → 2 | tenant A لا يرى B؛ `g.tenant_id` في كل request؛ CI per-file coverage | 🟡 عزل ✅؛ coverage manifest ✅ |
-| 2 → 3 | CRUD منتج عبر API؛ seed platform_settings | ⬜ |
-| 3 → 4 | checkout ينشئ order `pending` بدون دفع | ⬜ |
+| 0 → 1 | CI أخضر؛ `alembic upgrade head`؛ login يعمل | ✅ |
+| 1 → 2 | tenant A لا يرى B؛ `g.tenant_id`؛ CI per-file coverage | ✅ |
+| 2 → 3 | CRUD منتج عبر API؛ seed platform_settings | ✅ |
+| 3 → 4 | checkout ينشئ order `pending` بدون دفع | ✅ |
 | 4 → 5 | دفع تجريبي Stripe → financial_event + ledger + invoice PDF | ⬜ |
 | 5 → MVP | storefront E2E: تصفح → سلة → دفع → إيصال | ⬜ |
 
@@ -740,7 +740,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **1** — Tenant + Auth | ✅ | 10/10 | 2026-06-27 — انظر §0.12.3 |
 | **2** — كتالوج | ✅ | 7/7 | 2026-06-27 — platform_settings + products API |
 | **3** — سلة وطلبات | ✅ | 7/7 | 2026-06-27 — cart + checkout بدون دفع |
-| **4** — مالية وبوابات | ⬜ | 0/17 | التالي |
+| **4** — مالية وبوابات | 🟡 | 3/17 | `financial_events` ✅ — payments قيد التنفيذ |
 | **5** — واجهات | ⬜ | 0/8 | — |
 | **6+** — ما بعد MVP | ⬜ | — | Release Train |
 
@@ -755,7 +755,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~45 اختبار؛ catalog + platform_settings + عزل |
+| `tests/` (pytest + Postgres) | ✅ | ~48 اختبار؛ waves 0–3 + financial_events |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -776,8 +776,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.3 حدود حجم الملف | 🔒§0 | `scripts/check_file_length.py` + CI |
 | §0.4 Route → Service (لا ORM في routes) | ✅ | `routes.py` — status فقط، لا `db.session` |
 | §0.5 secrets في `.env` | ✅ | `.env.example`؛ `.gitignore` |
-| §0.12 لا قفز موجات | ✅ | موجات 0–2 — التالي: سلة/طلبات (موجة 3) |
-| §0.13.2 `COMMISSION_FALLBACK_CHAIN` | 🟡 | `core/constants.py` — بدون `commission_service` |
+| §0.12 لا قفز موجات | ✅ | موجات 0–3 ✅؛ موجة 4 قيد التنفيذ |
+| §0.13.2 `COMMISSION_FALLBACK_CHAIN` | ✅ | `constants.py` + `financial_events_service` |
 | §0.14 `GATEWAY_RESPONSE_DENYLIST` | ✅ | `constants.py` + `strip_gateway_secrets` + tests |
 | §0.14 Fernet `crypto.py` | ✅ | `core/crypto.py` + `test_crypto.py` |
 | §0.8 coverage ملف-بملف + ≥85% | 🔒§0 | `coverage_manifest.yaml` + `--cov-fail-under=85` + CI |
