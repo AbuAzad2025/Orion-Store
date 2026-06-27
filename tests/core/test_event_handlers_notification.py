@@ -26,9 +26,8 @@ def test_order_paid_sends_confirmation(app):
     db.session.add(order)
     db.session.commit()
 
-    with patch(
-        "notification_svc.notification_service.NotificationService.send_order_confirmation"
-    ) as mock_send:
+    target = "notification_svc.notification_service.NotificationService"
+    with patch(f"{target}.send_order_confirmation") as mock_send:
         publish("order.paid", order_id=order.id, tenant_id=order.tenant_id)
         mock_send.assert_called_once()
         assert mock_send.call_args[0][0].id == order.id

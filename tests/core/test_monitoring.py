@@ -7,7 +7,7 @@ import logging
 from unittest.mock import patch
 
 from core.logging_config import JsonLogFormatter, configure_logging
-from core.monitoring import init_prometheus, init_sentry, register_monitoring
+from core.monitoring import init_sentry, register_monitoring
 
 
 def test_json_log_formatter():

@@ -13,6 +13,8 @@ def test_lazy_image_attrs_deferred():
 
 
 def test_lazy_image_attrs_high_priority():
-    attrs = lazy_image_attrs("https://cdn.example/hero.jpg", alt="Hero", high_priority=True)
+    attrs = lazy_image_attrs(
+        "https://cdn.example/hero.jpg", alt="Hero", high_priority=True
+    )
     assert attrs["src"] == "https://cdn.example/hero.jpg"
     assert "data-lazy-src" not in attrs
