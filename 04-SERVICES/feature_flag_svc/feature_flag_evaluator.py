@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from feature_flag.feature_flag import TenantFeatureFlagOverride
 from feature_flag.feature_flag_override import FeatureFlagOverride
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 
@@ -12,6 +13,11 @@ class FeatureFlagEvaluator:
 
     def is_enabled(self, tenant_id: int, code: str) -> bool:
         flag = self._flags.get_by_code(code)
+        new_override = TenantFeatureFlagOverride.query.filter_by(
+            flag_id=flag.id, tenant_id=tenant_id
+        ).first()
+        if new_override:
+            return new_override.enabled
         override = FeatureFlagOverride.query.filter_by(
             feature_flag_id=flag.id, tenant_id=tenant_id
         ).first()

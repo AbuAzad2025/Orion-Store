@@ -1,0 +1,46 @@
+from flask import Blueprint, jsonify, request
+
+from core.exceptions import OrionError
+from core.middleware import require_tenant_context
+from live_chat_svc.live_chat_service import LiveChatService
+
+live_chat_bp = Blueprint("live_chat", __name__)
+_svc = LiveChatService()
+
+
+@live_chat_bp.route("/sessions", methods=["POST"])
+def create_session():
+    try:
+        tenant = require_tenant_context()
+        data = request.get_json(silent=True) or {}
+        session = _svc.create_session(tenant_id=tenant.id, customer_email=data.get("customer_email"))
+        return jsonify({"session": session.to_dict()}), 201
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid request."}), 400
+
+
+@live_chat_bp.route("/sessions/<int:session_id>/messages", methods=["GET"])
+def get_messages(session_id: int):
+    try:
+        tenant = require_tenant_context()
+        messages = _svc.get_messages(tenant_id=tenant.id, session_id=session_id)
+        return jsonify({"messages": [m.to_dict() for m in messages]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@live_chat_bp.route("/sessions/<int:session_id>/messages", methods=["POST"])
+def send_message(session_id: int):
+    try:
+        tenant = require_tenant_context()
+        data = request.get_json(silent=True) or {}
+        msg = _svc.send_message(
+            tenant_id=tenant.id, session_id=session_id, sender_type=data["sender_type"], message=data["message"],
+        )
+        return jsonify({"message": msg.to_dict()}), 201
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except (KeyError, TypeError, ValueError):
+        return jsonify({"error": "Invalid request."}), 400

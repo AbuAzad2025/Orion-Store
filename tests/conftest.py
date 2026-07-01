@@ -118,6 +118,9 @@ def app(fernet_key: str, database_url: str) -> Generator[Flask, None, None]:
     os.environ["DATABASE_URL"] = database_url
     application = create_app("testing")
     yield application
+    # Strip leaked SMTP config that could poison subsequent session-scoped tests
+    application.config.pop("SMTP_HOST", None)
+    application.config.pop("SMTP_PORT", None)
 
 
 # ---------------------------------------------------------------------------

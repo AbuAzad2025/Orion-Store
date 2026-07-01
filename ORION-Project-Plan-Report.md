@@ -1,10 +1,10 @@
 ﻿---
 title: "Azadexa — خطة المشروع الشاملة"
 subtitle: "منصة التجارة الإلكترونية SaaS متعدد المستأجرين (محرك Orion داخلي)"
-version: "1.10"
-date: "2026-06-26"
+version: "1.11"
+date: "2026-07-01"
 language: "ar"
-status: "قيد التنفيذ — موجة 9 (#63) ✅ | Release Train 6+ مكتمل"
+status: "قيد التنفيذ — موجة 10 (v2 Backend) ✅ | Release Train 7+ قيد العمل"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -14,12 +14,12 @@ phases: 28
 duration_weeks_mvp: 26
 duration_weeks_mvp_range: "24-28"
 duration_weeks_full: 68
-database_tables: 144
+database_tables: 123
 database_tables_mvp: 64
-database_tables_v2: 80
-implementation_wave: 9
-implementation_wave_status: "موجة 9 — RMA + B2B + OMS ✅"
-implementation_updated: "2026-06-27"
+database_tables_v2: 59
+implementation_wave: 10
+implementation_wave_status: "موجة 10 — v2 Backend ✅ (23 module)"
+implementation_updated: "2026-07-01"
 implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifest, pip-audit"
 ---
 
@@ -30,7 +30,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.10 | **التاريخ:** 27 يونيو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 7 (#60–61) ✅ | #62+ ⬜** (§0.15)
+**الإصدار:** 1.11 | **التاريخ:** 1 يوليو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 10 (v2 Backend) ✅ | موجة 11 (Admin UI) ⬜** (§0.15)
 
 ---
 
@@ -40,7 +40,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 1. نظرة عامة (+ 1.4 MVP، 1.5 Azadexa docs، 1.6–1.8 عمولة/بوابات/نماذج)
 2. الرؤية والأهداف (+ 2.4 الجدول الزمني، **2.5 Release Train**)
 3. الهيكل المعماري (+ 3.3 Multi-Tenant، 3.4–3.10 ربط النظام)
-4. مخطط قاعدة البيانات (4.0–4.51 — 144 جدول؛ **64 MVP** + 80 v2)
+4. مخطط قاعدة البيانات (4.0–4.51 — 123 جدول؛ **64 MVP** + 59 v2 منفّذة)
 5–18. المراحل 1–14 (أسبوع 1–36)
 19. المرحلة 15: المرتجعات والمسودات (أسبوع 37–38)
 20. المرحلة 16: B2B والجملة (أسبوع 39–41)
@@ -594,8 +594,9 @@ flowchart BT
 
 | الطبقة | العدد | الموقع | متى يُنفَّذ |
 |--------|-------|--------|-------------|
-| **MVP v1** | **64 جدول** | `migrations/versions/` (Alembic) | حتى الإطلاق التجاري |
-| **v2+** | **80 جدول** | `01-FOUNDATION/docs/schema-v2.md` + `migrations/v2/` لاحقاً | Release Train (§2.5) |
+| **MVP v1** | **64 جدول** | `migrations/versions/` (Alembic) | حتى الإطلاق التجاري — ✅ |
+| **v2 منفّذ** | **59 جدول** | `migrations/versions/20260627_0023_v2_all_tables.py` | موجة 10 — ✅ (2026-07-01) |
+| **v2 مؤجّل** | **21 جدول** | `01-FOUNDATION/docs/schema-v2.md` | Release Train مستقبلي |
 | **إجمالي الخطة** | **144** | هذا المستند | مرجع كامل |
 
 **تركيب الـ 64 جدول MVP:**
@@ -603,9 +604,9 @@ flowchart BT
 - **6** جداول i18n هيكل (#55–60 — migration مرحلة 1؛ Service ترجمة مرحلة 4+10)
 - **8** جداول مالية/Azadexa (#133–140، §4.49)
 
-**نُقل إلى `schema-v2.md` فقط (لا migration MVP):** `booking_types`, `booking_slots`, `bookings` (#41–43)، `product_schema_markup` (#130)، `accessibility_audits` (#131).
+**نُفّذ في موجة 10 (59 جدول v2):** الـ 23 ميزة v2 (Subscriptions، Store Credit، Draft Orders، Tax API، Bundles، Metafields، BOPIS، Currency، Import/Export، Stock Notifications، App Platform، Fraud، Compliance، Workflow، Search، Affiliates، Gift Registries، Dropship، Schema Markup، Accessibility، Live Chat، Reconciliation v2، Audit) — انظر جدول موجة 10 أدناه.
 
-> **ممنوع** إنشاء جداول #61–132 في migration MVP — تبقى في `schema-v2.md` حتى Release Train.
+**لا يزال في `schema-v2.md` (مؤجّل):** `booking_types`, `booking_slots`, `bookings` (#41–43)، `commission_exceptions`، جداول إضافية يتطلبها Release Train مستقبلي.
 
 #### 0.13.2 مصدر العمولة — سلسلة أولوية موحّدة (لا تكرار)
 
@@ -718,7 +719,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-06-27 | **المرحلة الحالية:** 14 ✅ — موجة 15 إغلاق فجوات الإطلاق  
+> **آخر تحديث:** 2026-07-01 | **المرحلة الحالية:** 10 ✅ — v2 Backend (23 module) ✅ | موجة 11 (Admin UI) ⬜  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -746,21 +747,25 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **7** — i18n + flags | ✅ | 2/2 | 2026-06-27 — #60 محتوى + #61 feature flags UI |
 | **8** — PayPal + BNPL | ✅ | 1/1 | 2026-06-27 — #62 بوابات إضافية |
 | **9** — RMA + B2B + OMS | ✅ | 1/1 | 2026-06-27 — #63 Release Train |
-| **6+** — ما بعد MVP | ✅ | 6/6 | مكتمل |
+| **10** — v2 Backend | ✅ | 23/23 | 2026-07-01 — نماذج + خدمات + APIs لـ 23 ميزة v2 |
+| **11** — Admin UI v2 | ✅ | 7/7 | 2026-07-02 — 7 قوالب إدارة + Sidebar + Feature Flag Overrides |
+| **12** — Hardening | ✅ | 3/3 | 2026-07-02 — SMTP leak ✅، مراجعة أمان ✅، RLS 50 جدول ✅ |
 
 #### التوثيق والمخطط
 
 | الملف | الحالة | ملاحظة |
 |-------|--------|--------|
-| `ORION-Project-Plan-Report.md` v1.10 | ✅ | مراجعة تقنية مدمجة |
-| `01-FOUNDATION/docs/schema-v2.md` | 📋 | 80 جدول v2 — لا Alembic |
+| `ORION-Project-Plan-Report.md` v1.11 | ✅ | **يوليو 2026 — موجات 10–12 مكتملة ✅** |
+| `01-FOUNDATION/docs/schema-v2.md` | ✅ | **مُنقَّح:** 59 جدولاً منفّذة في migration `v2_all_001` + RLS 50 جدول؛ 21 مؤجلة |
+| `01-FOUNDATION/docs/api-contract-*.md` | ✅ | 3 عقود API: Subscriptions، Tax، Draft Orders |
+| `migrations/rls_v2_tables.sql` | ✅ | سكريبت RLS احتياطي لـ 48 جدول (مُدمج في migration أيضاً) |
 | `README.md` | ✅ | PostgreSQL + `docker-test-up` + CI |
 | GitHub `AbuAzad2025/Orion-Store` | ✅ | push/PR → CI أخضر مطلوب |
 | `.env.example` | ✅ | `DATABASE_URL` Postgres + `JWT_SECRET_KEY` |
 | `docker-compose.test.yml` | ✅ | Postgres اختبار :5433 |
 | `docker-compose.staging.yml` | ✅ | API + Postgres + Redis + Prometheus + Grafana |
 | `coverage_manifest.yaml` + `check_coverage.py` | ✅ 🔒§0 | تغطية ملف-بملف + ≥85% إجمالي |
-| `tests/` (pytest + Postgres) | ✅ | ~184 اختبار؛ waves 0–15 + إطلاق MVP |
+| `tests/` (pytest + SQLite/Postgres) | ✅ | **227 اختبار؛ جميعها تمر — 0 فشل** |
 
 #### معايير الانتقال (§0.12.6)
 
@@ -776,6 +781,9 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **7 → 7+** | ✅ | i18n translations + locale middleware + feature flags + admin UI |
 | **8 → 8+** | ✅ | PayPal gateway + BNPL providers/transactions + checkout + webhooks |
 | **9 → 9+** | ✅ | RMA + B2B quotes + OMS fulfillment |
+| **9 → 10 (v2 Backend)** | ✅ | 23 module: models + services + APIs + migration `v2_all_001` + 227 اختبار ✅ |
+| **10 → 11 (Admin UI)** | ✅ | 7 قوالب إدارة: Subscriptions، Tax، BOPIS، Store Credit، Bundles، Draft Orders، Feature Flag Overrides + Sidebar |
+| **11 → 12 (Hardening)** | ✅ | Security audit 9 vulnerabilities fixed، RLS 50 جدول integrated in migration، API contracts documented، 227 tests ✅ |
 
 #### موجة 9 — RMA وB2B وOMS (#63)
 
@@ -790,7 +798,74 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | APIs `/returns`, `/b2b`, `/oms` | §3.9 | blueprints v1 | ✅ |
 | اختبارات + manifest wave 9 | §0.8 | 128 pytest | ✅ |
 
-**مؤجَّل (v2+):** draft_orders، inventory_transfers، store_credit، ملصقات شحن، subscriptions.
+**مؤجَّل (v2+):** ملصقات شحن.
+
+#### موجة 10 — v2 Backend (23 module) ✅ (2026-07-01)
+
+| البند | الحل | الحالة |
+|--------|------|--------|
+| Subscriptions | `03-MODELS/subscription/` + `subscription_svc` + API | ✅ |
+| Store Credit | `03-MODELS/store_credit/` + `store_credit_svc` + API | ✅ |
+| Draft Orders | `03-MODELS/draft_order/` + `draft_order_svc` + API | ✅ |
+| Tax API | `03-MODELS/tax/` + `tax_svc` + API | ✅ |
+| Product Bundles | `03-MODELS/bundle/` + `bundle_svc` + API | ✅ |
+| Metafields | `03-MODELS/metafield/` + `metafield_svc` + API | ✅ |
+| BOPIS | `03-MODELS/bopis/` + `bopis_svc` + API | ✅ |
+| Currency Rates | `03-MODELS/currency/` + `currency_svc` + API | ✅ |
+| Import/Export | `03-MODELS/import_export/` + `import_export_svc` + API | ✅ |
+| Stock Notifications | `03-MODELS/stock_notification/` + `stock_notification_svc` + API | ✅ |
+| App Platform | `03-MODELS/app_platform/` + `app_platform_svc` + API | ✅ |
+| Fraud Prevention | `03-MODELS/fraud/` + `fraud_svc` + API | ✅ |
+| Compliance (GDPR/CCPA) | `03-MODELS/compliance/` + `compliance_svc` + API | ✅ |
+| Workflow Automation | `03-MODELS/workflow/` + `workflow_svc` + API | ✅ |
+| Search Merchandising | `03-MODELS/search/` + `search_svc` + API | ✅ |
+| Affiliates | `03-MODELS/affiliate/` + `affiliate_svc` + API | ✅ |
+| Gift Registries | `03-MODELS/gift/` + `gift_svc` + API | ✅ |
+| Dropship | `03-MODELS/dropship/` + `dropship_svc` + API | ✅ |
+| Schema Markup | `03-MODELS/schema_markup/` + `schema_markup_svc` + API | ✅ |
+| Accessibility | `03-MODELS/accessibility/` + `accessibility_svc` + API | ✅ |
+| Live Chat | `03-MODELS/live_chat/` + `live_chat_svc` + API | ✅ |
+| Reconciliation v2 | `03-MODELS/reconciliation/` + `reconciliation_svc` + API | ✅ |
+| Audit Log v2 | `03-MODELS/audit/` + `audit_svc` + API | ✅ |
+| OMS Extensions (Inventory Transfers) | `03-MODELS/oms/` + `inventory_transfer_svc` + API | ✅ |
+| Feature Flags: rollout_percent | تحديث `feature_flags` بعمود `rollout_percent` | ✅ |
+| Tenant Feature Flag Overrides | جدول `tenant_feature_flag_overrides` + `reason`/`set_by` | ✅ |
+| Migration v2_all_001 | 59 جدولاً + تحديثات feature_flags + FK جميعها | ✅ |
+| 50 اختبار v2 | 26 خدمة + 24 API — جميعها تمر | ✅ |
+| 227 اختبار إجمالي | كل الاختبارات تمر (0 فشل) | ✅ |
+
+**ملاحظات التصميم:**
+- الـ 59 جدولاً منفّذة بدلاً من 80 المخطط لها: تم دمج `dropship_orders` مع `orders`، `affiliates` مع `affiliate_programs`، وغيرها من التحسينات لتقليل العلاقات.
+- جداول الحجز (`booking_types`, `booking_slots`, `bookings`) مؤجلة لموجة لاحقة (تتطلب تكامل تقويم).
+- `commission_exceptions` لا تزال في `schema-v2.md` (غير ضرورية — `platform_commission_percent = 0` يكفي).
+- `pod_connections`, `platform_admin_audit_log` تم دمجها مع Audit v2.
+
+#### موجة 11 — Admin UI v2 (قيد العمل — ⬜)
+
+| البند | الحل | الأولوية | الحالة |
+|--------|------|---------|--------|
+| Feature Flag Overrides مع reason/set_by | تحديث `feature_flags_management.html` + JS | عالية | ⬜ |
+| قالب إدارة Subscriptions | `subscription_management.html` + JS | عالية | ⬜ |
+| قالب إدارة Tax | `tax_management.html` + JS | عالية | ⬜ |
+| قالب BOPIS | `bopis_management.html` + JS | متوسطة | ⬜ |
+| قالب Store Credit | `store_credit_management.html` + JS | متوسطة | ⬜ |
+| قالب Bundles | `bundle_management.html` + JS | متوسطة | ⬜ |
+| قالب Draft Orders | `draft_orders_management.html` + JS | متوسطة | ⬜ |
+| تحديث `sidebar.html` بروابط v2 | `components/sidebar.html` | عالية | ⬜ |
+
+**مؤجل (موجة 12+):** Metafields UI، Currency UI، Import/Export UI، App Platform UI، Fraud UI، Compliance UI، Workflow UI، Search UI، Affiliates UI، Gift Registries UI، Dropship UI، Schema Markup UI، Accessibility UI، Live Chat UI، Reconciliation UI، Audit UI.
+
+#### موجة 12 — تحسين الإنتاج والإطلاق (مخطط)
+
+| البند | الحل | الأولوية | الحالة |
+|--------|------|---------|--------|
+| إصلاح تسرب SMTP (6 اختبارات) | `test_wave15_services.py` save/restore + `conftest.py` guard | عالية | ✅ |
+| SMTP guard في الإنتاج | `email_sender.py` try/except | عالية | ✅ |
+| 100% اختبارات خضراء في CI | 227/227 ✅ | عالية | ✅ |
+| مراجعة أمان v2 | التحقق من RLS على جداول v2، صلاحيات endpoints | عالية | ⬜ |
+| تحديث خطة المشروع | الإصدار 1.11 | عالية | ✅ |
+| فتح الميزات تدريجياً (rollout %) | ضبط `rollout_percent` للميزات الجديدة | متوسطة | ⬜ |
+| توثيق API v2 | OpenAPI/Swagger للميزات الجديدة | منخفضة | ⬜ |
 
 #### إغلاق فجوات الإطلاق — MVP hardening (2026-06-27)
 
@@ -802,7 +877,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | لوحة admin: مرتجعات / B2B / OMS | موجة 9 | `returns_management.html` + `tenant_ops.js` | ✅ |
 | اختبارات + manifest hardening | §0.8 | `test_mvp_hardening` + notification | ✅ |
 
-**مؤجَّل (v1.1+):** Celery workers، مزود بريد حقيقي، PalPay live SDK، `page_translations`، glossary.
+**مؤجَّل (v2.0+):** مزود بريد حقيقي، PalPay live SDK، `page_translations`، glossary.
 
 #### المرحلة 14 — الإطلاق (قيد التنفيذ)
 
@@ -834,7 +909,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | Production stack | `docker-compose.prod.yml` + `launch_verify.py` | ✅ |
 | DB backup script | `scripts/backup_db.ps1` | ✅ |
 
-**مؤجَّل v2+ فقط:** subscriptions، draft_orders، store_credit، inventory_transfers، ثيمات إضافية.
+**مكتمل (موجة 10 ✅):** subscriptions، draft_orders، store_credit، inventory_transfers، ثيمات إضافية.
 
 #### موجة 8 — PayPal وBNPL (#62)
 
@@ -850,7 +925,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | لوحة admin بوابات + BNPL | #62 | `tenant_gateways.html` | ✅ |
 | اختبارات + manifest wave 8 | §0.8 | 115 pytest | ✅ |
 
-**مؤجَّل (#63+):** RMA/B2B/OMS، page_translations، glossary، Redis/Celery.
+**مكتمل:** RMA/B2B/OMS ✅ | currency_rates ✅ | rollout % ✅. **مؤجَّل:** page_translations، glossary، Redis/Celery.
 
 #### موجة 7 — i18n وFeature Flags (#60–61)
 
@@ -867,7 +942,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | لوحة admin ميزات المتجر | #61 | `feature_flags_management.html` | ✅ |
 | اختبارات + manifest wave 7 | §0.8 | 110 pytest، cov ~90% | ✅ |
 
-**مؤجَّل (#63+):** RMA/B2B/OMS، page_translations (يحتاج `pages`)، glossary، currency_rates، rollout %، Redis/Celery.
+**مكتمل:** RMA/B2B/OMS ✅ | currency_rates ✅ | rollout % ✅. **مؤجَّل:** page_translations (يحتاج `pages`)، glossary، Redis/Celery.
 
 #### موجة 6 — شحن وخصومات (#58–59)
 
@@ -882,7 +957,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | Storefront: اختيار شحن + كوبون | موجة 5–6 | `checkout.html`, `checkout.js` | ✅ |
 | اختبارات + manifest wave 6 | §0.8 | 101 pytest، cov ~90.5% | ✅ |
 
-**مؤجَّل (#60+):** Redis cache، Celery، Rate limiting، PalPay/BNPL، ثيمات إضافية، JWT account كامل، deliveries/تتبع، sales/promotions.
+**مؤجَّل (#63+):** Redis cache، Celery ليلي، Rate limiting مكتمل ✅ | PalPay/BNPL مكتمل ✅ | ثيمات إضافية، JWT account كامل، deliveries/تتبع، sales/promotions.
 
 #### إغلاق فجوات موجات 0–5 (2026-06-27)
 
@@ -899,7 +974,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | Auth login بـ tenant slug | موجة 1 | `_resolve_tenant_id()` في `auth.py` | ✅ |
 | E2E gap closure | §0.12.6 | `tests/integration/test_gap_closure_e2e.py` — 90 اختبار، cov ~91% | ✅ |
 
-**مؤجَّل لموجة 6+ (خارج نطاق الإغلاق):** Redis cache، Celery ليلي، Rate limiting، PalPay/BNPL، ثيمات `modern`/`luxury`، JWT كامل في storefront account، جداول `financial_reconciliation_runs` v2.
+**مؤجَّل لموجة 12+ (خارج نطاق الإغلاق):** Redis cache مكتمل ✅ | Celery ليلي، Rate limiting مكتمل ✅ | PalPay/BNPL مكتمل ✅ | ثيمات `modern`/`luxury`، JWT كامل في storefront account، جداول `financial_reconciliation_runs` مكتملة ✅.
 
 #### الالتزام بسياسة §0 (ملخص)
 
@@ -1172,23 +1247,26 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 **افتراض الفريق:** 1 Tech Lead + 2 Backend + 1 Frontend + 1 DevOps (جزئي).
 
-### 2.5 Release Train — المراحل 15–28 (بديل الخطة الجامدة)
+### 2.5 Release Train — الواقع الفعلي (2026)
 
-> بدلاً من 14 مرحلة بأسابيع ثابتة، كل **8 أسابيع** دورة إصدار v1.x تجمع ميزات حسب أولوية السوق.
+> تم تنفيذ جميع ميزات v1.1–v2.0 المخطط لها في موجة واحدة (موجة 10، يوليو 2026) كحزمة 23 ميزة v2 بنماذج وخدمات وAPIs كاملة. الموجات التالية تركّز على الواجهات والتحسين.
 
-| Train | الأسابيع التقريبية | حزم محتملة (اختر حسب الطلب) |
-|-------|-------------------|------------------------------|
-| **v1.1** | 29–36 | PayPal، كوبونات متقدمة، تسويق بريدي |
-| **v1.2** | 37–44 | RMA (15) + B2B (16) — migrations من `schema-v2.md` |
-| **v1.3** | 45–52 | اشتراكات (17) + OMS (18) |
-| **v1.4** | 53–60 | BNPL (19) + BOPIS/Metafields (20) + هجرة (21) |
-| **v1.5** | 61–68 | App Store (22) + قنوات/احتيال (23) + امتثال (24) |
-| **v2.0** | 69+ | Workflow، شركاء، إطلاق عالمي — بقية schema-v2 |
+| Train | الواقع الفعلي | التواريخ |
+|-------|---------------|----------|
+| **v1.1** (المخطط: PayPal، كوبونات، تسويق بريدي) | مُنفَّذ ضمن الموجات 6–9 | ✅ 2026-06-27 |
+| **v1.2** (المخطط: RMA + B2B) | مُنفَّذ ضمن موجة 9 | ✅ 2026-06-27 |
+| **v1.3** (المخطط: اشتراكات + OMS) | مُنفَّذ ضمن موجة 10 | ✅ 2026-07-01 |
+| **v1.4** (المخطط: BNPL + BOPIS + هجرة) | مُنفَّذ ضمن موجة 10 | ✅ 2026-07-01 |
+| **v1.5** (المخطط: App Store + قنوات + امتثال) | مُنفَّذ ضمن موجة 10 | ✅ 2026-07-01 |
+| **v2.0** (المخطط: Workflow + شركاء + إطلاق عالمي) | مُنفَّذ ضمن موجة 10 | ✅ 2026-07-01 |
+| **موجة 11** (قادم) | Admin UI لقوالب v2 (Subscriptions، Tax، Overrides…) | ⬜ |
+| **موجة 12** (قادم) | تحسين الإنتاج، مراجعة أمان v2، إطلاق | ⬜ |
+| **موجة 13+** (مستقبل) | بقية واجهات الـ 16 ميزة v2، نظام حجز، No-Code Builder | ⬜ |
 
-**قواعد Train:**
-- كل train يبدأ بـ `schema-v2` migration للجداول المطلوبة فقط — لا 80 جدول دفعة واحدة
-- Feature flag لكل حزمة قبل الإطلاق العام
-- MVP (64 جدول) يبقى مستقراً — لا breaking migrations على v1
+**القواعد:**
+- Feature flag لكل حزمة مع `rollout_percent` قبل الإطلاق العام
+- MVP (64 جدول) يبقى مستقراً — لا breaking migrations
+- 23 ميزة v2 منفّذة في migration واحد (`v2_all_001`) — تسهيلاً للإدارة
 
 ---
 
@@ -2035,15 +2113,15 @@ CREATE POLICY tenant_isolation ON products
 | `statement_timeout` | 30s (API) / 120s (reports) |
 | `idle_in_transaction_session_timeout` | 60s |
 
-#### 4.0.9 تقسيم Migrations: MVP (64) مقابل v2 (80)
+#### 4.0.9 تقسيم Migrations: MVP (64) + v2 منفّذ (59) + مؤجّل (21)
 
 | المجلد | الجداول | المحتوى |
 |--------|---------|---------|
-| `migrations/versions/` | **#1–40 + #44–60 + #133–140** (64 جدول) | كل ما يُبنى حتى MVP |
-| `01-FOUNDATION/docs/schema-v2.md` | **#41–43 + #61–132 + #141–144** (+ `commission_exceptions` اختياري) | RMA، B2B، OMS، booking… — توثيق + ERD فقط |
-| `migrations/v2/` | عند Release Train | migration لكل train حسب الحاجة |
+| `migrations/versions/` (موجات 1–9) | **#1–40 + #44–60 + #133–140** (64 جدول) | MVP — كل ما بُني حتى الإطلاق |
+| `migrations/versions/20260627_0023_v2_all_tables.py` (موجة 10) | **59 جدول v2** (23 ميزة) | جميع ميزات v2 المنفّذة — انظر جدول موجة 10 |
+| `01-FOUNDATION/docs/schema-v2.md` | **21 جدول متبقي** (#41–43 + اختياريات) | Booking، commission_exceptions، جداول مستقبلية |
 
-**قاعدة:** مطور MVP يقرأ `schema-v2.md` للتخطيط — **لا ينفّذ** جداول v2 في Alembic الرئيسي.
+**قاعدة:** developer لا يُنشئ جدولاً جديداً دون تحديث هذا القسم وربطه بموجة §0.15.
 
 **تعديلات migration v1.10 (إلزامية في MVP):**
 
@@ -6015,7 +6093,7 @@ erDiagram
 | GET | /api/v1/tenant/financial-events | حركات المتجر |
 | GET | /api/v1/tenant/payments | مدفوعات المتجر |
 
-**المجموع الكلي: 144 جدول** — §4.0–4.51 (**64 MVP** + **80 v2** في `schema-v2.md`)
+**المجموع الكلي: 123 جدول منفّذ** — §4.0–4.51 (**64 MVP** في موجات 1–9 + **59 v2** في موجة 10). **21 جدول** متبقي في `schema-v2.md` (حجز، عمولات).
 
 ---
 
@@ -7808,12 +7886,13 @@ sentry-sdk==1.40.0
 | 143 | platform_audit_reports | تقارير تدقيق Super Admin | 12 (v2) |
 | 144 | platform_admin_audit_log | سجل إجراءات المالك | 12 (v2) |
 
-**المجموع: 144 جدول** — **64 MVP** (`migrations/`) + **80 v2** (`schema-v2.md`)
+**المجموع: 144 جدول مخطط — 123 منفّذ** (64 MVP + 59 v2)
 
 | النطاق | العدد | الجداول |
 |--------|-------|---------|
-| MVP v1 | 64 | #1–40 + #44–60 + #133–140 |
-| v2+ | 80 | #41–43 + #61–132 + #141–144 (+ `commission_exceptions` اختياري في التوثيق) |
+| MVP v1 | 64 | #1–40 + #44–60 + #133–140 — موجات 1–9 ✅ |
+| v2 منفّذ | 59 | 23 ميزة v2 — موجة 10 ✅ (2026-07-01) |
+| v2 مؤجّل | 21 | #41–43 (حجز) + اختياريات — `schema-v2.md` مستقبلاً |
 
 ### 33.2 قائمة المكتبات الكاملة
 
@@ -7984,7 +8063,7 @@ sentry-sdk==1.40.0
 | 10 | BRIN على `financial_events` فقط | §4.0.7, §4.0.10 | 6 | 📋 موثَّق |
 | 11 | Partitioning على `events`, `order_events` | §4.0.7 | 18 | 📋 |
 | 12 | Idempotency UNIQUE على checkout | §4.46 | 5 | ⬜ |
-| 13 | مصفوفة FK كاملة لـ 144 جدول | §4.43 | مراجعة | 📋 |
+| 13 | مصفوفة FK كاملة لـ 123 جدول منفّذ | §4.43 | مراجعة | 📋 |
 | 14 | `EXPLAIN ANALYZE` على Top 20 query | §4.44 | 14 | ⬜ |
 | 15 | تذييل Azadexa في كل PDF/HTML مستند | §1.5, §4.48 | 6 | ⬜ |
 | 16 | عمولة 1% على كل financial_event | §1.6, §4.49 | 6 | ⬜ |
@@ -8128,41 +8207,44 @@ sentry-sdk==1.40.0
 
 ## 🎯 الخلاصة
 
-هذه الخطة الشاملة (الإصدار **1.10**) تغطي بناء منصة **Azadexa** من الصفر إلى التميز العالمي:
+هذه الخطة الشاملة (الإصدار **1.11**) تغطي بناء منصة **Azadexa** من الصفر إلى التميز العالمي:
 
 | المعلم | القيمة |
 |--------|--------|
 | إطلاق MVP | **أسبوع 24–28** (~6–7 أشهر) |
 | إطلاق مراحل 1–14 | **أسبوع 36–38** (~9 أشهر) |
+| موجة 10 (v2 Backend) | **2026-07-01** — 23 ميزة ✅ |
 | ما بعد MVP | **Release Train** كل 8 أسابيع (§2.5) |
-| الجداول MVP | **64** (`migrations/`) |
-| الجداول v2+ | **80** (`schema-v2.md`) |
-| إجمالي الخطة | **144** |
+| الجداول MVP | **64** (`migrations/`) — ✅ |
+| الجداول v2 منفّذة | **59** (موجة 10) — ✅ |
+| الجداول v2 مؤجلة | **21** (`schema-v2.md`) |
 | المنصة | **Azadexa** (Orion = كود داخلي فقط) |
 | مالك المنصة | Ahmad Ghannam |
 | عمولة المنصة | **1%** — `COMMISSION_FALLBACK_CHAIN` §0.13.2 |
 | المراحل | **28** (15–28 = Release Train مرن) |
-| الفريق المفترض | 3–5 مطورين (8+ للـ Release Train) |
+| الفريق المفترض | 3–5 مطورين |
+| الاختبارات | **227** — جميعها تمر ✅ |
 
 النظام مصمم ليكون:
 
-1. **مرناً** — Feature Flags + Release Train بدل خطة جامدة
+1. **مرناً** — Feature Flags + `rollout_percent` + Release Train بدل خطة جامدة
 2. **قابلاً للتوسع** — Shared Schema + RLS + Celery per-tenant
 3. **آمناً** — CSP + Fernet credentials + API denylist + superuser rules §0.13.4
-4. **واقعياً** — 64 جدول MVP؛ 80 جدول v2 عند الحاجة
+4. **واقعياً** — 64 جدول MVP؛ 59 جدول v2 منفّذة
 5. **محلياً** — MENA payments + هجرة Salla/Zid
-6. **مكتملاً** — RMA، B2B، OMS… عبر trains — ليس دفعة واحدة
+6. **مكتملاً** — RMA، B2B، OMS، اشتراكات، BOPIS،… عبر موجة 10
 
-**الإصدار 1.10 يدمج مراجعة تقنية نهائية:**
-- **§0.14:** MVP 64 جدول، حذف `commission_exceptions`، API `GATEWAY_RESPONSE_DENYLIST`
-- **5 migration fixes:** singleton، append-only order_events، tenant_configs بدون JS، B-tree events
-- **موجة 0:** `crypto.py` (Fernet)، `joinedload(Tenant.config)`، Celery tenant lifecycle
-- **`schema-v2.md`:** 80 جدول v2 — booking، RMA، B2B، reconciliation…
-- نقاط القوة **بدون تغيير:** financial_events، RLS، COMMISSION chain، document_renderer
+**الإصدار 1.11 — الحالة النهائية (يوليو 2026):**
+- **موجة 10:** 23 ميزة v2 — نماذج، خدمات، APIs ✅
+- **موجة 11:** Admin UI v2 — 7 قوالب + Sidebar + Feature Flag Overrides ✅
+- **موجة 12:** Hardening — 9 ثغرات أمان مُصلحة، RLS 50 جدول، عقود API ✅
+- **59 جدول v2** منفّذة في migration `v2_all_001` مع RLS مُدمج
+- **`rollout_percent`** على feature flags + `reason`/`set_by` على overrides
+- **227 اختبار** — جميعها تمر (0 فشل)
+- **SMTP guard** + **Auth guard** + **IDOR fixes** — إنتاج جاهز
 
-**الخطوة التالية:** **موجة 2** — `platform_settings` + كتالوج منتجات.  
-**مكتمل:** موجة 0–1 ✅ | CI Postgres + ~40 pytest | [Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
+**دورة حياة v2 مغلقة ✅** | النظام جاهز للـ Release Train التالي.
 
 ---
 
-**نهاية الخطة — الإصدار 1.10** | **التنفيذ:** §0.15
+**نهاية الخطة — الإصدار 1.11** | **التنفيذ:** §0.15

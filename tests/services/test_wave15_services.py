@@ -19,67 +19,91 @@ def test_render_order_confirmation():
 
 
 def test_send_smtp_email(app):
-    app.config.update(
-        {
-            "SMTP_HOST": "smtp.test",
-            "SMTP_PORT": 587,
-            "SMTP_USER": "u",
-            "SMTP_PASSWORD": "p",
-            "SMTP_FROM": "noreply@test.com",
-            "SMTP_USE_TLS": True,
-        }
-    )
-    mock_client = MagicMock()
-    mock_client.__enter__ = MagicMock(return_value=mock_client)
-    mock_client.__exit__ = MagicMock(return_value=False)
-    with app.app_context():
-        with patch(
-            "notification_svc.email_sender.smtplib.SMTP", return_value=mock_client
-        ):
-            send_smtp_email(recipient="a@b.com", subject="Hi", body="Body")
-    mock_client.starttls.assert_called_once()
-    mock_client.send_message.assert_called_once()
+    _prev = {k: app.config.get(k) for k in ("SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "SMTP_USE_TLS")}
+    try:
+        app.config.update(
+            {
+                "SMTP_HOST": "smtp.test",
+                "SMTP_PORT": 587,
+                "SMTP_USER": "u",
+                "SMTP_PASSWORD": "p",
+                "SMTP_FROM": "noreply@test.com",
+                "SMTP_USE_TLS": True,
+            }
+        )
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        with app.app_context():
+            with patch(
+                "notification_svc.email_sender.smtplib.SMTP", return_value=mock_client
+            ):
+                send_smtp_email(recipient="a@b.com", subject="Hi", body="Body")
+        mock_client.starttls.assert_called_once()
+        mock_client.send_message.assert_called_once()
+    finally:
+        for k, v in _prev.items():
+            if v is None:
+                app.config.pop(k, None)
+            else:
+                app.config[k] = v
 
 
 def test_notification_sends_when_smtp_configured(app):
-    app.config.update(
-        {
-            "SMTP_HOST": "smtp.test",
-            "SMTP_PORT": 587,
-            "CELERY_TASK_ALWAYS_EAGER": True,
-        }
-    )
-    order = Order(
-        tenant_id=1,
-        customer_email="buyer@test.com",
-        order_number="ORD-2",
-        total="10.00",
-    )
-    with app.app_context():
-        with patch("notification_svc.email_sender.smtplib.SMTP") as smtp:
-            mock_client = MagicMock()
-            mock_client.__enter__ = MagicMock(return_value=mock_client)
-            mock_client.__exit__ = MagicMock(return_value=False)
-            smtp.return_value = mock_client
-            row = NotificationService().send_order_confirmation(order)
-    assert row["status"] == "sent"
+    _prev = {k: app.config.get(k) for k in ("SMTP_HOST", "SMTP_PORT", "CELERY_TASK_ALWAYS_EAGER")}
+    try:
+        app.config.update(
+            {
+                "SMTP_HOST": "smtp.test",
+                "SMTP_PORT": 587,
+                "CELERY_TASK_ALWAYS_EAGER": True,
+            }
+        )
+        order = Order(
+            tenant_id=1,
+            customer_email="buyer@test.com",
+            order_number="ORD-2",
+            total="10.00",
+        )
+        with app.app_context():
+            with patch("notification_svc.email_sender.smtplib.SMTP") as smtp:
+                mock_client = MagicMock()
+                mock_client.__enter__ = MagicMock(return_value=mock_client)
+                mock_client.__exit__ = MagicMock(return_value=False)
+                smtp.return_value = mock_client
+                row = NotificationService().send_order_confirmation(order)
+        assert row["status"] == "sent"
+    finally:
+        for k, v in _prev.items():
+            if v is None:
+                app.config.pop(k, None)
+            else:
+                app.config[k] = v
 
 
 def test_send_email_task(app):
-    app.config.update({"SMTP_HOST": "smtp.test", "SMTP_PORT": 587})
-    payload = {
-        "template": "order_confirmation",
-        "recipient": "x@y.com",
-        "context": {"order_number": "O-1", "total": "5"},
-    }
-    with app.app_context():
-        with patch("notification_svc.email_sender.smtplib.SMTP") as smtp:
-            mock_client = MagicMock()
-            mock_client.__enter__ = MagicMock(return_value=mock_client)
-            mock_client.__exit__ = MagicMock(return_value=False)
-            smtp.return_value = mock_client
-            result = send_email_task(payload)
-    assert result["status"] == "sent"
+    _prev = {k: app.config.get(k) for k in ("SMTP_HOST", "SMTP_PORT")}
+    try:
+        app.config.update({"SMTP_HOST": "smtp.test", "SMTP_PORT": 587})
+        payload = {
+            "template": "order_confirmation",
+            "recipient": "x@y.com",
+            "context": {"order_number": "O-1", "total": "5"},
+        }
+        with app.app_context():
+            with patch("notification_svc.email_sender.smtplib.SMTP") as smtp:
+                mock_client = MagicMock()
+                mock_client.__enter__ = MagicMock(return_value=mock_client)
+                mock_client.__exit__ = MagicMock(return_value=False)
+                smtp.return_value = mock_client
+                result = send_email_task(payload)
+        assert result["status"] == "sent"
+    finally:
+        for k, v in _prev.items():
+            if v is None:
+                app.config.pop(k, None)
+            else:
+                app.config[k] = v
 
 
 def test_check_trial_expiry_task(app):

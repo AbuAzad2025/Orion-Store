@@ -154,22 +154,56 @@ document.addEventListener("DOMContentLoaded", () => {
         flagsEl.innerHTML = data.flags
           .map(
             (f) => `
-          <div class="flex items-center justify-between rounded border p-3 bg-white">
-            <div>
-              <strong>${f.name}</strong>
-              <p class="text-xs text-gray-500">${f.code} — ${f.description || ""}</p>
+          <div class="rounded border p-3 bg-white" data-flag="${f.code}">
+            <div class="flex items-center justify-between">
+              <div>
+                <strong>${f.name}</strong>
+                <p class="text-xs text-gray-500">${f.code} — ${f.description || ""}</p>
+                <p class="text-xs text-gray-400 mt-1">Rollout: ${f.rollout_percent}%</p>
+              </div>
+              <div class="flex items-center gap-3">
+                ${f.has_override ? `<span class="text-xs text-amber-600">مخصّص</span>` : `<span class="text-xs text-gray-400">تلقائي</span>`}
+                <label class="inline-flex items-center gap-2">
+                  <input type="checkbox" data-flag-code="${f.code}" ${f.value ? "checked" : ""}>
+                  <span class="text-sm">${f.value ? "مفعّل" : "معطّل"}</span>
+                </label>
+              </div>
             </div>
-            <label class="inline-flex items-center gap-2">
-              <input type="checkbox" data-flag-code="${f.code}" ${f.value ? "checked" : ""}>
-              <span class="text-sm">${f.value ? "مفعّل" : "معطّل"}</span>
-            </label>
+            ${f.override_reason ? `<div class="mt-2 text-xs text-gray-500 border-t pt-2"><span class="font-medium">السبب:</span> ${f.override_reason}${f.override_set_by_name ? ` <span class="text-gray-400 mr-2">— ${f.override_set_by_name}</span>` : ""}</div>` : ""}
+            ${f.has_override ? `<div class="mt-2 text-right"><button class="remove-override text-xs text-red-500" data-flag-code="${f.code}">إزالة التخصيص</button></div>` : ""}
+            <div class="reason-field mt-2 hidden" data-flag-code="${f.code}">
+              <input type="text" class="reason-input w-full border rounded px-2 py-1 text-xs" placeholder="سبب التغيير (اختياري)">
+              <button class="save-override mt-1 text-xs rounded bg-blue-600 px-3 py-1 text-white" data-flag-code="${f.code}">حفظ مع السبب</button>
+            </div>
           </div>`
           )
           .join("");
         flagsEl.querySelectorAll("input[data-flag-code]").forEach((input) => {
           input.addEventListener("change", () => {
             const code = input.getAttribute("data-flag-code");
-            OrionAPI.put(`/tenant/feature-flags/${code}`, { value: input.checked })
+            const container = document.querySelector(`[data-flag="${code}"]`);
+            const reasonField = container.querySelector(".reason-field");
+            if (input.checked !== (container.querySelector(".save-override") !== null)) {
+              reasonField.classList.remove("hidden");
+            }
+          });
+        });
+        flagsEl.querySelectorAll(".save-override").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const code = btn.getAttribute("data-flag-code");
+            const container = document.querySelector(`[data-flag="${code}"]`);
+            const checkbox = container.querySelector("input[data-flag-code]");
+            const reason = container.querySelector(".reason-input").value.trim() || null;
+            OrionAPI.put(`/tenant/feature-flags/${code}`, { value: checkbox.checked, reason })
+              .then(() => location.reload())
+              .catch((err) => alert(err.message));
+          });
+        });
+        flagsEl.querySelectorAll(".remove-override").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const code = btn.getAttribute("data-flag-code");
+            if (!confirm("إزالة التخصيص لهذه الميزة؟")) return;
+            OrionAPI.put(`/tenant/feature-flags/${code}`, { value: null })
               .then(() => location.reload())
               .catch((err) => alert(err.message));
           });

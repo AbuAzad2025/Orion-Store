@@ -1,0 +1,19 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">الحزم</h2>
+    <form id="bundle-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="name" type="text" placeholder="اسم الحزمة" required>
+      <input name="code" type="text" placeholder="رمز الحزمة" required>
+      <input name="discount_percent" type="number" step="0.01" placeholder="نسبة الخصم" value="0">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة حزمة</button>
+    </form>
+    <div id="bundles-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/tenant_ops.js') }}"></script>
+<script>OrionTenantOps.initBundles();</script>
+{% endblock %}

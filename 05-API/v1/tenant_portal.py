@@ -220,10 +220,14 @@ def set_feature_flag(code: str):
     try:
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
+        value = data.get("value")
+        if value is None:
+            _flags.remove_tenant_override(tenant_id=g.tenant_id, code=code)
+            return jsonify({"flag": {"code": code, "has_override": False}}), 200
         result = _flags.set_tenant_override(
             tenant_id=g.tenant_id,
             code=code,
-            value=bool(data.get("value", False)),
+            value=bool(value),
             reason=data.get("reason"),
             set_by=g.user.id if g.user else None,
         )

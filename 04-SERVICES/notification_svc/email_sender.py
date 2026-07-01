@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import smtplib
 from email.message import EmailMessage
+
+logger = logging.getLogger(__name__)
 
 
 def smtp_configured() -> bool:
@@ -31,12 +34,17 @@ def send_smtp_email(*, recipient: str, subject: str, body: str) -> None:
     msg["To"] = recipient
     msg.set_content(body)
 
-    with smtplib.SMTP(host, port, timeout=15) as client:
-        if use_tls:
-            client.starttls()
-        if user and password:
-            client.login(user, password)
-        client.send_message(msg)
+    try:
+        with smtplib.SMTP(host, port, timeout=15) as client:
+            if use_tls:
+                client.starttls()
+            if user and password:
+                client.login(user, password)
+            client.send_message(msg)
+    except Exception:
+        logger.exception(
+            "SMTP delivery failed", extra={"recipient": recipient, "smtp_host": host}
+        )
 
 
 def render_order_confirmation(context: dict) -> tuple[str, str]:
