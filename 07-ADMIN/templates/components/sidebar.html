@@ -1,6 +1,6 @@
-<aside class="w-56 bg-slate-900 text-white p-4">
-  <div class="mb-8 font-bold text-lg">Azadexa</div>
-  <nav class="space-y-2 text-sm">
+<aside class="w-56 bg-slate-900 text-white p-4 flex flex-col min-h-screen">
+  <div class="mb-8 font-bold text-lg">{{ platform_settings.platform_name | default('Azadexa') }}</div>
+  <nav class="space-y-2 text-sm flex-1">
     {% if tenant %}
       <a href="/admin/store/dashboard" class="block py-2 px-3 rounded {% if active_nav == 'dashboard' %}bg-slate-700{% endif %}">لوحة المتجر</a>
       <a href="/admin/store/gateways" class="block py-2 px-3 rounded {% if active_nav == 'gateways' %}bg-slate-700{% endif %}">بوابات الدفع</a>
@@ -32,9 +32,20 @@
       <a href="/admin/store/live-chat" class="block py-2 px-3 rounded {% if active_nav == 'live_chat' %}bg-slate-700{% endif %}">الدردشة المباشرة</a>
       <a href="/admin/store/reconciliation" class="block py-2 px-3 rounded {% if active_nav == 'reconciliation' %}bg-slate-700{% endif %}">التسوية المالية</a>
       <a href="/admin/store/platform-audit" class="block py-2 px-3 rounded {% if active_nav == 'platform_audit' %}bg-slate-700{% endif %}">تدقيق المنصة</a>
+      <hr class="border-slate-700 my-2">
+      <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="block py-2 px-3 rounded text-emerald-400 hover:bg-slate-800">
+        رابط المتجر <span class="text-xs">↗</span>
+      </a>
     {% else %}
       <a href="/admin/platform/dashboard" class="block py-2 px-3 rounded {% if active_nav == 'dashboard' %}bg-slate-700{% endif %}">لوحة المنصة</a>
+      <a href="/admin/platform/tenants" class="block py-2 px-3 rounded {% if active_nav == 'tenants' %}bg-slate-700{% endif %}">المتاجر</a>
+      <a href="/admin/platform/users" class="block py-2 px-3 rounded {% if active_nav == 'users' %}bg-slate-700{% endif %}">المستخدمين</a>
+      <a href="/admin/platform/settings" class="block py-2 px-3 rounded {% if active_nav == 'settings' %}bg-slate-700{% endif %}">إعدادات المنصة</a>
       <a href="/admin/platform/reconciliation" class="block py-2 px-3 rounded {% if active_nav == 'reconciliation' %}bg-slate-700{% endif %}">التسوية</a>
     {% endif %}
   </nav>
+  <div class="mt-4 pt-4 border-t border-slate-700 space-y-2 text-sm">
+    <a href="/admin/profile" class="block py-2 px-3 rounded {% if active_nav == 'profile' %}bg-slate-700{% endif %}">الملف الشخصي</a>
+    <a href="/admin/logout" class="block py-2 px-3 rounded text-red-300 hover:bg-slate-800">تسجيل الخروج</a>
+  </div>
 </aside>

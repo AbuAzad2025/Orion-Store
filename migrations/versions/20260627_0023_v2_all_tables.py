@@ -1159,8 +1159,6 @@ def upgrade() -> None:
     for t in _rls_all_tables:
         _tenant_rls(t)
 
-    op.drop_column("feature_flags", "rollout_percent")
-
 
 def downgrade() -> None:
     tables = [

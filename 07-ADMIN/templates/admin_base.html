@@ -5,16 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page_title }} — Azadexa Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  {% if admin_token %}
+  <script>
+    localStorage.setItem("orion_access_token", {{ admin_token | tojson }});
+  </script>
+  {% endif %}
 </head>
 <body class="bg-gray-100 min-h-screen" {% if tenant %}data-tenant-id="{{ tenant.slug }}"{% endif %} data-user-id="">
   <div class="flex min-h-screen">
     {% include "components/sidebar.html" %}
-    <main class="flex-1 p-6">
+    <main class="flex-1 p-6 flex flex-col min-h-screen">
       <header class="mb-6">
         <h1 class="text-2xl font-bold text-gray-800">{{ page_title }}</h1>
         {% if tenant %}<p class="text-sm text-gray-500">{{ tenant.name }}</p>{% endif %}
       </header>
-      {% block content %}{% endblock %}
+      <div class="flex-1">
+        {% block content %}{% endblock %}
+      </div>
+      <footer class="mt-8 pt-4 border-t border-gray-300 text-xs text-gray-500 text-center">
+        <p class="mb-1">
+          {{ platform_settings.platform_name | default('Azadexa') }} — منصة التجارة الإلكترونية الذكية
+        </p>
+        <p>
+          تطوير: {{ platform_settings.owner_name | default('Ahmad Ghannam') }} ·
+          شركة ازاد للأنظمة الذكية
+        </p>
+      </footer>
     </main>
   </div>
   <script src="{{ url_for('admin_assets.static', filename='js/api_client.js') }}"></script>

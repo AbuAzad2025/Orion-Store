@@ -1,10 +1,40 @@
 {% extends "admin_base.html" %}
 {% block content %}
-<table class="w-full bg-white rounded shadow text-sm">
-  <thead><tr class="border-b text-right"><th class="p-3">المتجر</th><th class="p-3">Slug</th><th class="p-3">إجراء</th></tr></thead>
-  <tbody id="platform-tenants"><tr><td colspan="3" class="p-3">جاري التحميل...</td></tr></tbody>
-</table>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded border p-4">
+    <div class="text-sm text-gray-500">إجمالي المتاجر</div>
+    <div id="stat-tenants" class="text-2xl font-bold">0</div>
+  </div>
+  <div class="bg-white rounded border p-4">
+    <div class="text-sm text-gray-500">المتاجر النشطة</div>
+    <div id="stat-active-tenants" class="text-2xl font-bold text-green-600">0</div>
+  </div>
+  <div class="bg-white rounded border p-4">
+    <div class="text-sm text-gray-500">إجمالي المستخدمين</div>
+    <div id="stat-users" class="text-2xl font-bold">0</div>
+  </div>
+  <div class="bg-white rounded border p-4">
+    <div class="text-sm text-gray-500">المستخدمين النشطين</div>
+    <div id="stat-active-users" class="text-2xl font-bold text-green-600">0</div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <a href="/admin/platform/tenants" class="bg-white rounded border p-4 hover:shadow transition">
+    <h3 class="font-semibold mb-1">إدارة المتاجر</h3>
+    <p class="text-sm text-gray-500">إضافة، تعديل، حذف، تعليق المتاجر</p>
+  </a>
+  <a href="/admin/platform/users" class="bg-white rounded border p-4 hover:shadow transition">
+    <h3 class="font-semibold mb-1">إدارة المستخدمين</h3>
+    <p class="text-sm text-gray-500">إضافة مديرين للمتاجر ومديرين للمنصة</p>
+  </a>
+  <a href="/admin/platform/settings" class="bg-white rounded border p-4 hover:shadow transition">
+    <h3 class="font-semibold mb-1">إعدادات المنصة</h3>
+    <p class="text-sm text-gray-500">اسم المنصة، العملة، اللغة، معلومات المالك</p>
+  </a>
+</div>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('admin_assets.static', filename='js/platform_admin.js') }}"></script>
+<script src="{{ url_for('admin_assets.static', filename='js/admin_platform.js') }}"></script>
+<script>OrionAdminPlatform.initDashboard();</script>
 {% endblock %}

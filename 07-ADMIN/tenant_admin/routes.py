@@ -6,6 +6,8 @@ from pathlib import Path
 
 from flask import Blueprint, g, render_template
 
+from platform_svc.platform_settings_service import PlatformSettingsService
+
 _ADMIN_ROOT = Path(__file__).resolve().parents[1]
 
 tenant_admin_bp = Blueprint(
@@ -13,6 +15,15 @@ tenant_admin_bp = Blueprint(
     __name__,
     template_folder=str(_ADMIN_ROOT / "templates"),
 )
+
+
+@tenant_admin_bp.context_processor
+def inject_platform_settings():
+    try:
+        settings = PlatformSettingsService().get_singleton()
+    except Exception:
+        settings = None
+    return {"platform_settings": settings}
 
 
 def _require_tenant():

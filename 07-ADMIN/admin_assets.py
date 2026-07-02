@@ -6,7 +6,7 @@ from pathlib import Path
 
 from flask import Blueprint
 
-_ADMIN_ROOT = Path(__file__).resolve().parents[1]
+_ADMIN_ROOT = Path(__file__).resolve().parent
 
 admin_assets_bp = Blueprint(
     "admin_assets",

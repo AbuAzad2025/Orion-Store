@@ -16,6 +16,15 @@ class PlatformSettingsService:
             raise NotFoundError("Platform settings not seeded.")
         return row
 
+    def update_singleton(self, **fields) -> PlatformSettings:
+        row = self.get_singleton()
+        for key, value in fields.items():
+            if value is None or not hasattr(row, key):
+                continue
+            setattr(row, key, value)
+        db.session.commit()
+        return row
+
     def ensure_seeded(self) -> PlatformSettings:
         existing = PlatformSettings.query.filter_by(singleton="1").first()
         if existing:

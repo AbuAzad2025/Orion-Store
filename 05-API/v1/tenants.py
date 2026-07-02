@@ -8,6 +8,7 @@ from auth.auth_service import AuthService
 from core.exceptions import OrionError
 from core.middleware import require_platform_admin
 from core.pagination import paginate_query, paginated_payload, pagination_params
+from orion.extensions import db
 from tenant.tenant import Tenant
 from tenant_svc.tenant_service import TenantService
 
@@ -55,6 +56,51 @@ def create_tenant():
         return jsonify({"error": exc.message}), exc.status_code
     except KeyError:
         return jsonify({"error": "Missing required fields."}), 400
+
+
+@tenant_bp.get("/<int:tenant_id>")
+def get_tenant(tenant_id: int):
+    try:
+        require_platform_admin()
+        tenant = Tenant.query.filter_by(id=tenant_id, deleted_at=None).first()
+        if not tenant:
+            return jsonify({"error": "Tenant not found."}), 404
+        return jsonify({"tenant": tenant.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_bp.put("/<int:tenant_id>")
+def update_tenant(tenant_id: int):
+    try:
+        require_platform_admin()
+        tenant = Tenant.query.filter_by(id=tenant_id, deleted_at=None).first()
+        if not tenant:
+            return jsonify({"error": "Tenant not found."}), 404
+        data = request.get_json(silent=True) or {}
+        for field in ("name", "slug", "email", "domain", "status"):
+            if field in data:
+                setattr(tenant, field, data[field])
+        db.session.commit()
+        return jsonify({"tenant": tenant.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 400
+
+
+@tenant_bp.delete("/<int:tenant_id>")
+def delete_tenant(tenant_id: int):
+    try:
+        require_platform_admin()
+        tenant = Tenant.query.filter_by(id=tenant_id, deleted_at=None).first()
+        if not tenant:
+            return jsonify({"error": "Tenant not found."}), 404
+        tenant.deleted_at = db.func.now()
+        db.session.commit()
+        return jsonify({"message": "Tenant deleted."}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @tenant_bp.get("/me")

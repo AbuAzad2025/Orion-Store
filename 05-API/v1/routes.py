@@ -43,6 +43,7 @@ from v1.subscriptions import subscriptions_bp
 from v1.tax_api import tax_bp
 from v1.tenant_portal import tenant_portal_bp
 from v1.tenants import tenant_bp
+from v1.users import users_bp
 from v1.vouchers import vouchers_bp
 from v1.webhooks import webhooks_bp
 from v1.workflow_api import workflow_bp
@@ -58,6 +59,7 @@ def platform_status():
 def register_blueprints(app: Flask) -> None:
     app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
     app.register_blueprint(tenant_bp, url_prefix="/api/v1/tenants")
+    app.register_blueprint(users_bp, url_prefix="/api/v1/users")
     app.register_blueprint(products_bp, url_prefix="/api/v1/products")
     app.register_blueprint(categories_bp, url_prefix="/api/v1/categories")
     app.register_blueprint(payments_bp, url_prefix="/api/v1/payments")

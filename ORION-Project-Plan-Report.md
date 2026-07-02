@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.11"
 date: "2026-07-01"
 language: "ar"
-status: "مكتمل — موجات 10–12 (v2 Backend + Admin UI v2 + Hardening) ✅ | Release Train 8 قادم"
+status: "موجات 10–12 ✅ + Admin shell hardening ✅ + Tenant Resolution via Subdomain/Query ✅ | المرحلة 13: Frontend Deep Dive قادم"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -30,14 +30,14 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.11 | **التاريخ:** 2 يوليو 2026 | **اللغة:** العربية | **الحالة:** **مكتمل — موجات 10–12: v2 Backend ✅ + Admin UI v2 ✅ + Hardening ✅** (§0.15)
+**الإصدار:** 1.11 | **التاريخ:** 2 يوليو 2026 | **اللغة:** العربية | **الحالة:** **موجات 10–12 ✅ + Admin shell hardening ✅ + Tenant Resolution via Subdomain/Query ✅ | المرحلة 13: Frontend Deep Dive قادم** (§0.15–§0.16)
 
 ---
 
 ## 📑 فهرس المحتويات
 
-0. **سياسة الهندسة + أولوية البناء + قرارات v1.9–v1.10 + متتبع التنفيذ (§0.15)**
-1. نظرة عامة (+ 1.4 MVP، 1.5 Azadexa docs، 1.6–1.8 عمولة/بوابات/نماذج)
+0. **سياسة الهندسة + أولوية البناء + قرارات v1.9–v1.10 + متتبع التنفيذ (§0.15) + المرحلة 13 (§0.16)**
+ 1. نظرة عامة (+ 1.4 MVP، 1.5 Azadexa docs، 1.6–1.8 عمولة/بوابات/نماذج)
 2. الرؤية والأهداف (+ 2.4 الجدول الزمني، **2.5 Release Train**)
 3. الهيكل المعماري (+ 3.3 Multi-Tenant، 3.4–3.10 ربط النظام)
 4. مخطط قاعدة البيانات (4.0–4.51 — 123 جدول؛ **64 MVP** + 59 v2 منفّذة)
@@ -719,7 +719,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-07-02 | **المرحلة الحالية:** 12 ✅ — v2 Backend ✅ + Admin UI v2 ✅ + Hardening ✅  
+> **آخر تحديث:** 2026-07-02 | **المرحلة الحالية:** 12 ✅ + Admin shell hardening ✅ — متاجر 10 شغّالة، أدمن المنصة شغّال، أدمن المتاجر شغّال  
+> **المرحلة القادمة:** 13 — Frontend Deep Dive (غوص عميق بواجهة المتجر والأدمن)  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -1007,6 +1008,130 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | §0.6 Pagination على list APIs | ✅ | `core/pagination.py` + كل list endpoints |
 | §0.5 Headers أمنية | ✅ | `core/security_headers.py` |
 | §0.8 PostgreSQL في الاختبارات | 🔒§0 | `DATABASE_URL` + `docker-compose.test.yml` + CI service |
+
+---
+
+### 0.15.1 إغلاق Admin shell + Tenant Resolution — تجميع النقطة الحالية (2026-07-02)
+
+> هذه الفقرة توثّق الحالة **الآن** قبل الانطلاق في المرحلة 13. تُستخدم كنقطة مرجعية إذا احتجنا العودة.
+
+#### ما شغّال حرفياً (verified يدوياً)
+
+| المكون | الملفات الرئيسية | الحالة | طريقة الوصول |
+|--------|------------------|--------|--------------|
+| **10 متاجر beta** | `seed_beta.py`, `tenant_service.py` | ✅ | `http://beta-*.local.azadexa:5000/` |
+| **Platform Admin** | `07-ADMIN/platform_admin/`, `admin_auth.py` | ✅ | `/admin/login` → `admin@azadexa.com` / `Admin2026!` |
+| **Tenant Admin** | `07-ADMIN/tenant_admin/`, `admin_auth.py` | ✅ | `/admin/login` + slug `beta-ramallah` → `ramallah@beta.azadexa.com` / `BetaStore2026!` |
+| **Admin Dashboard** | `platform_dashboard.html`, `admin_platform.js` | ✅ | إحصائيات حقيقية: tenants, users, active counts |
+| **إدارة المتاجر** | `platform_tenants.html`, `tenants.py` | ✅ | list / create / update / delete |
+| **إدارة المستخدمين** | `platform_users.html`, `users.py` | ✅ | list / create tenant admin / platform admin |
+| **إعدادات المنصة** | `platform_settings.html`, `platform_settings_service.py` | ✅ | GET/PUT `platform_settings` |
+| **Logout + Profile + Footer** | `admin_auth.py`, `admin_profile.html`, `admin_base.html`, `sidebar.html` | ✅ | رابط ثابت في كل صفحة أدمن |
+| **رابط المتجر للزبائن** | `sidebar.html` + `middleware.py` | ✅ | `/?tenant_slug=beta-ramallah` أو النطاق الفرعي |
+
+#### آلية عزل المستأجرين والصلاحيات (تحقق نهائي)
+
+| المادة | التنفيذ | الدليل |
+|--------|---------|--------|
+| **RLS** | `migrations/versions/20260627_0023_v2_all_tables.py` + `migrations/rls_v2_tables.sql` | كل جدول tenant-scoped يملك `tenant_id` + `rls_enable` + `policy tenant_isolation` |
+| **Middleware** | `02-CORE/core/middleware.py` | `g.tenant_id` يُحل من: `X-Tenant-ID` header → subdomain/custom domain → `?tenant_slug=` (dev) → `beta-ramallah` fallback |
+| **Platform Admin** | `require_platform_admin()` | `g.is_platform_admin` = `user.is_superuser` AND `tenant_id IS NULL` |
+| **Tenant Admin** | `guard_admin_html()` + `require_tenant_admin()` | `user.is_admin` AND `user.tenant_id == g.tenant_id` |
+| **JWT identity** | `issue_tokens_for_user()` | `is_superuser`, `tenant_id` في الـ claims |
+| **Session auth** | `admin_auth.py` | `session["user_id"]` + `session["is_platform_admin"]`، HTML admin يستخدم session، API يستخدم JWT |
+| **JWT key length** | `.env` | يُنصح بـ `JWT_SECRET_KEY` ≥ 32 حرفاً (الافتراضي "dev-only-change-me" قصير) |
+
+#### قواعد عزل تم التحقق منها
+
+1. **Tenant A لا يرى Tenant B:**
+   - `SELECT * FROM products WHERE tenant_id = 2` لا يرجع صفوف Tenant 1 حتى بدون RLS (FK مطلق).
+   - مع RLS مفعّل، حتى `SELECT * FROM products` من حساب `tenant_id = 2` لا يرجع إلا صفوفه.
+
+2. **Platform Admin لا ينتمي لـ tenant:**
+   - `users` table: `CHECK (is_superuser=FALSE OR tenant_id IS NULL)`.
+   - الـ middleware يرفض `user.is_superuser` مع `tenant_id != None`.
+
+3. **API `/api/v1/tenants/` يتطلّب Platform Admin:**
+   - `require_platform_admin()` قبل كل endpoint.
+   - تم اختباره: token tenant admin → 403 "Platform admin required".
+
+4. **Admin HTML routes محمية:**
+   - `/admin/platform/*` → redirect لو لست platform admin.
+   - `/admin/store/*` → 403 لو `user.tenant_id != g.tenant_id`.
+
+5. **Local dev preview:**
+   - `?tenant_slug=beta-nablus` يُظهر متجر نابلس، `?tenant_slug=beta-ramallah` يُظهر متجر رام الله.
+   - `setup_local_hosts.ps1` يُضيف النطاقات الفرعية لاختبار حقيقي.
+
+### 0.16 المرحلة 13: غوص Frontend العميق (Frontend Deep Dive)
+
+> **نقطة البداية:** متاجر 10 شغّالة، أدمن المنصة شغّال، أدمن المتاجر شغّال، العزل والصلاحيات متحققة.  
+> **الهدف:** تحويل الواجهة من "كلاسيكي Tailwind جاهز" إلى **تجربة فاخرة (luxury) ومتجاوبة و RTL كامل** للمتجر والأدمن، مع فصل الأنماط والـ JS إلى مكتبة قابلة لإعادة الاستخدام.
+
+#### 13.1 تشخيص الواجهة الحالية
+
+| المشكلة | الموقع | الأولوية |
+|---------|--------|----------|
+| كلاسيكي Tailwind CDN بدون تصميم خاص | كل القوالب | عالية |
+| لا يوجد نظام ألوان/طباعة ثابت | `admin_base.html`, `storefront themes` | عالية |
+| JS مبعثر في ملفات متعددة | `07-ADMIN/static/js/*.js` | عالية |
+| لا يوجد component library reusable | — | عالية |
+| صفحات المتجر بسيطة جداً | `06-STOREFRONT/themes/default/` | عالية |
+| لا يوجد animation أو micro-interaction | — | متوسطة |
+| لا يوجد loading skeleton | القوائم الطويلة | متوسطة |
+| لا يوجد mobile-first refinements | Sidebar، الجداول | متوسطة |
+
+#### 13.2 الأهداف المحددة
+
+| # | الهدف | المخرجات | المدة التقديرية |
+|---|-------|----------|-----------------|
+| 1 | **Design System** للأدمن والمتجر | `07-ADMIN/static/css/azadexa.css` + `06-STOREFRONT/static/css/azadexa-store.css` + tokens (colors, spacing, typography) | 2–3 أيام |
+| 2 | **Component Library** reusable | `07-ADMIN/static/js/components/` + `06-STOREFRONT/static/js/components/` (buttons, cards, tables, modals, forms, loaders) | 3–4 أيام |
+| 3 | **Admin UI luxury refactor** | إعادة تصميم `admin_base.html`, `sidebar.html`, `platform_dashboard.html`, `platform_tenants.html`, `platform_users.html`, `platform_settings.html` | 4–5 أيام |
+| 4 | **Storefront luxury refactor** | إعادة تصميم `index.html`, `product.html`, `category.html`, `cart.html`, `checkout.html`, `account.html` | 5–7 أيام |
+| 5 | **RTL & i18n polish** | تثبيت الـ RTL، دعم `dir="rtl"`، تحميل خطوط عربية (Cairo/Noto Sans Arabic) | 2 أيام |
+| 6 | **Animations + micro-interactions** | hover states, loading skeletons, toast notifications, smooth page transitions | 2–3 أيام |
+| 7 | **Mobile responsiveness** | off-canvas sidebar, responsive tables, touch-friendly forms | 2–3 أيام |
+| 8 | **Tests UI** | 5–10 اختبارات UI playwright أو pytest للتأكد من أن الـ refactor لم يكسر الـ APIs | 2 أيام |
+
+#### 13.3 قرارات التصميم الأولية
+
+| القرار | التفاصيل |
+|--------|----------|
+| **CSS framework** | نبقى على Tailwind CSS CDN للـ dev، لكن نبني **Design Tokens** فوقه |
+| **Font Arabic** | Cairo (Google Fonts) أو Noto Sans Arabic |
+| **Font Latin** | Inter |
+| **Color palette** | Primary: `indigo-700` / Secondary: `emerald-500` / Danger: `rose-500` / Surface: slate/gray |
+| **Components** | Web Components خفيفة (custom elements) أو Plain JS modules — **لا Vue/React مبكراً** |
+| **Icons** | Lucide أو Heroicons |
+| **RTL** | كل القوالب تستخدم `dir="rtl"` + `text-start`/`text-end` بدلاً من `text-right`/`text-left` |
+| **JS architecture** | `BaseComponent` + `Store` pattern + `api_client.js` كـ service واحد |
+
+#### 13.4 ترتيب العمل المقترح
+
+1. **Design Tokens + CSS base** (يوم 1)
+2. **Component Library** (أيام 2–4)
+3. **Admin refactor** (أيام 5–9)
+4. **Storefront refactor** (أيام 10–16)
+5. **RTL + polish** (أيام 17–18)
+6. **Tests + review** (أيام 19–20)
+
+#### 13.5 ما لا يُغيّر في هذه المرحلة
+
+- **لا نلمس الـ backend**: APIs, Services, Models, migrations, RLS — كلها ثابتة.
+- **لا نضيف Vue/React/Angular**: نبقى على server-rendered HTML + vanilla JS.
+- **لا نغيّر URLs**: كل routes `/admin/*` و `/` و `/api/v1/*` كما هي.
+- **لا نغيّر صلاحيات**: middleware و auth كما هي.
+
+#### 13.6 معايير القبول (Acceptance Criteria)
+
+- كل صفحة أدمن تبدو "فاخرة" ومنظمة.
+- كل صفحة متجر تبدو احترافية ومتجاوبة.
+- لا يوجد CSS inline scattered.
+- لا يوجد JS duplicated.
+- RTL يعمل بشكل صحيح.
+- Mobile: sidebar تتحول إلى off-canvas، الجداول قابلة للتمرير الأفقي.
+- الـ APIs ما زالت تستجيب بشكل صحيح (اختبارات UI).
 
 ---
 

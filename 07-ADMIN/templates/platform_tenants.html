@@ -1,0 +1,61 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+  <h2 class="text-lg font-semibold">المتاجر</h2>
+  <button onclick="OrionAdminPlatform.openTenantModal()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm">+ إضافة متجر</button>
+</div>
+
+<div class="bg-white rounded border overflow-hidden">
+  <table class="w-full text-sm">
+    <thead><tr class="border-b bg-gray-50 text-right">
+      <th class="p-3">الاسم</th>
+      <th class="p-3">Slug</th>
+      <th class="p-3">Email</th>
+      <th class="p-3">الحالة</th>
+      <th class="p-3">إجراء</th>
+    </tr></thead>
+    <tbody id="tenants-list"><tr><td colspan="5" class="p-3">جاري التحميل...</td></tr></tbody>
+  </table>
+</div>
+
+<div id="tenant-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white rounded p-6 w-full max-w-md space-y-3">
+    <h3 id="tenant-modal-title" class="font-semibold text-lg">إضافة متجر</h3>
+    <form id="tenant-form" class="space-y-3">
+      <input type="hidden" name="tenant_id" id="tenant-id">
+      <div>
+        <label class="block text-sm mb-1">اسم المتجر</label>
+        <input name="name" id="tenant-name" required class="w-full border rounded px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Slug</label>
+        <input name="slug" id="tenant-slug" required class="w-full border rounded px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Email</label>
+        <input name="email" id="tenant-email" type="email" required class="w-full border rounded px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Domain</label>
+        <input name="domain" id="tenant-domain" class="w-full border rounded px-3 py-2">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">الحالة</label>
+        <select name="status" id="tenant-status" class="w-full border rounded px-3 py-2">
+          <option value="trial">تجربي</option>
+          <option value="active">نشط</option>
+          <option value="suspended">معلق</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-2 pt-3">
+        <button type="button" onclick="OrionAdminPlatform.closeTenantModal()" class="px-4 py-2 border rounded text-sm">إلغاء</button>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">حفظ</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_platform.js') }}"></script>
+<script>OrionAdminPlatform.initTenants();</script>
+{% endblock %}

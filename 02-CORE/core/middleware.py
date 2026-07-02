@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from flask import Flask, g, redirect, request
+from flask import Flask, current_app, g, redirect, request, session
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from sqlalchemy.orm import joinedload
 
@@ -34,6 +34,11 @@ def register_middleware(app: Flask) -> None:
             g.tenant = tenant
 
         _resolve_authenticated_user()
+
+        if g.user and g.user.tenant_id:
+            g.tenant_id = g.user.tenant_id
+            g.tenant = Tenant.query.get(g.user.tenant_id)
+
         _resolve_request_locale()
 
     @app.before_request
@@ -111,6 +116,16 @@ def _resolve_tenant_from_request() -> Tenant | None:
         tenant = _tenant_query().filter_by(custom_domain=host).first()
         if tenant:
             return tenant
+
+    if current_app.debug:
+        preview_slug = request.args.get("tenant_slug")
+        if preview_slug:
+            tenant = _tenant_query().filter_by(slug=preview_slug).first()
+            if tenant:
+                return tenant
+        tenant = _tenant_query().filter_by(slug="beta-ramallah").first()
+        if tenant:
+            return tenant
     return None
 
 
@@ -119,14 +134,26 @@ def _tenant_query():
 
 
 def _resolve_authenticated_user() -> None:
-    """JWT (production) then X-User-ID (tests / dev tooling)."""
+    """JWT (API), session (HTML admin), then X-User-ID (dev tooling)."""
     if request.path in ("/api/v1/auth/refresh", "/admin/login"):
         return
-    verify_jwt_in_request(optional=True, locations=["headers"])
-    identity = get_jwt_identity()
-    if identity:
-        _bind_user_to_context(str(identity))
-        return
+    try:
+        verify_jwt_in_request(optional=True, locations=["headers"])
+        identity = get_jwt_identity()
+        if identity:
+            _bind_user_to_context(str(identity))
+            return
+    except Exception:
+        pass
+
+    if "user_id" in session:
+        user = User.query.filter_by(id=session["user_id"], is_active=True).first()
+        if user:
+            g.user = user
+            g.is_platform_admin = user.is_superuser
+            g.role = "platform_admin" if user.is_superuser else ("tenant_admin" if user.is_admin else "customer")
+            return
+
     _resolve_user_from_dev_header()
 
 
