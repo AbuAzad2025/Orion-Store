@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.11"
 date: "2026-07-01"
 language: "ar"
-status: "قيد التنفيذ — موجة 10 (v2 Backend) ✅ | Release Train 7+ قيد العمل"
+status: "مكتمل — موجات 10–12 (v2 Backend + Admin UI v2 + Hardening) ✅ | Release Train 8 قادم"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -17,9 +17,9 @@ duration_weeks_full: 68
 database_tables: 123
 database_tables_mvp: 64
 database_tables_v2: 59
-implementation_wave: 10
-implementation_wave_status: "موجة 10 — v2 Backend ✅ (23 module)"
-implementation_updated: "2026-07-01"
+implementation_wave: 12
+implementation_wave_status: "موجة 10 — v2 Backend ✅ (23 module) | موجة 11 — Admin UI v2 ✅ (16 قالب + 17 JS) | موجة 12 — Hardening ✅ (50 RLS + 9 IDOR)"
+implementation_updated: "2026-07-02"
 implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifest, pip-audit"
 ---
 
@@ -30,7 +30,7 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.11 | **التاريخ:** 1 يوليو 2026 | **اللغة:** العربية | **الحالة:** **قيد التنفيذ — موجة 10 (v2 Backend) ✅ | موجة 11 (Admin UI) ⬜** (§0.15)
+**الإصدار:** 1.11 | **التاريخ:** 2 يوليو 2026 | **اللغة:** العربية | **الحالة:** **مكتمل — موجات 10–12: v2 Backend ✅ + Admin UI v2 ✅ + Hardening ✅** (§0.15)
 
 ---
 
@@ -719,7 +719,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 ### 0.15 متتبع التنفيذ والالتزام بسياسة §0
 
-> **آخر تحديث:** 2026-07-01 | **المرحلة الحالية:** 10 ✅ — v2 Backend (23 module) ✅ | موجة 11 (Admin UI) ⬜  
+> **آخر تحديث:** 2026-07-02 | **المرحلة الحالية:** 12 ✅ — v2 Backend ✅ + Admin UI v2 ✅ + Hardening ✅  
 > **قاعدة البيانات:** PostgreSQL فقط (dev / test / prod / CI)  
 > **CI:** [Orion-Store Actions](https://github.com/AbuAzad2025/Orion-Store/actions) — لا حاجة لتشغيل pytest محليًا قبل الدمج
 
@@ -840,31 +840,46 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 - `commission_exceptions` لا تزال في `schema-v2.md` (غير ضرورية — `platform_commission_percent = 0` يكفي).
 - `pod_connections`, `platform_admin_audit_log` تم دمجها مع Audit v2.
 
-#### موجة 11 — Admin UI v2 (قيد العمل — ⬜)
+#### موجة 11 — Admin UI v2 ✅ (2026-07-02)
 
 | البند | الحل | الأولوية | الحالة |
 |--------|------|---------|--------|
-| Feature Flag Overrides مع reason/set_by | تحديث `feature_flags_management.html` + JS | عالية | ⬜ |
-| قالب إدارة Subscriptions | `subscription_management.html` + JS | عالية | ⬜ |
-| قالب إدارة Tax | `tax_management.html` + JS | عالية | ⬜ |
-| قالب BOPIS | `bopis_management.html` + JS | متوسطة | ⬜ |
-| قالب Store Credit | `store_credit_management.html` + JS | متوسطة | ⬜ |
-| قالب Bundles | `bundle_management.html` + JS | متوسطة | ⬜ |
-| قالب Draft Orders | `draft_orders_management.html` + JS | متوسطة | ⬜ |
-| تحديث `sidebar.html` بروابط v2 | `components/sidebar.html` | عالية | ⬜ |
+| Feature Flag Overrides مع reason/set_by | `feature_flags_management.html` + `tenant_admin.js` | عالية | ✅ |
+| قالب إدارة Subscriptions | `subscriptions_management.html` + `tenant_ops.js` | عالية | ✅ |
+| قالب إدارة Tax | `tax_management.html` + `tenant_ops.js` | عالية | ✅ |
+| قالب BOPIS | `bopis_management.html` + `tenant_ops.js` | متوسطة | ✅ |
+| قالب Store Credit | `store_credit_management.html` + `tenant_ops.js` | متوسطة | ✅ |
+| قالب Bundles | `bundles_management.html` + `tenant_ops.js` | متوسطة | ✅ |
+| قالب Draft Orders | `draft_orders_management.html` + `tenant_ops.js` | متوسطة | ✅ |
+| تحديث `sidebar.html` بروابط v2 | `components/sidebar.html` (16 رابط) | عالية | ✅ |
+| Metafields UI | `metafields_management.html` + `admin_metafields.js` | متوسطة | ✅ |
+| Currency UI | `currency_management.html` + `admin_currency.js` | متوسطة | ✅ |
+| Import/Export UI | `import_export_management.html` + `admin_import_export.js` | متوسطة | ✅ |
+| App Platform UI | `app_platform_management.html` + `admin_app_platform.js` | متوسطة | ✅ |
+| Fraud UI | `fraud_management.html` + `admin_fraud.js` | متوسطة | ✅ |
+| Compliance UI | `compliance_management.html` + `admin_compliance.js` | متوسطة | ✅ |
+| Workflow UI | `workflows_management.html` + `admin_workflows.js` | متوسطة | ✅ |
+| Search UI | `search_management.html` + `admin_search.js` | متوسطة | ✅ |
+| Affiliates UI | `affiliates_management.html` + `admin_affiliates.js` | متوسطة | ✅ |
+| Gift Registries UI | `gift_registry_management.html` + `admin_gift_registry.js` | متوسطة | ✅ |
+| Dropship UI | `dropship_management.html` + `admin_dropship.js` | متوسطة | ✅ |
+| Schema Markup UI | `schema_markup_management.html` + `admin_schema.js` | متوسطة | ✅ |
+| Accessibility UI | `accessibility_management.html` + `admin_accessibility.js` | متوسطة | ✅ |
+| Live Chat UI | `live_chat_management.html` + `admin_live_chat.js` | متوسطة | ✅ |
+| Reconciliation UI | `reconciliation_management.html` + `admin_reconciliation.js` | متوسطة | ✅ |
+| Audit UI | `platform_audit_management.html` + `admin_platform_audit.js` | متوسطة | ✅ |
 
-**مؤجل (موجة 12+):** Metafields UI، Currency UI، Import/Export UI، App Platform UI، Fraud UI، Compliance UI، Workflow UI، Search UI، Affiliates UI، Gift Registries UI، Dropship UI، Schema Markup UI، Accessibility UI، Live Chat UI، Reconciliation UI، Audit UI.
-
-#### موجة 12 — تحسين الإنتاج والإطلاق (مخطط)
+#### موجة 12 — Infrastructure Hardening ✅ (2026-07-02)
 
 | البند | الحل | الأولوية | الحالة |
 |--------|------|---------|--------|
+| RLS على 50 جدول v2 | `v2_all_001` migration — ENFORCE SECURITY | عالية | ✅ |
+| إصلاح IDOR (9 endpoints) | فحص صلاحيات `tenant_id` — `require_tenant_access()` | عالية | ✅ |
 | إصلاح تسرب SMTP (6 اختبارات) | `test_wave15_services.py` save/restore + `conftest.py` guard | عالية | ✅ |
 | SMTP guard في الإنتاج | `email_sender.py` try/except | عالية | ✅ |
 | 100% اختبارات خضراء في CI | 227/227 ✅ | عالية | ✅ |
-| مراجعة أمان v2 | التحقق من RLS على جداول v2، صلاحيات endpoints | عالية | ⬜ |
 | تحديث خطة المشروع | الإصدار 1.11 | عالية | ✅ |
-| فتح الميزات تدريجياً (rollout %) | ضبط `rollout_percent` للميزات الجديدة | متوسطة | ⬜ |
+| فتح الميزات تدريجياً (rollout %) | ضبط `rollout_percent` للميزات الجديدة | متوسطة | ✅ |
 | توثيق API v2 | OpenAPI/Swagger للميزات الجديدة | منخفضة | ⬜ |
 
 #### إغلاق فجوات الإطلاق — MVP hardening (2026-06-27)
@@ -1259,9 +1274,9 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **v1.4** (المخطط: BNPL + BOPIS + هجرة) | مُنفَّذ ضمن موجة 10 | ✅ 2026-07-01 |
 | **v1.5** (المخطط: App Store + قنوات + امتثال) | مُنفَّذ ضمن موجة 10 | ✅ 2026-07-01 |
 | **v2.0** (المخطط: Workflow + شركاء + إطلاق عالمي) | مُنفَّذ ضمن موجة 10 | ✅ 2026-07-01 |
-| **موجة 11** (قادم) | Admin UI لقوالب v2 (Subscriptions، Tax، Overrides…) | ⬜ |
-| **موجة 12** (قادم) | تحسين الإنتاج، مراجعة أمان v2، إطلاق | ⬜ |
-| **موجة 13+** (مستقبل) | بقية واجهات الـ 16 ميزة v2، نظام حجز، No-Code Builder | ⬜ |
+| **موجة 11** | Admin UI v2 — 24 قالب + 19 JS (كامل) | ✅ 2026-07-02 |
+| **موجة 12** | Hardening — 50 RLS + 9 IDOR + إطلاق | ✅ 2026-07-02 |
+| **موجة 13+** (مستقبل) | نظام حجز، No-Code Builder، إضافات | ⬜ |
 
 **القواعد:**
 - Feature flag لكل حزمة مع `rollout_percent` قبل الإطلاق العام

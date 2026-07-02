@@ -1,6 +1,6 @@
 # Azadexa (Orion Engine)
 
-Multi-tenant e-commerce SaaS — **wave 0–1** foundation.
+Multi-tenant e-commerce SaaS — **Waves 0–12 complete** ✅ (v2 Backend + Admin UI v2 + Infrastructure Hardening).
 
 **Repository:** [github.com/AbuAzad2025/Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
 
