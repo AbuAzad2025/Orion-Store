@@ -2,10 +2,41 @@ from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
+from dropship.dropship import DropshipOrder, DropshipSupplier, PodConnection
 from dropship_svc.dropship_service import DropshipService
 
 dropship_bp = Blueprint("dropship", __name__)
 _svc = DropshipService()
+
+
+@dropship_bp.route("/pod", methods=["GET"])
+def list_pod():
+    try:
+        tenant = require_tenant_context()
+        connections = PodConnection.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"connections": [c.to_dict() for c in connections]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@dropship_bp.route("/suppliers", methods=["GET"])
+def list_suppliers():
+    try:
+        tenant = require_tenant_context()
+        suppliers = DropshipSupplier.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"suppliers": [s.to_dict() for s in suppliers]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@dropship_bp.route("/orders", methods=["GET"])
+def list_dropship_orders():
+    try:
+        tenant = require_tenant_context()
+        orders = DropshipOrder.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"orders": [d.to_dict() for d in orders]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @dropship_bp.route("/pod", methods=["POST"])

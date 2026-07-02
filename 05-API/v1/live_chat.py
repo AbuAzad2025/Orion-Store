@@ -2,10 +2,21 @@ from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
+from live_chat.live_chat import LiveChatSession
 from live_chat_svc.live_chat_service import LiveChatService
 
 live_chat_bp = Blueprint("live_chat", __name__)
 _svc = LiveChatService()
+
+
+@live_chat_bp.route("/sessions", methods=["GET"])
+def list_sessions():
+    try:
+        tenant = require_tenant_context()
+        sessions = LiveChatSession.query.filter_by(tenant_id=tenant.id).order_by(LiveChatSession.created_at.desc()).all()
+        return jsonify({"sessions": [s.to_dict() for s in sessions]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @live_chat_bp.route("/sessions", methods=["POST"])

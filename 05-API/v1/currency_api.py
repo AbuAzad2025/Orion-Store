@@ -2,11 +2,22 @@ from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_platform_admin
+from currency.currency_rate import CurrencyRate
 from currency_svc.currency_service import CurrencyService
 from decimal import Decimal
 
 currency_bp = Blueprint("currency", __name__)
 _svc = CurrencyService()
+
+
+@currency_bp.route("/rates", methods=["GET"])
+def list_rates():
+    try:
+        require_platform_admin()
+        rates = CurrencyRate.query.order_by(CurrencyRate.created_at.desc()).limit(100).all()
+        return jsonify({"rates": [r.to_dict() for r in rates]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @currency_bp.route("/rates", methods=["POST"])

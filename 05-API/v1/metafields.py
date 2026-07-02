@@ -2,10 +2,21 @@ from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
+from metafield.metafield import MetafieldDefinition
 from metafield_svc.metafield_service import MetafieldService
 
 metafields_bp = Blueprint("metafields", __name__)
 _svc = MetafieldService()
+
+
+@metafields_bp.route("/definitions", methods=["GET"])
+def list_definitions():
+    try:
+        tenant = require_tenant_context()
+        definitions = MetafieldDefinition.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"definitions": [d.to_dict() for d in definitions]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @metafields_bp.route("/definitions", methods=["POST"])

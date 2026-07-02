@@ -2,10 +2,21 @@ from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
+from gift.gift_registry import GiftRegistry
 from gift_svc.gift_registry_service import GiftRegistryService
 
 gift_registries_bp = Blueprint("gift_registries", __name__)
 _svc = GiftRegistryService()
+
+
+@gift_registries_bp.route("", methods=["GET"])
+def list_registries():
+    try:
+        tenant = require_tenant_context()
+        registries = GiftRegistry.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"registries": [r.to_dict() for r in registries]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @gift_registries_bp.route("", methods=["POST"])

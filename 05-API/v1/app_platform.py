@@ -1,11 +1,35 @@
 from flask import Blueprint, jsonify, request
 
+from app_platform.app_platform import OAuthApplication, SandboxStore
 from app_platform_svc.app_platform_service import AppPlatformService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
 
 app_platform_bp = Blueprint("app_platform", __name__)
 _svc = AppPlatformService()
+
+
+@app_platform_bp.route("/apps", methods=["GET"])
+def list_apps():
+    try:
+        tenant = require_tenant_context()
+        apps = OAuthApplication.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"apps": [a.to_dict() for a in apps]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@app_platform_bp.route("/sandboxes", methods=["GET"])
+def list_sandboxes():
+    try:
+        tenant = require_tenant_context()
+        sandboxes = SandboxStore.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"sandboxes": [s.to_dict() for s in sandboxes]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@app_platform_bp.route("/apps", methods=["POST"])
 
 
 @app_platform_bp.route("/apps", methods=["POST"])

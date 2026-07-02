@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from support.http import auth_headers, tenant_headers
+from support.http import auth_headers
 
 from auth.auth_service import AuthService
 from catalog_svc.product_service import ProductService
@@ -49,7 +49,7 @@ def test_store_credit_api(client, app, setup):
     assert res.status_code == 200
     assert float(res.get_json()["credit"]["balance"]) == 50.00
 
-    balance = client.get("/api/v1/store-credit/balance?customer_email=buyer@test.com", headers=tenant_headers(tenant.slug))
+    balance = client.get("/api/v1/store-credit/balance?customer_email=buyer@test.com", headers=headers)
     assert balance.status_code == 200
     assert float(balance.get_json()["balance"]) == 50.00
 

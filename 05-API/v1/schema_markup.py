@@ -2,10 +2,21 @@ from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
+from schema_markup.schema_markup import ProductSchemaMarkup
 from schema_markup_svc.schema_markup_service import SchemaMarkupService
 
 schema_markup_bp = Blueprint("schema_markup", __name__)
 _svc = SchemaMarkupService()
+
+
+@schema_markup_bp.route("", methods=["GET"])
+def list_markups():
+    try:
+        tenant = require_tenant_context()
+        markups = ProductSchemaMarkup.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"markups": [m.to_dict() for m in markups]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @schema_markup_bp.route("", methods=["POST"])

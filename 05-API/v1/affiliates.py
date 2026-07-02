@@ -1,11 +1,45 @@
 from flask import Blueprint, jsonify, request
 
+from affiliate.affiliate import Affiliate, AffiliateCommission, AffiliateProgram
 from affiliate_svc.affiliate_service import AffiliateService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
 
 affiliates_bp = Blueprint("affiliates", __name__)
 _svc = AffiliateService()
+
+
+@affiliates_bp.route("/programs", methods=["GET"])
+def list_programs():
+    try:
+        tenant = require_tenant_context()
+        programs = AffiliateProgram.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"programs": [p.to_dict() for p in programs]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@affiliates_bp.route("/affiliates", methods=["GET"])
+def list_affiliates():
+    try:
+        tenant = require_tenant_context()
+        affiliates = Affiliate.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"affiliates": [a.to_dict() for a in affiliates]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@affiliates_bp.route("/commissions", methods=["GET"])
+def list_commissions():
+    try:
+        tenant = require_tenant_context()
+        commissions = AffiliateCommission.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"commissions": [c.to_dict() for c in commissions]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@affiliates_bp.route("/programs", methods=["POST"])
 
 
 @affiliates_bp.route("/programs", methods=["POST"])

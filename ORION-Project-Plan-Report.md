@@ -1168,7 +1168,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 |---------|----------|--------|-------|--------|
 | **AZ-0.1** | 🔴 CRITICAL | ✅ مكتمل | تأمين register/platform — requires platform admin للبوتستراب، تعطيل الوصول العام | `5f84755` |
 | **AZ-0.2** | 🔴 CRITICAL | ✅ مكتمل | X-User-ID Identity Override Removal — إزالة الهيدر، JWT Bearer بديل | `c535d79` |
-| **AZ-0.3** | 🔴 CRITICAL | ⬜ معلق | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | — |
+| **AZ-0.3** | 🔴 CRITICAL | 🟡 جاري | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | — |
 | **AZ-0.4** | 🔴 CRITICAL | ⬜ معلق | تفعيل webhook signature verification (PayPal, Stripe, BNPL) | — |
 | **AZ-0.5** | 🟠 HIGH | ⬜ معلق | إصلاح OrionAPI.delete (المفقود في api_client.js) | — |
 | **AZ-0.6** | 🟠 HIGH | ⬜ معلق | إصلاح Platform Settings — إضافة الحقول غير المدعومة | — |
@@ -1263,7 +1263,167 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **ملاحظة** | لا يتضمن AZ-0.2 أي تنفيذ لميزة impersonation. تم إنشاء تذكرة منفصلة (AZ-0.18) لهذا الغرض. |
 | **Commit** | `c535d79` (تطبيق) + `7081522` (توثيق) |
 
-#### 0.16.1.8 AZ-0.18 — Secure Platform Admin Impersonation ⬜
+#### 0.16.1.8 AZ-0.3 — Tenant-Admin Authorization Enforcement 🔴
+
+| البند | التفاصيل |
+|-------|----------|
+| **الحالة** | 🟡 **قيد التنفيذ** |
+| **السبب الجذري** | تستخدم 80+ نقطة نهاية API فقط `require_tenant_context()` للتحقق من سياق المستأجر دون أي تحقق من مصادقة المستخدم أو صلاحياته. هذا يعني أن أي شخص يعرف `X-Tenant-ID` (public_id أو slug المستأجر — وهو معرف غير سري) يمكنه قراءة وكتابة بيانات المستأجر. |
+| **المنهج** | لا يتم استبدال `require_tenant_context()` بشكل آلي. يتم تحليل كل نقطة نهاية وتصنيفها حسب نوع المتصل المقصود، ثم تطبيق الحارس المناسب. الحارس المعياري للمشروع هو `require_tenant_admin()` الموجود بالفعل في `core/middleware.py:183`، والذي يتحقق من: `g.tenant_id` موجود، `g.user` موجود، والمستخدم إما platform admin أو tenant admin لنفس المستأجر. |
+| **مصفوفة الجرد الكاملة** | انظر الجدول الموسع أدناه |
+
+##### مصفوفة جرد نقاط النهاية — AZ-0.3
+
+**التصنيفات:**
+- **CA** = Tenant Admin مطلوب (كتابة/إعدادات المستأجر)
+- **CS** = Storefront عام (مقيد بنطاق المستأجر فقط)
+- **CC** = Customer موثّق (JWT + ownership check)
+- **CP** = Platform Admin فقط
+- **W** = Webhook (تحقق من التوقيع)
+- **I** = Internal/Integration
+
+| الملف | المسار | الطريقة | الوظيفة | الحارس الحالي | المتصل المقصود | قراءة/كتابة | الحساسية | الحارس المطلوب | ✅/❌ |
+|-------|--------|---------|---------|---------------|-----------------|-------------|----------|----------------|------|
+| **المالية والاحتيال والتسوية** |
+| `fraud.py` | `/rules` | GET | list_rules | RTC | CA | R | عالية — قواعد الاحتيال | `require_tenant_admin()` | ❌ |
+| `fraud.py` | `/rules` | POST | create_rule | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `fraud.py` | `/reviews` | POST | review_order | RTC | CA | W | عالية — مراجعة طلب | `require_tenant_admin()` | ❌ |
+| `fraud.py` | `/chargebacks` | POST | create_chargeback | RTC | CA | W | عالية — مالية | `require_tenant_admin()` | ❌ |
+| `reconciliation_v2.py` | `/runs` | GET | list_runs | RTC | CA | R | عالية — تسوية مالية | `require_tenant_admin()` | ❌ |
+| `reconciliation_v2.py` | `/runs` | POST | create_run | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `reconciliation_v2.py` | `/runs/<id>/items` | POST | add_item | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `reconciliation_v2.py` | `/runs/<id>/complete` | POST | complete_run | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| **الاشتراكات ورصيد المتجر** |
+| `subscriptions.py` | `/plans` | GET | list_plans | RTC | CA/CS | R | متوسطة — خطط الاشتراك | RTC (عام) | ✅ (CS) |
+| `subscriptions.py` | `/plans` | POST | create_plan | RTC | CA | W | عالية — تسعير | `require_tenant_admin()` | ❌ |
+| `subscriptions.py` | `/subscribe` | POST | subscribe | RTC | CA/CS | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `subscriptions.py` | `/subscriptions` | GET | list_subscriptions | RTC | CA | R | عالية — بيانات المشتركين | `require_tenant_admin()` | ❌ |
+| `subscriptions.py` | `/subscriptions/<id>/cancel` | POST | cancel_subscription | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `subscriptions.py` | `/digital-assets` | POST | create_asset | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `subscriptions.py` | `/digital-assets/<id>/download` | POST | create_download | RTC | CA/CS | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `subscriptions.py` | `/licenses` | POST | generate_license | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `store_credit.py` | `/balance` | GET | get_balance | RTC | CA | R | عالية — أرصدة العملاء | `require_tenant_admin()` | ❌ |
+| `store_credit.py` | `/add` | POST | add_funds | RTC | CA | W | عالية — مالية | `require_tenant_admin()` | ❌ |
+| `store_credit.py` | `/deduct` | POST | deduct_funds | RTC | CA | W | عالية — مالية | `require_tenant_admin()` | ❌ |
+| `store_credit.py` | `/transactions` | GET | list_transactions | RTC | CA | R | عالية — سجل مالي | `require_tenant_admin()` | ❌ |
+| **الطلبات المسودة** |
+| `draft_orders.py` | `` | GET | list_drafts | RTC | CA | R | عالية — طلبات معلقة | `require_tenant_admin()` | ❌ |
+| `draft_orders.py` | `` | POST | create_draft | RTC | CA | W | عالية — إنشاء طلب | `require_tenant_admin()` | ❌ |
+| `draft_orders.py` | `/<id>/items` | POST | add_item | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `draft_orders.py` | `/<id>/convert` | POST | convert | RTC | CA | W | عالية — تحويل لطلب حقيقي | `require_tenant_admin()` | ❌ |
+| **Dropship والإعدادات التشغيلية** |
+| `dropship.py` | `/pod` | POST | create_pod | RTC | CA | W | عالية — بيانات اعتماد API | `require_tenant_admin()` | ❌ |
+| `dropship.py` | `/suppliers` | POST | create_supplier | RTC | CA | W | عالية — بيانات المورد | `require_tenant_admin()` | ❌ |
+| `dropship.py` | `/orders` | POST | create_dropship_order | RTC | CA | W | عالية — طلب شراء | `require_tenant_admin()` | ❌ |
+| **إدارة التطبيقات والمنصة** |
+| `app_platform.py` | `/apps` | POST | register_app | RTC | CA | W | عالية — تسجيل تطبيق | `require_tenant_admin()` | ❌ |
+| `app_platform.py` | `/apps/<id>/install` | POST | install_app | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `app_platform.py` | `/installations/<id>/webhooks` | POST | subscribe_webhook | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `app_platform.py` | `/sandboxes` | POST | create_sandbox | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| **العمولات والتسويق بالعمولة** |
+| `affiliates.py` | `/programs` | POST | create_program | RTC | CA | W | عالية — برنامج عمولة | `require_tenant_admin()` | ❌ |
+| `affiliates.py` | `/register` | POST | register_affiliate | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `affiliates.py` | `/commissions` | POST | record_commission | RTC | CA | W | عالية — مالية | `require_tenant_admin()` | ❌ |
+| **BOPIS والمواقع** |
+| `bopis.py` | `/locations` | GET | list_locations | RTC | CA/CS | R | منخفضة | RTC (عام) OR `require_tenant_admin()` | ✅ (CS) |
+| `bopis.py` | `/locations` | POST | create_location | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `bopis.py` | `/locations/<id>/slots` | POST | create_slot | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| **الحزم والمنتجات** |
+| `bundles.py` | `` | GET | list_bundles | RTC | CA/CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| `bundles.py` | `` | POST | create_bundle | RTC | CA | W | متوسطة — تسعير | `require_tenant_admin()` | ❌ |
+| `bundles.py` | `/<id>/items` | POST | add_bundle_item | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| **الامتثال وإعدادات الخصوصية** |
+| `compliance.py` | `/consent` | POST | record_consent | RTC | CA/CS | W | متوسطة — موافقة العميل | `require_tenant_admin()` | ❌ |
+| `compliance.py` | `/data-requests` | POST | create_data_request | RTC | CA | W | عالية — طلب GDPR | `require_tenant_admin()` | ❌ |
+| `compliance.py` | `/cookie-settings` | PUT | upsert_cookie_settings | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `compliance.py` | `/sso` | GET | list_sso | RTC | CA | R | عالية — إعدادات SSO | `require_tenant_admin()` | ❌ |
+| `compliance.py` | `/sso` | POST | create_sso | RTC | CA | W | عالية — بيانات اعتماد SSO | `require_tenant_admin()` | ❌ |
+| **الوصولية والتدقيق** |
+| `accessibility_api.py` | `/audits` | GET | list_audits | RTC | CA | R | متوسطة | `require_tenant_admin()` | ❌ |
+| `accessibility_api.py` | `/audits` | POST | record_audit | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| **سجلات التدقيق** |
+| `audit_api.py` | `/logs` | POST | log_action | RTC | I | W | متوسطة — سجل داخلي | `require_tenant_admin()` | ❌ |
+| **الاستيراد والتصدير** |
+| `import_export.py` | `/jobs` | GET | list_jobs | RTC | CA | R | عالية — بيانات هجرة | `require_tenant_admin()` | ❌ |
+| `import_export.py` | `/jobs` | POST | create_job | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `import_export.py` | `/jobs/<id>/progress` | PUT | update_progress | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| **الدردشة المباشرة** |
+| `live_chat.py` | `/sessions` | POST | create_session | RTC | CA/CS | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `live_chat.py` | `/sessions/<id>/messages` | GET | get_messages | RTC | CA/CS | R | متوسطة | `require_tenant_admin()` | ❌ |
+| `live_chat.py` | `/sessions/<id>/messages` | POST | send_message | RTC | CA/CS | W | متوسطة | `require_tenant_admin()` | ❌ |
+| **Metafields** |
+| `metafields.py` | `/definitions` | POST | define | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `metafields.py` | `/values` | POST | set_value | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `metafields.py` | `/<type>/<id>` | GET | get_for_owner | RTC | CA/CS | R | متوسطة | `require_tenant_admin()` | ❌ |
+| **إضافات OMS** |
+| `oms_extensions.py` | `/transfers` | POST | create_transfer | RTC | CA | W | عالية — نقل مخزون | `require_tenant_admin()` | ❌ |
+| `oms_extensions.py` | `/transfers/<id>/items` | POST | add_transfer_item | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `oms_extensions.py` | `/transfers/<id>/complete` | POST | complete_transfer | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `oms_extensions.py` | `/warehouses` | GET | list_warehouses | RTC | CA | R | متوسطة | `require_tenant_admin()` | ❌ |
+| **Schema Markup** |
+| `schema_markup.py` | `` | POST | set_markup | RTC | CA | W | متوسطة — SEO | `require_tenant_admin()` | ❌ |
+| `schema_markup.py` | `/<product_id>` | GET | get_markup | RTC | CA/CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| **تحسين محركات البحث** |
+| `search_merchandising.py` | `/synonyms` | GET | list_synonyms | RTC | CA | R | متوسطة | `require_tenant_admin()` | ❌ |
+| `search_merchandising.py` | `/synonyms` | POST | add_synonym | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `search_merchandising.py` | `/redirects` | POST | add_redirect | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| `search_merchandising.py` | `/boosts` | POST | add_boost | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| **الضرائب** |
+| `tax_api.py` | `/jurisdictions` | GET | list_jurisdictions | RTC | CA | R | عالية — إعدادات ضريبية | `require_tenant_admin()` | ❌ |
+| `tax_api.py` | `/jurisdictions` | POST | create_jurisdiction | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| `tax_api.py` | `/jurisdictions/<id>/rates` | POST | set_rate | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| **سير العمل** |
+| `workflow_api.py` | `/definitions` | GET | list_definitions | RTC | CA | R | عالية — أتمتة | `require_tenant_admin()` | ❌ |
+| `workflow_api.py` | `/definitions` | POST | create_definition | RTC | CA | W | عالية | `require_tenant_admin()` | ❌ |
+| **سجل الهدايا** |
+| `gift_registries.py` | `` | POST | create_registry | RTC | CA | W | متوسطة | `require_tenant_admin()` | ❌ |
+| **الترجمة (محتوى عام)** |
+| `i18n.py` | `/pages` | GET | list_pages | RTC | CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| `i18n.py` | `/pages/<slug>` | GET | get_page | RTC | CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| `i18n.py` | `/glossary` | GET | list_glossary | RTC | CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| `i18n.py` | `/glossary` | POST | upsert_glossary_term | RTA | CA | W | متوسطة | `require_tenant_admin()` | ✅ (موجود) |
+| **واجهة المتجر** |
+| `storefront.py` | 13 endpoints | GET/POST | متنوعة | RTC | CS | R/W | منخفضة-متوسطة | RTC (عام) | ✅ (CS) |
+| `store_account.py` | `/register` | POST | register_customer | RTC | CS | W | منخفضة | RTC (عام) | ✅ (CS) |
+| `store_account.py` | `/login` | POST | login_customer | RTC | CS | W | منخفضة | RTC (عام) | ✅ (CS) |
+| `store_account.py` | `/me` | GET | customer_profile | RTC+JWT | CC | R | عالية — بيانات شخصية | `@jwt_required()`, RTC | ✅ (موجود) |
+| `store_account.py` | `/orders` | GET | customer_orders | RTC+JWT | CC | R | عالية — بيانات طلب | `@jwt_required()`, RTC | ✅ (موجود) |
+| **الشحن واجهة المتجر** |
+| `shipping.py` | `/methods` | GET | list_methods | RTC | CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| `shipping.py` | `/calculate` | POST | calculate_shipping | RTC | CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| **الكوبونات واجهة المتجر** |
+| `vouchers.py` | `/<code>/validate` | GET | validate_voucher | RTC | CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| `vouchers.py` | `/<code>/apply` | POST | apply_voucher | RTC | CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| **المرتجعات واجهة المتجر** |
+| `returns.py` | `/reasons` | GET | list_reasons | RTC | CS | R | منخفضة | RTC (عام) | ✅ (CS) |
+| `returns.py` | `/` | POST | create_return | RTC | CS | W | متوسطة | RTC (عام) — لكن يجب إضافة JWT للعميل | ✅ (CS) |
+| `returns.py` | `/<id>` | GET | get_return | RTC | CS | R | متوسطة | RTC (عام) | ✅ (CS) |
+| `returns.py` | `/` | GET | list_returns | RTA | CA | R | متوسطة | `require_tenant_admin()` | ✅ (موجود) |
+| `returns.py` | `/<id>/approve` | PUT | approve_return | RTA | CA | W | عالية | `require_tenant_admin()` | ✅ (موجود) |
+| `returns.py` | `/<id>/complete` | POST | complete_return | RTA | CA | W | عالية | `require_tenant_admin()` | ✅ (موجود) |
+| **إشعارات المخزون** |
+| `stock_notifications.py` | `` | POST | subscribe | RTC | CS | W | منخفضة | RTC (عام) | ✅ (CS) |
+| **سجل الهدايا (عام)** |
+| `gift_registries.py` | `/<slug>` | GET | get_registry | لا شيء | CS | R | منخفضة | لا شيء (عام) | ✅ (عام) |
+
+**الملخص:**
+- **`RTC`** = `require_tenant_context()` — يتحقق فقط من وجود `g.tenant`
+- **`RTA`** = `require_tenant_admin()` — ✅ حماية صحيحة
+- **`CS`** = Storefront عام — ✅ لا يحتاج إلى حماية مشرف
+- **`CC`** = Customer موثّق — ✅ محمي بـ JWT
+- **`CA`** = Tenant Admin — ❌ بحاجة إلى `require_tenant_admin()`
+
+**عدد نقاط النهاية التي تحتاج إلى إصلاح: 73 نقطة نهاية عبر 22 ملفاً**
+**عدد نقاط النهاية الصحيحة (Storefront/عام/موجود): 33 نقطة نهاية**
+
+##### ترتيب التنفيذ
+
+1. **Batch 1 — المالية والاحتيال والتسوية والاشتراكات:** `fraud.py`, `reconciliation_v2.py`, `subscriptions.py`, `store_credit.py`, `draft_orders.py` (24 endpoint)
+2. **Batch 2 — العمليات التجارية:** `dropship.py`, `affiliates.py`, `app_platform.py`, `compliance.py`, `gift_registries.py`, `live_chat.py` (18 endpoint)
+3. **Batch 3 — إعدادات المستأجر:** `accessibility_api.py`, `bopis.py`, `bundles.py`, `import_export.py`, `metafields.py`, `oms_extensions.py`, `schema_markup.py`, `search_merchandising.py`, `tax_api.py`, `workflow_api.py` (25 endpoint)
+4. **Batch 4 — المتبقي:** `audit_api.py` (1 endpoint)
+
+#### 0.16.1.9 AZ-0.18 — Secure Platform Admin Impersonation ⬜
 
 | البند | التفاصيل |
 |-------|----------|

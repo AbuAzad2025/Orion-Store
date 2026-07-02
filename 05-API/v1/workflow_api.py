@@ -2,10 +2,21 @@ from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
+from workflow.workflow import WorkflowRun
 from workflow_svc.workflow_service import WorkflowService
 
 workflow_bp = Blueprint("workflow", __name__)
 _svc = WorkflowService()
+
+
+@workflow_bp.route("/runs", methods=["GET"])
+def list_runs():
+    try:
+        tenant = require_tenant_context()
+        runs = WorkflowRun.query.filter_by(tenant_id=tenant.id).order_by(WorkflowRun.created_at.desc()).all()
+        return jsonify({"runs": [r.to_dict() for r in runs]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @workflow_bp.route("/definitions", methods=["GET"])

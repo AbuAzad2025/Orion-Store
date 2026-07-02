@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
+from search.search import SearchBoostRule, SearchRedirect
 from search_svc.search_merchandising_service import SearchMerchandisingService
 
 search_bp = Blueprint("search", __name__)
@@ -30,6 +31,16 @@ def add_synonym():
         return jsonify({"error": "Invalid request."}), 400
 
 
+@search_bp.route("/redirects", methods=["GET"])
+def list_redirects():
+    try:
+        tenant = require_tenant_context()
+        redirects = SearchRedirect.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"redirects": [r.to_dict() for r in redirects]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
 @search_bp.route("/redirects", methods=["POST"])
 def add_redirect():
     try:
@@ -41,6 +52,16 @@ def add_redirect():
         return jsonify({"error": exc.message}), exc.status_code
     except (KeyError, TypeError, ValueError):
         return jsonify({"error": "Invalid request."}), 400
+
+
+@search_bp.route("/boosts", methods=["GET"])
+def list_boosts():
+    try:
+        tenant = require_tenant_context()
+        boosts = SearchBoostRule.query.filter_by(tenant_id=tenant.id).all()
+        return jsonify({"boosts": [b.to_dict() for b in boosts]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @search_bp.route("/boosts", methods=["POST"])
