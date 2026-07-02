@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 from auth.auth_service import AuthService
 from core.exceptions import OrionError
 from core.jwt_auth import issue_tokens_for_user
 from core.rate_limit import limiter
+from user.user import User
 
 auth_bp = Blueprint("auth", __name__)
 _auth = AuthService()
@@ -50,10 +51,26 @@ def refresh():
 
 @auth_bp.post("/register/platform")
 def register_platform_admin():
+    from flask import current_app
+    from user.user import User
+    
     data = request.get_json(silent=True) or {}
-    user = _auth.register_super_admin(
-        email=data.get("email", "").strip().lower(),
-        password=data.get("password", ""),
-        first_name=data.get("first_name", "Platform"),
-    )
-    return jsonify({"user": user.to_dict()}), 201
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+    first_name = data.get("first_name", "Platform")
+    
+    if not email or not password:
+        return jsonify({"error": "Email and password required."}), 400
+        
+    if User.query.filter_by(email=email, tenant_id=None).first():
+        return jsonify({"error": "Super admin already exists."}), 409
+        
+    from auth.auth_service import AuthService
+    try:
+        user = AuthService().register_super_admin(email=email, password=password, first_name=first_name)
+        return jsonify({"user": user.to_dict()}), 201
+    except Exception as exc:
+        from core.exceptions import OrionError
+        if isinstance(exc, OrionError):
+            return jsonify({"error": exc.message}), exc.status_code
+        return jsonify({"error": "Failed to create super admin."}), 500
