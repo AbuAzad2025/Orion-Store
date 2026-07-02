@@ -1167,7 +1167,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | التذكرة | الأولوية | الحالة | الوصف | Commit |
 |---------|----------|--------|-------|--------|
 | **AZ-0.1** | 🔴 CRITICAL | ✅ مكتمل | تأمين register/platform — requires platform admin للبوتستراب، تعطيل الوصول العام | `5f84755` |
-| **AZ-0.2** | 🔴 CRITICAL | ✅ مكتمل | إزالة X-User-ID من middleware + api_client.js؛ JWT Bearer بديل | `051fe91` |
+| **AZ-0.2** | 🔴 CRITICAL | ✅ مكتمل | إزالة X-User-ID من middleware + api_client.js؛ JWT Bearer بديل | `c535d79` |
 | **AZ-0.3** | 🔴 CRITICAL | 🔄 قيد التنفيذ | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | — |
 | **AZ-0.4** | 🔴 CRITICAL | ⬜ معلق | تفعيل webhook signature verification (PayPal, Stripe, BNPL) | — |
 | **AZ-0.5** | 🟠 HIGH | ⬜ معلق | إصلاح OrionAPI.delete (المفقود في api_client.js) | — |
@@ -1245,7 +1245,7 @@ Baseline: 34 passed  في ~140s (updated for AZ-0.2)
 | **الآثار الأمنية** | ✅ لم يعد بإمكان أي طرف ثالث انتحال شخصية المستخدم عبر تزوير `X-User-ID`. الهوية الوحيدة المقبولة هي JWT Bearer token (API) أو session من جانب الخادم (HTML admin). |
 | **تأثير التوافق** | أي كود خارجي يعتمد على إرسال `X-User-ID` لتحديد الهوية سيفشل (وهو المطلوب أمنياً). |
 | **المرحلة التالية** | AZ-0.3 — تدقيق نقاط نهاية tenant-admin واستبدال `require_tenant_context` بحماية `auth+role` |
-| **Commit** | `[AZ-0.2]` |
+| **Commit** | `c535d79` |
 
 ---
 
