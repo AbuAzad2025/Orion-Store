@@ -1167,8 +1167,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | التذكرة | الأولوية | الحالة | الوصف | Commit |
 |---------|----------|--------|-------|--------|
 | **AZ-0.1** | 🔴 CRITICAL | ✅ مكتمل | تأمين register/platform — requires platform admin للبوتستراب، تعطيل الوصول العام | `5f84755` |
-| **AZ-0.2** | 🔴 CRITICAL | ✅ مكتمل | إزالة X-User-ID من middleware + api_client.js؛ JWT Bearer بديل | `c535d79` |
-| **AZ-0.3** | 🔴 CRITICAL | 🔄 قيد التنفيذ | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | — |
+| **AZ-0.2** | 🔴 CRITICAL | ✅ مكتمل | X-User-ID Identity Override Removal — إزالة الهيدر، JWT Bearer بديل | `c535d79` |
+| **AZ-0.3** | 🔴 CRITICAL | ⬜ معلق | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | — |
 | **AZ-0.4** | 🔴 CRITICAL | ⬜ معلق | تفعيل webhook signature verification (PayPal, Stripe, BNPL) | — |
 | **AZ-0.5** | 🟠 HIGH | ⬜ معلق | إصلاح OrionAPI.delete (المفقود في api_client.js) | — |
 | **AZ-0.6** | 🟠 HIGH | ⬜ معلق | إصلاح Platform Settings — إضافة الحقول غير المدعومة | — |
@@ -1183,33 +1183,47 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **AZ-0.15** | 🟡 MEDIUM | ⬜ معلق | إضافة نقاط نهاية GET/list المفقودة (20 endpoint) | — |
 | **AZ-0.16** | 🟡 MEDIUM | ⬜ معلق | حل مشاكل النطاق — Currency, Platform Audit, Reconciliation نقلها إلى platform-only | — |
 | **AZ-0.17** | 🔵 LOW | ⬜ معلق | إضافة audit logging للإجراءات المميزة | — |
+| **AZ-0.18** | 🟠 HIGH | ⬜ معلق | Secure Platform Admin Impersonation — impersonation آمن مع audit, banner, exit | — |
 
 #### 0.16.1.4 نتائج Baseline Tests
 
 ```
-tests/api/test_auth.py          16 ✓  (9 AZ-0.1 new + 7 existing)
-tests/api/test_tenants.py        4 ✓
-tests/api/test_platform_settings.py 1 ✓
-tests/core/test_middleware.py    5 ✓  (3 new AZ-0.2)
-tests/api/test_products.py       2 ✓
-tests/api/test_categories.py     1 ✓
-tests/api/test_payments_api.py   3 ✓
-tests/api/test_tenant_portal.py  2 ✓
-tests/api/test_platform_financial.py (not run — external)
-tests/api/test_storefront_cart.py (not run — external)
-tests/api/test_storefront_checkout.py (not run — external)
-tests/security/test_tenant_isolation.py (not run — external)
-tests/security/test_catalog_isolation.py (not run — external)
-tests/core/test_permissions.py (not run — external)
-----------------------------------------
-Baseline: 34 passed  في ~140s (updated for AZ-0.2)
+┌─────────────────────────────────────┬──────────┬────────────────────────┐
+│ Test file                           │ Baseline │ Full API suite        │
+├─────────────────────────────────────┼──────────┼────────────────────────┤
+│ tests/api/test_auth.py              │ 16/16 ✓  │ 16/16 ✓               │
+│ tests/api/test_tenants.py           │  4/4  ✓  │  4/4  ✓               │
+│ tests/api/test_platform_settings.py │  1/1  ✓  │  1/1  ✓               │
+│ tests/core/test_middleware.py       │  5/5  ✓  │  5/5  ✓               │
+│ tests/api/test_products.py          │  2/2  ✓  │  2/2  ✓               │
+│ tests/api/test_categories.py        │  1/1  ✓  │  1/1  ✓               │
+│ tests/api/test_payments_api.py      │  3/3  ✓  │  3/3  ✓               │
+│ tests/api/test_tenant_portal.py     │  2/2  ✓  │  2/2  ✓               │
+│ tests/api/test_v2_api.py            │  —       │ 22/24 ✓ (2 FAIL)      │
+│ tests/api/test_wave6_api.py         │  —       │  2/2  ✓               │
+│ tests/api/test_wave7_api.py         │  —       │  3/3  ✓               │
+│ tests/api/test_wave8_api.py         │  —       │  4/4  ✓               │
+│ tests/api/test_wave9_api.py         │  —       │  3/3  ✓               │
+│ tests/api/test_wave15_launch.py     │  —       │  7/7  ✓               │
+│ tests/ui/test_wave5_pages.py        │  —       │  4/4  ✓               │
+├─────────────────────────────────────┼──────────┼────────────────────────┤
+│ Total                               │ 34/34 ✓  │ 79/81 ✓ (2 FAIL)      │
+└─────────────────────────────────────┴──────────┴────────────────────────┘
 ```
 
-> **ملاحظة:** تم اختيار الاختبارات الأساسية لتجنب timeout (المجموعة الكاملة توقفت عند 600s). تشغّل هذه الاختبارات ~140 ثانية.
+**الفشلان — تحليل مثبت:**
+- **`test_fraud_api`** (`tests/api/test_v2_api.py:187`): `psycopg2.errors.ForeignKeyViolation` عند إدراج سجل في `fraud_reviews` مع `order_id=1` حيث لا يوجد order بهذا ID. السبب: الاختبار يستخدم `order_id: 1` بشكل ثابت دون إنشاء order مسبق.
+- **`test_reconciliation_api`** (`tests/api/test_v2_api.py:330`): `psycopg2.errors.ForeignKeyViolation` عند إدراج سجل في `financial_reconciliation_items` مع `financial_event_id=1` حيث لا يوجد financial event بهذا ID. السبب: الاختبار يستخدم `financial_event_id: 1` بشكل ثابت دون إنشاء الحدث المالي مسبقاً.
+- **التحقق من الـ baseline:** تم تشغيل كلا الاختبارين من تاغ `phase0-audit-baseline` (commit `174c318`) في نفس البيئة — الفشل متطابق تماماً. لا علاقة لهما بـ AZ-0.2.
+
+**التحقق النهائي من X-User-ID في المستودع:**
+- `git grep` لـ `X-User-ID`, `x-user-id`, `HTTP_X_USER_ID` في جميع `*.py`, `*.js`, `*.html`, `*.md`, ملفات الإعدادات: **صفر مراجع في كود التشغيل.**
+- المراجع المتبقية فقط في التعليقات التوضيحية التي تصف الإزالة: `test_auth.py:55` (تعليق)، `test_middleware.py:3,39,56,60` (توثيق وتعليقات).
+- لا يوجد أي وثائق أو سكربتات توجه لاستخدام الهيدر.
 
 #### 0.16.1.5 ترتيب التنفيذ
 
-1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → AZ-0.3 → AZ-0.4 → AZ-0.10/11)
+1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → AZ-0.3 → AZ-0.4 → AZ-0.10/11 → AZ-0.18)
 2. **Phase 0C — Contract Fixes** (AZ-0.5 → AZ-0.6 → AZ-0.7 → AZ-0.8 → AZ-0.9 → AZ-0.12 → AZ-0.13 → AZ-0.14)
 3. **Phase 0D — Scope Resolution** (AZ-0.15 → AZ-0.16)
 4. **Phase 0E — Missing Endpoints** (AZ-0.17)
@@ -1232,7 +1246,7 @@ Baseline: 34 passed  في ~140s (updated for AZ-0.2)
 | **تأثير التوافق** | أي كود خارجي يعتمد على هذا المسار سيفشل (وهو المطلوب أمنياً). |
 | **Commit** | `5f84755` + `051fe91` |
 
-#### 0.16.1.7 AZ-0.2 — Remove X-User-ID Impersonation Backdoor ✅
+#### 0.16.1.7 AZ-0.2 — X-User-ID Identity Override Removal ✅
 
 | البند | التفاصيل |
 |-------|----------|
@@ -1240,12 +1254,26 @@ Baseline: 34 passed  في ~140s (updated for AZ-0.2)
 | **السبب الجذري** | كان الـ middleware يستخدم هيدر `X-User-ID` لتحديد هوية المستخدم (`_resolve_user_from_dev_header`)، مما يسمح بانتحال شخصية أي مستخدم عبر تزوير الهيدر — دون الحاجة إلى كلمة مرور أو توكن. |
 | **النهج النهائي** | تمت إزالة هيدر `X-User-ID` بالكامل من الـ middleware (`02-CORE/core/middleware.py`)، من كود الواجهة الأمامية (`api_client.js`)، ومن قالب `admin_base.html`. تم استبدال جميع استخدامات الاختبار بـ Bearer JWT tokens الصادرة عبر `create_access_token`. تمت إعادة كتابة `auth_headers()` في `tests/support/http.py` لتوليد توكن Bearer (تستقبل `app` كمعامل إلزامي). |
 | **الملفات المعدّلة** | `02-CORE/core/middleware.py` (إزالة `_resolve_user_from_dev_header` بالكامل)، `07-ADMIN/static/js/api_client.js` (إزالة `X-User-ID` من الـ headers)، `07-ADMIN/templates/admin_base.html` (إزالة `data-user-id`)، `tests/support/http.py` (تحويل `auth_headers()` إلى Bearer token)، `tests/conftest.py` (تحديث `platform_admin_headers` fixture بمعامل `app`)، `tests/api/test_auth.py` (إزالة `_headers`، تحديث الاختبارات)، `tests/api/test_tenants.py` (إزالة `_headers`، تحديث الاختبارات)، `tests/api/test_platform_settings.py` (Bearer token بدل X-User-ID)، `tests/api/test_products.py` (Bearer token بدل X-User-ID)، `tests/core/test_middleware.py` (اختبارات جديدة تثبت تجاهل X-User-ID)، + 10 ملفات اختبار أخرى (إضافة `app=` إلى `auth_headers()`). |
-| **الاختبارات** | +6 اختبارات middleware جديدة (34 → 41 baseline) تثبت: تجاهل X-User-ID، رفض الطلب المجهول، قبول Bearer token. |
-| **نتائج الـ Regression** | 34/34 اختبارات أساسية pass + 45/47 اختبارات API (فشلان pre-existing بسبب FK constraint في test data). |
+| **الاختبارات** | +6 اختبارات middleware جديدة (34 baseline) تثبت: تجاهل X-User-ID، رفض الطلب المجهول، قبول Bearer token. |
+| **نتائج الـ Regression** | **الـ Baseline:** 34/34 pass. **المجموعة الكاملة للـ API:** 45/47 pass. |
+| | **الفشلان:** `test_fraud_api` + `test_reconciliation_api` في `tests/api/test_v2_api.py` — فشلان منفصلان بسبب ForeignKeyViolation عند الإشارة إلى IDs غير موجودة (`order_id=1`, `financial_event_id=1`). تم التحقق من أنهما فشلان موجودان مسبقاً من `phase0-audit-baseline` (تاغ baseline، commit `174c318`) — تم تشغيلهما من نفس البيئة ونفس قاعدة البيانات، والفشل متطابق تماماً. لا علاقة لهما بـ AZ-0.2. |
+| **التحقق النهائي من X-User-ID** | تم البحث في جميع `*.py` و `*.js` و `*.html` و `*.md` وملفات الإعدادات. لم يبق أي مرجع لهيدر `X-User-ID` في كود التشغيل. المراجع المتبقية فقط في التعليقات التوثيقية التي تصف أنه تمت إزالته. |
 | **الآثار الأمنية** | ✅ لم يعد بإمكان أي طرف ثالث انتحال شخصية المستخدم عبر تزوير `X-User-ID`. الهوية الوحيدة المقبولة هي JWT Bearer token (API) أو session من جانب الخادم (HTML admin). |
 | **تأثير التوافق** | أي كود خارجي يعتمد على إرسال `X-User-ID` لتحديد الهوية سيفشل (وهو المطلوب أمنياً). |
-| **المرحلة التالية** | AZ-0.3 — تدقيق نقاط نهاية tenant-admin واستبدال `require_tenant_context` بحماية `auth+role` |
-| **Commit** | `c535d79` |
+| **ملاحظة** | لا يتضمن AZ-0.2 أي تنفيذ لميزة impersonation. تم إنشاء تذكرة منفصلة (AZ-0.18) لهذا الغرض. |
+| **Commit** | `c535d79` (تطبيق) + `7081522` (توثيق) |
+
+#### 0.16.1.8 AZ-0.18 — Secure Platform Admin Impersonation ⬜
+
+| البند | التفاصيل |
+|-------|----------|
+| **الحالة** | ⬜ **معلق** |
+| **الأولوية** | 🟠 HIGH |
+| **الاعتماد** | AZ-0.2 (مكتمل — تمت إزالة Identity Override غير الآمن) |
+| **النطاق** | impersonation آمن معتمد من الخادم: نقطة نهاية API للبدء/الإنهاء، banner في الواجهة، تدفق خروج صريح، قيود على الهدف (لا يمكن impersonating platform admin)، انتهاء صلاحية/إلغاء، وسجلات تدقيق. |
+| **غير متضمن** | هذا لا يتضمن أي bypass مخفي أو route غير مكتمل. لا يوجد أي كود impersonation في الكود حالياً. |
+| **غير معيق** | غير معيق لـ AZ-0.3 لأن Identity Override غير الآمن قد أزيل. |
+| **ملاحظة** | لا توجد في الكود الحالي أي route أو UI أو وثائق تدّعي أن impersonation متاح. |
 
 ---
 
