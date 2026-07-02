@@ -39,7 +39,7 @@ def test_tenant_admin_pages(client, app):
         password="password123",
         is_admin=True,
     )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
 
     for path in (
         "/admin/store/dashboard",

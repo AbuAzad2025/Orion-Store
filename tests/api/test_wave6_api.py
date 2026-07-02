@@ -20,7 +20,7 @@ def test_shipping_api_create_and_calculate(client, app):
         password="password123",
         is_admin=True,
     )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     create = client.post(
         "/api/v1/shipping/methods",
         headers=headers,
@@ -61,7 +61,7 @@ def test_voucher_api_create_validate_apply(client, app):
         password="password123",
         is_admin=True,
     )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     create = client.post(
         "/api/v1/vouchers/",
         headers=headers,

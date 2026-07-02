@@ -21,7 +21,7 @@ pytestmark = pytest.mark.integration
 
 
 def test_tenant_onboarding_persists_to_postgres_and_stubs_gateway_callback(
-    client, platform_admin, db_session, mocker
+    client, app, platform_admin, db_session, mocker
 ):
     """POST /tenants persists rows; outbound gateway HTTP is mocked."""
     gateway_response = mocker.Mock()
@@ -39,7 +39,7 @@ def test_tenant_onboarding_persists_to_postgres_and_stubs_gateway_callback(
 
     response = client.post(
         "/api/v1/tenants/",
-        headers=auth_headers(platform_admin),
+        headers=auth_headers(platform_admin, app=app),
         json=tenant_create_payload(
             name="Gateway Store",
             slug="gateway-store",
@@ -74,7 +74,7 @@ def test_tenant_onboarding_persists_to_postgres_and_stubs_gateway_callback(
 
 
 def test_duplicate_slug_rejected_with_single_database_row(
-    client, platform_admin, db_session, mocker
+    client, app, platform_admin, db_session, mocker
 ):
     mocker.patch.object(
         requests,
@@ -89,7 +89,7 @@ def test_duplicate_slug_rejected_with_single_database_row(
         {"TENANT_REGISTRY_URL": "https://gateway.azadexa.test/v1"},
         clear=False,
     )
-    headers = auth_headers(platform_admin)
+    headers = auth_headers(platform_admin, app=app)
     first = tenant_create_payload(slug="once-only", name="First", email="a@t.com")
 
     assert (

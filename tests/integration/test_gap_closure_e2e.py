@@ -91,7 +91,7 @@ def test_refund_flow(client, app):
         payment_method="cod",
     )
     payment_id = paid["payment"]["public_id"]
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     refund = client.post(
         f"/api/v1/payments/{payment_id}/refund",
         headers=headers,
@@ -121,7 +121,7 @@ def test_pagination_on_product_list(client, app):
             quantity=1,
             is_published=True,
         )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     resp = client.get("/api/v1/products/?page=1&per_page=2", headers=headers)
     assert resp.status_code == 200
     body = resp.get_json()

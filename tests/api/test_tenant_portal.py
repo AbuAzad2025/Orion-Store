@@ -23,18 +23,18 @@ def tenant_admin_store(app):
     return tenant, admin
 
 
-def test_tenant_dashboard_api(client, tenant_admin_store):
+def test_tenant_dashboard_api(client, app, tenant_admin_store):
     tenant, admin = tenant_admin_store
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     resp = client.get("/api/v1/tenant/dashboard", headers=headers)
     assert resp.status_code == 200
     body = resp.get_json()
     assert body["stats"]["orders_total"] == 0
 
 
-def test_tenant_gateways_and_templates(client, tenant_admin_store):
+def test_tenant_gateways_and_templates(client, app, tenant_admin_store):
     tenant, admin = tenant_admin_store
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
 
     cod = client.post("/api/v1/tenant/gateways/cod", headers=headers)
     assert cod.status_code == 201

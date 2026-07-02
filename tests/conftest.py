@@ -228,7 +228,7 @@ def platform_admin(app: Flask):
 
 
 @pytest.fixture
-def platform_admin_headers(platform_admin):
+def platform_admin_headers(platform_admin, app):
     from support.http import auth_headers
 
-    return auth_headers(platform_admin)
+    return auth_headers(platform_admin, app=app)

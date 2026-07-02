@@ -25,9 +25,9 @@ def tenant_store(app):
     return tenant, admin
 
 
-def test_create_and_list_categories(client, tenant_store):
+def test_create_and_list_categories(client, app, tenant_store):
     tenant, admin = tenant_store
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
 
     create = client.post(
         "/api/v1/categories/",

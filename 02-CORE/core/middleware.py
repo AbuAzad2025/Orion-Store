@@ -134,7 +134,7 @@ def _tenant_query():
 
 
 def _resolve_authenticated_user() -> None:
-    """JWT (API), session (HTML admin), then X-User-ID (dev tooling)."""
+    """JWT (API) or session (HTML admin)."""
     if request.path in ("/api/v1/auth/refresh", "/admin/login"):
         return
     try:
@@ -153,16 +153,6 @@ def _resolve_authenticated_user() -> None:
             g.is_platform_admin = user.is_superuser
             g.role = "platform_admin" if user.is_superuser else ("tenant_admin" if user.is_admin else "customer")
             return
-
-    _resolve_user_from_dev_header()
-
-
-def _resolve_user_from_dev_header() -> None:
-    user_public_id = request.headers.get("X-User-ID")
-    if not user_public_id:
-        return
-    _bind_user_to_context(user_public_id)
-
 
 def _bind_user_to_context(user_public_id: str) -> None:
     try:

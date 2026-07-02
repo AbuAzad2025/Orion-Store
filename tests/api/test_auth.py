@@ -11,11 +11,6 @@ from __future__ import annotations
 from orion.extensions import db
 
 
-def _headers(user) -> dict[str, str]:
-    # NOTE: X-User-ID will be removed in AZ-0.2.
-    return {"X-User-ID": user.public_id, "Content-Type": "application/json"}
-
-
 def _create_tenant_and_admin(app) -> object:
     """Trusted internal helper: creates a tenant and a tenant-admin user.
 
@@ -278,10 +273,11 @@ def test_login_requires_json_body(client):
     assert response.status_code == 401
 
 
-def test_list_tenants_as_platform_admin(client, platform_admin):
+def test_list_tenants_as_platform_admin(client, app, platform_admin):
+    headers = _bearer_token_for(app, platform_admin)
     create = client.post(
         "/api/v1/tenants/",
-        headers=_headers(platform_admin),
+        headers=headers,
         json={
             "name": "Listed Store",
             "slug": "listed-store",
@@ -289,6 +285,6 @@ def test_list_tenants_as_platform_admin(client, platform_admin):
         },
     )
     assert create.status_code == 201
-    response = client.get("/api/v1/tenants/", headers=_headers(platform_admin))
+    response = client.get("/api/v1/tenants/", headers=headers)
     assert response.status_code == 200
     assert len(response.get_json()["tenants"]) == 1

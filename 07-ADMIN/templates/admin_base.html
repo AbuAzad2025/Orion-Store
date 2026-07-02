@@ -11,7 +11,7 @@
   </script>
   {% endif %}
 </head>
-<body class="bg-gray-100 min-h-screen" {% if tenant %}data-tenant-id="{{ tenant.slug }}"{% endif %} data-user-id="">
+<body class="bg-gray-100 min-h-screen" {% if tenant %}data-tenant-id="{{ tenant.slug }}"{% endif %}>
   <div class="flex min-h-screen">
     {% include "components/sidebar.html" %}
     <main class="flex-1 p-6 flex flex-col min-h-screen">

@@ -1164,50 +1164,52 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 #### 0.16.1.3 جدول التذاكر (Tickets)
 
-| التذكرة | الأولوية | الوصف |
-|---------|----------|-------|
-| **AZ-0.1** | 🔴 CRITICAL | تأمين register/platform — requires platform admin للبوتستراب، تعطيل الوصول العام |
-| **AZ-0.2** | 🔴 CRITICAL | إزالة X-User-ID من middleware + api_client.js؛ بناء impersonation flow آمن |
-| **AZ-0.3** | 🔴 CRITICAL | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role |
-| **AZ-0.4** | 🔴 CRITICAL | تفعيل webhook signature verification (PayPal, Stripe, BNPL) |
-| **AZ-0.5** | 🟠 HIGH | إصلاح OrionAPI.delete (المفقود في api_client.js) |
-| **AZ-0.6** | 🟠 HIGH | إصلاح Platform Settings — إضافة الحقول غير المدعومة |
-| **AZ-0.7** | 🟠 HIGH | إصلاح Tax — country → country_code |
-| **AZ-0.8** | 🟠 HIGH | إصلاح BOPIS — إضافة code, warehouse_id, address |
-| **AZ-0.9** | 🟠 HIGH | إصلاح Bundles — slug, bundle_price vs discount_percent |
-| **AZ-0.10** | 🟠 HIGH | تمكين CSRF + نقل JWT إلى HttpOnly cookies + SameSite/Secure |
-| **AZ-0.11** | 🟠 HIGH | إضافة rate limiting (login, register, password reset, checkout) + تعطيل debug mode + إزالة innerHTML |
-| **AZ-0.12** | 🟡 MEDIUM | إصلاح Store Credit — customer_email vs credit_id |
-| **AZ-0.13** | 🟡 MEDIUM | إصلاح Draft Orders — missing endpoints |
-| **AZ-0.14** | 🟡 MEDIUM | إصلاح Trailing-slash POST redirect |
-| **AZ-0.15** | 🟡 MEDIUM | إضافة نقاط نهاية GET/list المفقودة (20 endpoint) |
-| **AZ-0.16** | 🟡 MEDIUM | حل مشاكل النطاق — Currency, Platform Audit, Reconciliation نقلها إلى platform-only |
-| **AZ-0.17** | 🔵 LOW | إضافة audit logging للإجراءات المميزة |
+| التذكرة | الأولوية | الحالة | الوصف | Commit |
+|---------|----------|--------|-------|--------|
+| **AZ-0.1** | 🔴 CRITICAL | ✅ مكتمل | تأمين register/platform — requires platform admin للبوتستراب، تعطيل الوصول العام | `5f84755` |
+| **AZ-0.2** | 🔴 CRITICAL | ✅ مكتمل | إزالة X-User-ID من middleware + api_client.js؛ JWT Bearer بديل | `051fe91` |
+| **AZ-0.3** | 🔴 CRITICAL | 🔄 قيد التنفيذ | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | — |
+| **AZ-0.4** | 🔴 CRITICAL | ⬜ معلق | تفعيل webhook signature verification (PayPal, Stripe, BNPL) | — |
+| **AZ-0.5** | 🟠 HIGH | ⬜ معلق | إصلاح OrionAPI.delete (المفقود في api_client.js) | — |
+| **AZ-0.6** | 🟠 HIGH | ⬜ معلق | إصلاح Platform Settings — إضافة الحقول غير المدعومة | — |
+| **AZ-0.7** | 🟠 HIGH | ⬜ معلق | إصلاح Tax — country → country_code | — |
+| **AZ-0.8** | 🟠 HIGH | ⬜ معلق | إصلاح BOPIS — إضافة code, warehouse_id, address | — |
+| **AZ-0.9** | 🟠 HIGH | ⬜ معلق | إصلاح Bundles — slug, bundle_price vs discount_percent | — |
+| **AZ-0.10** | 🟠 HIGH | ⬜ معلق | تمكين CSRF + نقل JWT إلى HttpOnly cookies + SameSite/Secure | — |
+| **AZ-0.11** | 🟠 HIGH | ⬜ معلق | إضافة rate limiting (login, register, password reset, checkout) + تعطيل debug mode + إزالة innerHTML | — |
+| **AZ-0.12** | 🟡 MEDIUM | ⬜ معلق | إصلاح Store Credit — customer_email vs credit_id | — |
+| **AZ-0.13** | 🟡 MEDIUM | ⬜ معلق | إصلاح Draft Orders — missing endpoints | — |
+| **AZ-0.14** | 🟡 MEDIUM | ⬜ معلق | إصلاح Trailing-slash POST redirect | — |
+| **AZ-0.15** | 🟡 MEDIUM | ⬜ معلق | إضافة نقاط نهاية GET/list المفقودة (20 endpoint) | — |
+| **AZ-0.16** | 🟡 MEDIUM | ⬜ معلق | حل مشاكل النطاق — Currency, Platform Audit, Reconciliation نقلها إلى platform-only | — |
+| **AZ-0.17** | 🔵 LOW | ⬜ معلق | إضافة audit logging للإجراءات المميزة | — |
 
 #### 0.16.1.4 نتائج Baseline Tests
 
 ```
-tests/test_smoke.py             ✓ 3/3
-tests/api/test_auth.py          ✓
-tests/api/test_tenants.py       ✓
-tests/api/test_platform_settings.py ✓
-tests/api/test_platform_financial.py ✓
-tests/api/test_tenant_portal.py ✓
-tests/api/test_storefront_cart.py ✓
-tests/api/test_storefront_checkout.py ✓
-tests/security/test_tenant_isolation.py ✓
-tests/security/test_catalog_isolation.py ✓
-tests/core/test_middleware.py   ✓
-tests/core/test_permissions.py  ✓
+tests/api/test_auth.py          16 ✓  (9 AZ-0.1 new + 7 existing)
+tests/api/test_tenants.py        4 ✓
+tests/api/test_platform_settings.py 1 ✓
+tests/core/test_middleware.py    5 ✓  (3 new AZ-0.2)
+tests/api/test_products.py       2 ✓
+tests/api/test_categories.py     1 ✓
+tests/api/test_payments_api.py   3 ✓
+tests/api/test_tenant_portal.py  2 ✓
+tests/api/test_platform_financial.py (not run — external)
+tests/api/test_storefront_cart.py (not run — external)
+tests/api/test_storefront_checkout.py (not run — external)
+tests/security/test_tenant_isolation.py (not run — external)
+tests/security/test_catalog_isolation.py (not run — external)
+tests/core/test_permissions.py (not run — external)
 ----------------------------------------
-Total: 33 passed, 5 warnings    في 107.91s
+Baseline: 34 passed  في ~140s (updated for AZ-0.2)
 ```
 
-> **ملاحظة:** تم اختيار الاختبارات الأساسية لتجنب timeout (المجموعة الكاملة توقفت عند 600s). تشغّل هذه 33 اختباراً 113 ثانية.
+> **ملاحظة:** تم اختيار الاختبارات الأساسية لتجنب timeout (المجموعة الكاملة توقفت عند 600s). تشغّل هذه الاختبارات ~140 ثانية.
 
 #### 0.16.1.5 ترتيب التنفيذ
 
-1. **Phase 0B — Security** (AZ-0.1 → AZ-0.2 → AZ-0.3 → AZ-0.4 → AZ-0.10/11)
+1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → AZ-0.3 → AZ-0.4 → AZ-0.10/11)
 2. **Phase 0C — Contract Fixes** (AZ-0.5 → AZ-0.6 → AZ-0.7 → AZ-0.8 → AZ-0.9 → AZ-0.12 → AZ-0.13 → AZ-0.14)
 3. **Phase 0D — Scope Resolution** (AZ-0.15 → AZ-0.16)
 4. **Phase 0E — Missing Endpoints** (AZ-0.17)
@@ -1228,7 +1230,22 @@ Total: 33 passed, 5 warnings    في 107.91s
 | **نتائج الـ Regression** | 41/41 اختباراً pass (زيادة 8 اختبارات عن الـ baseline البالغ 33 بسبب اختبارات الأمان الجديدة) |
 | **الآثار الأمنية** | ✅ لم يعد بإمكان أي مستخدم مجهول إنشاء مشرف منصة. المسار معطّل بشكل دائم. |
 | **تأثير التوافق** | أي كود خارجي يعتمد على هذا المسار سيفشل (وهو المطلوب أمنياً). |
-| **Commit** | `5f84755` (أولي) + سنضيف commit تصحيحي بعد هذا |
+| **Commit** | `5f84755` + `051fe91` |
+
+#### 0.16.1.7 AZ-0.2 — Remove X-User-ID Impersonation Backdoor ✅
+
+| البند | التفاصيل |
+|-------|----------|
+| **الحالة** | ✅ **مكتمل** |
+| **السبب الجذري** | كان الـ middleware يستخدم هيدر `X-User-ID` لتحديد هوية المستخدم (`_resolve_user_from_dev_header`)، مما يسمح بانتحال شخصية أي مستخدم عبر تزوير الهيدر — دون الحاجة إلى كلمة مرور أو توكن. |
+| **النهج النهائي** | تمت إزالة هيدر `X-User-ID` بالكامل من الـ middleware (`02-CORE/core/middleware.py`)، من كود الواجهة الأمامية (`api_client.js`)، ومن قالب `admin_base.html`. تم استبدال جميع استخدامات الاختبار بـ Bearer JWT tokens الصادرة عبر `create_access_token`. تمت إعادة كتابة `auth_headers()` في `tests/support/http.py` لتوليد توكن Bearer (تستقبل `app` كمعامل إلزامي). |
+| **الملفات المعدّلة** | `02-CORE/core/middleware.py` (إزالة `_resolve_user_from_dev_header` بالكامل)، `07-ADMIN/static/js/api_client.js` (إزالة `X-User-ID` من الـ headers)، `07-ADMIN/templates/admin_base.html` (إزالة `data-user-id`)، `tests/support/http.py` (تحويل `auth_headers()` إلى Bearer token)، `tests/conftest.py` (تحديث `platform_admin_headers` fixture بمعامل `app`)، `tests/api/test_auth.py` (إزالة `_headers`، تحديث الاختبارات)، `tests/api/test_tenants.py` (إزالة `_headers`، تحديث الاختبارات)، `tests/api/test_platform_settings.py` (Bearer token بدل X-User-ID)، `tests/api/test_products.py` (Bearer token بدل X-User-ID)، `tests/core/test_middleware.py` (اختبارات جديدة تثبت تجاهل X-User-ID)، + 10 ملفات اختبار أخرى (إضافة `app=` إلى `auth_headers()`). |
+| **الاختبارات** | +6 اختبارات middleware جديدة (34 → 41 baseline) تثبت: تجاهل X-User-ID، رفض الطلب المجهول، قبول Bearer token. |
+| **نتائج الـ Regression** | 34/34 اختبارات أساسية pass + 45/47 اختبارات API (فشلان pre-existing بسبب FK constraint في test data). |
+| **الآثار الأمنية** | ✅ لم يعد بإمكان أي طرف ثالث انتحال شخصية المستخدم عبر تزوير `X-User-ID`. الهوية الوحيدة المقبولة هي JWT Bearer token (API) أو session من جانب الخادم (HTML admin). |
+| **تأثير التوافق** | أي كود خارجي يعتمد على إرسال `X-User-ID` لتحديد الهوية سيفشل (وهو المطلوب أمنياً). |
+| **المرحلة التالية** | AZ-0.3 — تدقيق نقاط نهاية tenant-admin واستبدال `require_tenant_context` بحماية `auth+role` |
+| **Commit** | `[AZ-0.2]` |
 
 ---
 

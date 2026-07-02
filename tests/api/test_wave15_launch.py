@@ -117,7 +117,7 @@ def test_i18n_glossary_api(client, app):
     )
     from support.http import auth_headers
 
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     created = client.post(
         "/api/v1/i18n/glossary",
         json={

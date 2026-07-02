@@ -40,7 +40,7 @@ def test_payments_api_pay_order(client, app):
         customer_email="buyer@payapi.com",
         shipping_address={},
     )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     response = client.post(
         f"/api/v1/payments/orders/{order.public_id}/pay",
         headers=headers,

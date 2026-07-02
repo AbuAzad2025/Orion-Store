@@ -25,7 +25,7 @@ def _setup_admin(client, app):
         password="password123",
         is_admin=True,
     )
-    return tenant, auth_headers(admin, tenant_id=tenant.slug)
+    return tenant, auth_headers(admin, app=app, tenant_id=tenant.slug)
 
 
 def test_returns_api_flow(client, app):

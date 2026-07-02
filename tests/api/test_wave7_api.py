@@ -32,7 +32,7 @@ def test_feature_flags_api_and_admin_page(client, app):
         password="password123",
         is_admin=True,
     )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     listed = client.get("/api/v1/tenant/feature-flags", headers=headers)
     assert listed.status_code == 200
     assert len(listed.get_json()["flags"]) >= 3
@@ -72,7 +72,7 @@ def test_product_translation_api(client, app):
         price="12.00",
         is_published=True,
     )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     put = client.put(
         f"/api/v1/tenant/products/{product.public_id}/translations/en",
         headers=headers,

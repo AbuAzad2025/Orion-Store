@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 
-def auth_headers(user, *, tenant_id: str | None = None) -> dict[str, str]:
+def auth_headers(user, *, app, tenant_id: str | None = None) -> dict[str, str]:
+    from flask_jwt_extended import create_access_token
+
+    with app.app_context():
+        token = create_access_token(identity=str(user.public_id))
     headers = {
-        "X-User-ID": str(user.public_id),
+        "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
     }
     if tenant_id:

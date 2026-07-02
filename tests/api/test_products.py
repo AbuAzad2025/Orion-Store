@@ -25,9 +25,9 @@ def tenant_store(app):
     return tenant, admin
 
 
-def test_product_crud(client, tenant_store):
+def test_product_crud(client, app, tenant_store):
     tenant, admin = tenant_store
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
 
     create = client.post(
         "/api/v1/products/",
@@ -65,10 +65,12 @@ def test_product_crud(client, tenant_store):
     assert listing_after.get_json()["products"] == []
 
 
-def test_products_require_tenant_context(client, platform_admin):
-    headers = {
-        "X-User-ID": platform_admin.public_id,
-        "Content-Type": "application/json",
-    }
-    response = client.get("/api/v1/products/", headers=headers)
+def test_products_require_tenant_context(client, app, platform_admin):
+    from flask_jwt_extended import create_access_token
+    from support.http import bearer_headers
+
+    with app.app_context():
+        token = create_access_token(identity=str(platform_admin.public_id))
+    # Authenticated but no X-Tenant-ID — must still fail
+    response = client.get("/api/v1/products/", headers=bearer_headers(token))
     assert response.status_code == 401

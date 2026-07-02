@@ -22,7 +22,7 @@ def setup(app):
         tenant_id=tenant.id, name="V2 API Product", slug="v2-api-product", price="19.99",
         quantity=100, is_published=True,
     )
-    return tenant, auth_headers(admin, tenant_id=tenant.slug), product
+    return tenant, auth_headers(admin, app=app, tenant_id=tenant.slug), product
 
 
 def test_subscription_plan_api(client, app, setup):
@@ -129,7 +129,7 @@ def test_bopis_api(client, app, setup):
 def test_currency_api(client, app, setup):
     tenant, headers, product = setup
     super_admin = AuthService().register_super_admin(email="su@currency.test", password="su123456")
-    su_headers = auth_headers(super_admin)
+    su_headers = auth_headers(super_admin, app=app)
     res = client.post("/api/v1/currency/rates", headers=su_headers, json={
         "from_currency": "USD", "to_currency": "EUR", "rate": "0.85",
     })
@@ -340,7 +340,7 @@ def test_reconciliation_api(client, app, setup):
 def test_audit_api(client, app, setup):
     tenant, headers, product = setup
     super_admin = AuthService().register_super_admin(email="su@audit.test", password="su123456")
-    su_headers = auth_headers(super_admin)
+    su_headers = auth_headers(super_admin, app=app)
     res = client.post("/api/v1/audit/logs", headers=headers, json={
         "user_id": 1, "action": "user.login", "details": {"ip": "1.2.3.4"},
     })

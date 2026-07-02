@@ -26,7 +26,7 @@ def test_rma_complete_refund_flow(client, app):
         password="password123",
         is_admin=True,
     )
-    admin_headers = auth_headers(admin, tenant_id=tenant.slug)
+    admin_headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     product = ProductService().create(
         tenant_id=tenant.id,
         name="Refund Me",

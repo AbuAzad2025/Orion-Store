@@ -12,8 +12,6 @@ const OrionAPI = {
     if (this.token) h.Authorization = `Bearer ${this.token}`;
     const tenantId = document.body.dataset.tenantId;
     if (tenantId) h["X-Tenant-ID"] = tenantId;
-    const userId = document.body.dataset.userId;
-    if (userId) h["X-User-ID"] = userId;
     return h;
   },
   async request(method, path, body) {
@@ -32,5 +30,8 @@ const OrionAPI = {
   },
   put(path, body) {
     return this.request("PUT", path, body);
+  },
+  delete(path) {
+    return this.request("DELETE", path);
   },
 };

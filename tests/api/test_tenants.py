@@ -2,15 +2,22 @@
 
 from __future__ import annotations
 
-
-def _headers(user) -> dict[str, str]:
-    return {"X-User-ID": user.public_id, "Content-Type": "application/json"}
+from support.http import bearer_headers
 
 
-def test_create_tenant(client, platform_admin):
+def _bearer_token_for(app, user) -> dict[str, str]:
+    from flask_jwt_extended import create_access_token
+
+    with app.app_context():
+        token = create_access_token(identity=str(user.public_id))
+    return bearer_headers(token)
+
+
+def test_create_tenant(client, app, platform_admin):
+    headers = _bearer_token_for(app, platform_admin)
     response = client.post(
         "/api/v1/tenants/",
-        headers=_headers(platform_admin),
+        headers=headers,
         json={
             "name": "Demo Store",
             "slug": "demo-store",
@@ -24,10 +31,11 @@ def test_create_tenant(client, platform_admin):
     assert tenant["slug"] == "demo-store"
 
 
-def test_create_tenant_missing_fields(client, platform_admin):
+def test_create_tenant_missing_fields(client, app, platform_admin):
+    headers = _bearer_token_for(app, platform_admin)
     response = client.post(
         "/api/v1/tenants/",
-        headers=_headers(platform_admin),
+        headers=headers,
         json={"name": "Incomplete"},
     )
     assert response.status_code == 400
@@ -38,10 +46,11 @@ def test_current_tenant_without_context(client):
     assert response.status_code == 404
 
 
-def test_current_tenant_by_slug_header(client, platform_admin):
+def test_current_tenant_by_slug_header(client, app, platform_admin):
+    headers = _bearer_token_for(app, platform_admin)
     create = client.post(
         "/api/v1/tenants/",
-        headers=_headers(platform_admin),
+        headers=headers,
         json={
             "name": "Header Store",
             "slug": "header-store",

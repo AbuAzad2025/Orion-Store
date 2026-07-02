@@ -20,7 +20,7 @@ def test_paypal_connect_and_payment_methods(client, app):
         password="password123",
         is_admin=True,
     )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     connect = client.post(
         "/api/v1/tenant/gateways/paypal",
         headers=headers,
@@ -51,7 +51,7 @@ def test_bnpl_provider_upsert(client, app):
         password="password123",
         is_admin=True,
     )
-    headers = auth_headers(admin, tenant_id=tenant.slug)
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
     upsert = client.put(
         "/api/v1/tenant/bnpl/providers/tabby",
         headers=headers,
