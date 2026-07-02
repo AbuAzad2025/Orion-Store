@@ -72,6 +72,17 @@ const StoreAPI = {
   getOrder(publicId) {
     return this.request("GET", `/orders/${publicId}`);
   },
+  async subscribeStockNotification(productId, customerEmail) {
+    const res = await fetch("/api/v1/stock-notifications", {
+      method: "POST",
+      headers: this.headers(),
+      body: JSON.stringify({ product_id: productId, customer_email: customerEmail }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    return data;
+  },
+
   getCartToken() {
     return localStorage.getItem(this.cartTokenKey);
   },

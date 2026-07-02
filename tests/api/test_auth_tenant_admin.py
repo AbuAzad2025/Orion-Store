@@ -188,6 +188,219 @@ class TestDraftOrders:
         _assert_denied(client.post(f"{self.BASE}/1/convert", headers=no_auth, json={"customer_email": "a@b.com"}))
 
 
+class TestDropship:
+    BASE = "/api/v1/dropship"
+
+    def test_list_pod_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/pod", headers=no_auth))
+
+    def test_list_pod_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/pod", headers=admin)
+        assert resp.status_code == 200
+
+    def test_create_pod_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.post(f"{self.BASE}/pod", headers=no_auth, json={"provider": "test", "api_key": "k"}))
+
+    def test_create_pod_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/pod", headers=admin, json={"provider": "TestProvider", "api_key": "sk_test"})
+        assert resp.status_code == 201
+
+    def test_list_suppliers_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/suppliers", headers=admin)
+        assert resp.status_code == 200
+
+    def test_create_supplier_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/suppliers", headers=admin, json={"name": "S1", "contact_email": "s@t.com"})
+        assert resp.status_code == 201
+
+    def test_dropship_orders_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/orders", headers=no_auth))
+
+    def test_dropship_orders_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/orders", headers=admin)
+        assert resp.status_code == 200
+
+
+class TestAffiliates:
+    BASE = "/api/v1/affiliates"
+
+    def test_list_programs_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/programs", headers=no_auth))
+
+    def test_list_programs_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/programs", headers=admin)
+        assert resp.status_code == 200
+
+    def test_list_affiliates_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/affiliates", headers=admin)
+        assert resp.status_code == 200
+
+    def test_list_commissions_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/commissions", headers=admin)
+        assert resp.status_code == 200
+
+    def test_create_program_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.post(f"{self.BASE}/programs", headers=no_auth, json={"name": "P", "code": "p", "commission_type": "percentage", "commission_value": "10"}))
+
+    def test_create_program_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/programs", headers=admin, json={"name": "Referral", "code": "REF", "commission_type": "percentage", "commission_value": "10"})
+        assert resp.status_code == 201
+
+    def test_register_affiliate_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        prog_resp = client.post(f"{self.BASE}/programs", headers=admin, json={"name": "RegTest", "code": "RT", "commission_type": "percentage", "commission_value": "5"})
+        assert prog_resp.status_code == 201
+        program_id = prog_resp.get_json()["program"]["id"]
+        resp = client.post(f"{self.BASE}/register", headers=admin, json={"program_id": program_id, "email": "a@t.com"})
+        assert resp.status_code == 201
+
+    def test_record_commission_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.post(f"{self.BASE}/commissions", headers=no_auth, json={"affiliate_id": 1, "order_id": 1, "amount": "10"}))
+
+
+class TestAppPlatform:
+    BASE = "/api/v1/app-platform"
+
+    def test_list_apps_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/apps", headers=no_auth))
+
+    def test_list_apps_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/apps", headers=admin)
+        assert resp.status_code == 200
+
+    def test_list_sandboxes_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/sandboxes", headers=admin)
+        assert resp.status_code == 200
+
+    def test_register_app_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.post(f"{self.BASE}/apps", headers=no_auth, json={"name": "App1"}))
+
+    def test_register_app_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/apps", headers=admin, json={"name": "MyApp"})
+        assert resp.status_code == 201
+
+    def test_create_sandbox_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/sandboxes", headers=admin, json={"slug": "sand1", "name": "Sand1", "expires_at": "2026-12-31"})
+        assert resp.status_code == 201
+
+
+class TestCompliance:
+    BASE = "/api/v1/compliance"
+
+    def test_list_consent_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/consent", headers=no_auth))
+
+    def test_list_consent_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/consent", headers=admin)
+        assert resp.status_code == 200
+
+    def test_list_data_requests_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/data-requests", headers=admin)
+        assert resp.status_code == 200
+
+    def test_get_cookie_settings_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/cookie-settings", headers=admin)
+        assert resp.status_code == 200
+
+    def test_record_consent_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.post(f"{self.BASE}/consent", headers=no_auth, json={"customer_email": "a@b.com", "consent_type": "marketing", "granted": True}))
+
+    def test_record_consent_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/consent", headers=admin, json={"customer_email": "a@t.com", "consent_type": "marketing", "granted": True})
+        assert resp.status_code == 201
+
+    def test_create_data_request_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/data-requests", headers=admin, json={"customer_email": "a@t.com", "request_type": "access"})
+        assert resp.status_code == 201
+
+    def test_list_sso_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/sso", headers=admin)
+        assert resp.status_code == 200
+
+    def test_create_sso_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/sso", headers=admin, json={"provider_type": "google", "client_id": "cid", "client_secret": "sec"})
+        assert resp.status_code == 201
+
+
+class TestGiftRegistries:
+    BASE = "/api/v1/gift-registries"
+
+    def test_list_registries_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(self.BASE, headers=no_auth))
+
+    def test_list_registries_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(self.BASE, headers=admin)
+        assert resp.status_code == 200
+
+    def test_create_registry_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.post(self.BASE, headers=no_auth, json={"customer_email": "a@b.com", "registry_name": "Wedding"}))
+
+    def test_create_registry_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(self.BASE, headers=admin, json={"customer_email": "a@t.com", "registry_name": "Wedding"})
+        assert resp.status_code == 201
+
+    def test_get_registry_public(self, client, setup):
+        t1, _, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/nonexistent", headers={"X-Tenant-ID": t1.slug})
+        assert resp.status_code == 404
+
+
+class TestLiveChat:
+    BASE = "/api/v1/live-chat"
+
+    def test_list_sessions_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/sessions", headers=no_auth))
+
+    def test_list_sessions_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/sessions", headers=admin)
+        assert resp.status_code == 200
+
+    def test_create_session_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.post(f"{self.BASE}/sessions", headers=no_auth, json={}))
+
+    def test_create_session_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.post(f"{self.BASE}/sessions", headers=admin, json={"customer_email": "a@t.com"})
+        assert resp.status_code == 201
+
+
 class TestCrossTenantIsolation:
     """Batch 1 endpoints must not leak cross-tenant data."""
 

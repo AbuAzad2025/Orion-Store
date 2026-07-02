@@ -6,8 +6,44 @@
   {% if product.short_description %}<p class="text-gray-600 mb-6">{{ product.short_description }}</p>{% endif %}
   <button data-add-cart="{{ product.id }}" class="rounded bg-emerald-600 px-6 py-2 text-white">أضف للسلة</button>
   <a href="/cart" class="mr-4 text-sm text-gray-600 underline">عرض السلة</a>
+
+  <hr class="my-6">
+  <div class="text-center">
+    <p class="text-sm text-gray-500 mb-2">نفد المخزون؟ اشترك ليصلك إشعار عند التوفر</p>
+    <form id="stock-notify-form" class="flex gap-2 max-w-sm mx-auto">
+      <input type="hidden" name="product_id" value="{{ product.id }}">
+      <input type="email" name="customer_email" placeholder="بريدك الإلكتروني" required
+        class="flex-1 border rounded px-3 py-2 text-sm">
+      <button type="submit" class="rounded bg-amber-600 px-4 py-2 text-white text-sm whitespace-nowrap">إشعرني</button>
+    </form>
+    <p id="stock-notify-msg" class="text-sm mt-2 hidden"></p>
+  </div>
 </article>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("stock-notify-form");
+  const msg = document.getElementById("stock-notify-msg");
+  if (!form) return;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.classList.add("hidden");
+    const fd = new FormData(form);
+    try {
+      await StoreAPI.subscribeStockNotification(
+        parseInt(fd.get("product_id")),
+        fd.get("customer_email").trim()
+      );
+      msg.textContent = "تم التسجيل! سنخبرك عند توفر المنتج.";
+      msg.className = "text-sm mt-2 text-emerald-700";
+      form.reset();
+    } catch (err) {
+      msg.textContent = err.message || "تعذّر التسجيل. حاول مرة أخرى.";
+      msg.className = "text-sm mt-2 text-red-600";
+    }
+  });
+});
+</script>
 {% endblock %}
