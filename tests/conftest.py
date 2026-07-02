@@ -179,6 +179,11 @@ class OrionTestClient:
     def flask_client(self) -> FlaskClient:
         return self._client
 
+    @property
+    def app(self) -> Flask:
+        """Expose the underlying Flask application for test helpers."""
+        return self._client.application  # type: ignore[no-any-return]
+
 
 @pytest.fixture
 def client(app: Flask) -> Generator[OrionTestClient, None, None]:
@@ -206,7 +211,14 @@ def platform_admin(app: Flask):
     from auth.auth_service import AuthService
 
     with app.app_context():
-        user = AuthService().register_super_admin(
+        auth = AuthService()
+        # Delete any existing platform admin first to ensure test isolation
+        from user.user import User
+        User.query.filter_by(email="owner@azadexa.com", tenant_id=None).delete()
+        db.session.commit()
+        
+        # Create platform admin through AuthService (trusted internal path)
+        user = auth.register_super_admin(
             email="owner@azadexa.com", password="password123"
         )
         return SimpleNamespace(

@@ -1,33 +1,88 @@
+#!/usr/bin/env python3
+"""Secure CLI bootstrap for the first platform administrator.
+
+Usage:
+
+    python scripts/bootstrap_cli.py
+
+This script is the **only** approved path for creating the first platform
+administrator. It:
+
+* Refuses to run when any platform administrator already exists.
+* Prompts the operator for email and password (hidden input).
+* Requires a minimum password length of 8 characters.
+* Seeds default platform settings before creating the admin.
+* Exits with code 1 on any error.
+
+It must **never** be exposed through an HTTP endpoint or automated deployment
+pipeline without human operator confirmation.
+"""
+
+from __future__ import annotations
+
+import getpass
 import os
 import sys
 from pathlib import Path
 
-ROOT = Path('D:/Data/Orion-SAAS Store').resolve()
-for sub in ('02-CORE', '03-MODELS', '04-SERVICES', '05-API'):
-    sys.path.insert(0, str(ROOT / sub))
+# ---------------------------------------------------------------------------
+# Bootstrap PATH — resolve project root dynamically
+# ---------------------------------------------------------------------------
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+for _sub in ("02-CORE", "03-MODELS", "04-SERVICES", "05-API"):
+    _p = str(_PROJECT_ROOT / _sub)
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
-from user.user import User
-from orion.app import create_app
-from auth.auth_service import AuthService
-from platform_svc.platform_settings_service import PlatformSettingsService
+# ---------------------------------------------------------------------------
+# Imports (after PATH setup)
+# ---------------------------------------------------------------------------
+from auth.auth_service import AuthService  # noqa: E402
+from orion.app import create_app  # noqa: E402
+from platform_svc.platform_settings_service import PlatformSettingsService  # noqa: E402
+from user.user import User  # noqa: E402
 
-os.environ.setdefault('FLASK_ENV', 'development')
-os.environ.setdefault('DATABASE_URL', 'postgresql://azadexa:azadexa_dev@localhost:5432/azadexa_dev')
-app = create_app()
 
-with app.app_context():
-    if User.query.filter_by(tenant_id=None).first():
-        print('ERROR: Platform admin already exists. Cannot bootstrap.')
-        sys.exit(1)
-        
-    import getpass
-    email = input('Platform admin email: ').strip().lower()
-    password = getpass.getpass('Password (min 8 chars): ')
-    if len(password) < 8:
-        print('ERROR: Password must be at least 8 characters.')
-        sys.exit(1)
-        
-    PlatformSettingsService().ensure_seeded()
-    auth = AuthService()
-    user = auth.register_super_admin(email=email, password=password, first_name='Platform')
-    print(f'SUCCESS: Platform admin created with email: {user.email}')
+def main() -> None:
+    os.environ.setdefault("FLASK_ENV", "development")
+    app = create_app()
+
+    with app.app_context():
+        # ── check for ANY existing platform admin ──────────────────────
+        existing = User.query.filter(
+            User.tenant_id.is_(None),
+            User.is_superuser.is_(True),
+            User.deleted_at.is_(None),
+        ).first()
+        if existing is not None:
+            msg = (
+                f"ERROR: A platform administrator already exists "
+                f"(email={existing.email!r}). "
+                f"Bootstrap is blocked. Use the existing account or contact "
+                f"an existing platform administrator."
+            )
+            print(msg, file=sys.stderr)
+            sys.exit(1)
+
+        # ── explicit operator input ────────────────────────────────────
+        email = input("Platform admin email: ").strip().lower()
+        if not email:
+            print("ERROR: Email cannot be empty.", file=sys.stderr)
+            sys.exit(1)
+
+        password = getpass.getpass("Password (min 8 chars): ")
+        if len(password) < 8:
+            print("ERROR: Password must be at least 8 characters.", file=sys.stderr)
+            sys.exit(1)
+
+        # ── seed + create ──────────────────────────────────────────────
+        PlatformSettingsService().ensure_seeded()
+        auth = AuthService()
+        user = auth.register_super_admin(
+            email=email, password=password, first_name="Platform"
+        )
+        print(f"SUCCESS: Platform admin created with email: {user.email}")
+
+
+if __name__ == "__main__":
+    main()
