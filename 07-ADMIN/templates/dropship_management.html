@@ -1,0 +1,39 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">اتصالات POD</h2>
+    <form id="pod-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="provider" type="text" placeholder="مزود POD (مثال: printful)" required>
+      <input name="api_key" type="password" placeholder="مفتاح API" required>
+      <input name="api_url" type="url" placeholder="رابط API">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة اتصال</button>
+    </form>
+    <div id="pod-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">موردي الدروبشيبنج</h2>
+    <form id="supplier-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="name" type="text" placeholder="اسم المورد" required>
+      <input name="contact_email" type="email" placeholder="البريد الإلكتروني" required>
+      <input name="fulfillment_time_days" type="number" placeholder="أيام التنفيذ" value="0">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة مورد</button>
+    </form>
+    <div id="suppliers-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">طلبات الدروبشيبنج</h2>
+    <form id="dropship-order-form" class="grid gap-2 max-w-md text-sm">
+      <input name="supplier_id" type="number" placeholder="معرف المورد" required>
+      <input name="order_id" type="number" placeholder="معرف الطلب" required>
+      <input name="cost" type="number" step="0.01" placeholder="التكلفة" required>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إنشاء طلب</button>
+    </form>
+    <div id="dropship-orders-list" class="text-gray-500 text-sm mt-3">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_dropship.js') }}"></script>
+<script>OrionAdminDropship.init();</script>
+{% endblock %}

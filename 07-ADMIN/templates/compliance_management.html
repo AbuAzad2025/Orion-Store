@@ -1,0 +1,59 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">سجلات الموافقة (Consent)</h2>
+    <form id="consent-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
+      <input name="consent_type" type="text" placeholder="نوع الموافقة (مثال: marketing)" required>
+      <label class="inline-flex items-center gap-2">
+        <input name="granted" type="checkbox" checked> ممنوحة
+      </label>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">تسجيل موافقة</button>
+    </form>
+    <div id="consent-records-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">طلبات بيانات العملاء (GDPR/CCPA)</h2>
+    <form id="dsr-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
+      <select name="request_type" class="border rounded px-2 py-1">
+        <option value="export">تصدير البيانات</option>
+        <option value="delete">حذف البيانات</option>
+        <option value="rectify">تصحيح البيانات</option>
+      </select>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إنشاء طلب</button>
+    </form>
+    <div id="dsr-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">إعدادات ملفات تعريف الارتباط</h2>
+    <form id="cookie-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <textarea name="banner_message" rows="2" placeholder="نص البانر" class="border rounded px-2 py-1"></textarea>
+      <label class="inline-flex items-center gap-2">
+        <input name="is_active" type="checkbox" checked> مفعّل
+      </label>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">حفظ الإعدادات</button>
+    </form>
+    <div id="cookie-settings-display" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">مزودو SSO</h2>
+    <form id="sso-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <select name="provider_type" class="border rounded px-2 py-1">
+        <option value="saml">SAML</option>
+        <option value="oidc">OpenID Connect</option>
+      </select>
+      <input name="client_id" type="text" placeholder="Client ID" required>
+      <input name="client_secret" type="password" placeholder="Client Secret" required>
+      <input name="issuer_url" type="url" placeholder="Issuer URL">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة مزود</button>
+    </form>
+    <div id="sso-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_compliance.js') }}"></script>
+<script>OrionAdminCompliance.init();</script>
+{% endblock %}

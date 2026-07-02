@@ -1,0 +1,26 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">مهام الاستيراد والتصدير</h2>
+    <form id="import-export-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <select name="job_type" class="border rounded px-2 py-1" required>
+        <option value="export">تصدير</option>
+        <option value="import">استيراد</option>
+      </select>
+      <select name="entity_type" class="border rounded px-2 py-1" required>
+        <option value="products">منتجات</option>
+        <option value="orders">طلبات</option>
+        <option value="customers">عملاء</option>
+      </select>
+      <input name="file_url" type="url" placeholder="رابط الملف (للاستيراد)" class="hidden" id="ie-file-url">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إنشاء مهمة</button>
+    </form>
+    <div id="import-export-jobs-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_import_export.js') }}"></script>
+<script>OrionAdminImportExport.init();</script>
+{% endblock %}

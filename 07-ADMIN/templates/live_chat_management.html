@@ -1,0 +1,29 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">جلسات الدردشة النشطة</h2>
+    <div id="chat-sessions-list" class="text-gray-500 text-sm mb-4">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4" id="chat-room" style="display:none;">
+    <h2 class="text-lg font-semibold mb-3">غرفة الدردشة — <span id="chat-session-id"></span></h2>
+    <div id="chat-messages" class="h-64 overflow-y-auto border rounded p-3 mb-3 bg-gray-50 text-sm space-y-2"></div>
+    <form id="chat-send-form" class="flex gap-2">
+      <input name="message" type="text" placeholder="اكتب رسالة..." class="flex-1 border rounded px-3 py-2 text-sm" required>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white text-sm">إرسال</button>
+    </form>
+    <button id="chat-close" class="mt-2 text-xs text-red-500">إغلاق الجلسة</button>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">إنشاء جلسة جديدة</h2>
+    <form id="chat-create-form" class="grid gap-2 max-w-md text-sm">
+      <input name="customer_email" type="email" placeholder="البريد الإلكتروني للعميل">
+      <button type="submit" class="rounded bg-emerald-600 px-4 py-2 text-white w-fit">إنشاء جلسة</button>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_live_chat.js') }}"></script>
+<script>OrionAdminLiveChat.init();</script>
+{% endblock %}

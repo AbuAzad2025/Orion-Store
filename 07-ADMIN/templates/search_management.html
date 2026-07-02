@@ -1,0 +1,38 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">مرادفات البحث</h2>
+    <form id="search-synonym-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="term" type="text" placeholder="الكلمة" required>
+      <input name="synonyms" type="text" placeholder="المرادفات (مفصولة بفواصل)" required>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة مرادف</button>
+    </form>
+    <div id="search-synonyms-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">إعادة توجيه البحث</h2>
+    <form id="search-redirect-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="query_term" type="text" placeholder="كلمة البحث" required>
+      <input name="redirect_url" type="url" placeholder="رابط التوجيه" required>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة توجيه</button>
+    </form>
+    <div id="search-redirects-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">قواعد التعزيز (Boost)</h2>
+    <form id="search-boost-form" class="grid gap-2 max-w-md text-sm">
+      <input name="product_id" type="number" placeholder="معرف المنتج">
+      <input name="category_id" type="number" placeholder="معرف التصنيف">
+      <input name="query_keyword" type="text" placeholder="كلمة مفتاحية">
+      <input name="boost_factor" type="number" placeholder="معامل التعزيز" value="1">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة قاعدة</button>
+    </form>
+    <div id="search-boosts-list" class="text-gray-500 text-sm mt-3">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_search.js') }}"></script>
+<script>OrionAdminSearch.init();</script>
+{% endblock %}

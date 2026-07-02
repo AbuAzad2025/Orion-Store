@@ -1,0 +1,24 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">تعريفات سير العمل</h2>
+    <form id="workflow-def-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="name" type="text" placeholder="اسم سير العمل" required>
+      <input name="trigger_event" type="text" placeholder="حدث المشغل (مثال: order.created)" required>
+      <textarea name="actions" rows="3" placeholder="الإجراءات (JSON)" class="border rounded px-2 py-1 font-mono text-xs"></textarea>
+      <textarea name="conditions" rows="2" placeholder="الشروط (JSON، اختياري)" class="border rounded px-2 py-1 font-mono text-xs"></textarea>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إنشاء تعريف</button>
+    </form>
+    <div id="workflow-defs-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">تشغيلات سير العمل</h2>
+    <div id="workflow-runs-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_workflows.js') }}"></script>
+<script>OrionAdminWorkflows.init();</script>
+{% endblock %}

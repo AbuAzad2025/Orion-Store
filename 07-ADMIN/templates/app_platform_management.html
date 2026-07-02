@@ -1,0 +1,29 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">تطبيقات OAuth</h2>
+    <form id="app-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="name" type="text" placeholder="اسم التطبيق" required>
+      <input name="redirect_uris" type="text" placeholder="روابط إعادة التوجيه (مفصولة بفواصل)">
+      <input name="scopes" type="text" placeholder="الصلاحيات">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">تسجيل تطبيق</button>
+    </form>
+    <div id="apps-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">متاجر Sandbox</h2>
+    <form id="sandbox-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="slug" type="text" placeholder="المعرف" required>
+      <input name="name" type="text" placeholder="الاسم" required>
+      <input name="expires_at" type="datetime-local" placeholder="تاريخ الانتهاء">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إنشاء Sandbox</button>
+    </form>
+    <div id="sandboxes-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_app_platform.js') }}"></script>
+<script>OrionAdminAppPlatform.init();</script>
+{% endblock %}

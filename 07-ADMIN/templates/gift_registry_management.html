@@ -1,0 +1,23 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">قوائم الهدايا</h2>
+    <form id="gift-registry-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
+      <input name="registry_name" type="text" placeholder="اسم القائمة" required>
+      <input name="event_type" type="text" placeholder="نوع المناسبة">
+      <input name="event_date" type="date" placeholder="تاريخ المناسبة">
+      <label class="inline-flex items-center gap-2">
+        <input name="is_public" type="checkbox" checked> عامة
+      </label>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إنشاء قائمة</button>
+    </form>
+    <div id="gift-registries-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_gift_registry.js') }}"></script>
+<script>OrionAdminGiftRegistry.init();</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">تشغيلات التسوية المالية</h2>
+    <button id="btn-create-run" class="rounded bg-blue-600 px-4 py-2 text-white text-sm mb-4">إنشاء تشغيل جديد</button>
+    <div id="reconciliation-runs-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+  </section>
+  <section class="rounded border bg-white p-4">
+    <h2 class="text-lg font-semibold mb-3">إضافة بند تسوية</h2>
+    <form id="reconciliation-item-form" class="grid gap-2 max-w-md text-sm">
+      <input name="run_id" type="number" placeholder="معرف التشغيل" required>
+      <input name="financial_event_id" type="number" placeholder="معرف الحدث المالي" required>
+      <input name="expected_amount" type="number" step="0.01" placeholder="المبلغ المتوقع" required>
+      <input name="actual_amount" type="number" step="0.01" placeholder="المبلغ الفعلي" required>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة بند</button>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_reconciliation.js') }}"></script>
+<script>OrionAdminReconciliation.init();</script>
+{% endblock %}
