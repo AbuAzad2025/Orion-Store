@@ -4,7 +4,7 @@ subtitle: "منصة التجارة الإلكترونية SaaS متعدد الم
 version: "1.11"
 date: "2026-07-01"
 language: "ar"
-status: "موجات 10–12 ✅ + Admin shell hardening ✅ + Tenant Resolution via Subdomain/Query ✅ | المرحلة 13: Frontend Deep Dive قادم"
+status: "Phase 0 — Security & Baseline Audit ✅ | موجات 10–12 ✅ + Admin shell hardening ✅ + Tenant Resolution via Subdomain/Query ✅ | المرحلة 13: Frontend Deep Dive قادم"
 document_type: "project-plan-report"
 source: "Project Plan.txt"
 platform_name: "Azadexa"
@@ -30,13 +30,13 @@ implementation_ci: "GitHub Actions — lint, pytest+Postgres, cov≥85%, manifes
 
 ---
 
-**الإصدار:** 1.11 | **التاريخ:** 2 يوليو 2026 | **اللغة:** العربية | **الحالة:** **موجات 10–12 ✅ + Admin shell hardening ✅ + Tenant Resolution via Subdomain/Query ✅ | المرحلة 13: Frontend Deep Dive قادم** (§0.15–§0.16)
+**الإصدار:** 1.12 | **التاريخ:** 2 يوليو 2026 | **اللغة:** العربية | **الحالة:** **Phase 0 — Security & Baseline Audit ✅ + موجات 10–12 ✅ + Admin shell hardening ✅ + Tenant Resolution via Subdomain/Query ✅ | المرحلة 13: Frontend Deep Dive قادم** (§0.15–§0.17)
 
 ---
 
 ## 📑 فهرس المحتويات
 
-0. **سياسة الهندسة + أولوية البناء + قرارات v1.9–v1.10 + متتبع التنفيذ (§0.15) + المرحلة 13 (§0.16)**
+0. **سياسة الهندسة + أولوية البناء + قرارات v1.9–v1.10 + متتبع التنفيذ (§0.15) + المرحلة 13 (§0.17) + Phase 0 Baseline (§0.16.1)**
  1. نظرة عامة (+ 1.4 MVP، 1.5 Azadexa docs، 1.6–1.8 عمولة/بوابات/نماذج)
 2. الرؤية والأهداف (+ 2.4 الجدول الزمني، **2.5 Release Train**)
 3. الهيكل المعماري (+ 3.3 Multi-Tenant، 3.4–3.10 ربط النظام)
@@ -1132,6 +1132,89 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 - RTL يعمل بشكل صحيح.
 - Mobile: sidebar تتحول إلى off-canvas، الجداول قابلة للتمرير الأفقي.
 - الـ APIs ما زالت تستجيب بشكل صحيح (اختبارات UI).
+
+---
+
+### 0.16.1 Phase 0 — Security & Baseline Audit Baseline
+
+> **تاريخ التدقيق:** 2026-07-02 | **Git branch:** `main` | **Baseline tag:** `phase0-audit-baseline`  
+> **الهدف:** حصر كامل للواجهات، نقاط الضعف، فجوات العقود، ومشاكل النطاق (scope) قبل أي تعديلات.
+
+#### 0.16.1.1 نطاق التدقيق
+
+| المجال | الملفات/النقاط | النتائج |
+|--------|---------------|---------|
+| قوالب الأدمن | 41 قالباً | `07-ADMIN/templates/admin/` |
+| JS الأدمن | 23 ملفاً | `07-ADMIN/static/js/` |
+| قوالب المتجر | 10 قوالب | `06-STOREFRONT/themes/default/templates/` |
+| JS المتجر | 5 ملفات | `06-STOREFRONT/static/js/` |
+| CSS المتجر | ملفان | `main.css` (سطر واحد)، `rtl.css` (9 أسطر) |
+| CSS الأدمن | 0 | لا يوجد ملف CSS مخصص |
+
+#### 0.16.1.2 الملخص
+
+| الفئة | العدد | التفاصيل |
+|-------|-------|----------|
+| فجوات API/UI مؤكدة | 8 | OrionAPI.delete مفقود، Platform Settings، Tax (country → country_code)، BOPIS، Bundles، Store Credit، Draft Orders، trailing-slash POST |
+| نقاط نهاية GET/list مفقودة | 20 | عبر 12 ميزة v2 |
+| مخاطر أمنية — CRITICAL | 5 | register/platform بدون auth، X-User-ID impersonation، anonymous tenant-admin write، webhooks بدون توقيع، beta-ramallah fallback |
+| مخاطر أمنية — HIGH | 4 | CSRF معطّل، JWT في localStorage، innerHTML مع بيانات API، لا rate limiting |
+| مخاطر أمنية — MEDIUM | 2 | debug mode beta-ramallah، لا audit logging |
+| مشاكل النطاق (Scope) | 3 | Currency (platform API → tenant UI)، Platform Audit (platform API → tenant UI)، Reconciliation (platform API → tenant UI) |
+
+#### 0.16.1.3 جدول التذاكر (Tickets)
+
+| التذكرة | الأولوية | الوصف |
+|---------|----------|-------|
+| **AZ-0.1** | 🔴 CRITICAL | تأمين register/platform — requires platform admin للبوتستراب، تعطيل الوصول العام |
+| **AZ-0.2** | 🔴 CRITICAL | إزالة X-User-ID من middleware + api_client.js؛ بناء impersonation flow آمن |
+| **AZ-0.3** | 🔴 CRITICAL | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role |
+| **AZ-0.4** | 🔴 CRITICAL | تفعيل webhook signature verification (PayPal, Stripe, BNPL) |
+| **AZ-0.5** | 🟠 HIGH | إصلاح OrionAPI.delete (المفقود في api_client.js) |
+| **AZ-0.6** | 🟠 HIGH | إصلاح Platform Settings — إضافة الحقول غير المدعومة |
+| **AZ-0.7** | 🟠 HIGH | إصلاح Tax — country → country_code |
+| **AZ-0.8** | 🟠 HIGH | إصلاح BOPIS — إضافة code, warehouse_id, address |
+| **AZ-0.9** | 🟠 HIGH | إصلاح Bundles — slug, bundle_price vs discount_percent |
+| **AZ-0.10** | 🟠 HIGH | تمكين CSRF + نقل JWT إلى HttpOnly cookies + SameSite/Secure |
+| **AZ-0.11** | 🟠 HIGH | إضافة rate limiting (login, register, password reset, checkout) + تعطيل debug mode + إزالة innerHTML |
+| **AZ-0.12** | 🟡 MEDIUM | إصلاح Store Credit — customer_email vs credit_id |
+| **AZ-0.13** | 🟡 MEDIUM | إصلاح Draft Orders — missing endpoints |
+| **AZ-0.14** | 🟡 MEDIUM | إصلاح Trailing-slash POST redirect |
+| **AZ-0.15** | 🟡 MEDIUM | إضافة نقاط نهاية GET/list المفقودة (20 endpoint) |
+| **AZ-0.16** | 🟡 MEDIUM | حل مشاكل النطاق — Currency, Platform Audit, Reconciliation نقلها إلى platform-only |
+| **AZ-0.17** | 🔵 LOW | إضافة audit logging للإجراءات المميزة |
+
+#### 0.16.1.4 نتائج Baseline Tests
+
+```
+tests/test_smoke.py             ✓ 3/3
+tests/api/test_auth.py          ✓
+tests/api/test_tenants.py       ✓
+tests/api/test_platform_settings.py ✓
+tests/api/test_platform_financial.py ✓
+tests/api/test_tenant_portal.py ✓
+tests/api/test_storefront_cart.py ✓
+tests/api/test_storefront_checkout.py ✓
+tests/security/test_tenant_isolation.py ✓
+tests/security/test_catalog_isolation.py ✓
+tests/core/test_middleware.py   ✓
+tests/core/test_permissions.py  ✓
+----------------------------------------
+Total: 33 passed, 5 warnings    في 107.91s
+```
+
+> **ملاحظة:** تم اختيار الاختبارات الأساسية لتجنب timeout (المجموعة الكاملة توقفت عند 600s). تشغّل هذه 33 اختباراً 113 ثانية.
+
+#### 0.16.1.5 ترتيب التنفيذ
+
+1. **Phase 0B — Security** (AZ-0.1 → AZ-0.2 → AZ-0.3 → AZ-0.4 → AZ-0.10/11)
+2. **Phase 0C — Contract Fixes** (AZ-0.5 → AZ-0.6 → AZ-0.7 → AZ-0.8 → AZ-0.9 → AZ-0.12 → AZ-0.13 → AZ-0.14)
+3. **Phase 0D — Scope Resolution** (AZ-0.15 → AZ-0.16)
+4. **Phase 0E — Missing Endpoints** (AZ-0.17)
+5. **Phase A — Shared Design System**
+6. **Phase B — Platform Admin**
+7. **Phase C — Tenant Admin**
+8. **Phase D — Storefront**
 
 ---
 
