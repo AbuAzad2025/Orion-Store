@@ -39,7 +39,7 @@ def _current_customer() -> User:
 
 
 @store_account_bp.post("/register")
-@limiter.limit("10 per minute")
+@limiter.limit("5 per minute")
 def register_customer():
     try:
         tenant = require_tenant_context()
@@ -73,7 +73,7 @@ def register_customer():
 
 
 @store_account_bp.post("/login")
-@limiter.limit("20 per minute")
+@limiter.limit("10 per minute")
 def login_customer():
     try:
         tenant = require_tenant_context()
@@ -98,6 +98,7 @@ def login_customer():
 
 @store_account_bp.post("/logout")
 @jwt_required()
+@limiter.limit("10 per minute")
 def customer_logout():
     from flask_jwt_extended import unset_jwt_cookies
 

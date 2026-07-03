@@ -26,6 +26,12 @@ def create_app(config_name: str | None = None) -> Flask:
     env = config_name or os.environ.get("FLASK_ENV", "development")
     app.config.from_object(config_by_name.get(env, config_by_name["default"]))
 
+    if app.config.get("ENV") == "production" and app.debug:
+        raise RuntimeError(
+            "Production mode requires DEBUG=False; "
+            "check FLASK_ENV and DEBUG env vars."
+        )
+
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)

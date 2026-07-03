@@ -9,6 +9,7 @@ from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 
 from auth.auth_service import AuthService
 from core.jwt_auth import issue_tokens_for_user
+from core.rate_limit import limiter
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant.tenant import Tenant
 
@@ -38,6 +39,7 @@ def admin_login():
 
 
 @admin_auth_bp.post("/login")
+@limiter.limit("5 per minute")
 def admin_login_post():
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")

@@ -1175,7 +1175,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **AZ-0.7** | 🟠 HIGH | ⬜ معلق | إصلاح Tax — country → country_code | — |
 | **AZ-0.8** | 🟠 HIGH | ⬜ معلق | إصلاح BOPIS — إضافة code, warehouse_id, address | — |
 | **AZ-0.9** | 🟠 HIGH | ⬜ معلق | إصلاح Bundles — slug, bundle_price vs discount_percent | — |
-| **AZ-0.10** | 🟠 HIGH | ⬜ معلق | تمكين CSRF + نقل JWT إلى HttpOnly cookies + SameSite/Secure | — |
+| **AZ-0.10** | 🟠 HIGH | ✅ مكتمل | تمكين CSRF + نقل JWT إلى HttpOnly cookies + SameSite/Secure | `32a8588` |
 | **AZ-0.11** | 🟠 HIGH | ⬜ معلق | إضافة rate limiting (login, register, password reset, checkout) + تعطيل debug mode + إزالة innerHTML | — |
 | **AZ-0.12** | 🟡 MEDIUM | ⬜ معلق | إصلاح Store Credit — customer_email vs credit_id | — |
 | **AZ-0.13** | 🟡 MEDIUM | ⬜ معلق | إصلاح Draft Orders — missing endpoints | — |
@@ -1223,7 +1223,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 #### 0.16.1.5 ترتيب التنفيذ
 
-1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → ~~AZ-0.3 ✅~~ → ~~AZ-0.4 ✅~~ → AZ-0.10/11 → AZ-0.18)
+1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → ~~AZ-0.3 ✅~~ → ~~AZ-0.4 ✅~~ → ~~AZ-0.10 ✅~~ → AZ-0.11 → AZ-0.18)
 2. **Phase 0C — Contract Fixes** (AZ-0.5 → AZ-0.6 → AZ-0.7 → AZ-0.8 → AZ-0.9 → AZ-0.12 → AZ-0.13 → AZ-0.14)
 3. **Phase 0D — Scope Resolution** (AZ-0.15 → AZ-0.16)
 4. **Phase 0E — Missing Endpoints** (AZ-0.17)
@@ -1439,7 +1439,25 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **تأخيرات معروفة** | لم يتم تثبيت SDKs الرسمية لـ Stripe/PayPal — يستخدم التطبيق HMAC يدوي (خوارزمية Stripe القياسية) بدلاً من `construct_event()`. تم تأجيل التحقق الكامل القائم على شهادة RSA لـ PayPal إلى إصدار لاحق. |
 | **Commit** | `d468fd8` |
 
-#### 0.16.1.10 AZ-0.18 — Secure Platform Admin Impersonation ⬜
+#### 0.16.1.10 AZ-0.10 — CSRF Protection + JWT HttpOnly Cookies ✅
+
+| البند | التفاصيل |
+|-------|----------|
+| **الحالة** | ✅ **مكتمل** |
+| **السبب الجذري** | كانت JWTs تُخزّن في `localStorage` (عرضة لسرقة XSS)، ولا توجد حماية CSRF على الإطلاق. |
+| **النهج النهائي** | تم نقل JWTs من `localStorage` إلى `HttpOnly` cookies مع `SameSite=Lax`، وتمكين حماية CSRF مزدوجة: Flask-WTF CSRFProtect لنماذج HTML الإدارية + JWT-Extended CSRF لطلبات API عبر الكوكيز. |
+| **التفاصيل المعمارية** | |
+| | **JWT HttpOnly Cookie:** يتم تعيين `access_token_cookie` و `refresh_token_cookie` في جميع نقاط نهاية تسجيل الدخول (API `/auth/login`، المتجر `/store/account/login` و `/register`، وإدارة `/admin/login`). يتحقق الـ middleware من `locations=["cookies", "headers"]` — يدعم كلاً من الكوكيز (المتصفح) ورأس `Authorization` (العملاء غير المتصفحين). |
+| | **CSRF Protection:** `Flask-WTF CSRFProtect` مشغّل بشكل عام، مع إعفاء جميع blueprints API الـ 42 (تتعامل JWT-Extended CSRF مع حماية API). نماذج HTML الإدارية تستخدم `{{ csrf_token() }}` في الحقل المخفي؛ طلبات AJAX تقرأ `csrf_access_token` كوكيز (قابل للقراءة من JS) وترسله كرأس `X-CSRF-TOKEN`. |
+| | **إزالة localStorage:** تم إزالة ضخ `admin_token` من `admin_base.html`، وإزالة Context Processor `inject_admin_token` من `platform_admin/routes.py`، وإزالة `Authorization: Bearer` من `api_client.js` و `account.js`. |
+| | **تسجيل خروج العملاء:** تمت إضافة نقطة نهاية `POST /logout` في `store_account.py` تمسح JWTs cookies عبر `unset_jwt_cookies()`. |
+| **الملفات المعدّلة** | `requirements.txt` (إضافة Flask-WTF)، `extensions.py` (إضافة CSRFProtect)، `config.py` (إعدادات JWT cookie + CSRF)، `app.py` (تهيئة CSRF + إعفاء blueprints API)، `middleware.py` (توسيع مواقع JWT)، `jwt_auth.py` (دالة `set_jwt_cookies` المساعدة)، `auth.py` (تعيين cookies عند تسجيل الدخول)، `store_account.py` (تعيين cookies + نقطة نهاية logout)، `admin_auth.py` (تعيين cookies بعد تسجيل الدخول الإداري)، `api_client.js` (إزالة localStorage + إضافة CSRF)، `admin_login.js` (إزالة localStorage.clear)، `admin_base.html` (إزالة ضخ JWT)، `platform_admin/routes.py` (إزالة context processor)، `admin_login.html` (إضافة CSRF hidden)، `account.js` (إزالة localStorage + إضافة CSRF)، `routes.py` (تصدير API_BLUEPRINTS) |
+| **الاختبارات** | 27 اختباراً (middleware + auth + tenants + payments) + 4 اختبارات (settings + products + categories) — جميعها تمر. 46 اختبار auth tenant admin تمر قبل timeout. |
+| **الآثار الأمنية** | ✅ لم يعد JWT متاحاً لـ JavaScript (HttpOnly cookie يمنع سرقة XSS). ✅ كل طلب POST/PUT/DELETE عبر API محمي بـ CSRF. ✅ نماذج HTML الإدارية محمية بـ CSRF. |
+| **تأثير التوافق** | أي كود JS يعتمد على قراءة JWT من `localStorage` سيفشل (وهو المطلوب أمنياً). العملاء غير المتصفحين (CLI، تطبيقات خارجية) لا يتأثرون — يستمرون في استخدام رأس `Authorization: Bearer`. |
+| **Commit** | `32a8588` |
+
+#### 0.16.1.11 AZ-0.18 — Secure Platform Admin Impersonation ⬜
 
 | البند | التفاصيل |
 |-------|----------|

@@ -8,6 +8,7 @@ from auth.auth_service import AuthService
 from core.exceptions import OrionError
 from core.middleware import require_platform_admin
 from core.pagination import paginate_query, paginated_payload, pagination_params
+from core.rate_limit import limiter
 from orion.extensions import db
 from tenant.tenant import Tenant
 from tenant_svc.tenant_service import TenantService
@@ -34,6 +35,7 @@ def list_tenants():
 
 
 @tenant_bp.post("/")
+@limiter.limit("5 per minute")
 def create_tenant():
     try:
         require_platform_admin()

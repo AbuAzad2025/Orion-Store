@@ -18,6 +18,7 @@ from core.context import get_locale
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
 from core.pagination import paginate_query, paginated_payload, pagination_params
+from core.rate_limit import limiter
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
@@ -125,6 +126,7 @@ def storefront_status():
 
 
 @storefront_bp.post("/cart")
+@limiter.limit("30 per minute")
 def create_cart():
     try:
         tenant = require_tenant_context()
@@ -146,6 +148,7 @@ def get_cart(cart_token: str):
 
 
 @storefront_bp.post("/cart/<cart_token>/items")
+@limiter.limit("60 per minute")
 def add_cart_item(cart_token: str):
     try:
         tenant = require_tenant_context()
@@ -174,6 +177,7 @@ def list_shipping_methods():
 
 
 @storefront_bp.post("/checkout")
+@limiter.limit("10 per minute")
 def checkout():
     try:
         tenant = require_tenant_context()
@@ -205,6 +209,7 @@ def list_payment_methods():
 
 
 @storefront_bp.post("/orders/<public_id>/pay")
+@limiter.limit("10 per minute")
 def pay_order(public_id: str):
     try:
         tenant = require_tenant_context()

@@ -32,7 +32,7 @@ def _resolve_tenant_id(tenant_ref: str | int | None) -> int | None:
 
 
 @auth_bp.post("/login")
-@limiter.limit("20 per minute")
+@limiter.limit("10 per minute")
 def login():
     data = request.get_json(silent=True) or {}
     email = data.get("email", "").strip().lower()
@@ -52,6 +52,7 @@ def login():
 
 @auth_bp.post("/refresh")
 @jwt_required(refresh=True)
+@limiter.limit("5 per minute")
 def refresh():
     identity = get_jwt_identity()
     return jsonify({"access_token": create_access_token(identity=identity)}), 200
