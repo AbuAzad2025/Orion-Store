@@ -5,7 +5,12 @@ from __future__ import annotations
 import uuid
 
 from flask import Blueprint, g, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import (
+    get_jwt_identity,
+    jwt_required,
+    set_access_cookies,
+    set_refresh_cookies,
+)
 
 from auth.auth_service import AuthService
 from core.audit_log import audit_log
@@ -57,7 +62,10 @@ def register_customer():
             tenant_id=tenant.id,
         )
         tokens = issue_tokens_for_user(user)
-        return jsonify({"user": user.to_dict(), **tokens}), 201
+        response = jsonify({"user": user.to_dict(), **tokens})
+        set_access_cookies(response, tokens["access_token"])
+        set_refresh_cookies(response, tokens["refresh_token"])
+        return response, 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
     except KeyError:
@@ -78,11 +86,24 @@ def login_customer():
         if not user.is_customer:
             return jsonify({"error": "Not a customer account."}), 403
         tokens = issue_tokens_for_user(user)
-        return jsonify({"user": user.to_dict(), **tokens}), 200
+        response = jsonify({"user": user.to_dict(), **tokens})
+        set_access_cookies(response, tokens["access_token"])
+        set_refresh_cookies(response, tokens["refresh_token"])
+        return response, 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
     except KeyError:
         return jsonify({"error": "Missing email or password."}), 400
+
+
+@store_account_bp.post("/logout")
+@jwt_required()
+def customer_logout():
+    from flask_jwt_extended import unset_jwt_cookies
+
+    response = jsonify({"ok": True})
+    unset_jwt_cookies(response)
+    return response, 200
 
 
 @store_account_bp.get("/me")

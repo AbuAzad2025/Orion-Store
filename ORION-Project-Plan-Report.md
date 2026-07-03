@@ -1169,7 +1169,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **AZ-0.1** | 🔴 CRITICAL | ✅ مكتمل | تأمين register/platform — requires platform admin للبوتستراب، تعطيل الوصول العام | `5f84755` |
 | **AZ-0.2** | 🔴 CRITICAL | ✅ مكتمل | X-User-ID Identity Override Removal — إزالة الهيدر، JWT Bearer بديل | `c535d79` |
 | **AZ-0.3** | 🔴 CRITICAL | 🟢 مكتمل | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | `65bb7f4` |
-| **AZ-0.4** | 🔴 CRITICAL | ⬜ معلق | تفعيل webhook signature verification (PayPal, Stripe, BNPL) | — |
+| **AZ-0.4** | 🔴 CRITICAL | ✅ مكتمل | تفعيل webhook signature verification (PayPal, Stripe, BNPL) | `d468fd8` |
 | **AZ-0.5** | 🟠 HIGH | ⬜ معلق | إصلاح OrionAPI.delete (المفقود في api_client.js) | — |
 | **AZ-0.6** | 🟠 HIGH | ⬜ معلق | إصلاح Platform Settings — إضافة الحقول غير المدعومة | — |
 | **AZ-0.7** | 🟠 HIGH | ⬜ معلق | إصلاح Tax — country → country_code | — |
@@ -1223,7 +1223,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 #### 0.16.1.5 ترتيب التنفيذ
 
-1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → ~~AZ-0.3 ✅~~ → AZ-0.4 → AZ-0.10/11 → AZ-0.18)
+1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → ~~AZ-0.3 ✅~~ → ~~AZ-0.4 ✅~~ → AZ-0.10/11 → AZ-0.18)
 2. **Phase 0C — Contract Fixes** (AZ-0.5 → AZ-0.6 → AZ-0.7 → AZ-0.8 → AZ-0.9 → AZ-0.12 → AZ-0.13 → AZ-0.14)
 3. **Phase 0D — Scope Resolution** (AZ-0.15 → AZ-0.16)
 4. **Phase 0E — Missing Endpoints** (AZ-0.17)
@@ -1423,7 +1423,23 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 3. **Batch 3 — إعدادات المستأجر:** `accessibility_api.py`, `bopis.py`, `bundles.py`, `import_export.py`, `metafields.py`, `oms_extensions.py`, `schema_markup.py`, `search_merchandising.py`, `tax_api.py`, `workflow_api.py` (25 endpoint)
 4. **Batch 4 — المتبقي:** `audit_api.py` (1 endpoint)
 
-#### 0.16.1.9 AZ-0.18 — Secure Platform Admin Impersonation ⬜
+#### 0.16.1.9 AZ-0.4 — Webhook Signature Verification ✅
+
+| البند | التفاصيل |
+|-------|----------|
+| **الحالة** | ✅ **مكتمل** |
+| **السبب الجذري** | كانت نقاط نهاية webhook (Stripe, PayPal, BNPL) تقبل أي طلب دون التحقق من التوقيع — يمكن لأي طرف إرسال أحداث وهمية ومعالجتها كأحداث حقيقية. |
+| **النهج النهائي** | تم إنشاء `WebhookVerificationService` مع دوال توقيع منفصلة لكل مزود: `verify_stripe_signature()` (تنسيق `Stripe-Signature` — `t=,v1=` مع HMAC-SHA256 وحماية replay في نافذة 300 ثانية)، `verify_paypal_signature()` (استخراج رؤوس PayPal + HMAC-SHA256)، `verify_hmac_signature()` (توقيع HMAC عام لـ BNPL/مخصص مع رأس `X-Webhook-Signature`). يتم البحث عن السر لكل مستأجر عبر `get_secret()` من `TenantPaymentGateway.webhook_secret` مع الرجوع إلى إعداد `WEBHOOK_SECRET`. تمت إضافة `bootstrap_tenant_context()` للتحقق من وجود المستأجر وتعيين `g.tenant_id` قبل أي معالجة. تمت إعادة هيكلة معالجات webhook الثلاثة لقراءة `request.get_data()` قبل `get_json()`. |
+| **الملفات المنشأة** | `04-SERVICES/webhook_svc/verification_service.py` (الخدمة الجديدة), `04-SERVICES/webhook_svc/__init__.py`, `tests/unit/test_webhook_verification.py` (14 اختبار وحدة) |
+| **الملفات المعدّلة** | `05-API/v1/webhooks.py` (إضافة التحقق من التوقيع في المعالجات الثلاثة), `02-CORE/orion/config.py` (إضافة `WEBHOOK_SECRET`, `WEBHOOK_MAX_AGE_SECONDS`), `tests/api/test_payments_api.py` (إضافة توقيع Stripe لإختبارات webhook + اختبارات توقيع خاطئ ومستأجر غير معروف), `tests/api/test_wave8_api.py` (إضافة توقيع PayPal وBNPL لإختبارات webhook) |
+| **الاختبارات** | 14 وحدة (توقيع صحيح، جسم معدّل، سر خاطئ، رأس مفقود، طابع زمني منتهي، رأس مشوّه، سر فارغ، ترميز Unicode) + 6 تكامل (Stripe, PayPal, BNPL توقيع صحيح + توقيع خاطئ + مستأجر غير معروف) |
+| **نتائج الـ Regression** | 20/20 اختبار webhook pass. جميع اختبارات API الحالية (الدفع، PayPal، BNPL) لم تتأثر ولا تزال تمر. |
+| **الآثار الأمنية** | ✅ لم يعد بإمكان أي طرف إرسال أحداث webhook وهمية دون توقيع صحيح. كل طلب webhook يتم التحقق من توقيعه قبل أي معالجة. الحماية من هجمات replay عبر نافذة زمنية قابلة للتكوين (افتراضياً 300 ثانية). |
+| **تأثير التوافق** | أي تكامل webhook خارجي لا يرسل توقيعاً صحيحاً سيرفض (وهو المطلوب أمنياً). |
+| **تأخيرات معروفة** | لم يتم تثبيت SDKs الرسمية لـ Stripe/PayPal — يستخدم التطبيق HMAC يدوي (خوارزمية Stripe القياسية) بدلاً من `construct_event()`. تم تأجيل التحقق الكامل القائم على شهادة RSA لـ PayPal إلى إصدار لاحق. |
+| **Commit** | `d468fd8` |
+
+#### 0.16.1.10 AZ-0.18 — Secure Platform Admin Impersonation ⬜
 
 | البند | التفاصيل |
 |-------|----------|

@@ -6,7 +6,6 @@ from pathlib import Path
 
 from flask import Blueprint, g, render_template
 
-from core.jwt_auth import issue_tokens_for_user
 from platform_svc.platform_settings_service import PlatformSettingsService
 
 _ADMIN_ROOT = Path(__file__).resolve().parents[1]
@@ -25,13 +24,6 @@ def inject_platform_settings():
     except Exception:
         settings = None
     return {"platform_settings": settings}
-
-
-@platform_admin_bp.context_processor
-def inject_admin_token():
-    if g.user and g.is_platform_admin:
-        return {"admin_token": issue_tokens_for_user(g.user)["access_token"]}
-    return {}
 
 
 @platform_admin_bp.get("/dashboard")

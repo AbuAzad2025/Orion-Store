@@ -5,8 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from flask import Blueprint, g, redirect, render_template, request, session, url_for
+from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 
 from auth.auth_service import AuthService
+from core.jwt_auth import issue_tokens_for_user
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant.tenant import Tenant
 
@@ -57,9 +59,13 @@ def admin_login_post():
     session["is_platform_admin"] = bool(user.is_superuser)
     session.permanent = True
 
-    if user.is_superuser:
-        return redirect("/admin/platform/dashboard")
-    return redirect("/admin/store/dashboard")
+    tokens = issue_tokens_for_user(user)
+    resp = redirect(
+        "/admin/platform/dashboard" if user.is_superuser else "/admin/store/dashboard"
+    )
+    set_access_cookies(resp, tokens["access_token"])
+    set_refresh_cookies(resp, tokens["refresh_token"])
+    return resp
 
 
 @admin_auth_bp.get("/logout")

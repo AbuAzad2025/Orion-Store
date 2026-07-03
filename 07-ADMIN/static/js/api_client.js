@@ -1,15 +1,13 @@
 /** Unified /api/v1 client for admin UIs (wave 5 #50). */
 const OrionAPI = {
-  get token() {
-    return localStorage.getItem("orion_access_token") || "";
-  },
-  setToken(value) {
-    if (value) localStorage.setItem("orion_access_token", value);
-    else localStorage.removeItem("orion_access_token");
+  getCookie(name) {
+    const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+    return match ? decodeURIComponent(match[2]) : "";
   },
   headers() {
     const h = { "Content-Type": "application/json" };
-    if (this.token) h.Authorization = `Bearer ${this.token}`;
+    const csrf = this.getCookie("csrf_access_token");
+    if (csrf) h["X-CSRF-TOKEN"] = csrf;
     const tenantId = document.body.dataset.tenantId;
     if (tenantId) h["X-Tenant-ID"] = tenantId;
     return h;
@@ -22,16 +20,8 @@ const OrionAPI = {
     if (!res.ok) throw new Error(data.error || res.statusText);
     return data;
   },
-  get(path) {
-    return this.request("GET", path);
-  },
-  post(path, body) {
-    return this.request("POST", path, body);
-  },
-  put(path, body) {
-    return this.request("PUT", path, body);
-  },
-  delete(path) {
-    return this.request("DELETE", path);
-  },
+  get(path) { return this.request("GET", path); },
+  post(path, body) { return this.request("POST", path, body); },
+  put(path, body) { return this.request("PUT", path, body); },
+  delete(path) { return this.request("DELETE", path); },
 };

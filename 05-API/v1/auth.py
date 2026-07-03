@@ -3,7 +3,13 @@
 from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import (
+    create_access_token,
+    get_jwt_identity,
+    jwt_required,
+    set_access_cookies,
+    set_refresh_cookies,
+)
 
 from auth.auth_service import AuthService
 from core.exceptions import OrionError
@@ -36,7 +42,10 @@ def login():
     try:
         user = _auth.authenticate(email=email, password=password, tenant_id=tenant_id)
         tokens = issue_tokens_for_user(user)
-        return jsonify({"user": user.to_dict(), **tokens}), 200
+        response = jsonify({"user": user.to_dict(), **tokens})
+        set_access_cookies(response, tokens["access_token"])
+        set_refresh_cookies(response, tokens["refresh_token"])
+        return response, 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

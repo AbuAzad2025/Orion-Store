@@ -15,8 +15,8 @@ from core.rate_limit import init_rate_limiter
 from core.redis_cache import RedisCache, ping_redis
 from core.security_headers import register_security_headers
 from orion.config import config_by_name
-from orion.extensions import db, jwt, migrate
-from v1.routes import register_blueprints, register_ui_blueprints
+from orion.extensions import csrf, db, jwt, migrate
+from v1.routes import API_BLUEPRINTS, register_blueprints, register_ui_blueprints
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -29,6 +29,7 @@ def create_app(config_name: str | None = None) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    csrf.init_app(app)
 
     import discount.voucher  # noqa: F401
     import feature_flag.feature_flag  # noqa: F401
@@ -72,6 +73,8 @@ def create_app(config_name: str | None = None) -> Flask:
     import user.user  # noqa: F401
 
     register_blueprints(app)
+    for bp in API_BLUEPRINTS:
+        csrf.exempt(bp)
     register_ui_blueprints(app)
     register_middleware(app)
     register_security_headers(app)

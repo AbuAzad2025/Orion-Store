@@ -31,6 +31,19 @@ class Config:
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
+    JWT_TOKEN_LOCATION = ["cookies", "headers"]
+    JWT_COOKIE_SECURE = False
+    JWT_COOKIE_SAMESITE = "Lax"
+    JWT_COOKIE_CSRF_PROTECT = True
+    JWT_ACCESS_COOKIE_NAME = "access_token_cookie"
+    JWT_REFRESH_COOKIE_NAME = "refresh_token_cookie"
+    JWT_ACCESS_CSRF_COOKIE_NAME = "csrf_access_token"
+    JWT_REFRESH_CSRF_COOKIE_NAME = "csrf_refresh_token"
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_HEADERS = ["X-CSRFToken", "X-CSRF-Token", "X-CSRF-TOKEN"]
+    WTF_CSRF_TIME_LIMIT = 3600
+    WTF_CSRF_SSL_STRICT = False
+    SESSION_COOKIE_SAMESITE = "Lax"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", DEFAULT_DEV_DATABASE_URL)
     REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
@@ -85,6 +98,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = testing_database_uri()
     ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY", "")
     WTF_CSRF_ENABLED = False
+    JWT_COOKIE_CSRF_PROTECT = False
     RATELIMIT_ENABLED = False
     PROMETHEUS_ENABLED = False
     CACHE_ENABLED = False

@@ -138,7 +138,7 @@ def _resolve_authenticated_user() -> None:
     if request.path in ("/api/v1/auth/refresh", "/admin/login"):
         return
     try:
-        verify_jwt_in_request(optional=True, locations=["headers"])
+        verify_jwt_in_request(optional=True, locations=["cookies", "headers"])
         identity = get_jwt_identity()
         if identity:
             _bind_user_to_context(str(identity))
