@@ -43,11 +43,14 @@ const AccountUI = {
     const list = document.getElementById("account-orders");
     if (list) {
       const rows = orders.data.orders || [];
-      list.innerHTML = rows.length
-        ? rows
-            .map((o) => `<div class="border-b py-2">${o.order_number} — ${o.total}</div>`)
-            .join("")
-        : "لا توجد طلبات.";
+      SafeDOM.clear(list);
+      if (rows.length) {
+        rows.forEach((o) => {
+          list.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${o.order_number} — ${o.total}`]));
+        });
+      } else {
+        list.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["لا توجد طلبات."]));
+      }
     }
   },
   init() {

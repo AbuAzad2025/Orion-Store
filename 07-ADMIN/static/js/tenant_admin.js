@@ -5,13 +5,25 @@ document.addEventListener("DOMContentLoaded", () => {
     OrionAPI.get("/tenant/dashboard")
       .then((data) => {
         const s = data.stats;
-        statsEl.innerHTML = `
-          <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <div class="rounded-lg bg-white p-4 shadow"><p class="text-sm text-gray-500">الطلبات</p><p class="text-2xl font-bold">${s.orders_total}</p></div>
-            <div class="rounded-lg bg-white p-4 shadow"><p class="text-sm text-gray-500">مدفوعة</p><p class="text-2xl font-bold">${s.orders_paid}</p></div>
-            <div class="rounded-lg bg-white p-4 shadow"><p class="text-sm text-gray-500">المنتجات</p><p class="text-2xl font-bold">${s.products_total}</p></div>
-            <div class="rounded-lg bg-white p-4 shadow"><p class="text-sm text-gray-500">منشورة</p><p class="text-2xl font-bold">${s.products_published}</p></div>
-          </div>`;
+        SafeDOM.clear(statsEl);
+        statsEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-4" }, [
+          SafeDOM.elem("div", { className: "rounded-lg bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["الطلبات"]),
+            SafeDOM.elem("p", { className: "text-2xl font-bold" }, [s.orders_total])
+          ]),
+          SafeDOM.elem("div", { className: "rounded-lg bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["مدفوعة"]),
+            SafeDOM.elem("p", { className: "text-2xl font-bold" }, [s.orders_paid])
+          ]),
+          SafeDOM.elem("div", { className: "rounded-lg bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["المنتجات"]),
+            SafeDOM.elem("p", { className: "text-2xl font-bold" }, [s.products_total])
+          ]),
+          SafeDOM.elem("div", { className: "rounded-lg bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["منشورة"]),
+            SafeDOM.elem("p", { className: "text-2xl font-bold" }, [s.products_published])
+          ])
+        ]));
       })
       .catch((err) => {
         statsEl.textContent = err.message;
@@ -23,15 +35,17 @@ document.addEventListener("DOMContentLoaded", () => {
     OrionAPI.get("/tenant/gateways")
       .then((data) => {
         if (!data.gateways.length) {
-          gatewaysEl.innerHTML = "<p class='text-gray-500'>لا توجد بوابات.</p>";
+          SafeDOM.clear(gatewaysEl);
+          gatewaysEl.appendChild(SafeDOM.emptyMsg("لا توجد بوابات."));
           return;
         }
-        gatewaysEl.innerHTML = data.gateways
-          .map(
-            (g) =>
-              `<div class="rounded border p-3 mb-2"><strong>${g.display_name}</strong> (${g.provider}) — ${g.status}</div>`
-          )
-          .join("");
+        SafeDOM.clear(gatewaysEl);
+        data.gateways.forEach((g) => {
+          gatewaysEl.appendChild(SafeDOM.elem("div", { className: "rounded border p-3 mb-2" }, [
+            SafeDOM.elem("strong", null, [g.display_name]),
+            ` (${g.provider}) — ${g.status}`
+          ]));
+        });
       })
       .catch((err) => {
         gatewaysEl.textContent = err.message;
@@ -71,29 +85,25 @@ document.addEventListener("DOMContentLoaded", () => {
   if (bnplEl) {
     OrionAPI.get("/tenant/bnpl/providers")
       .then((data) => {
-        bnplEl.innerHTML = (data.providers || [])
-          .map(
-            (p) => `
-          <div class="rounded border p-3 mb-3 bg-gray-50" data-bnpl="${p.provider}">
-            <div class="flex justify-between items-center mb-2">
-              <strong>${p.provider}</strong>
-              <span class="text-xs ${p.is_enabled ? "text-green-700" : "text-gray-500"}">
-                ${p.is_enabled ? "مفعّل" : "معطّل"}
-              </span>
-            </div>
-            <input type="text" class="bnpl-merchant border rounded px-2 py-1 text-sm w-full mb-2"
-              placeholder="Merchant ID" value="${p.merchant_id || ""}">
-            <input type="password" class="bnpl-key border rounded px-2 py-1 text-sm w-full mb-2"
-              placeholder="API Key (اتركه فارغاً للإبقاء)">
-            <label class="inline-flex items-center gap-2 text-sm mb-2">
-              <input type="checkbox" class="bnpl-sandbox" ${(p.config || {}).is_sandbox !== false ? "checked" : ""}>
-              Sandbox
-            </label>
-            <button type="button" class="bnpl-save rounded bg-indigo-600 px-3 py-1 text-white text-sm"
-              data-provider="${p.provider}">حفظ</button>
-          </div>`
-          )
-          .join("");
+        SafeDOM.clear(bnplEl);
+        (data.providers || []).forEach((p) => {
+          const sandboxAttrs = { type: "checkbox", className: "bnpl-sandbox" };
+          if ((p.config || {}).is_sandbox !== false) sandboxAttrs.checked = "";
+          const wrap = SafeDOM.elem("div", { className: "rounded border p-3 mb-3 bg-gray-50", "data-bnpl": p.provider }, [
+            SafeDOM.elem("div", { className: "flex justify-between items-center mb-2" }, [
+              SafeDOM.elem("strong", null, [p.provider]),
+              SafeDOM.elem("span", { className: `text-xs ${p.is_enabled ? "text-green-700" : "text-gray-500"}` }, [p.is_enabled ? "مفعّل" : "معطّل"])
+            ]),
+            SafeDOM.elem("input", { type: "text", className: "bnpl-merchant border rounded px-2 py-1 text-sm w-full mb-2", placeholder: "Merchant ID", value: p.merchant_id || "" }),
+            SafeDOM.elem("input", { type: "password", className: "bnpl-key border rounded px-2 py-1 text-sm w-full mb-2", placeholder: "API Key (اتركه فارغاً للإبقاء)" }),
+            SafeDOM.elem("label", { className: "inline-flex items-center gap-2 text-sm mb-2" }, [
+              SafeDOM.elem("input", sandboxAttrs),
+              " Sandbox"
+            ]),
+            SafeDOM.elem("button", { type: "button", className: "bnpl-save rounded bg-indigo-600 px-3 py-1 text-white text-sm", "data-provider": p.provider }, ["حفظ"])
+          ]);
+          bnplEl.appendChild(wrap);
+        });
         bnplEl.querySelectorAll(".bnpl-save").forEach((btn) => {
           btn.addEventListener("click", () => {
             const code = btn.getAttribute("data-provider");
@@ -122,15 +132,17 @@ document.addEventListener("DOMContentLoaded", () => {
     OrionAPI.get("/tenant/document-templates")
       .then((data) => {
         if (!data.templates.length) {
-          templatesEl.innerHTML = "<p class='text-gray-500'>لا توجد قوالب بعد.</p>";
+          SafeDOM.clear(templatesEl);
+          templatesEl.appendChild(SafeDOM.emptyMsg("لا توجد قوالب بعد."));
           return;
         }
-        templatesEl.innerHTML = data.templates
-          .map(
-            (t) =>
-              `<div class="rounded border p-3 mb-2"><strong>${t.document_type}</strong> (${t.locale})</div>`
-          )
-          .join("");
+        SafeDOM.clear(templatesEl);
+        data.templates.forEach((t) => {
+          templatesEl.appendChild(SafeDOM.elem("div", { className: "rounded border p-3 mb-2" }, [
+            SafeDOM.elem("strong", null, [t.document_type]),
+            ` (${t.locale})`
+          ]));
+        });
       })
       .catch((err) => {
         templatesEl.textContent = err.message;
@@ -151,33 +163,42 @@ document.addEventListener("DOMContentLoaded", () => {
   if (flagsEl) {
     OrionAPI.get("/tenant/feature-flags")
       .then((data) => {
-        flagsEl.innerHTML = data.flags
-          .map(
-            (f) => `
-          <div class="rounded border p-3 bg-white" data-flag="${f.code}">
-            <div class="flex items-center justify-between">
-              <div>
-                <strong>${f.name}</strong>
-                <p class="text-xs text-gray-500">${f.code} — ${f.description || ""}</p>
-                <p class="text-xs text-gray-400 mt-1">Rollout: ${f.rollout_percent}%</p>
-              </div>
-              <div class="flex items-center gap-3">
-                ${f.has_override ? `<span class="text-xs text-amber-600">مخصّص</span>` : `<span class="text-xs text-gray-400">تلقائي</span>`}
-                <label class="inline-flex items-center gap-2">
-                  <input type="checkbox" data-flag-code="${f.code}" ${f.value ? "checked" : ""}>
-                  <span class="text-sm">${f.value ? "مفعّل" : "معطّل"}</span>
-                </label>
-              </div>
-            </div>
-            ${f.override_reason ? `<div class="mt-2 text-xs text-gray-500 border-t pt-2"><span class="font-medium">السبب:</span> ${f.override_reason}${f.override_set_by_name ? ` <span class="text-gray-400 mr-2">— ${f.override_set_by_name}</span>` : ""}</div>` : ""}
-            ${f.has_override ? `<div class="mt-2 text-right"><button class="remove-override text-xs text-red-500" data-flag-code="${f.code}">إزالة التخصيص</button></div>` : ""}
-            <div class="reason-field mt-2 hidden" data-flag-code="${f.code}">
-              <input type="text" class="reason-input w-full border rounded px-2 py-1 text-xs" placeholder="سبب التغيير (اختياري)">
-              <button class="save-override mt-1 text-xs rounded bg-blue-600 px-3 py-1 text-white" data-flag-code="${f.code}">حفظ مع السبب</button>
-            </div>
-          </div>`
-          )
-          .join("");
+        SafeDOM.clear(flagsEl);
+        data.flags.forEach((f) => {
+          const checkboxAttrs = { type: "checkbox", "data-flag-code": f.code };
+          if (f.value) checkboxAttrs.checked = "";
+          const overrideSection = f.override_reason ? SafeDOM.elem("div", { className: "mt-2 text-xs text-gray-500 border-t pt-2" }, [
+            SafeDOM.elem("span", { className: "font-medium" }, ["السبب:"]),
+            ` ${f.override_reason}`,
+            f.override_set_by_name ? SafeDOM.elem("span", { className: "text-gray-400 mr-2" }, [`— ${f.override_set_by_name}`]) : null
+          ]) : null;
+          const removeSection = f.has_override ? SafeDOM.elem("div", { className: "mt-2 text-right" }, [
+            SafeDOM.elem("button", { className: "remove-override text-xs text-red-500", "data-flag-code": f.code }, ["إزالة التخصيص"])
+          ]) : null;
+          const flagWrap = SafeDOM.elem("div", { className: "rounded border p-3 bg-white", "data-flag": f.code }, [
+            SafeDOM.elem("div", { className: "flex items-center justify-between" }, [
+              SafeDOM.elem("div", null, [
+                SafeDOM.elem("strong", null, [f.name]),
+                SafeDOM.elem("p", { className: "text-xs text-gray-500" }, [`${f.code} — ${f.description || ""}`]),
+                SafeDOM.elem("p", { className: "text-xs text-gray-400 mt-1" }, [`Rollout: ${f.rollout_percent}%`])
+              ]),
+              SafeDOM.elem("div", { className: "flex items-center gap-3" }, [
+                f.has_override ? SafeDOM.elem("span", { className: "text-xs text-amber-600" }, ["مخصّص"]) : SafeDOM.elem("span", { className: "text-xs text-gray-400" }, ["تلقائي"]),
+                SafeDOM.elem("label", { className: "inline-flex items-center gap-2" }, [
+                  SafeDOM.elem("input", checkboxAttrs),
+                  SafeDOM.elem("span", { className: "text-sm" }, [f.value ? "مفعّل" : "معطّل"])
+                ])
+              ])
+            ]),
+            overrideSection,
+            removeSection,
+            SafeDOM.elem("div", { className: "reason-field mt-2 hidden", "data-flag-code": f.code }, [
+              SafeDOM.elem("input", { type: "text", className: "reason-input w-full border rounded px-2 py-1 text-xs", placeholder: "سبب التغيير (اختياري)" }),
+              SafeDOM.elem("button", { className: "save-override mt-1 text-xs rounded bg-blue-600 px-3 py-1 text-white", "data-flag-code": f.code }, ["حفظ مع السبب"])
+            ])
+          ]);
+          flagsEl.appendChild(flagWrap);
+        });
         flagsEl.querySelectorAll("input[data-flag-code]").forEach((input) => {
           input.addEventListener("change", () => {
             const code = input.getAttribute("data-flag-code");

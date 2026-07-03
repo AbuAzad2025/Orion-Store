@@ -7,9 +7,13 @@ const OrionAdminFraud = {
       const data = await OrionAPI.get("/fraud/rules");
       const rows = data.rules || [];
       if (!rows.length) { el.textContent = "لا توجد قواعد."; return; }
-      el.innerHTML = rows.map((r) =>
-        `<div class="border-b py-2"><strong>${r.name}</strong> — ${r.rule_type} ${r.operator} ${r.threshold_value} → ${r.action}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [r.name]),
+          " — ", r.rule_type, " ", r.operator, " ", r.threshold_value, " → ", r.action
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

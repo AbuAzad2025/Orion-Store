@@ -7,9 +7,13 @@ const OrionAdminPlatformAudit = {
       const data = await OrionAPI.get("/audit/reports");
       const rows = data.reports || [];
       if (!rows.length) { el.textContent = "لا توجد تقارير."; return; }
-      el.innerHTML = rows.map((r) =>
-        `<div class="border-b py-2"><strong>${r.report_number}</strong> — ${r.report_type} — بواسطة #${r.generated_by}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [r.report_number]),
+          " — ", r.report_type, " — بواسطة #", r.generated_by
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -20,9 +24,14 @@ const OrionAdminPlatformAudit = {
       const data = await OrionAPI.get("/audit/logs");
       const rows = data.logs || [];
       if (!rows.length) { el.textContent = "لا توجد سجلات."; return; }
-      el.innerHTML = rows.map((l) =>
-        `<div class="border-b py-2">#${l.user_id} — ${l.action}${l.target_type ? ` → ${l.target_type}#${l.target_id}` : ""}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const l of rows) {
+        const children = ["#", l.user_id, " — ", l.action];
+        if (l.target_type) {
+          children.push(" → ", l.target_type, "#", l.target_id);
+        }
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, children));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

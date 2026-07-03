@@ -7,9 +7,13 @@ const OrionAdminAffiliates = {
       const data = await OrionAPI.get("/affiliates/programs");
       const rows = data.programs || [];
       if (!rows.length) { el.textContent = "لا توجد برامج."; return; }
-      el.innerHTML = rows.map((p) =>
-        `<div class="border-b py-2"><strong>${p.name}</strong> (${p.code}) — ${p.commission_type} ${p.commission_value}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const p of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [p.name]),
+          " (", p.code, ") — ", p.commission_type, " ", p.commission_value
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -20,9 +24,12 @@ const OrionAdminAffiliates = {
       const data = await OrionAPI.get("/affiliates/affiliates");
       const rows = data.affiliates || [];
       if (!rows.length) { el.textContent = "لا يوجد مسوقون."; return; }
-      el.innerHTML = rows.map((a) =>
-        `<div class="border-b py-2">${a.email} — ${a.referral_code} — ${a.total_earned || 0}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const a of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          a.email, " — ", a.referral_code, " — ", a.total_earned || 0
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -33,9 +40,12 @@ const OrionAdminAffiliates = {
       const data = await OrionAPI.get("/affiliates/commissions");
       const rows = data.commissions || [];
       if (!rows.length) { el.textContent = "لا توجد عمولات."; return; }
-      el.innerHTML = rows.map((c) =>
-        `<div class="border-b py-2">مسوق #${c.affiliate_id} — طلب #${c.order_id} — ${c.amount}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const c of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          "مسوق #", c.affiliate_id, " — طلب #", c.order_id, " — ", c.amount
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

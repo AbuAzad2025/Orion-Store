@@ -7,9 +7,12 @@ const OrionAdminSchema = {
       const data = await OrionAPI.get("/schema-markup/");
       const rows = data.markups || [];
       if (!rows.length) { el.textContent = "لا توجد إعدادات."; return; }
-      el.innerHTML = rows.map((m) =>
-        `<div class="border-b py-2">منتج #${m.product_id} — ${m.schema_type}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const m of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          "منتج #", m.product_id, " — ", m.schema_type
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

@@ -16,26 +16,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function refresh() {
     const token = StoreAPI.getCartToken();
     if (!token) {
-      if (listEl) listEl.innerHTML = "<p class='text-gray-500'>السلة فارغة.</p>";
+      if (listEl) { SafeDOM.clear(listEl); listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["السلة فارغة."])); }
       if (summaryEl) summaryEl.textContent = "";
       return;
     }
     const data = await StoreAPI.getCart(token);
     if (!data.items.length) {
-      if (listEl) listEl.innerHTML = "<p class='text-gray-500'>السلة فارغة.</p>";
+      if (listEl) { SafeDOM.clear(listEl); listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["السلة فارغة."])); }
       if (summaryEl) summaryEl.textContent = "";
       return;
     }
     if (listEl) {
-      listEl.innerHTML = data.items
-        .map(
-          (i) =>
-            `<div class="flex justify-between border-b py-2"><span>${i.product_name || i.product_id}</span><span>${i.quantity} × ${i.unit_price}</span></div>`
-        )
-        .join("");
+      SafeDOM.clear(listEl);
+      data.items.forEach((i) => {
+        listEl.appendChild(SafeDOM.elem("div", { className: "flex justify-between border-b py-2" }, [
+          SafeDOM.elem("span", {}, [i.product_name || i.product_id]),
+          SafeDOM.elem("span", {}, [`${i.quantity} × ${i.unit_price}`]),
+        ]));
+      });
     }
     if (summaryEl) {
-      summaryEl.innerHTML = `<a href="/checkout" class="inline-block mt-4 rounded bg-emerald-600 px-4 py-2 text-white">إتمام الشراء</a>`;
+      SafeDOM.clear(summaryEl);
+      summaryEl.appendChild(SafeDOM.elem("a", { href: "/checkout", className: "inline-block mt-4 rounded bg-emerald-600 px-4 py-2 text-white" }, ["إتمام الشراء"]));
     }
   }
 

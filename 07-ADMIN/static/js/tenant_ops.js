@@ -10,18 +10,15 @@ const OrionTenantOps = {
         el.textContent = "لا توجد طلبات إرجاع.";
         return;
       }
-      el.innerHTML = rows
-        .map(
-          (r) => `<div class="border-b py-2 flex justify-between items-center gap-2">
-            <span>#${r.id} — ${r.status} — ${r.return_type || ""}</span>
-            ${
-              r.status === "pending"
-                ? `<button data-approve="${r.id}" class="text-emerald-700 text-xs">موافقة</button>`
-                : ""
-            }
-          </div>`
-        )
-        .join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        const row = SafeDOM.elem("div", { className: "border-b py-2 flex justify-between items-center gap-2" });
+        row.appendChild(SafeDOM.elem("span", null, [`#${r.id} — ${r.status} — ${r.return_type || ""}`]));
+        if (r.status === "pending") {
+          row.appendChild(SafeDOM.elem("button", { "data-approve": r.id, className: "text-emerald-700 text-xs" }, ["موافقة"]));
+        }
+        el.appendChild(row);
+      }
       el.querySelectorAll("[data-approve]").forEach((btn) => {
         btn.addEventListener("click", async () => {
           await OrionAPI.put(`/returns/${btn.dataset.approve}/approve`);
@@ -47,12 +44,10 @@ const OrionTenantOps = {
         el.textContent = "لا توجد مجموعات.";
         return;
       }
-      el.innerHTML = rows
-        .map(
-          (g) =>
-            `<div class="border-b py-2">${g.name} (${g.code}) — خصم ${g.discount_percent}%</div>`
-        )
-        .join("");
+      SafeDOM.clear(el);
+      for (const g of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${g.name} (${g.code}) — خصم ${g.discount_percent}%`]));
+      }
     } catch (err) {
       el.textContent = err.message || "تعذّر التحميل";
     }
@@ -86,14 +81,10 @@ const OrionTenantOps = {
         el.textContent = "لا توجد مستودعات.";
         return;
       }
-      el.innerHTML = rows
-        .map(
-          (w) =>
-            `<div class="border-b py-2">${w.name} (${w.code})${
-              w.is_default ? " — افتراضي" : ""
-            }</div>`
-        )
-        .join("");
+      SafeDOM.clear(el);
+      for (const w of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${w.name} (${w.code})${w.is_default ? " — افتراضي" : ""}`]));
+      }
     } catch (err) {
       el.textContent = err.message || "تعذّر التحميل";
     }
@@ -124,9 +115,10 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/subscriptions/plans");
       const rows = data.plans || [];
       if (!rows.length) { el.textContent = "لا توجد خطط بعد."; return; }
-      el.innerHTML = rows.map((p) =>
-        `<div class="border-b py-2">${p.name} (${p.code}) — ${p.price} ${p.currency} / ${p.billing_period_days} يوم${p.trial_period_days ? ` + ${p.trial_period_days} يوم تجريبي` : ""}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const p of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${p.name} (${p.code}) — ${p.price} ${p.currency} / ${p.billing_period_days} يوم${p.trial_period_days ? ` + ${p.trial_period_days} يوم تجريبي` : ""}`]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -137,9 +129,10 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/subscriptions/subscriptions");
       const rows = data.subscriptions || [];
       if (!rows.length) { el.textContent = "لا توجد اشتراكات حالية."; return; }
-      el.innerHTML = rows.map((s) =>
-        `<div class="border-b py-2">${s.customer_email} — ${s.status} (تنتهي: ${new Date(s.current_period_end).toLocaleDateString("ar")})</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const s of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${s.customer_email} — ${s.status} (تنتهي: ${new Date(s.current_period_end).toLocaleDateString("ar")})`]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -171,9 +164,17 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/tax/jurisdictions");
       const rows = data.jurisdictions || [];
       if (!rows.length) { el.textContent = "لا توجد مناطق ضريبية بعد."; return; }
-      el.innerHTML = rows.map((j) =>
-        `<div class="border-b py-2"><strong>${j.name}</strong> (${j.code}) — ${j.country}${j.region ? ` / ${j.region}` : ""}${j.rates && j.rates.length ? `<span class="text-xs text-gray-500 mr-2">${j.rates.length} معدّل</span>` : ""}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const j of rows) {
+        const children = [
+          SafeDOM.elem("strong", null, [j.name]),
+          ` (${j.code}) — ${j.country}${j.region ? ` / ${j.region}` : ""}`
+        ];
+        if (j.rates && j.rates.length) {
+          children.push(SafeDOM.elem("span", { className: "text-xs text-gray-500 mr-2" }, [`${j.rates.length} معدّل`]));
+        }
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, children));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -201,9 +202,13 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/bopis/locations");
       const rows = data.locations || [];
       if (!rows.length) { el.textContent = "لا توجد مواقع استلام."; return; }
-      el.innerHTML = rows.map((l) =>
-        `<div class="border-b py-2"><strong>${l.name}</strong> — ${l.address}${l.phone ? ` (${l.phone})` : ""}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const l of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", null, [l.name]),
+          ` — ${l.address}${l.phone ? ` (${l.phone})` : ""}`
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -230,9 +235,13 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/bundles/");
       const rows = data.bundles || [];
       if (!rows.length) { el.textContent = "لا توجد حزم بعد."; return; }
-      el.innerHTML = rows.map((b) =>
-        `<div class="border-b py-2"><strong>${b.name}</strong> (${b.code}) — خصم ${b.discount_percent}%</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const b of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", null, [b.name]),
+          ` (${b.code}) — خصم ${b.discount_percent}%`
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -283,9 +292,10 @@ const OrionTenantOps = {
           const txData = await OrionAPI.get(`/store-credit/transactions?customer_email=${encodeURIComponent(email)}`);
           const txRows = txData.transactions || [];
           if (!txRows.length) { txEl.textContent = "لا توجد حركات."; return; }
-          txEl.innerHTML = txRows.map((t) =>
-            `<div class="border-b py-1 text-sm">${t.type} — ${t.amount} — ${t.reason || ""} (${new Date(t.created_at).toLocaleDateString("ar")})</div>`
-          ).join("");
+          SafeDOM.clear(txEl);
+          for (const t of txRows) {
+            txEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 text-sm" }, [`${t.type} — ${t.amount} — ${t.reason || ""} (${new Date(t.created_at).toLocaleDateString("ar")})`]));
+          }
         } catch (err) {
           alert(err.message || "تعذّر تحميل الرصيد");
         }
@@ -300,12 +310,18 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/draft-orders/");
       const rows = data.draft_orders || [];
       if (!rows.length) { el.textContent = "لا توجد مسودات."; return; }
-      el.innerHTML = rows.map((d) =>
-        `<div class="border-b py-2 flex justify-between items-center">
-          <span><strong>#${d.id}</strong> — ${d.customer_email} — ${d.status}${d.notes ? ` (${d.notes})` : ""}</span>
-          ${d.status === "draft" ? `<button data-convert="${d.id}" class="text-emerald-700 text-xs">تحويل إلى طلب</button>` : ""}
-        </div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const d of rows) {
+        const row = SafeDOM.elem("div", { className: "border-b py-2 flex justify-between items-center" });
+        row.appendChild(SafeDOM.elem("span", null, [
+          SafeDOM.elem("strong", null, [`#${d.id}`]),
+          ` — ${d.customer_email} — ${d.status}${d.notes ? ` (${d.notes})` : ""}`
+        ]));
+        if (d.status === "draft") {
+          row.appendChild(SafeDOM.elem("button", { "data-convert": d.id, className: "text-emerald-700 text-xs" }, ["تحويل إلى طلب"]));
+        }
+        el.appendChild(row);
+      }
       el.querySelectorAll("[data-convert]").forEach((btn) => {
         btn.addEventListener("click", async () => {
           await OrionAPI.post(`/draft-orders/${btn.dataset.convert}/convert`);

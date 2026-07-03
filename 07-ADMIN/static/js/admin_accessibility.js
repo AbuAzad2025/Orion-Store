@@ -7,9 +7,15 @@ const OrionAdminAccessibility = {
       const data = await OrionAPI.get("/accessibility/audits");
       const rows = data.audits || [];
       if (!rows.length) { el.textContent = "لا توجد تدقيقات."; return; }
-      el.innerHTML = rows.map((a) =>
-        `<div class="border-b py-2"><a href="${a.page_url}" target="_blank" class="text-blue-600">${a.page_url}</a> — درجة: <strong>${a.score}</strong>/100</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const a of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("a", { href: a.page_url, target: "_blank", className: "text-blue-600" }, [a.page_url]),
+          " — درجة: ",
+          SafeDOM.elem("strong", {}, [String(a.score)]),
+          "/100"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

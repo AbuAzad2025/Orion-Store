@@ -7,9 +7,12 @@ const OrionAdminCompliance = {
       const data = await OrionAPI.get("/compliance/consent");
       const rows = data.consent_records || [];
       if (!rows.length) { el.textContent = "لا توجد سجلات."; return; }
-      el.innerHTML = rows.map((c) =>
-        `<div class="border-b py-2">${c.customer_email} — ${c.consent_type} — ${c.granted ? "ممنوحة" : "ملغاة"}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const c of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          c.customer_email, " — ", c.consent_type, " — ", c.granted ? "ممنوحة" : "ملغاة"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -20,9 +23,12 @@ const OrionAdminCompliance = {
       const data = await OrionAPI.get("/compliance/data-requests");
       const rows = data.requests || [];
       if (!rows.length) { el.textContent = "لا توجد طلبات."; return; }
-      el.innerHTML = rows.map((r) =>
-        `<div class="border-b py-2">${r.customer_email} — ${r.request_type} — ${r.status || "pending"}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          r.customer_email, " — ", r.request_type, " — ", r.status || "pending"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -33,7 +39,10 @@ const OrionAdminCompliance = {
       const data = await OrionAPI.get("/compliance/cookie-settings");
       const s = data.settings;
       if (!s) { el.textContent = "لا توجد إعدادات."; return; }
-      el.innerHTML = `<div class="border-b py-2">${s.banner_message || "بدون نص"} — ${s.is_active ? "مفعّل" : "معطّل"}</div>`;
+      SafeDOM.clear(el);
+      el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+        s.banner_message || "بدون نص", " — ", s.is_active ? "مفعّل" : "معطّل"
+      ]));
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -44,9 +53,12 @@ const OrionAdminCompliance = {
       const data = await OrionAPI.get("/compliance/sso");
       const rows = data.sso_providers || [];
       if (!rows.length) { el.textContent = "لا توجد مزودين."; return; }
-      el.innerHTML = rows.map((p) =>
-        `<div class="border-b py-2">${p.provider_type} — ${p.issuer_url || "بدون issuer"}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const p of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          p.provider_type, " — ", p.issuer_url || "بدون issuer"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

@@ -7,9 +7,13 @@ const OrionAdminSearch = {
       const data = await OrionAPI.get("/search/synonyms");
       const rows = data.synonyms || [];
       if (!rows.length) { el.textContent = "لا توجد مرادفات."; return; }
-      el.innerHTML = rows.map((s) =>
-        `<div class="border-b py-2"><strong>${s.term}</strong> → ${(s.synonyms || []).join(", ")}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const s of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [s.term]),
+          " → ", (s.synonyms || []).join(", ")
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -20,9 +24,13 @@ const OrionAdminSearch = {
       const data = await OrionAPI.get("/search/redirects");
       const rows = data.redirects || [];
       if (!rows.length) { el.textContent = "لا توجد توجيهات."; return; }
-      el.innerHTML = rows.map((r) =>
-        `<div class="border-b py-2">${r.query_term} → <a href="${r.redirect_url}" class="text-blue-600" target="_blank">${r.redirect_url}</a></div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          r.query_term, " → ",
+          SafeDOM.elem("a", { href: r.redirect_url, className: "text-blue-600", target: "_blank" }, [r.redirect_url])
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -33,9 +41,12 @@ const OrionAdminSearch = {
       const data = await OrionAPI.get("/search/boosts");
       const rows = data.boosts || [];
       if (!rows.length) { el.textContent = "لا توجد قواعد تعزيز."; return; }
-      el.innerHTML = rows.map((b) =>
-        `<div class="border-b py-2">product=${b.product_id || '-'} cat=${b.category_id || '-'} kw=${b.query_keyword || '-'} ×${b.boost_factor}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const b of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          "product=", b.product_id || '-', " cat=", b.category_id || '-', " kw=", b.query_keyword || '-', " ×", b.boost_factor
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

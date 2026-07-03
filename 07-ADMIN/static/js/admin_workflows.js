@@ -7,9 +7,13 @@ const OrionAdminWorkflows = {
       const data = await OrionAPI.get("/workflow/definitions");
       const rows = data.definitions || [];
       if (!rows.length) { el.textContent = "لا توجد تعريفات."; return; }
-      el.innerHTML = rows.map((d) =>
-        `<div class="border-b py-2"><strong>${d.name}</strong> — ${d.trigger_event}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const d of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [d.name]),
+          " — ", d.trigger_event
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -20,9 +24,14 @@ const OrionAdminWorkflows = {
       const data = await OrionAPI.get("/workflow/runs");
       const rows = data.runs || [];
       if (!rows.length) { el.textContent = "لا توجد تشغيلات."; return; }
-      el.innerHTML = rows.map((r) =>
-        `<div class="border-b py-2">#${r.id} — ${r.status}${r.error_message ? ` <span class="text-red-500">${r.error_message}</span>` : ""}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        const children = ["#", r.id, " — ", r.status];
+        if (r.error_message) {
+          children.push(" ", SafeDOM.elem("span", { className: "text-red-500" }, [r.error_message]));
+        }
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, children));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

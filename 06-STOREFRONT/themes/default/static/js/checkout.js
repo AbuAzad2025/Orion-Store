@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       StoreAPI.listShippingMethods(),
       StoreAPI.listPaymentMethods(),
     ]);
-    methodSelect.innerHTML = "";
+    SafeDOM.clear(methodSelect);
     (methodsRes.methods || []).forEach((m) => {
       const opt = document.createElement("option");
       opt.value = m.code;
@@ -29,10 +29,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       methodSelect.appendChild(opt);
     });
     if (!methodsRes.methods || !methodsRes.methods.length) {
-      methodSelect.innerHTML = '<option value="">لا توجد طرق شحن</option>';
+      SafeDOM.clear(methodSelect);
+      methodSelect.appendChild(SafeDOM.elem("option", { value: "" }, ["لا توجد طرق شحن"]));
     }
     if (paymentSelect) {
-      paymentSelect.innerHTML = "";
+      SafeDOM.clear(paymentSelect);
       (payRes.payment_methods || []).forEach((pm) => {
         const opt = document.createElement("option");
         opt.value = pm.code;
@@ -40,13 +41,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         paymentSelect.appendChild(opt);
       });
       if (!payRes.payment_methods || !payRes.payment_methods.length) {
-        paymentSelect.innerHTML = '<option value="cod">الدفع عند الاستلام</option>';
+        SafeDOM.clear(paymentSelect);
+        paymentSelect.appendChild(SafeDOM.elem("option", { value: "cod" }, ["الدفع عند الاستلام"]));
       }
     }
   } catch (err) {
-    methodSelect.innerHTML = '<option value="">تعذر تحميل الشحن</option>';
+    SafeDOM.clear(methodSelect);
+    methodSelect.appendChild(SafeDOM.elem("option", { value: "" }, ["تعذر تحميل الشحن"]));
     if (paymentSelect) {
-      paymentSelect.innerHTML = '<option value="cod">الدفع عند الاستلام</option>';
+      SafeDOM.clear(paymentSelect);
+      paymentSelect.appendChild(SafeDOM.elem("option", { value: "cod" }, ["الدفع عند الاستلام"]));
     }
   }
 
@@ -68,9 +72,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       const order = orderRes.order;
       summaryEl.textContent = `المجموع: ${order.total} (شحن: ${order.shipping_cost})`;
       const payRes = await StoreAPI.payOrder(order.public_id, method);
-      resultEl.innerHTML = `<p class="text-green-700">تم الدفع — رقم الطلب ${order.order_number}</p>`;
+      SafeDOM.clear(resultEl);
+      resultEl.appendChild(SafeDOM.elem("p", { className: "text-green-700" }, [`تم الدفع — رقم الطلب ${order.order_number}`]));
       if (payRes.invoice) {
-        resultEl.innerHTML += `<p class="text-sm">فاتورة: ${payRes.invoice.invoice_number}</p>`;
+        resultEl.appendChild(SafeDOM.elem("p", { className: "text-sm" }, [`فاتورة: ${payRes.invoice.invoice_number}`]));
       }
       localStorage.removeItem(StoreAPI.cartTokenKey);
     } catch (err) {

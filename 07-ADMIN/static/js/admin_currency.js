@@ -7,9 +7,12 @@ const OrionAdminCurrency = {
       const data = await OrionAPI.get("/currency/rates");
       const rows = data.rates || [];
       if (!rows.length) { el.textContent = "لا توجد أسعار."; return; }
-      el.innerHTML = rows.map((r) =>
-        `<div class="border-b py-2">${r.from_currency} → ${r.to_currency} = ${r.rate} (${r.source || "manual"})</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          r.from_currency, " → ", r.to_currency, " = ", r.rate, " (", r.source || "manual", ")"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

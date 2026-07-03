@@ -50,23 +50,28 @@ const OrionAdminPlatform = {
       const data = await OrionAPI.get("/tenants/");
       const rows = data.tenants || [];
       if (!rows.length) {
-        el.innerHTML = '<tr><td colspan="5" class="p-3">لا توجد متاجر.</td></tr>';
+        SafeDOM.clear(el);
+        el.appendChild(SafeDOM.elem("tr", null, [
+          SafeDOM.elem("td", { className: "p-3", colspan: "5" }, ["لا توجد متاجر."])
+        ]));
         return;
       }
-      el.innerHTML = rows.map((t) => `
-        <tr class="border-b">
-          <td class="p-3">${t.name}</td>
-          <td class="p-3">${t.slug}</td>
-          <td class="p-3">${t.email}</td>
-          <td class="p-3">${t.status}</td>
-          <td class="p-3">
-            <button onclick="OrionAdminPlatform.editTenant(${t.id})" class="text-blue-600 text-sm ml-2">تعديل</button>
-            <button onclick="OrionAdminPlatform.deleteTenant(${t.id})" class="text-red-600 text-sm">حذف</button>
-          </td>
-        </tr>
-      `).join("");
+      SafeDOM.clear(el);
+      for (const t of rows) {
+        const nameTd = SafeDOM.elem("td", { className: "p-3" }, [t.name]);
+        const slugTd = SafeDOM.elem("td", { className: "p-3" }, [t.slug]);
+        const emailTd = SafeDOM.elem("td", { className: "p-3" }, [t.email]);
+        const statusTd = SafeDOM.elem("td", { className: "p-3" }, [t.status]);
+        const editBtn = SafeDOM.actionBtn("تعديل", "text-blue-600 text-sm ml-2", () => OrionAdminPlatform.editTenant(t.id));
+        const deleteBtn = SafeDOM.actionBtn("حذف", "text-red-600 text-sm", () => OrionAdminPlatform.deleteTenant(t.id));
+        const actionsTd = SafeDOM.elem("td", { className: "p-3" }, [editBtn, deleteBtn]);
+        el.appendChild(SafeDOM.elem("tr", { className: "border-b" }, [nameTd, slugTd, emailTd, statusTd, actionsTd]));
+      }
     } catch (err) {
-      el.innerHTML = `<tr><td colspan="5" class="p-3 text-red-600">${err.message}</td></tr>`;
+      SafeDOM.clear(el);
+      el.appendChild(SafeDOM.elem("tr", null, [
+        SafeDOM.elem("td", { className: "p-3 text-red-600", colspan: "5" }, [err.message])
+      ]));
     }
   },
 
@@ -145,9 +150,12 @@ const OrionAdminPlatform = {
     try {
       const data = await OrionAPI.get("/tenants/");
       const rows = data.tenants || [];
-      select.innerHTML = rows.map((t) => `<option value="${t.id}">${t.name} (${t.slug})</option>`).join("");
+      SafeDOM.clear(select);
+      for (const t of rows) {
+        select.appendChild(SafeDOM.elem("option", { value: t.id }, [`${t.name} (${t.slug})`]));
+      }
     } catch (err) {
-      select.innerHTML = "";
+      SafeDOM.clear(select);
     }
   },
 
@@ -158,23 +166,28 @@ const OrionAdminPlatform = {
       const data = await OrionAPI.get("/users/");
       const rows = data.users || [];
       if (!rows.length) {
-        el.innerHTML = '<tr><td colspan="6" class="p-3">لا يوجد مستخدمين.</td></tr>';
+        SafeDOM.clear(el);
+        el.appendChild(SafeDOM.elem("tr", null, [
+          SafeDOM.elem("td", { className: "p-3", colspan: "6" }, ["لا يوجد مستخدمين."])
+        ]));
         return;
       }
-      el.innerHTML = rows.map((u) => `
-        <tr class="border-b">
-          <td class="p-3">${u.email}</td>
-          <td class="p-3">${u.first_name || ""} ${u.last_name || ""}</td>
-          <td class="p-3">${u.tenant_id || "—"}</td>
-          <td class="p-3">${u.is_superuser ? "مدير منصة" : (u.is_admin ? "مدير متجر" : "—")}</td>
-          <td class="p-3">${u.is_active ? "نشط" : "معطل"}</td>
-          <td class="p-3">
-            <button onclick="OrionAdminPlatform.deleteUser(${u.id})" class="text-red-600 text-sm">حذف</button>
-          </td>
-        </tr>
-      `).join("");
+      SafeDOM.clear(el);
+      for (const u of rows) {
+        const emailTd = SafeDOM.elem("td", { className: "p-3" }, [u.email]);
+        const nameTd = SafeDOM.elem("td", { className: "p-3" }, [`${u.first_name || ""} ${u.last_name || ""}`]);
+        const tenantTd = SafeDOM.elem("td", { className: "p-3" }, [u.tenant_id || "—"]);
+        const roleTd = SafeDOM.elem("td", { className: "p-3" }, [u.is_superuser ? "مدير منصة" : (u.is_admin ? "مدير متجر" : "—")]);
+        const activeTd = SafeDOM.elem("td", { className: "p-3" }, [u.is_active ? "نشط" : "معطل"]);
+        const deleteBtn = SafeDOM.actionBtn("حذف", "text-red-600 text-sm", () => OrionAdminPlatform.deleteUser(u.id));
+        const actionsTd = SafeDOM.elem("td", { className: "p-3" }, [deleteBtn]);
+        el.appendChild(SafeDOM.elem("tr", { className: "border-b" }, [emailTd, nameTd, tenantTd, roleTd, activeTd, actionsTd]));
+      }
     } catch (err) {
-      el.innerHTML = `<tr><td colspan="6" class="p-3 text-red-600">${err.message}</td></tr>`;
+      SafeDOM.clear(el);
+      el.appendChild(SafeDOM.elem("tr", null, [
+        SafeDOM.elem("td", { className: "p-3 text-red-600", colspan: "6" }, [err.message])
+      ]));
     }
   },
 

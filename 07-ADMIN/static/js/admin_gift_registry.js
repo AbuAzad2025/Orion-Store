@@ -7,9 +7,13 @@ const OrionAdminGiftRegistry = {
       const data = await OrionAPI.get("/gift-registries/");
       const rows = data.registries || [];
       if (!rows.length) { el.textContent = "لا توجد قوائم."; return; }
-      el.innerHTML = rows.map((r) =>
-        `<div class="border-b py-2"><strong>${r.registry_name}</strong> — ${r.customer_email} — ${r.event_type || ""} — ${r.is_public ? "عامة" : "خاصة"}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [r.registry_name]),
+          " — ", r.customer_email, " — ", r.event_type || "", " — ", r.is_public ? "عامة" : "خاصة"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

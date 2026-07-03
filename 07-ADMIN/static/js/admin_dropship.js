@@ -7,9 +7,13 @@ const OrionAdminDropship = {
       const data = await OrionAPI.get("/dropship/pod");
       const rows = data.connections || [];
       if (!rows.length) { el.textContent = "لا توجد اتصالات."; return; }
-      el.innerHTML = rows.map((c) =>
-        `<div class="border-b py-2"><strong>${c.provider}</strong> — ${c.api_url || "بدون رابط"}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const c of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [c.provider]),
+          " — ", c.api_url || "بدون رابط"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -20,9 +24,13 @@ const OrionAdminDropship = {
       const data = await OrionAPI.get("/dropship/suppliers");
       const rows = data.suppliers || [];
       if (!rows.length) { el.textContent = "لا يوجد موردون."; return; }
-      el.innerHTML = rows.map((s) =>
-        `<div class="border-b py-2"><strong>${s.name}</strong> — ${s.contact_email} — ${s.fulfillment_time_days} يوم</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const s of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [s.name]),
+          " — ", s.contact_email, " — ", s.fulfillment_time_days, " يوم"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -33,9 +41,12 @@ const OrionAdminDropship = {
       const data = await OrionAPI.get("/dropship/orders");
       const rows = data.dropship_orders || [];
       if (!rows.length) { el.textContent = "لا توجد طلبات."; return; }
-      el.innerHTML = rows.map((o) =>
-        `<div class="border-b py-2">مورد #${o.supplier_id} — طلب #${o.order_id} — ${o.cost}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const o of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          "مورد #", o.supplier_id, " — طلب #", o.order_id, " — ", o.cost
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

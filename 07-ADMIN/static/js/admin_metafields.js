@@ -7,9 +7,17 @@ const OrionAdminMetafields = {
       const data = await OrionAPI.get("/metafields/definitions");
       const rows = data.definitions || [];
       if (!rows.length) { el.textContent = "لا توجد تعريفات."; return; }
-      el.innerHTML = rows.map((d) =>
-        `<div class="border-b py-2"><strong>${d.key}</strong> (${d.owner_type}) — ${d.label} — ${d.field_type}${d.is_required ? " <span class='text-red-500'>*</span>" : ""}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const d of rows) {
+        const children = [
+          SafeDOM.elem("strong", {}, [d.key]),
+          " (", d.owner_type, ") — ", d.label, " — ", d.field_type
+        ];
+        if (d.is_required) {
+          children.push(" ", SafeDOM.elem("span", { className: "text-red-500" }, ["*"]));
+        }
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, children));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

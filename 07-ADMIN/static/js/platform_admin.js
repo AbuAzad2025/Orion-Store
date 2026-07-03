@@ -4,19 +4,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (tenantsEl) {
     OrionAPI.get("/tenants/")
       .then((data) => {
-        tenantsEl.innerHTML = data.tenants
-          .map(
-            (t) =>
-              `<tr class="border-b">
-                <td class="py-2">${t.name}</td>
-                <td class="py-2">${t.slug}</td>
-                <td class="py-2"><a class="text-blue-600" href="/admin/platform/stores/${t.id}/finance">مالية</a></td>
-              </tr>`
-          )
-          .join("");
+        SafeDOM.clear(tenantsEl);
+        data.tenants.forEach((t) => {
+          const link = SafeDOM.elem("a", { className: "text-blue-600", href: `/admin/platform/stores/${t.id}/finance` }, ["مالية"]);
+          tenantsEl.appendChild(SafeDOM.elem("tr", { className: "border-b" }, [
+            SafeDOM.elem("td", { className: "py-2" }, [t.name]),
+            SafeDOM.elem("td", { className: "py-2" }, [t.slug]),
+            SafeDOM.elem("td", { className: "py-2" }, [link])
+          ]));
+        });
       })
       .catch((err) => {
-        tenantsEl.innerHTML = `<tr><td colspan="3">${err.message}</td></tr>`;
+        SafeDOM.clear(tenantsEl);
+        tenantsEl.appendChild(SafeDOM.elem("tr", null, [
+          SafeDOM.elem("td", { colspan: "3" }, [err.message])
+        ]));
       });
   }
 
@@ -26,17 +28,26 @@ document.addEventListener("DOMContentLoaded", () => {
     OrionAPI.get(`/platform/stores/${tenantId}/financial-report`)
       .then((data) => {
         const s = data.summary;
-        reportEl.innerHTML = `
-          <h2 class="text-xl font-bold mb-4">${data.tenant.name}</h2>
-          <div class="grid grid-cols-2 gap-4 md:grid-cols-3 mb-6">
-            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">إجمالي الوارد</p><p class="text-xl font-bold">${s.total_inbound}</p></div>
-            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">العمولة</p><p class="text-xl font-bold">${s.total_commission}</p></div>
-            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">طلبات مدفوعة</p><p class="text-xl font-bold">${s.orders_paid}</p></div>
-          </div>
-          <h3 class="font-semibold mb-2">أحداث مالية حديثة</h3>
-          <ul class="space-y-1 text-sm">${data.recent_events
-            .map((e) => `<li>${e.event_type}: ${e.amount} ${e.currency}</li>`)
-            .join("")}</ul>`;
+        SafeDOM.clear(reportEl);
+        reportEl.appendChild(SafeDOM.elem("h2", { className: "text-xl font-bold mb-4" }, [data.tenant.name]));
+        const cards = [
+          SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["إجمالي الوارد"]),
+            SafeDOM.elem("p", { className: "text-xl font-bold" }, [s.total_inbound])
+          ]),
+          SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["العمولة"]),
+            SafeDOM.elem("p", { className: "text-xl font-bold" }, [s.total_commission])
+          ]),
+          SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["طلبات مدفوعة"]),
+            SafeDOM.elem("p", { className: "text-xl font-bold" }, [s.orders_paid])
+          ])
+        ];
+        reportEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-3 mb-6" }, cards));
+        reportEl.appendChild(SafeDOM.elem("h3", { className: "font-semibold mb-2" }, ["أحداث مالية حديثة"]));
+        const events = data.recent_events.map((e) => SafeDOM.elem("li", null, [`${e.event_type}: ${e.amount} ${e.currency}`]));
+        reportEl.appendChild(SafeDOM.elem("ul", { className: "space-y-1 text-sm" }, events));
       })
       .catch((err) => {
         reportEl.textContent = err.message;
@@ -47,12 +58,22 @@ document.addEventListener("DOMContentLoaded", () => {
   if (reconEl) {
     OrionAPI.get("/platform/reconciliation")
       .then((data) => {
-        reconEl.innerHTML = `
-          <div class="grid grid-cols-3 gap-4">
-            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">عمولات معلقة</p><p class="text-xl font-bold">${data.pending_commission_entries}</p></div>
-            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">عمولات مسوّاة</p><p class="text-xl font-bold">${data.settled_commission_entries}</p></div>
-            <div class="rounded bg-white p-4 shadow"><p class="text-sm text-gray-500">أحداث مالية</p><p class="text-xl font-bold">${data.financial_events_total}</p></div>
-          </div>`;
+        SafeDOM.clear(reconEl);
+        const reconCards = [
+          SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["عمولات معلقة"]),
+            SafeDOM.elem("p", { className: "text-xl font-bold" }, [data.pending_commission_entries])
+          ]),
+          SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["عمولات مسوّاة"]),
+            SafeDOM.elem("p", { className: "text-xl font-bold" }, [data.settled_commission_entries])
+          ]),
+          SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["أحداث مالية"]),
+            SafeDOM.elem("p", { className: "text-xl font-bold" }, [data.financial_events_total])
+          ])
+        ];
+        reconEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-3 gap-4" }, reconCards));
       })
       .catch((err) => {
         reconEl.textContent = err.message;

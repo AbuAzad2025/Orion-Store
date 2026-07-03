@@ -7,9 +7,13 @@ const OrionAdminImportExport = {
       const data = await OrionAPI.get("/import-export/jobs");
       const rows = data.jobs || [];
       if (!rows.length) { el.textContent = "لا توجد مهام."; return; }
-      el.innerHTML = rows.map((j) =>
-        `<div class="border-b py-2"><strong>${j.job_type}</strong> — ${j.entity_type} — ${j.status || "pending"} (${j.processed_count || 0}/${j.total_count || 0})</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const j of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [j.job_type]),
+          " — ", j.entity_type, " — ", j.status || "pending", " (", j.processed_count || 0, "/", j.total_count || 0, ")"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

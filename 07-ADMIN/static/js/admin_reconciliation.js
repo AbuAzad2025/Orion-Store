@@ -7,9 +7,13 @@ const OrionAdminReconciliation = {
       const data = await OrionAPI.get("/reconciliation/runs");
       const rows = data.runs || [];
       if (!rows.length) { el.textContent = "لا توجد تشغيلات."; return; }
-      el.innerHTML = rows.map((r) =>
-        `<div class="border-b py-2"><strong>${r.run_number}</strong> — ${r.status} — ${r.matched_count || 0}/${r.total_events || 0} متطابق</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const r of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [r.run_number]),
+          " — ", r.status, " — ", r.matched_count || 0, "/", r.total_events || 0, " متطابق"
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

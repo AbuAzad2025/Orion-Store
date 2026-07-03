@@ -7,9 +7,13 @@ const OrionAdminAppPlatform = {
       const data = await OrionAPI.get("/app-platform/apps");
       const rows = data.apps || [];
       if (!rows.length) { el.textContent = "لا توجد تطبيقات."; return; }
-      el.innerHTML = rows.map((a) =>
-        `<div class="border-b py-2"><strong>${a.name}</strong> — ${a.client_id}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const a of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          SafeDOM.elem("strong", {}, [a.name]),
+          " — ", a.client_id
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
@@ -20,9 +24,12 @@ const OrionAdminAppPlatform = {
       const data = await OrionAPI.get("/app-platform/sandboxes");
       const rows = data.sandboxes || [];
       if (!rows.length) { el.textContent = "لا توجد sandbox."; return; }
-      el.innerHTML = rows.map((s) =>
-        `<div class="border-b py-2">${s.slug} — ${s.name}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const s of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+          s.slug, " — ", s.name
+        ]));
+      }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 

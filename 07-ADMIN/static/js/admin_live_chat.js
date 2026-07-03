@@ -9,12 +9,16 @@ const OrionAdminLiveChat = {
       const data = await OrionAPI.get("/live-chat/sessions");
       const rows = data.sessions || [];
       if (!rows.length) { el.textContent = "لا توجد جلسات."; return; }
-      el.innerHTML = rows.map((s) =>
-        `<div class="border-b py-2 flex justify-between items-center">
-          <span><strong>#${s.id}</strong> — ${s.customer_email || "زائر"} — ${s.status}</span>
-          <button data-open="${s.id}" class="text-blue-600 text-xs">فتح</button>
-        </div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const s of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex justify-between items-center" }, [
+          SafeDOM.elem("span", {}, [
+            SafeDOM.elem("strong", {}, [`#${s.id}`]),
+            " — ", s.customer_email || "زائر", " — ", s.status
+          ]),
+          SafeDOM.elem("button", { "data-open": s.id, className: "text-blue-600 text-xs" }, ["فتح"])
+        ]));
+      }
       el.querySelectorAll("[data-open]").forEach((btn) => {
         btn.addEventListener("click", () => OrionAdminLiveChat.openSession(parseInt(btn.dataset.open)));
       });
@@ -34,9 +38,13 @@ const OrionAdminLiveChat = {
     try {
       const data = await OrionAPI.get(`/live-chat/sessions/${sessionId}/messages`);
       const rows = data.messages || [];
-      el.innerHTML = rows.map((m) =>
-        `<div class="${m.sender_type === 'agent' ? 'text-blue-700' : 'text-gray-700'}"><strong>${m.sender_type}:</strong> ${m.message}</div>`
-      ).join("");
+      SafeDOM.clear(el);
+      for (const m of rows) {
+        el.appendChild(SafeDOM.elem("div", { className: m.sender_type === 'agent' ? 'text-blue-700' : 'text-gray-700' }, [
+          SafeDOM.elem("strong", {}, [m.sender_type + ":"]),
+          " ", m.message
+        ]));
+      }
       el.scrollTop = el.scrollHeight;
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
