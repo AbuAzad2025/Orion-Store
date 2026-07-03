@@ -1168,7 +1168,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 |---------|----------|--------|-------|--------|
 | **AZ-0.1** | 🔴 CRITICAL | ✅ مكتمل | تأمين register/platform — requires platform admin للبوتستراب، تعطيل الوصول العام | `5f84755` |
 | **AZ-0.2** | 🔴 CRITICAL | ✅ مكتمل | X-User-ID Identity Override Removal — إزالة الهيدر، JWT Bearer بديل | `c535d79` |
-| **AZ-0.3** | 🔴 CRITICAL | 🟡 جاري | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | — |
+| **AZ-0.3** | 🔴 CRITICAL | 🟢 مكتمل | تدقيق نقاط نهاية tenant-admin؛ استبدال require_tenant_context بحماية auth+role | `65bb7f4` |
 | **AZ-0.4** | 🔴 CRITICAL | ⬜ معلق | تفعيل webhook signature verification (PayPal, Stripe, BNPL) | — |
 | **AZ-0.5** | 🟠 HIGH | ⬜ معلق | إصلاح OrionAPI.delete (المفقود في api_client.js) | — |
 | **AZ-0.6** | 🟠 HIGH | ⬜ معلق | إصلاح Platform Settings — إضافة الحقول غير المدعومة | — |
@@ -1223,7 +1223,7 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 
 #### 0.16.1.5 ترتيب التنفيذ
 
-1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → AZ-0.3 → AZ-0.4 → AZ-0.10/11 → AZ-0.18)
+1. **Phase 0B — Security** (~~AZ-0.1 ✅~~ → ~~AZ-0.2 ✅~~ → ~~AZ-0.3 ✅~~ → AZ-0.4 → AZ-0.10/11 → AZ-0.18)
 2. **Phase 0C — Contract Fixes** (AZ-0.5 → AZ-0.6 → AZ-0.7 → AZ-0.8 → AZ-0.9 → AZ-0.12 → AZ-0.13 → AZ-0.14)
 3. **Phase 0D — Scope Resolution** (AZ-0.15 → AZ-0.16)
 4. **Phase 0E — Missing Endpoints** (AZ-0.17)
@@ -1263,11 +1263,11 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | **ملاحظة** | لا يتضمن AZ-0.2 أي تنفيذ لميزة impersonation. تم إنشاء تذكرة منفصلة (AZ-0.18) لهذا الغرض. |
 | **Commit** | `c535d79` (تطبيق) + `7081522` (توثيق) |
 
-#### 0.16.1.8 AZ-0.3 — Tenant-Admin Authorization Enforcement 🔴
+#### 0.16.1.8 AZ-0.3 — Tenant-Admin Authorization Enforcement 🟢
 
 | البند | التفاصيل |
 |-------|----------|
-| **الحالة** | 🟡 **قيد التنفيذ** |
+| **الحالة** | 🟢 **مكتمل** |
 | **السبب الجذري** | تستخدم 80+ نقطة نهاية API فقط `require_tenant_context()` للتحقق من سياق المستأجر دون أي تحقق من مصادقة المستخدم أو صلاحياته. هذا يعني أن أي شخص يعرف `X-Tenant-ID` (public_id أو slug المستأجر — وهو معرف غير سري) يمكنه قراءة وكتابة بيانات المستأجر. |
 | **المنهج** | لا يتم استبدال `require_tenant_context()` بشكل آلي. يتم تحليل كل نقطة نهاية وتصنيفها حسب نوع المتصل المقصود، ثم تطبيق الحارس المناسب. الحارس المعياري للمشروع هو `require_tenant_admin()` الموجود بالفعل في `core/middleware.py:183`، والذي يتحقق من: `g.tenant_id` موجود، `g.user` موجود، والمستخدم إما platform admin أو tenant admin لنفس المستأجر. |
 | **مصفوفة الجرد الكاملة** | انظر الجدول الموسع أدناه |

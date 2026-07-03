@@ -2,11 +2,44 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
+import time
+
 from support.http import auth_headers, tenant_headers
 
 from auth.auth_service import AuthService
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant_svc.tenant_service import TenantService
+
+WEBHOOK_SECRET = "whsec_test_paypal"
+
+
+def _paypal_headers(raw: bytes) -> dict[str, str]:
+    ts = int(time.time())
+    body_str = raw.decode("utf-8")
+    signed_parts = [str(ts), ts, "webhook_id", body_str]
+    signed_str = "|".join(str(p) for p in signed_parts)
+    sig = hmac.new(
+        WEBHOOK_SECRET.encode("utf-8"),
+        signed_str.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return {
+        "Content-Type": "application/json",
+        "PAYPAL-TRANSMIT-ID": str(ts),
+        "PAYPAL-TRANSMIT-TIME": str(ts),
+        "PAYPAL-WEBHOOK-ID": "webhook_id",
+        "PAYPAL-AUTH-ALGO": "HMAC-SHA256",
+        "PAYPAL-CERT-URL": "https://example.com/cert",
+        "PAYPAL-TRANSMIT-SIG": sig,
+    }
+
+
+def _hmac_signature(raw: bytes) -> str:
+    return hmac.new(
+        WEBHOOK_SECRET.encode("utf-8"), raw, hashlib.sha256
+    ).hexdigest()
 
 
 def test_paypal_connect_and_payment_methods(client, app):
@@ -75,17 +108,32 @@ def test_bnpl_provider_upsert(client, app):
 
 
 def test_paypal_webhook(client, app):
+    app.config["WEBHOOK_SECRET"] = WEBHOOK_SECRET
+    tenant = TenantService().create_tenant(
+        name="PP WH", slug="pp-wh", email="ppwh@test.com"
+    )
+    raw = b'{"event_type":"PAYMENT.CAPTURE.COMPLETED"}'
     res = client.post(
-        "/webhooks/paypal/1",
-        json={"event_type": "PAYMENT.CAPTURE.COMPLETED"},
+        f"/webhooks/paypal/{tenant.id}",
+        data=raw,
+        content_type="application/json",
+        headers=_paypal_headers(raw),
     )
     assert res.status_code == 200
     assert res.get_json()["received"] is True
 
 
 def test_bnpl_webhook(client, app):
+    app.config["WEBHOOK_SECRET"] = WEBHOOK_SECRET
+    tenant = TenantService().create_tenant(
+        name="BNPL WH", slug="bnpl-wh", email="bnplwh@test.com"
+    )
+    raw = b'{"status":"captured"}'
+    sig = _hmac_signature(raw)
     res = client.post(
-        "/webhooks/bnpl/tabby/1",
-        json={"status": "captured"},
+        f"/webhooks/bnpl/tabby/{tenant.id}",
+        data=raw,
+        content_type="application/json",
+        headers={"X-Webhook-Signature": sig},
     )
     assert res.status_code == 200

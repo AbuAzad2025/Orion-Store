@@ -70,6 +70,8 @@ class Config:
         "true",
         "yes",
     )
+    WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET", "")
+    WEBHOOK_MAX_AGE_SECONDS = int(os.environ.get("WEBHOOK_MAX_AGE_SECONDS", "300"))
 
 
 class DevelopmentConfig(Config):
