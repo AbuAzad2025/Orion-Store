@@ -401,6 +401,136 @@ class TestLiveChat:
         assert resp.status_code == 201
 
 
+class TestAccessibility:
+    BASE = "/api/v1/accessibility"
+
+    def test_list_audits_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/audits", headers=no_auth))
+
+    def test_list_audits_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/audits", headers=admin)
+        assert resp.status_code == 200
+
+
+class TestBopis:
+    BASE = "/api/v1/bopis"
+
+    def test_list_locations_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/locations", headers=no_auth))
+
+    def test_list_locations_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/locations", headers=admin)
+        assert resp.status_code == 200
+
+
+class TestBundles:
+    BASE = "/api/v1/bundles"
+
+    def test_list_bundles_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(self.BASE, headers=no_auth))
+
+    def test_list_bundles_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(self.BASE, headers=admin)
+        assert resp.status_code == 200
+
+
+class TestImportExport:
+    BASE = "/api/v1/import-export"
+
+    def test_list_jobs_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/jobs", headers=no_auth))
+
+    def test_list_jobs_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/jobs", headers=admin)
+        assert resp.status_code == 200
+
+
+class TestMetafields:
+    BASE = "/api/v1/metafields"
+
+    def test_list_definitions_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/definitions", headers=no_auth))
+
+    def test_list_definitions_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/definitions", headers=admin)
+        assert resp.status_code == 200
+
+
+class TestOmsExtensions:
+    BASE = "/api/v1/oms-ext"
+
+    def test_list_warehouses_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/warehouses", headers=no_auth))
+
+    def test_list_warehouses_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/warehouses", headers=admin)
+        assert resp.status_code == 200
+
+
+class TestSchemaMarkup:
+    BASE = "/api/v1/schema-markup"
+
+    def test_list_markups_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(self.BASE, headers=no_auth))
+
+    def test_list_markups_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(self.BASE, headers=admin)
+        assert resp.status_code == 200
+
+
+class TestSearchMerchandising:
+    BASE = "/api/v1/search"
+
+    def test_list_synonyms_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/synonyms", headers=no_auth))
+
+    def test_list_synonyms_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/synonyms", headers=admin)
+        assert resp.status_code == 200
+
+
+class TestTax:
+    BASE = "/api/v1/tax"
+
+    def test_list_jurisdictions_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/jurisdictions", headers=no_auth))
+
+    def test_list_jurisdictions_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/jurisdictions", headers=admin)
+        assert resp.status_code == 200
+
+
+class TestWorkflow:
+    BASE = "/api/v1/workflow"
+
+    def test_list_runs_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.get(f"{self.BASE}/runs", headers=no_auth))
+
+    def test_list_runs_allows_admin(self, client, setup):
+        _, admin, _, _, _ = setup
+        resp = client.get(f"{self.BASE}/runs", headers=admin)
+        assert resp.status_code == 200
+
+
 class TestCrossTenantIsolation:
     """Batch 1 endpoints must not leak cross-tenant data."""
 

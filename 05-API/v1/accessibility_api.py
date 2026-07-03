@@ -1,8 +1,8 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
 
 from accessibility_svc.accessibility_service import AccessibilityService
 from core.exceptions import OrionError
-from core.middleware import require_tenant_context
+from core.middleware import require_tenant_admin
 
 accessibility_bp = Blueprint("accessibility", __name__)
 _svc = AccessibilityService()
@@ -11,8 +11,8 @@ _svc = AccessibilityService()
 @accessibility_bp.route("/audits", methods=["GET"])
 def list_audits():
     try:
-        tenant = require_tenant_context()
-        audits = _svc.list_audits(tenant.id)
+        require_tenant_admin()
+        audits = _svc.list_audits(g.tenant_id)
         return jsonify({"audits": [a.to_dict() for a in audits]}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
@@ -21,10 +21,10 @@ def list_audits():
 @accessibility_bp.route("/audits", methods=["POST"])
 def record_audit():
     try:
-        tenant = require_tenant_context()
+        require_tenant_admin()
         data = request.get_json(silent=True) or {}
         audit = _svc.record_audit(
-            tenant_id=tenant.id, page_url=data["page_url"],
+            tenant_id=g.tenant_id, page_url=data["page_url"],
             score=int(data["score"]), issues=data.get("issues"),
         )
         return jsonify({"audit": audit.to_dict()}), 201
