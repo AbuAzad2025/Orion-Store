@@ -2,7 +2,7 @@ from flask import Blueprint, g, jsonify, request
 
 from audit_svc.audit_v2_service import AuditV2Service
 from core.exceptions import OrionError
-from core.middleware import require_platform_admin, require_tenant_context
+from core.middleware import require_platform_admin
 
 audit_bp = Blueprint("audit", __name__)
 _svc = AuditV2Service()
@@ -47,7 +47,7 @@ def list_logs():
 @audit_bp.route("/logs", methods=["POST"])
 def log_action():
     try:
-        require_tenant_context()
+        require_platform_admin()
         data = request.get_json(silent=True) or {}
         log = _svc.log_action(
             user_id=int(data["user_id"]), action=data["action"],

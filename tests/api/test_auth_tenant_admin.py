@@ -531,6 +531,25 @@ class TestWorkflow:
         assert resp.status_code == 200
 
 
+class TestAudit:
+    BASE = "/api/v1/audit"
+
+    def test_log_action_denies_anonymous(self, client, setup):
+        _, _, _, _, no_auth = setup
+        _assert_denied(client.post(f"{self.BASE}/logs", headers=no_auth, json={"user_id": 1, "action": "test"}))
+
+    def test_log_action_allows_platform_admin(self, client, app, setup):
+        from auth.auth_service import AuthService
+        from platform_svc.platform_settings_service import PlatformSettingsService
+        PlatformSettingsService().ensure_seeded()
+        platform_admin = AuthService().register_super_admin(
+            email="pa@test.com", password="password123",
+        )
+        pa_headers = auth_headers(platform_admin, app=app)
+        resp = client.post(f"{self.BASE}/logs", headers=pa_headers, json={"user_id": 1, "action": "test_action"})
+        assert resp.status_code == 201
+
+
 class TestCrossTenantIsolation:
     """Batch 1 endpoints must not leak cross-tenant data."""
 
