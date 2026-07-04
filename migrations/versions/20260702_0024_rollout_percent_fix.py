@@ -10,10 +10,14 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        "feature_flags",
-        sa.Column("rollout_percent", sa.Integer(), server_default=sa.text("100"), nullable=False),
-    )
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    columns = [col["name"] for col in inspector.get_columns("feature_flags")]
+    if "rollout_percent" not in columns:
+        op.add_column(
+            "feature_flags",
+            sa.Column("rollout_percent", sa.Integer(), server_default=sa.text("100"), nullable=False),
+        )
 
 
 def downgrade() -> None:
