@@ -1,9 +1,9 @@
 from flask import Blueprint, g, jsonify, request
+from gift.gift_registry import GiftRegistry
+from gift_svc.gift_registry_service import GiftRegistryService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from gift.gift_registry import GiftRegistry
-from gift_svc.gift_registry_service import GiftRegistryService
 
 gift_registries_bp = Blueprint("gift_registries", __name__)
 _svc = GiftRegistryService()

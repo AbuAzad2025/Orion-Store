@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 
 from audit.audit_v2 import PlatformAdminAuditLog, PlatformAuditReport
+
 from orion.extensions import db
 
 

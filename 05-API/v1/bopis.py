@@ -1,6 +1,6 @@
+from bopis_svc.bopis_service import BopisService
 from flask import Blueprint, g, jsonify, request
 
-from bopis_svc.bopis_service import BopisService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
 

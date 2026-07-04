@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from core.exceptions import NotFoundError
 from dropship.dropship import DropshipOrder, DropshipSupplier, PodConnection
+
+from core.exceptions import NotFoundError
 from orion.extensions import db
 
 

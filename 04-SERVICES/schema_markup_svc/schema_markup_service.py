@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from schema_markup.schema_markup import ProductSchemaMarkup
+
 from core.exceptions import NotFoundError
 from orion.extensions import db
-from schema_markup.schema_markup import ProductSchemaMarkup
 
 
 class SchemaMarkupService:

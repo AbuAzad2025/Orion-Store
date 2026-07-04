@@ -1,9 +1,9 @@
 from flask import Blueprint, g, jsonify, request
+from live_chat.live_chat import LiveChatSession
+from live_chat_svc.live_chat_service import LiveChatService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from live_chat.live_chat import LiveChatSession
-from live_chat_svc.live_chat_service import LiveChatService
 
 live_chat_bp = Blueprint("live_chat", __name__)
 _svc = LiveChatService()

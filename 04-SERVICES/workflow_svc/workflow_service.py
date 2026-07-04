@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from workflow.workflow import WorkflowDefinition, WorkflowRun
+
 from core.exceptions import NotFoundError
 from orion.extensions import db
-from workflow.workflow import WorkflowDefinition, WorkflowRun
 
 
 class WorkflowService:

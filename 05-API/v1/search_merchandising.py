@@ -1,9 +1,9 @@
 from flask import Blueprint, g, jsonify, request
+from search.search import SearchBoostRule, SearchRedirect
+from search_svc.search_merchandising_service import SearchMerchandisingService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from search.search import SearchBoostRule, SearchRedirect
-from search_svc.search_merchandising_service import SearchMerchandisingService
 
 search_bp = Blueprint("search", __name__)
 _svc = SearchMerchandisingService()

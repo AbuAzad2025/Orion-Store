@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from core.exceptions import NotFoundError
 from metafield.metafield import Metafield, MetafieldDefinition
+
+from core.exceptions import NotFoundError
 from orion.extensions import db
 
 

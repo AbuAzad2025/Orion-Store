@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from stock_notification.stock_notification import StockNotification
+
 from core.exceptions import NotFoundError
 from orion.extensions import db
-from stock_notification.stock_notification import StockNotification
 
 
 class StockNotificationService:

@@ -1,6 +1,6 @@
+from audit_svc.audit_v2_service import AuditV2Service
 from flask import Blueprint, g, jsonify, request
 
-from audit_svc.audit_v2_service import AuditV2Service
 from core.exceptions import OrionError
 from core.middleware import require_platform_admin
 

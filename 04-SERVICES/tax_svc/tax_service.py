@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from tax.tax import TaxJurisdiction, TaxNexusRule, TaxRate
+
 from core.exceptions import NotFoundError
 from orion.extensions import db
-from tax.tax import TaxJurisdiction, TaxNexusRule, TaxRate
 
 
 class TaxService:

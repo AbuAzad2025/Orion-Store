@@ -3,9 +3,10 @@ from __future__ import annotations
 import uuid
 from decimal import Decimal
 
+from draft_order.draft_order import DraftOrder, DraftOrderItem
+
 from catalog.product import Product
 from core.exceptions import NotFoundError, ValidationError
-from draft_order.draft_order import DraftOrder, DraftOrderItem
 from order.order import Order, OrderEvent, OrderItem
 from orion.extensions import db
 

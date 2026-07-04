@@ -8,6 +8,7 @@ from app_platform.app_platform import (
     OAuthApplication,
     SandboxStore,
 )
+
 from core.exceptions import NotFoundError, ValidationError
 from orion.extensions import db
 

@@ -1,10 +1,11 @@
+from decimal import Decimal
+
+from currency.currency_rate import CurrencyRate
+from currency_svc.currency_service import CurrencyService
 from flask import Blueprint, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_platform_admin
-from currency.currency_rate import CurrencyRate
-from currency_svc.currency_service import CurrencyService
-from decimal import Decimal
 
 currency_bp = Blueprint("currency", __name__)
 _svc = CurrencyService()

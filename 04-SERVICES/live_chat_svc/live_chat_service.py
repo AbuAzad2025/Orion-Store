@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import uuid
 
-from core.exceptions import NotFoundError
 from live_chat.live_chat import LiveChatMessage, LiveChatSession
+
+from core.exceptions import NotFoundError
 from orion.extensions import db
 
 

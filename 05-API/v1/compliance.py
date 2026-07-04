@@ -1,11 +1,11 @@
-from flask import Blueprint, g, jsonify, request
-
 from compliance.compliance import (
     ConsentRecord,
     CookieConsentSetting,
     DataSubjectRequest,
 )
 from compliance_svc.compliance_service import ComplianceService
+from flask import Blueprint, g, jsonify, request
+
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
 

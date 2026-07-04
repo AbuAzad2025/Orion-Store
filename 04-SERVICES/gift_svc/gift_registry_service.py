@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import uuid
 
-from core.exceptions import NotFoundError
 from gift.gift_registry import GiftRegistry, GiftRegistryItem
+
+from core.exceptions import NotFoundError
 from orion.extensions import db
 
 

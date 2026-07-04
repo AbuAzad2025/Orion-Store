@@ -1,7 +1,7 @@
-from flask import Blueprint, g, jsonify, request
-
 from app_platform.app_platform import OAuthApplication, SandboxStore
 from app_platform_svc.app_platform_service import AppPlatformService
+from flask import Blueprint, g, jsonify, request
+
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
 

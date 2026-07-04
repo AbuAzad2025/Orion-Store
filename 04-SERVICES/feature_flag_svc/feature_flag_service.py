@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import hashlib
 
-from core.exceptions import NotFoundError
 from feature_flag.feature_flag import FeatureFlag, TenantFeatureFlagOverride
 from feature_flag.feature_flag_override import FeatureFlagOverride
+
+from core.exceptions import NotFoundError
 from orion.extensions import db
 
 

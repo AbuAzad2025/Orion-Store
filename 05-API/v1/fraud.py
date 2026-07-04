@@ -1,8 +1,8 @@
 from flask import Blueprint, g, jsonify, request
+from fraud_svc.fraud_service import FraudService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from fraud_svc.fraud_service import FraudService
 
 fraud_bp = Blueprint("fraud", __name__)
 _svc = FraudService()

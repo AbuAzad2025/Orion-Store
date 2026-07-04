@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from store_credit.store_credit import StoreCredit, StoreCreditTransaction
+
 from core.exceptions import NotFoundError, ValidationError
 from core.utils import utc_now
 from orion.extensions import db
-from store_credit.store_credit import StoreCredit, StoreCreditTransaction
 
 
 class StoreCreditService:

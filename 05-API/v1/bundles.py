@@ -1,6 +1,6 @@
+from bundle_svc.bundle_service import BundleService
 from flask import Blueprint, g, jsonify, request
 
-from bundle_svc.bundle_service import BundleService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
 

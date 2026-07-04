@@ -1,6 +1,6 @@
+from accessibility_svc.accessibility_service import AccessibilityService
 from flask import Blueprint, g, jsonify, request
 
-from accessibility_svc.accessibility_service import AccessibilityService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
 

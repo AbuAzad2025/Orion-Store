@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
+from webhook_svc.verification_service import WebhookVerificationService
 
 from core.exceptions import OrionError
-from webhook_svc.verification_service import WebhookVerificationService
 
 webhooks_bp = Blueprint("webhooks", __name__)
 _svc = WebhookVerificationService()

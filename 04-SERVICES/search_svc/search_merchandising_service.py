@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from search.search import SearchBoostRule, SearchRedirect, SearchSynonym
+
 from core.exceptions import NotFoundError
 from orion.extensions import db
-from search.search import SearchBoostRule, SearchRedirect, SearchSynonym
 
 
 class SearchMerchandisingService:

@@ -1,9 +1,9 @@
+from dropship.dropship import DropshipOrder, DropshipSupplier, PodConnection
+from dropship_svc.dropship_service import DropshipService
 from flask import Blueprint, g, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from dropship.dropship import DropshipOrder, DropshipSupplier, PodConnection
-from dropship_svc.dropship_service import DropshipService
 
 dropship_bp = Blueprint("dropship", __name__)
 _svc = DropshipService()

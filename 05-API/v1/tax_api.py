@@ -1,8 +1,8 @@
 from flask import Blueprint, g, jsonify, request
+from tax_svc.tax_service import TaxService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from tax_svc.tax_service import TaxService
 
 tax_bp = Blueprint("tax", __name__)
 _svc = TaxService()

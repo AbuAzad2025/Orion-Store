@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from currency.currency_rate import CurrencyRate
+
 from orion.extensions import db
 
 

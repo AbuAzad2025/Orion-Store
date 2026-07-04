@@ -1,8 +1,8 @@
 from flask import Blueprint, g, jsonify, request
+from subscription_svc.subscription_service import SubscriptionService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin, require_tenant_context
-from subscription_svc.subscription_service import SubscriptionService
 
 subscriptions_bp = Blueprint("subscriptions", __name__)
 _svc = SubscriptionService()

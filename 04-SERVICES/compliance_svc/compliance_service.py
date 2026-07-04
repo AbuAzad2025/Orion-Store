@@ -6,6 +6,7 @@ from compliance.compliance import (
     DataSubjectRequest,
     SsoProvider,
 )
+
 from core.exceptions import NotFoundError
 from orion.extensions import db
 

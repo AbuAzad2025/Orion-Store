@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from bundle.bundle import BundleItem, ProductBundle
+
 from catalog.product import Product
 from core.exceptions import NotFoundError
 from orion.extensions import db

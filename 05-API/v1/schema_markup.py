@@ -1,9 +1,9 @@
 from flask import Blueprint, g, jsonify, request
+from schema_markup.schema_markup import ProductSchemaMarkup
+from schema_markup_svc.schema_markup_service import SchemaMarkupService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from schema_markup.schema_markup import ProductSchemaMarkup
-from schema_markup_svc.schema_markup_service import SchemaMarkupService
 
 schema_markup_bp = Blueprint("schema_markup", __name__)
 _svc = SchemaMarkupService()

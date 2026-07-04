@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from bopis.bopis import PickupLocation, PickupSlot
+
 from core.exceptions import NotFoundError, ValidationError
 from orion.extensions import db
 

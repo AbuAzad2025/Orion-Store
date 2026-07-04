@@ -9,6 +9,7 @@ from affiliate.affiliate import (
     AffiliateLink,
     AffiliateProgram,
 )
+
 from core.exceptions import NotFoundError
 from orion.extensions import db
 

@@ -1,9 +1,9 @@
 from flask import Blueprint, g, jsonify, request
+from metafield.metafield import MetafieldDefinition
+from metafield_svc.metafield_service import MetafieldService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from metafield.metafield import MetafieldDefinition
-from metafield_svc.metafield_service import MetafieldService
 
 metafields_bp = Blueprint("metafields", __name__)
 _svc = MetafieldService()

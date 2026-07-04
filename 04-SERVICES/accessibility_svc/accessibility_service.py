@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from accessibility.accessibility import AccessibilityAudit
+
 from orion.extensions import db
 
 

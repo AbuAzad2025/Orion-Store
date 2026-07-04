@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
+from stock_notification_svc.stock_notification_service import StockNotificationService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_context
-from stock_notification_svc.stock_notification_service import StockNotificationService
 
 stock_notifications_bp = Blueprint("stock_notifications", __name__)
 _svc = StockNotificationService()

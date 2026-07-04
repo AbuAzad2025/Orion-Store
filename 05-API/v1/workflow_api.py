@@ -1,9 +1,9 @@
 from flask import Blueprint, g, jsonify, request
+from workflow.workflow import WorkflowRun
+from workflow_svc.workflow_service import WorkflowService
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from workflow.workflow import WorkflowRun
-from workflow_svc.workflow_service import WorkflowService
 
 workflow_bp = Blueprint("workflow", __name__)
 _svc = WorkflowService()

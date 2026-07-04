@@ -1,7 +1,7 @@
-from flask import Blueprint, g, jsonify, request
-
 from affiliate.affiliate import Affiliate, AffiliateCommission, AffiliateProgram
 from affiliate_svc.affiliate_service import AffiliateService
+from flask import Blueprint, g, jsonify, request
+
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
 
