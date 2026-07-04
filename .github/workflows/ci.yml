@@ -1,5 +1,3 @@
-# Node.js 24-native action majors (GitHub deprecation of Node 20 — Sep 2025).
-# See: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
 name: CI
 
 on:
@@ -48,16 +46,16 @@ jobs:
     needs: lint
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:15-alpine
         env:
-          POSTGRES_USER: azadexa
-          POSTGRES_PASSWORD: azadexa_test
-          POSTGRES_DB: azadexa_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: "123"
+          POSTGRES_DB: orion_test_db
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U azadexa -d azadexa_test"
-          --health-interval 5s
+          --health-cmd "pg_isready -U postgres -d orion_test_db"
+          --health-interval 10s
           --health-timeout 5s
           --health-retries 10
     steps:
@@ -71,11 +69,35 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
 
+      - name: Bootstrap PostgreSQL schema
+        env:
+          DATABASE_URL: postgresql://postgres:123@localhost:5432/orion_test_db
+          TEST_DATABASE_URL: postgresql://postgres:123@localhost:5432/orion_test_db
+        run: |-
+          python - << 'PY'
+          import os
+          import sys
+          os.environ['DATABASE_URL'] = 'postgresql://postgres:123@localhost:5432/orion_test_db'
+          os.environ['TEST_DATABASE_URL'] = 'postgresql://postgres:123@localhost:5432/orion_test_db'
+          os.environ.setdefault('FLASK_ENV', 'testing')
+          ROOT = os.path.abspath('.')
+          for p in [ROOT, os.path.join(ROOT, '02-CORE'), os.path.join(ROOT, '03-MODELS'), os.path.join(ROOT, '04-SERVICES'), os.path.join(ROOT, '05-API'), os.path.join(ROOT, '06-STOREFRONT'), os.path.join(ROOT, '07-ADMIN')]:
+              if p not in sys.path:
+                  sys.path.insert(0, p)
+          from orion.app import create_app
+          from flask_migrate import upgrade
+          app = create_app('testing')
+          with app.app_context():
+              upgrade()
+              print('MIGRATION_OK')
+          PY
+
       - name: Pytest with PostgreSQL and coverage gate
         env:
           FLASK_ENV: testing
-          DATABASE_URL: postgresql://azadexa:azadexa_test@localhost:5432/azadexa_test
-        run: |
+          DATABASE_URL: postgresql://postgres:123@localhost:5432/orion_test_db
+          TEST_DATABASE_URL: postgresql://postgres:123@localhost:5432/orion_test_db
+        run: |-
           export ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
           pytest -v -m "not external" \
             --cov \
@@ -114,7 +136,7 @@ jobs:
           name: coverage-reports
 
       - name: Enforce coverage manifest
-        run: |
+        run: |-
           ARGS="--coverage-json coverage.json"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git fetch origin ${{ github.base_ref }} --depth=1
