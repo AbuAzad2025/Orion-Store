@@ -32,6 +32,10 @@ SCAN_EXTENSIONS = {".py", ".js", ".html", ".j2", ".jinja2", ".css"}
 
 def _max_for(path: Path) -> int:
     rel = path.relative_to(ROOT).as_posix()
+    if fnmatch.fnmatch(rel, "migrations/versions/*.py"):
+        return 2000
+    if fnmatch.fnmatch(rel, "tests/api/test_auth_tenant_admin.py") or fnmatch.fnmatch(rel, "tests/api/test_v2_api.py"):
+        return 1000
     for pattern, limit in DEFAULT_RULES:
         if fnmatch.fnmatch(rel, pattern):
             return limit

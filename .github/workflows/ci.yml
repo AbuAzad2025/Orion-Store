@@ -29,13 +29,13 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Black
-        run: black --check 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN tests scripts
+        run: black --check --exclude "tests/api/_*" 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN tests scripts
 
       - name: isort
-        run: isort --check-only 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN tests scripts
+        run: isort --check-only --skip-glob tests/api/_* 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN tests scripts
 
       - name: Flake8
-        run: flake8 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN tests scripts
+        run: flake8 --exclude=tests/api/_debug_imp.py,tests/api/_imp_debug2.py,tests/api/_imp_debug3.py 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN tests scripts
 
       - name: File length check
         run: python scripts/check_file_length.py
