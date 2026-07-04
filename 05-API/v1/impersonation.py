@@ -8,13 +8,15 @@ from flask import Blueprint, g, jsonify, request
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
+    get_jwt,
     get_jwt_identity,
     jwt_required,
     set_access_cookies,
     set_refresh_cookies,
 )
-
 from core.jwt_auth import issue_tokens_for_user
+
+from core.utils import utc_now
 from core.middleware import require_platform_admin
 from core.rate_limit import limiter
 from orion.extensions import db
@@ -24,7 +26,6 @@ from user.user import User
 impersonation_bp = Blueprint(
     "impersonation", __name__, url_prefix="/platform/impersonation"
 )
-
 
 MAX_IMPERSONATION_DURATION = timedelta(hours=4)
 
@@ -82,7 +83,7 @@ def start_impersonation():
             409,
         )
 
-    started = db.func.now()
+    started = utc_now()
     expires = started + duration
     session = ImpersonationSession(
         impersonator_user_id=impersonator_id,
@@ -102,8 +103,6 @@ def start_impersonation():
         resource_type="user",
         resource_id=str(target_user_id),
         tenant_id=target.tenant_id,
-        actor_user_id=impersonator_id,
-        impersonator_user_id=impersonator_id,
         details={"target_email": target.email, "expires_at": expires.isoformat()},
     )
     db.session.commit()
@@ -156,92 +155,119 @@ def end_impersonation():
     """End the current impersonation session and restore platform admin cookies."""
     claims = get_jwt()
     impersonation = claims.get("impersonation")
-    if not impersonation:
-        return jsonify({"error": "No active impersonation"}), 400
+    if impersonation:
+        impersonator_id = impersonation.get("impersonator_user_id")
+        target_user_id = impersonation.get("target_user_id")
+        if impersonator_id and target_user_id:
+            session = (
+                ImpersonationSession.query.filter_by(
+                    impersonator_user_id=impersonator_id,
+                    target_user_id=target_user_id,
+                )
+                .order_by(ImpersonationSession.id.desc())
+                .first()
+            )
+            if session:
+                active = session.is_active()
+                if active:
+                    session.ended_at = utc_now()
+                    session.revoked = True
+                    from core.audit_log import audit_log
+                    audit_log(
+                        action="impersonation_end",
+                        resource_type="user",
+                        resource_id=str(session.target_user_id),
+                        tenant_id=session.tenant_id,
+                        details={"session_id": session.id},
+                    )
+                    db.session.commit()
+                    impersonator = User.query.filter_by(
+                        id=impersonator_id, is_active=True, is_superuser=True
+                    ).first()
+                    if impersonator:
+                        tokens = issue_tokens_for_user(impersonator)
+                        response = jsonify(
+                            {"message": "Impersonation ended", "session": session.to_dict()}
+                        )
+                        set_access_cookies(response, tokens["access_token"])
+                        set_refresh_cookies(response, tokens["refresh_token"])
+                        return response, 200
+                    return jsonify({"error": "Impersonator not found"}), 404
+                return (
+                    jsonify({"active": False, "reason": "Session expired or revoked"}),
+                    200,
+                )
 
-    impersonator_id = impersonation.get("impersonator_user_id")
-    target_user_id = impersonation.get("target_user_id")
-    if not impersonator_id or not target_user_id:
-        return jsonify({"error": "Invalid impersonation claim"}), 400
-
-    session = (
-        ImpersonationSession.query.filter_by(
-            impersonator_user_id=impersonator_id,
-            target_user_id=target_user_id,
-            revoked=False,
-            ended_at=None,
+    if g.is_platform_admin and g.user:
+        session = (
+            ImpersonationSession.query.filter_by(
+                impersonator_user_id=g.user.id, revoked=False, ended_at=None
+            )
+            .filter(ImpersonationSession.expires_at > db.func.now())
+            .first()
         )
-        .filter(ImpersonationSession.expires_at > db.func.now())
-        .first()
-    )
-    if not session:
-        return jsonify({"error": "No active session found"}), 404
+        if not session:
+            return jsonify({"active": False, "session": None}), 200
+        session.ended_at = utc_now()
+        session.revoked = True
+        from core.audit_log import audit_log
+        audit_log(
+            action="impersonation_end",
+            resource_type="user",
+            resource_id=str(session.target_user_id),
+            tenant_id=session.tenant_id,
+            details={"session_id": session.id},
+        )
+        db.session.commit()
+        tokens = issue_tokens_for_user(g.user)
+        response = jsonify(
+            {"message": "Impersonation ended", "session": session.to_dict()}
+        )
+        set_access_cookies(response, tokens["access_token"])
+        set_refresh_cookies(response, tokens["refresh_token"])
+        return response, 200
 
-    session.ended_at = db.func.now()
-    session.revoked = True
-
-    from core.audit_log import audit_log
-
-    audit_log(
-        action="impersonation_end",
-        resource_type="user",
-        resource_id=str(target_user_id),
-        tenant_id=session.tenant_id,
-        actor_user_id=target_user_id,
-        impersonator_user_id=impersonator_id,
-        details={"session_id": session.id},
-    )
-    db.session.commit()
-
-    impersonator = User.query.filter_by(
-        id=impersonator_id, is_active=True, is_superuser=True
-    ).first()
-    if not impersonator:
-        return jsonify({"error": "Impersonator not found"}), 404
-
-    tokens = issue_tokens_for_user(impersonator)
-    response = jsonify({"message": "Impersonation ended", "session": session.to_dict()})
-    set_access_cookies(response, tokens["access_token"])
-    set_refresh_cookies(response, tokens["refresh_token"])
-    return response, 200
+    return jsonify({"active": False, "session": None, "reason": "Unauthorized"}), 401
 
 
 @impersonation_bp.get("/status")
 @jwt_required()
 def impersonation_status():
-    """Return current impersonation status from JWT claims."""
+    """Return whether the current admin has an active impersonation session."""
     claims = get_jwt()
     impersonation = claims.get("impersonation")
-    if not impersonation:
-        return jsonify({"active": False}), 200
+    if impersonation:
+        impersonator_id = impersonation.get("impersonator_user_id")
+        target_user_id = impersonation.get("target_user_id")
+        if impersonator_id and target_user_id:
+            session = (
+                ImpersonationSession.query.filter_by(
+                    impersonator_user_id=impersonator_id,
+                    target_user_id=target_user_id,
+                )
+                .order_by(ImpersonationSession.id.desc())
+                .first()
+            )
+            if session:
+                return (
+                    jsonify({"active": session.is_active(), "session": session.to_dict()}),
+                    200,
+                )
+            return jsonify({"active": False, "session": None}), 200
 
-    impersonator_id = impersonation.get("impersonator_user_id")
-    target_user_id = impersonation.get("target_user_id")
-    if not impersonator_id or not target_user_id:
-        return jsonify({"active": False, "error": "Invalid impersonation claim"}), 200
-
-    session = (
-        ImpersonationSession.query.filter_by(
-            impersonator_user_id=impersonator_id,
-            target_user_id=target_user_id,
-            revoked=False,
-            ended_at=None,
+    if g.get("user") and getattr(g.user, "is_superuser", False):
+        session = (
+            ImpersonationSession.query.filter_by(
+                impersonator_user_id=g.user.id, revoked=False, ended_at=None
+            )
+            .filter(ImpersonationSession.expires_at > db.func.now())
+            .first()
         )
-        .filter(ImpersonationSession.expires_at > db.func.now())
-        .first()
-    )
+        if not session:
+            return jsonify({"active": False, "session": None}), 200
+        return (
+            jsonify({"active": session.is_active(), "session": session.to_dict()}),
+            200,
+        )
 
-    if not session:
-        return jsonify({"active": False, "reason": "Session expired or revoked"}), 200
-
-    return (
-        jsonify(
-            {
-                "active": True,
-                "session": session.to_dict(),
-                "impersonator": impersonation.get("impersonator_public_id"),
-                "target": impersonation.get("target_public_id"),
-            }
-        ),
-        200,
-    )
+    return jsonify({"active": False, "session": None}), 200

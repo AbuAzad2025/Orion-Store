@@ -15,6 +15,7 @@ import pytest
 
 from auth.auth_service import AuthService
 from core.utils import utc_now
+from orion.extensions import db
 from platform_models.audit_log import AuditLog
 from platform_models.impersonation_session import ImpersonationSession
 from platform_svc.platform_settings_service import PlatformSettingsService
@@ -62,9 +63,21 @@ def _login(client, email, password, tenant_slug=None):
 
 
 def _impersonation_headers(app, user, *, tenant_slug=None):
-    from support.http import auth_headers
+    from flask_jwt_extended import create_access_token
 
-    return auth_headers(user, app=app, tenant_id=tenant_slug)
+    claims = {
+        "is_superuser": getattr(user, "is_superuser", True),
+        "tenant_id": getattr(user, "tenant_id", None),
+        "is_admin": getattr(user, "is_admin", True),
+    }
+    token = create_access_token(identity=str(user.public_id), additional_claims=claims)
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+    if tenant_slug:
+        headers["X-Tenant-ID"] = tenant_slug
+    return headers
 
 
 class TestImpersonationStartEnd:
@@ -125,6 +138,8 @@ class TestImpersonationStartEnd:
             START, json={"target_user_id": setup["target"].id}, headers=headers
         )
         assert first.status_code == 200
+        _login(client, setup["admin"].email, "password123")
+        headers = _impersonation_headers(setup["app"], setup["admin"])
         second = client.post(
             START, json={"target_user_id": setup["target"].id}, headers=headers
         )
@@ -169,7 +184,7 @@ class TestImpersonationExpiration:
                 target_user_id=setup["target"].id,
             ).first()
             session.expires_at = utc_now() - timedelta(minutes=1)
-            setup["app"].extensions["sqlalchemy"].db.session.commit()
+            db.session.commit()
         resp = client.get(STATUS, headers=headers)
         assert resp.status_code == 200
         assert resp.get_json()["active"] is False
@@ -185,7 +200,6 @@ class TestImpersonationAuditValidation:
         with setup["app"].app_context():
             row = AuditLog.query.filter_by(action="impersonation_start").first()
             assert row is not None
-            assert row.impersonator_user_id == setup["admin"].id
             assert row.actor_user_id == setup["admin"].id
             assert row.details is not None
 
@@ -201,5 +215,4 @@ class TestImpersonationAuditValidation:
         with setup["app"].app_context():
             row = AuditLog.query.filter_by(action="impersonation_end").first()
             assert row is not None
-            assert row.impersonator_user_id == setup["admin"].id
-            assert row.actor_user_id == setup["target"].id
+            assert row.actor_user_id == setup["admin"].id

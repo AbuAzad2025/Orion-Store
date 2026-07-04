@@ -6,6 +6,8 @@ from support.http import auth_headers
 
 from auth.auth_service import AuthService
 from catalog_svc.product_service import ProductService
+from order.order import Order
+from orion.extensions import db
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant_svc.tenant_service import TenantService
 
@@ -312,11 +314,34 @@ def test_fraud_api(client, app, setup):
     assert res.status_code == 201
     assert res.get_json()["rule"]["name"] == "High Value"
 
+    with app.app_context():
+        order = Order(
+            tenant_id=tenant.id,
+            user_id=None,
+            order_number="TEST-1",
+            status="pending",
+            payment_status="pending",
+            fulfillment_status="unfulfilled",
+            customer_email="buyer@test.com",
+            customer_first_name="Test",
+            customer_last_name="Buyer",
+            is_guest=True,
+            shipping_address={},
+            subtotal="10.00",
+            tax_amount="0",
+            shipping_cost="0",
+            discount_amount="0",
+            total="10.00",
+        )
+        db.session.add(order)
+        db.session.commit()
+        order_id = order.id
+
     res = client.post(
         "/api/v1/fraud/reviews",
         headers=headers,
         json={
-            "order_id": 1,
+            "order_id": order_id,
             "risk_score": 85,
         },
     )
