@@ -16,9 +16,7 @@ def auth_headers(
         identity = None
     if identity is None:
         raise TypeError("auth_headers expects a user object or public_id string.")
-    headers = {
-        "Authorization": f"Bearer {create_access_token(identity=str(identity))}"
-    }
+    headers = {"Authorization": f"Bearer {create_access_token(identity=str(identity))}"}
     headers["Content-Type"] = "application/json"
     if tenant_id:
         headers["X-Tenant-ID"] = tenant_id
@@ -43,6 +41,8 @@ def tenant_headers(user, *, tenant_slug: str | None = None) -> dict[str, str]:
         if slug is None and isinstance(user, str):
             slug = user
         if slug is None:
-            raise TypeError("tenant_headers expects a tenant object or `tenant_slug` keyword.")
+            raise TypeError(
+                "tenant_headers expects a tenant object or `tenant_slug` keyword."
+            )
         tenant_slug = slug
     return auth_headers(user, app=None, tenant_id=tenant_slug)

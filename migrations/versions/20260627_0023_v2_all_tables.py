@@ -47,7 +47,12 @@ def upgrade() -> None:
     if "rollout_percent" not in columns:
         op.add_column(
             "feature_flags",
-            sa.Column("rollout_percent", sa.Integer(), server_default=sa.text("100"), nullable=False),
+            sa.Column(
+                "rollout_percent",
+                sa.Integer(),
+                server_default=sa.text("100"),
+                nullable=False,
+            ),
         )
 
     # ── Tenant feature flag overrides ──
@@ -66,7 +71,11 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["set_by"], ["users.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_tenant_feature_flag_overrides_tenant_id", "tenant_feature_flag_overrides", ["tenant_id"])
+    op.create_index(
+        "ix_tenant_feature_flag_overrides_tenant_id",
+        "tenant_feature_flag_overrides",
+        ["tenant_id"],
+    )
 
     # ── Subscription plans ──
     op.create_table(
@@ -89,7 +98,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tenant_id", "code", name="uq_sub_plans_code"),
     )
-    op.create_index("ix_subscription_plans_tenant_id", "subscription_plans", ["tenant_id"])
+    op.create_index(
+        "ix_subscription_plans_tenant_id", "subscription_plans", ["tenant_id"]
+    )
     _tenant_rls("subscription_plans")
 
     # ── Customer subscriptions ──
@@ -109,13 +120,19 @@ def upgrade() -> None:
         sa.Column("cancelled_at", _TS, nullable=True),
         sa.Column("pause_resume_at", _TS, nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["plan_id"], ["subscription_plans.id"], ondelete="RESTRICT"),
+        sa.ForeignKeyConstraint(
+            ["plan_id"], ["subscription_plans.id"], ondelete="RESTRICT"
+        ),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tenant_id", "customer_email", name="uq_cust_sub_email"),
     )
-    op.create_index("ix_customer_subscriptions_tenant_id", "customer_subscriptions", ["tenant_id"])
-    op.create_index("ix_customer_subscriptions_plan_id", "customer_subscriptions", ["plan_id"])
+    op.create_index(
+        "ix_customer_subscriptions_tenant_id", "customer_subscriptions", ["tenant_id"]
+    )
+    op.create_index(
+        "ix_customer_subscriptions_plan_id", "customer_subscriptions", ["plan_id"]
+    )
     _tenant_rls("customer_subscriptions")
 
     # ── Subscription invoices ──
@@ -134,13 +151,21 @@ def upgrade() -> None:
         sa.Column("paid_at", _TS, nullable=True),
         sa.Column("payment_id", _PK, nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["subscription_id"], ["customer_subscriptions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["subscription_id"], ["customer_subscriptions.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["payment_id"], ["payments.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("invoice_number"),
     )
-    op.create_index("ix_subscription_invoices_tenant_id", "subscription_invoices", ["tenant_id"])
-    op.create_index("ix_subscription_invoices_subscription_id", "subscription_invoices", ["subscription_id"])
+    op.create_index(
+        "ix_subscription_invoices_tenant_id", "subscription_invoices", ["tenant_id"]
+    )
+    op.create_index(
+        "ix_subscription_invoices_subscription_id",
+        "subscription_invoices",
+        ["subscription_id"],
+    )
     _tenant_rls("subscription_invoices")
 
     # ── Subscription events ──
@@ -153,12 +178,20 @@ def upgrade() -> None:
         sa.Column("event_type", sa.String(50), nullable=False),
         sa.Column("message", sa.Text(), nullable=True),
         sa.Column("metadata", sa.JSON(), nullable=True),
-        sa.ForeignKeyConstraint(["subscription_id"], ["customer_subscriptions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["subscription_id"], ["customer_subscriptions.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_subscription_events_subscription_id", "subscription_events", ["subscription_id"])
-    op.create_index("ix_subscription_events_tenant_id", "subscription_events", ["tenant_id"])
+    op.create_index(
+        "ix_subscription_events_subscription_id",
+        "subscription_events",
+        ["subscription_id"],
+    )
+    op.create_index(
+        "ix_subscription_events_tenant_id", "subscription_events", ["tenant_id"]
+    )
 
     # ── Digital assets ──
     op.create_table(
@@ -194,12 +227,16 @@ def upgrade() -> None:
         sa.Column("download_count", sa.Integer(), nullable=False),
         sa.Column("expires_at", _TS, nullable=False),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["asset_id"], ["digital_assets.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["asset_id"], ["digital_assets.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["order_id"], ["orders.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("download_token"),
     )
-    op.create_index("ix_digital_downloads_tenant_id", "digital_downloads", ["tenant_id"])
+    op.create_index(
+        "ix_digital_downloads_tenant_id", "digital_downloads", ["tenant_id"]
+    )
     op.create_index("ix_digital_downloads_asset_id", "digital_downloads", ["asset_id"])
     op.create_index("ix_digital_downloads_order_id", "digital_downloads", ["order_id"])
 
@@ -217,7 +254,9 @@ def upgrade() -> None:
         sa.Column("activated_at", _TS, nullable=True),
         sa.Column("expires_at", _TS, nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["order_item_id"], ["order_items.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["order_item_id"], ["order_items.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["product_id"], ["products.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("key"),
@@ -241,10 +280,14 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("tenant_id", "customer_email", name="uq_store_credit_email"),
+        sa.UniqueConstraint(
+            "tenant_id", "customer_email", name="uq_store_credit_email"
+        ),
     )
     op.create_index("ix_store_credits_tenant_id", "store_credits", ["tenant_id"])
-    op.create_index("ix_store_credits_customer_email", "store_credits", ["customer_email"])
+    op.create_index(
+        "ix_store_credits_customer_email", "store_credits", ["customer_email"]
+    )
     _tenant_rls("store_credits")
 
     op.create_table(
@@ -259,12 +302,22 @@ def upgrade() -> None:
         sa.Column("reference_type", sa.String(50), nullable=True),
         sa.Column("reference_id", _PK, nullable=True),
         sa.Column("reason", sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(["credit_id"], ["store_credits.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["credit_id"], ["store_credits.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_store_credit_transactions_credit_id", "store_credit_transactions", ["credit_id"])
-    op.create_index("ix_store_credit_transactions_tenant_id", "store_credit_transactions", ["tenant_id"])
+    op.create_index(
+        "ix_store_credit_transactions_credit_id",
+        "store_credit_transactions",
+        ["credit_id"],
+    )
+    op.create_index(
+        "ix_store_credit_transactions_tenant_id",
+        "store_credit_transactions",
+        ["tenant_id"],
+    )
 
     # ── Draft orders ──
     op.create_table(
@@ -291,7 +344,9 @@ def upgrade() -> None:
         sa.Column("completed_at", _TS, nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="SET NULL"),
-        sa.ForeignKeyConstraint(["converted_order_id"], ["orders.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["converted_order_id"], ["orders.id"], ondelete="SET NULL"
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("draft_number"),
     )
@@ -309,13 +364,19 @@ def upgrade() -> None:
         sa.Column("unit_price", sa.Numeric(10, 2), nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=False),
         sa.Column("total_price", sa.Numeric(10, 2), nullable=False),
-        sa.ForeignKeyConstraint(["draft_order_id"], ["draft_orders.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["draft_order_id"], ["draft_orders.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["product_id"], ["products.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_draft_order_items_draft_order_id", "draft_order_items", ["draft_order_id"])
-    op.create_index("ix_draft_order_items_tenant_id", "draft_order_items", ["tenant_id"])
+    op.create_index(
+        "ix_draft_order_items_draft_order_id", "draft_order_items", ["draft_order_id"]
+    )
+    op.create_index(
+        "ix_draft_order_items_tenant_id", "draft_order_items", ["tenant_id"]
+    )
 
     # ── Tax ──
     op.create_table(
@@ -333,7 +394,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tenant_id", "code", name="uq_tax_jurisdictions"),
     )
-    op.create_index("ix_tax_jurisdictions_tenant_id", "tax_jurisdictions", ["tenant_id"])
+    op.create_index(
+        "ix_tax_jurisdictions_tenant_id", "tax_jurisdictions", ["tenant_id"]
+    )
     _tenant_rls("tax_jurisdictions")
 
     op.create_table(
@@ -347,7 +410,9 @@ def upgrade() -> None:
         sa.Column("product_tax_code", sa.String(50), nullable=True),
         sa.Column("is_compound", sa.Boolean(), nullable=False),
         sa.Column("priority", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["jurisdiction_id"], ["tax_jurisdictions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["jurisdiction_id"], ["tax_jurisdictions.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("jurisdiction_id", "product_tax_code", name="uq_tax_rates"),
@@ -366,7 +431,9 @@ def upgrade() -> None:
         sa.Column("threshold_amount", sa.Numeric(12, 2), nullable=True),
         sa.Column("threshold_transactions", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["jurisdiction_id"], ["tax_jurisdictions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["jurisdiction_id"], ["tax_jurisdictions.id"], ondelete="CASCADE"
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index("ix_tax_nexus_rules_tenant_id", "tax_nexus_rules", ["tenant_id"])
@@ -398,7 +465,9 @@ def upgrade() -> None:
         sa.Column("product_id", _PK, nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=False),
         sa.Column("discount_percent", sa.Numeric(5, 2), nullable=False),
-        sa.ForeignKeyConstraint(["bundle_id"], ["product_bundles.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["bundle_id"], ["product_bundles.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["product_id"], ["products.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -422,7 +491,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tenant_id", "owner_type", "key", name="uq_metafield_def"),
     )
-    op.create_index("ix_metafield_definitions_tenant_id", "metafield_definitions", ["tenant_id"])
+    op.create_index(
+        "ix_metafield_definitions_tenant_id", "metafield_definitions", ["tenant_id"]
+    )
     _tenant_rls("metafield_definitions")
 
     op.create_table(
@@ -436,7 +507,9 @@ def upgrade() -> None:
         sa.Column("value", sa.Text(), nullable=True),
         sa.Column("json_value", sa.JSON(), nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["definition_id"], ["metafield_definitions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["definition_id"], ["metafield_definitions.id"], ondelete="CASCADE"
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("definition_id", "owner_id", name="uq_metafield_value"),
     )
@@ -460,7 +533,9 @@ def upgrade() -> None:
         sa.Column("is_active", sa.Boolean(), nullable=False),
         sa.Column("instructions", sa.Text(), nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["warehouse_id"], ["warehouses.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["warehouse_id"], ["warehouses.id"], ondelete="SET NULL"
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tenant_id", "code", name="uq_pickup_locations"),
     )
@@ -480,7 +555,9 @@ def upgrade() -> None:
         sa.Column("max_orders", sa.Integer(), nullable=False),
         sa.Column("current_orders", sa.Integer(), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(["location_id"], ["pickup_locations.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["location_id"], ["pickup_locations.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -497,10 +574,17 @@ def upgrade() -> None:
         sa.Column("from_currency", sa.String(3), nullable=False),
         sa.Column("to_currency", sa.String(3), nullable=False),
         sa.Column("rate", sa.Numeric(12, 6), nullable=False),
-        sa.Column("rate_date", sa.Date(), server_default=sa.text("CURRENT_DATE"), nullable=False),
+        sa.Column(
+            "rate_date",
+            sa.Date(),
+            server_default=sa.text("CURRENT_DATE"),
+            nullable=False,
+        ),
         sa.Column("source", sa.String(50), nullable=False),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("from_currency", "to_currency", "rate_date", name="uq_currency_rates"),
+        sa.UniqueConstraint(
+            "from_currency", "to_currency", "rate_date", name="uq_currency_rates"
+        ),
     )
 
     # ── Inventory transfers ──
@@ -517,12 +601,18 @@ def upgrade() -> None:
         sa.Column("notes", sa.Text(), nullable=True),
         sa.Column("completed_at", _TS, nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["from_warehouse_id"], ["warehouses.id"], ondelete="RESTRICT"),
-        sa.ForeignKeyConstraint(["to_warehouse_id"], ["warehouses.id"], ondelete="RESTRICT"),
+        sa.ForeignKeyConstraint(
+            ["from_warehouse_id"], ["warehouses.id"], ondelete="RESTRICT"
+        ),
+        sa.ForeignKeyConstraint(
+            ["to_warehouse_id"], ["warehouses.id"], ondelete="RESTRICT"
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("transfer_number"),
     )
-    op.create_index("ix_inventory_transfers_tenant_id", "inventory_transfers", ["tenant_id"])
+    op.create_index(
+        "ix_inventory_transfers_tenant_id", "inventory_transfers", ["tenant_id"]
+    )
 
     op.create_table(
         "inventory_transfer_items",
@@ -530,11 +620,17 @@ def upgrade() -> None:
         sa.Column("transfer_id", _PK, nullable=False),
         sa.Column("product_id", _PK, nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["transfer_id"], ["inventory_transfers.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["transfer_id"], ["inventory_transfers.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["product_id"], ["products.id"], ondelete="RESTRICT"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_inventory_transfer_items_transfer_id", "inventory_transfer_items", ["transfer_id"])
+    op.create_index(
+        "ix_inventory_transfer_items_transfer_id",
+        "inventory_transfer_items",
+        ["transfer_id"],
+    )
 
     # ── Import / export ──
     op.create_table(
@@ -556,7 +652,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_import_export_jobs_tenant_id", "import_export_jobs", ["tenant_id"])
+    op.create_index(
+        "ix_import_export_jobs_tenant_id", "import_export_jobs", ["tenant_id"]
+    )
 
     # ── Stock notifications ──
     op.create_table(
@@ -573,8 +671,12 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["product_id"], ["products.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_stock_notifications_tenant_id", "stock_notifications", ["tenant_id"])
-    op.create_index("ix_stock_notifications_product_id", "stock_notifications", ["product_id"])
+    op.create_index(
+        "ix_stock_notifications_tenant_id", "stock_notifications", ["tenant_id"]
+    )
+    op.create_index(
+        "ix_stock_notifications_product_id", "stock_notifications", ["product_id"]
+    )
 
     # ── App platform ──
     op.create_table(
@@ -593,7 +695,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("client_id"),
     )
-    op.create_index("ix_oauth_applications_tenant_id", "oauth_applications", ["tenant_id"])
+    op.create_index(
+        "ix_oauth_applications_tenant_id", "oauth_applications", ["tenant_id"]
+    )
 
     op.create_table(
         "app_installations",
@@ -608,11 +712,15 @@ def upgrade() -> None:
         sa.Column("is_active", sa.Boolean(), nullable=False),
         sa.Column("settings", sa.JSON(), nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["app_id"], ["oauth_applications.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["app_id"], ["oauth_applications.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["installed_by"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_app_installations_tenant_id", "app_installations", ["tenant_id"])
+    op.create_index(
+        "ix_app_installations_tenant_id", "app_installations", ["tenant_id"]
+    )
 
     op.create_table(
         "app_webhook_subscriptions",
@@ -625,10 +733,16 @@ def upgrade() -> None:
         sa.Column("callback_url", sa.String(1024), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["installation_id"], ["app_installations.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["installation_id"], ["app_installations.id"], ondelete="CASCADE"
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_app_webhook_subscriptions_tenant_id", "app_webhook_subscriptions", ["tenant_id"])
+    op.create_index(
+        "ix_app_webhook_subscriptions_tenant_id",
+        "app_webhook_subscriptions",
+        ["tenant_id"],
+    )
 
     op.create_table(
         "sandbox_stores",
@@ -720,7 +834,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index("ix_consent_records_tenant_id", "consent_records", ["tenant_id"])
-    op.create_index("ix_consent_records_customer_email", "consent_records", ["customer_email"])
+    op.create_index(
+        "ix_consent_records_customer_email", "consent_records", ["customer_email"]
+    )
 
     op.create_table(
         "data_subject_requests",
@@ -735,7 +851,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_data_subject_requests_tenant_id", "data_subject_requests", ["tenant_id"])
+    op.create_index(
+        "ix_data_subject_requests_tenant_id", "data_subject_requests", ["tenant_id"]
+    )
 
     op.create_table(
         "cookie_consent_settings",
@@ -751,7 +869,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_cookie_consent_settings_tenant_id", "cookie_consent_settings", ["tenant_id"])
+    op.create_index(
+        "ix_cookie_consent_settings_tenant_id", "cookie_consent_settings", ["tenant_id"]
+    )
 
     op.create_table(
         "sso_providers",
@@ -785,7 +905,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_workflow_definitions_tenant_id", "workflow_definitions", ["tenant_id"])
+    op.create_index(
+        "ix_workflow_definitions_tenant_id", "workflow_definitions", ["tenant_id"]
+    )
 
     op.create_table(
         "workflow_runs",
@@ -799,11 +921,15 @@ def upgrade() -> None:
         sa.Column("error_message", sa.Text(), nullable=True),
         sa.Column("completed_at", _TS, nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["definition_id"], ["workflow_definitions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["definition_id"], ["workflow_definitions.id"], ondelete="CASCADE"
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index("ix_workflow_runs_tenant_id", "workflow_runs", ["tenant_id"])
-    op.create_index("ix_workflow_runs_definition_id", "workflow_runs", ["definition_id"])
+    op.create_index(
+        "ix_workflow_runs_definition_id", "workflow_runs", ["definition_id"]
+    )
 
     # ── Search merchandising ──
     op.create_table(
@@ -849,7 +975,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["category_id"], ["categories.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_search_boost_rules_tenant_id", "search_boost_rules", ["tenant_id"])
+    op.create_index(
+        "ix_search_boost_rules_tenant_id", "search_boost_rules", ["tenant_id"]
+    )
 
     # ── Affiliates ──
     op.create_table(
@@ -868,7 +996,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tenant_id", "code", name="uq_aff_programs"),
     )
-    op.create_index("ix_affiliate_programs_tenant_id", "affiliate_programs", ["tenant_id"])
+    op.create_index(
+        "ix_affiliate_programs_tenant_id", "affiliate_programs", ["tenant_id"]
+    )
 
     op.create_table(
         "affiliates",
@@ -884,7 +1014,9 @@ def upgrade() -> None:
         sa.Column("total_earned", sa.Numeric(10, 2), nullable=False),
         sa.Column("total_paid", sa.Numeric(10, 2), nullable=False),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["program_id"], ["affiliate_programs.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["program_id"], ["affiliate_programs.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("referral_code"),
@@ -903,12 +1035,20 @@ def upgrade() -> None:
         sa.Column("status", sa.String(20), nullable=False),
         sa.Column("paid_at", sa.String(50), nullable=True),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["affiliate_id"], ["affiliates.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["affiliate_id"], ["affiliates.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["order_id"], ["orders.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_affiliate_commissions_tenant_id", "affiliate_commissions", ["tenant_id"])
-    op.create_index("ix_affiliate_commissions_affiliate_id", "affiliate_commissions", ["affiliate_id"])
+    op.create_index(
+        "ix_affiliate_commissions_tenant_id", "affiliate_commissions", ["tenant_id"]
+    )
+    op.create_index(
+        "ix_affiliate_commissions_affiliate_id",
+        "affiliate_commissions",
+        ["affiliate_id"],
+    )
 
     op.create_table(
         "affiliate_links",
@@ -919,11 +1059,15 @@ def upgrade() -> None:
         sa.Column("product_id", _PK, nullable=True),
         sa.Column("url", sa.String(1024), nullable=False),
         sa.Column("click_count", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["affiliate_id"], ["affiliates.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["affiliate_id"], ["affiliates.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["product_id"], ["products.id"], ondelete="SET NULL"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_affiliate_links_affiliate_id", "affiliate_links", ["affiliate_id"])
+    op.create_index(
+        "ix_affiliate_links_affiliate_id", "affiliate_links", ["affiliate_id"]
+    )
 
     # ── Gift registries ──
     op.create_table(
@@ -954,11 +1098,15 @@ def upgrade() -> None:
         sa.Column("product_id", _PK, nullable=False),
         sa.Column("requested_quantity", sa.Integer(), nullable=False),
         sa.Column("purchased_quantity", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["registry_id"], ["gift_registries.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["registry_id"], ["gift_registries.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["product_id"], ["products.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_gift_registry_items_registry_id", "gift_registry_items", ["registry_id"])
+    op.create_index(
+        "ix_gift_registry_items_registry_id", "gift_registry_items", ["registry_id"]
+    )
 
     # ── Dropship ──
     op.create_table(
@@ -990,7 +1138,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_dropship_suppliers_tenant_id", "dropship_suppliers", ["tenant_id"])
+    op.create_index(
+        "ix_dropship_suppliers_tenant_id", "dropship_suppliers", ["tenant_id"]
+    )
 
     op.create_table(
         "dropship_orders",
@@ -1004,12 +1154,16 @@ def upgrade() -> None:
         sa.Column("status", sa.String(20), nullable=False),
         sa.Column("cost", sa.Numeric(10, 2), nullable=False),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["supplier_id"], ["dropship_suppliers.id"], ondelete="RESTRICT"),
+        sa.ForeignKeyConstraint(
+            ["supplier_id"], ["dropship_suppliers.id"], ondelete="RESTRICT"
+        ),
         sa.ForeignKeyConstraint(["order_id"], ["orders.id"], ondelete="RESTRICT"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index("ix_dropship_orders_tenant_id", "dropship_orders", ["tenant_id"])
-    op.create_index("ix_dropship_orders_supplier_id", "dropship_orders", ["supplier_id"])
+    op.create_index(
+        "ix_dropship_orders_supplier_id", "dropship_orders", ["supplier_id"]
+    )
     op.create_index("ix_dropship_orders_order_id", "dropship_orders", ["order_id"])
 
     # ── Schema markup ──
@@ -1027,8 +1181,12 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("product_id"),
     )
-    op.create_index("ix_product_schema_markup_tenant_id", "product_schema_markup", ["tenant_id"])
-    op.create_index("ix_product_schema_markup_product_id", "product_schema_markup", ["product_id"])
+    op.create_index(
+        "ix_product_schema_markup_tenant_id", "product_schema_markup", ["tenant_id"]
+    )
+    op.create_index(
+        "ix_product_schema_markup_product_id", "product_schema_markup", ["product_id"]
+    )
 
     # ── Accessibility ──
     op.create_table(
@@ -1044,7 +1202,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_accessibility_audits_tenant_id", "accessibility_audits", ["tenant_id"])
+    op.create_index(
+        "ix_accessibility_audits_tenant_id", "accessibility_audits", ["tenant_id"]
+    )
 
     # ── Live chat ──
     op.create_table(
@@ -1063,7 +1223,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("session_token"),
     )
-    op.create_index("ix_live_chat_sessions_tenant_id", "live_chat_sessions", ["tenant_id"])
+    op.create_index(
+        "ix_live_chat_sessions_tenant_id", "live_chat_sessions", ["tenant_id"]
+    )
 
     op.create_table(
         "live_chat_messages",
@@ -1073,10 +1235,14 @@ def upgrade() -> None:
         sa.Column("sender_type", sa.String(20), nullable=False),
         sa.Column("message", sa.Text(), nullable=False),
         sa.Column("is_read", sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(["session_id"], ["live_chat_sessions.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["session_id"], ["live_chat_sessions.id"], ondelete="CASCADE"
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_live_chat_messages_session_id", "live_chat_messages", ["session_id"])
+    op.create_index(
+        "ix_live_chat_messages_session_id", "live_chat_messages", ["session_id"]
+    )
 
     # ── Financial reconciliation (v2) ──
     op.create_table(
@@ -1095,7 +1261,11 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("run_number"),
     )
-    op.create_index("ix_financial_reconciliation_runs_tenant_id", "financial_reconciliation_runs", ["tenant_id"])
+    op.create_index(
+        "ix_financial_reconciliation_runs_tenant_id",
+        "financial_reconciliation_runs",
+        ["tenant_id"],
+    )
 
     op.create_table(
         "financial_reconciliation_items",
@@ -1106,11 +1276,19 @@ def upgrade() -> None:
         sa.Column("actual_amount", sa.Numeric(10, 2), nullable=False),
         sa.Column("status", sa.String(20), nullable=False),
         sa.Column("notes", sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(["run_id"], ["financial_reconciliation_runs.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["financial_event_id"], ["financial_events.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["run_id"], ["financial_reconciliation_runs.id"], ondelete="CASCADE"
+        ),
+        sa.ForeignKeyConstraint(
+            ["financial_event_id"], ["financial_events.id"], ondelete="CASCADE"
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_financial_reconciliation_items_run_id", "financial_reconciliation_items", ["run_id"])
+    op.create_index(
+        "ix_financial_reconciliation_items_run_id",
+        "financial_reconciliation_items",
+        ["run_id"],
+    )
 
     # ── Platform audit ──
     op.create_table(
@@ -1140,28 +1318,62 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_platform_admin_audit_log_user_id", "platform_admin_audit_log", ["user_id"])
+    op.create_index(
+        "ix_platform_admin_audit_log_user_id", "platform_admin_audit_log", ["user_id"]
+    )
 
     # ── Apply RLS to all tenant-scoped v2 tables atomically ──
     _rls_all_tables = [
         "tenant_feature_flag_overrides",
-        "subscription_plans", "customer_subscriptions", "subscription_invoices",
-        "subscription_events", "digital_assets", "digital_downloads", "license_keys",
-        "store_credits", "store_credit_transactions",
-        "draft_orders", "draft_order_items",
-        "tax_jurisdictions", "tax_rates", "tax_nexus_rules",
-        "product_bundles", "metafield_definitions", "metafields",
-        "pickup_locations", "pickup_slots",
-        "inventory_transfers", "import_export_jobs", "stock_notifications",
-        "oauth_applications", "app_installations", "app_webhook_subscriptions", "sandbox_stores",
-        "fraud_rules", "fraud_reviews", "chargebacks",
-        "consent_records", "data_subject_requests", "cookie_consent_settings", "sso_providers",
-        "workflow_definitions", "workflow_runs",
-        "search_synonyms", "search_redirects", "search_boost_rules",
-        "affiliate_programs", "affiliates", "affiliate_commissions",
-        "gift_registries", "pod_connections", "dropship_suppliers", "dropship_orders",
-        "product_schema_markup", "accessibility_audits",
-        "live_chat_sessions", "financial_reconciliation_runs",
+        "subscription_plans",
+        "customer_subscriptions",
+        "subscription_invoices",
+        "subscription_events",
+        "digital_assets",
+        "digital_downloads",
+        "license_keys",
+        "store_credits",
+        "store_credit_transactions",
+        "draft_orders",
+        "draft_order_items",
+        "tax_jurisdictions",
+        "tax_rates",
+        "tax_nexus_rules",
+        "product_bundles",
+        "metafield_definitions",
+        "metafields",
+        "pickup_locations",
+        "pickup_slots",
+        "inventory_transfers",
+        "import_export_jobs",
+        "stock_notifications",
+        "oauth_applications",
+        "app_installations",
+        "app_webhook_subscriptions",
+        "sandbox_stores",
+        "fraud_rules",
+        "fraud_reviews",
+        "chargebacks",
+        "consent_records",
+        "data_subject_requests",
+        "cookie_consent_settings",
+        "sso_providers",
+        "workflow_definitions",
+        "workflow_runs",
+        "search_synonyms",
+        "search_redirects",
+        "search_boost_rules",
+        "affiliate_programs",
+        "affiliates",
+        "affiliate_commissions",
+        "gift_registries",
+        "pod_connections",
+        "dropship_suppliers",
+        "dropship_orders",
+        "product_schema_markup",
+        "accessibility_audits",
+        "live_chat_sessions",
+        "financial_reconciliation_runs",
     ]
     for t in _rls_all_tables:
         _tenant_rls(t)
@@ -1169,50 +1381,117 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     tables = [
-        "platform_admin_audit_log", "platform_audit_reports",
-        "financial_reconciliation_items", "financial_reconciliation_runs",
-        "live_chat_messages", "live_chat_sessions",
-        "accessibility_audits", "product_schema_markup",
-        "dropship_orders", "dropship_suppliers", "pod_connections",
-        "gift_registry_items", "gift_registries",
-        "affiliate_links", "affiliate_commissions", "affiliates", "affiliate_programs",
-        "search_boost_rules", "search_redirects", "search_synonyms",
-        "workflow_runs", "workflow_definitions",
-        "sso_providers", "cookie_consent_settings", "data_subject_requests", "consent_records",
-        "chargebacks", "fraud_reviews", "fraud_rules",
-        "sandbox_stores", "app_webhook_subscriptions", "app_installations", "oauth_applications",
-        "stock_notifications", "import_export_jobs",
-        "inventory_transfer_items", "inventory_transfers",
+        "platform_admin_audit_log",
+        "platform_audit_reports",
+        "financial_reconciliation_items",
+        "financial_reconciliation_runs",
+        "live_chat_messages",
+        "live_chat_sessions",
+        "accessibility_audits",
+        "product_schema_markup",
+        "dropship_orders",
+        "dropship_suppliers",
+        "pod_connections",
+        "gift_registry_items",
+        "gift_registries",
+        "affiliate_links",
+        "affiliate_commissions",
+        "affiliates",
+        "affiliate_programs",
+        "search_boost_rules",
+        "search_redirects",
+        "search_synonyms",
+        "workflow_runs",
+        "workflow_definitions",
+        "sso_providers",
+        "cookie_consent_settings",
+        "data_subject_requests",
+        "consent_records",
+        "chargebacks",
+        "fraud_reviews",
+        "fraud_rules",
+        "sandbox_stores",
+        "app_webhook_subscriptions",
+        "app_installations",
+        "oauth_applications",
+        "stock_notifications",
+        "import_export_jobs",
+        "inventory_transfer_items",
+        "inventory_transfers",
         "currency_rates",
-        "pickup_slots", "pickup_locations",
-        "metafields", "metafield_definitions",
-        "bundle_items", "product_bundles",
-        "tax_nexus_rules", "tax_rates", "tax_jurisdictions",
-        "draft_order_items", "draft_orders",
-        "store_credit_transactions", "store_credits",
-        "license_keys", "digital_downloads", "digital_assets",
-        "subscription_events", "subscription_invoices", "customer_subscriptions", "subscription_plans",
+        "pickup_slots",
+        "pickup_locations",
+        "metafields",
+        "metafield_definitions",
+        "bundle_items",
+        "product_bundles",
+        "tax_nexus_rules",
+        "tax_rates",
+        "tax_jurisdictions",
+        "draft_order_items",
+        "draft_orders",
+        "store_credit_transactions",
+        "store_credits",
+        "license_keys",
+        "digital_downloads",
+        "digital_assets",
+        "subscription_events",
+        "subscription_invoices",
+        "customer_subscriptions",
+        "subscription_plans",
         "tenant_feature_flag_overrides",
     ]
     rls_tables = [
         "tenant_feature_flag_overrides",
-        "subscription_plans", "customer_subscriptions", "subscription_invoices",
-        "subscription_events", "digital_assets", "digital_downloads", "license_keys",
-        "store_credits", "store_credit_transactions",
-        "draft_orders", "draft_order_items",
-        "tax_jurisdictions", "tax_rates", "tax_nexus_rules",
-        "product_bundles", "metafield_definitions", "metafields",
-        "pickup_locations", "pickup_slots",
-        "inventory_transfers", "import_export_jobs", "stock_notifications",
-        "oauth_applications", "app_installations", "app_webhook_subscriptions", "sandbox_stores",
-        "fraud_rules", "fraud_reviews", "chargebacks",
-        "consent_records", "data_subject_requests", "cookie_consent_settings", "sso_providers",
-        "workflow_definitions", "workflow_runs",
-        "search_synonyms", "search_redirects", "search_boost_rules",
-        "affiliate_programs", "affiliates", "affiliate_commissions",
-        "gift_registries", "pod_connections", "dropship_suppliers", "dropship_orders",
-        "product_schema_markup", "accessibility_audits",
-        "live_chat_sessions", "financial_reconciliation_runs",
+        "subscription_plans",
+        "customer_subscriptions",
+        "subscription_invoices",
+        "subscription_events",
+        "digital_assets",
+        "digital_downloads",
+        "license_keys",
+        "store_credits",
+        "store_credit_transactions",
+        "draft_orders",
+        "draft_order_items",
+        "tax_jurisdictions",
+        "tax_rates",
+        "tax_nexus_rules",
+        "product_bundles",
+        "metafield_definitions",
+        "metafields",
+        "pickup_locations",
+        "pickup_slots",
+        "inventory_transfers",
+        "import_export_jobs",
+        "stock_notifications",
+        "oauth_applications",
+        "app_installations",
+        "app_webhook_subscriptions",
+        "sandbox_stores",
+        "fraud_rules",
+        "fraud_reviews",
+        "chargebacks",
+        "consent_records",
+        "data_subject_requests",
+        "cookie_consent_settings",
+        "sso_providers",
+        "workflow_definitions",
+        "workflow_runs",
+        "search_synonyms",
+        "search_redirects",
+        "search_boost_rules",
+        "affiliate_programs",
+        "affiliates",
+        "affiliate_commissions",
+        "gift_registries",
+        "pod_connections",
+        "dropship_suppliers",
+        "dropship_orders",
+        "product_schema_markup",
+        "accessibility_audits",
+        "live_chat_sessions",
+        "financial_reconciliation_runs",
     ]
     if op.get_bind().dialect.name == "postgresql":
         for t in rls_tables:
@@ -1236,6 +1515,13 @@ def downgrade() -> None:
     )
 
     conn = op.get_bind()
-    column_names = [row[1] for row in conn.execute(sa.text("SELECT column_name FROM information_schema.columns WHERE table_name='feature_flags' AND column_name='rollout_percent'")).fetchall()]
+    column_names = [
+        row[1]
+        for row in conn.execute(
+            sa.text(
+                "SELECT column_name FROM information_schema.columns WHERE table_name='feature_flags' AND column_name='rollout_percent'"
+            )
+        ).fetchall()
+    ]
     if "rollout_percent" in column_names:
         op.drop_column("feature_flags", "rollout_percent")
