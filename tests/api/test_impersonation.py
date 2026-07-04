@@ -23,9 +23,9 @@ from tenant_svc.tenant_service import TenantService
 from user.user import User
 
 PLATFORM_LOGIN = "/api/v1/auth/login"
-START = "/api/v1/platform/impersonation/start"
-END = "/api/v1/platform/impersonation/end"
-STATUS = "/api/v1/platform/impersonation/status"
+START = "/api/v1/start"
+END = "/api/v1/end"
+STATUS = "/api/v1/status"
 
 
 @pytest.fixture
