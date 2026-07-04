@@ -41,7 +41,14 @@ def _no_rls(_table: str) -> None:
 
 def upgrade() -> None:
     # ── Feature flag rollout % ──
-    op.add_column("feature_flags", sa.Column("rollout_percent", sa.Integer(), server_default=sa.text("100"), nullable=False))
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    columns = [col["name"] for col in inspector.get_columns("feature_flags")]
+    if "rollout_percent" not in columns:
+        op.add_column(
+            "feature_flags",
+            sa.Column("rollout_percent", sa.Integer(), server_default=sa.text("100"), nullable=False),
+        )
 
     # ── Tenant feature flag overrides ──
     op.create_table(
