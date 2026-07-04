@@ -19,8 +19,8 @@ from v1.draft_orders import draft_orders_bp
 from v1.dropship import dropship_bp
 from v1.fraud import fraud_bp
 from v1.gift_registries import gift_registries_bp
-from v1.impersonation import impersonation_bp
 from v1.i18n import i18n_bp
+from v1.impersonation import impersonation_bp
 from v1.import_export import import_export_bp
 from v1.live_chat import live_chat_bp
 from v1.metafields import metafields_bp
