@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 
-def auth_headers(user, *, app, tenant_id: str | None = None, claims=None) -> dict[str, str]:
+def auth_headers(
+    user, *, app, tenant_id: str | None = None, claims=None
+) -> dict[str, str]:
     from flask_jwt_extended import create_access_token
 
     headers = {

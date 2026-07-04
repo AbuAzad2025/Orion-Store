@@ -173,6 +173,7 @@ def end_impersonation():
                     session.ended_at = utc_now()
                     session.revoked = True
                     from core.audit_log import audit_log
+
                     audit_log(
                         action="impersonation_end",
                         resource_type="user",
@@ -187,7 +188,10 @@ def end_impersonation():
                     if impersonator:
                         tokens = issue_tokens_for_user(impersonator)
                         response = jsonify(
-                            {"message": "Impersonation ended", "session": session.to_dict()}
+                            {
+                                "message": "Impersonation ended",
+                                "session": session.to_dict(),
+                            }
                         )
                         set_access_cookies(response, tokens["access_token"])
                         set_refresh_cookies(response, tokens["refresh_token"])
@@ -211,6 +215,7 @@ def end_impersonation():
         session.ended_at = utc_now()
         session.revoked = True
         from core.audit_log import audit_log
+
         audit_log(
             action="impersonation_end",
             resource_type="user",
@@ -250,7 +255,9 @@ def impersonation_status():
             )
             if session:
                 return (
-                    jsonify({"active": session.is_active(), "session": session.to_dict()}),
+                    jsonify(
+                        {"active": session.is_active(), "session": session.to_dict()}
+                    ),
                     200,
                 )
             return jsonify({"active": False, "session": None}), 200

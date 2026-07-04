@@ -122,7 +122,9 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(tenant_portal_bp, url_prefix="/api/v1/tenant")
     register_platform_store_routes(platform_bp)
     register_platform_reconciliation_routes(platform_bp)
-    app.register_blueprint(impersonation_bp, url_prefix="/api/v1/platform/impersonation")
+    app.register_blueprint(
+        impersonation_bp, url_prefix="/api/v1/platform/impersonation"
+    )
     app.register_blueprint(platform_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(webhooks_bp, url_prefix="/webhooks")
     # v2 blueprints
