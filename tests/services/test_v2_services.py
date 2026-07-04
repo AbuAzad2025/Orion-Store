@@ -17,7 +17,6 @@ from gift_svc.gift_registry_service import GiftRegistryService
 from import_export_svc.import_export_service import ImportExportService
 from live_chat_svc.live_chat_service import LiveChatService
 from metafield_svc.metafield_service import MetafieldService
-from oms_svc.extensions.inventory_transfer_service import InventoryTransferService
 from reconciliation_svc.reconciliation_v2_service import ReconciliationV2Service
 from schema_markup_svc.schema_markup_service import SchemaMarkupService
 from search_svc.search_merchandising_service import SearchMerchandisingService
@@ -28,27 +27,37 @@ from tax_svc.tax_service import TaxService
 from workflow_svc.workflow_service import WorkflowService
 
 from catalog_svc.product_service import ProductService
-from tenant_svc.tenant_service import TenantService
+from oms_svc.extensions.inventory_transfer_service import InventoryTransferService
 from orion.extensions import db
+from tenant_svc.tenant_service import TenantService
 
 
 @pytest.fixture
 def tenant(app):
-    return TenantService().create_tenant(name="V2 Test", slug="v2-test", email="v2@test.com")
+    return TenantService().create_tenant(
+        name="V2 Test", slug="v2-test", email="v2@test.com"
+    )
 
 
 @pytest.fixture
 def product(tenant):
-    from catalog.product import Product
     from catalog.brand import Brand
     from catalog.category import Category
+    from catalog.product import Product
+
     brand = Brand(name="TestBrand", slug="test-brand", tenant_id=tenant.id)
     cat = Category(name="TestCat", slug="test-cat", tenant_id=tenant.id)
     db.session.add_all([brand, cat])
     db.session.commit()
     prod = Product(
-        name="Test Product", slug="test-product", tenant_id=tenant.id, price="29.99",
-        quantity=100, is_published=True, brand_id=brand.id, category_id=cat.id,
+        name="Test Product",
+        slug="test-product",
+        tenant_id=tenant.id,
+        price="29.99",
+        quantity=100,
+        is_published=True,
+        brand_id=brand.id,
+        category_id=cat.id,
     )
     db.session.add(prod)
     db.session.commit()
@@ -58,8 +67,12 @@ def product(tenant):
 def test_subscription_plan_crud(tenant):
     svc = SubscriptionService()
     plan = svc.create_plan(
-        tenant_id=tenant.id, name="Pro", code="pro",
-        billing_period_days=30, price="29.99", trial_period_days=14,
+        tenant_id=tenant.id,
+        name="Pro",
+        code="pro",
+        billing_period_days=30,
+        price="29.99",
+        trial_period_days=14,
     )
     assert plan.name == "Pro"
     assert plan.code == "pro"
@@ -70,18 +83,33 @@ def test_subscription_plan_crud(tenant):
 
 def test_subscription_subscribe(tenant):
     subs = SubscriptionService()
-    plan = subs.create_plan(tenant_id=tenant.id, name="Pro", code="pro", billing_period_days=30, price="29.99")
-    sub = subs.subscribe(tenant_id=tenant.id, plan_id=plan.id, customer_email="cust@test.com")
+    plan = subs.create_plan(
+        tenant_id=tenant.id,
+        name="Pro",
+        code="pro",
+        billing_period_days=30,
+        price="29.99",
+    )
+    sub = subs.subscribe(
+        tenant_id=tenant.id, plan_id=plan.id, customer_email="cust@test.com"
+    )
     assert sub.customer_email == "cust@test.com"
     assert sub.status == "active"
 
 
 def test_store_credit_add_and_deduct(tenant):
     svc = StoreCreditService()
-    credit = svc.add_funds(tenant_id=tenant.id, customer_email="buyer@test.com", amount="50.00", reason="Promotion")
+    credit = svc.add_funds(
+        tenant_id=tenant.id,
+        customer_email="buyer@test.com",
+        amount="50.00",
+        reason="Promotion",
+    )
     assert float(credit.balance) == 50.00
 
-    credit = svc.deduct(tenant_id=tenant.id, customer_email="buyer@test.com", amount="20.00")
+    credit = svc.deduct(
+        tenant_id=tenant.id, customer_email="buyer@test.com", amount="20.00"
+    )
     assert float(credit.balance) == 30.00
 
     balance = svc.get_balance(tenant_id=tenant.id, customer_email="buyer@test.com")
@@ -94,16 +122,26 @@ def test_draft_order_lifecycle(tenant, product):
     assert draft.status == "draft"
     assert draft.notes == "Draft order"
 
-    item = svc.add_item(tenant_id=tenant.id, draft_id=draft.id, product_id=product.id, quantity=2)
+    item = svc.add_item(
+        tenant_id=tenant.id, draft_id=draft.id, product_id=product.id, quantity=2
+    )
     assert item.quantity == 2
 
-    order = svc.convert_to_order(tenant_id=tenant.id, draft_id=draft.id, customer_email="cust@test.com")
+    order = svc.convert_to_order(
+        tenant_id=tenant.id, draft_id=draft.id, customer_email="cust@test.com"
+    )
     assert order.status == "pending"
 
 
 def test_tax_rate_lookup(tenant):
     svc = TaxService()
-    jur = svc.create_jurisdiction(tenant_id=tenant.id, name="CA State", code="CA-STATE", country_code="US", region="CA")
+    jur = svc.create_jurisdiction(
+        tenant_id=tenant.id,
+        name="CA State",
+        code="CA-STATE",
+        country_code="US",
+        region="CA",
+    )
     assert jur.name == "CA State"
 
     rate = svc.set_rate(tenant_id=tenant.id, jurisdiction_id=jur.id, rate="0.0725")
@@ -112,7 +150,9 @@ def test_tax_rate_lookup(tenant):
 
 def test_bundle_crud(tenant, product):
     svc = BundleService()
-    bundle = svc.create_bundle(tenant_id=tenant.id, name="Combo", slug="combo-1", bundle_price="5.00")
+    bundle = svc.create_bundle(
+        tenant_id=tenant.id, name="Combo", slug="combo-1", bundle_price="5.00"
+    )
     assert bundle.name == "Combo"
     assert float(bundle.bundle_price) == 5.00
 
@@ -120,20 +160,33 @@ def test_bundle_crud(tenant, product):
 def test_metafield_crud(tenant):
     svc = MetafieldService()
     mf = svc.define(
-        tenant_id=tenant.id, owner_type="product", key="material",
-        label="Material", field_type="string",
+        tenant_id=tenant.id,
+        owner_type="product",
+        key="material",
+        label="Material",
+        field_type="string",
     )
     assert mf.key == "material"
 
-    val = svc.set_value(tenant_id=tenant.id, definition_id=mf.id, owner_id=1, value="cotton")
+    val = svc.set_value(
+        tenant_id=tenant.id, definition_id=mf.id, owner_id=1, value="cotton"
+    )
     assert val.value == "cotton"
 
 
 def test_pickup_location(tenant):
     svc = BopisService()
     loc = svc.create_location(
-        tenant_id=tenant.id, code="DTLA", name="Downtown Store",
-        address={"street": "123 Main St", "city": "LA", "region": "CA", "postal_code": "90001", "country": "US"},
+        tenant_id=tenant.id,
+        code="DTLA",
+        name="Downtown Store",
+        address={
+            "street": "123 Main St",
+            "city": "LA",
+            "region": "CA",
+            "postal_code": "90001",
+            "country": "US",
+        },
     )
     assert loc.name == "Downtown Store"
 
@@ -156,7 +209,9 @@ def test_create_job(tenant):
 
 def test_stock_notification(tenant):
     svc = StockNotificationService()
-    sn = svc.subscribe(tenant_id=tenant.id, customer_email="notify@test.com", product_id=42)
+    sn = svc.subscribe(
+        tenant_id=tenant.id, customer_email="notify@test.com", product_id=42
+    )
     assert sn.customer_email == "notify@test.com"
     assert sn.product_id == 42
     assert sn.is_notified is False
@@ -165,12 +220,19 @@ def test_stock_notification(tenant):
 def test_app_platform_lifecycle(tenant):
     svc = AppPlatformService()
     app = svc.register_app(
-        tenant_id=tenant.id, name="MyApp", redirect_uris=["https://app.com/callback"],
+        tenant_id=tenant.id,
+        name="MyApp",
+        redirect_uris=["https://app.com/callback"],
         scopes="read_products write_products",
     )
     assert app.name == "MyApp"
 
-    sandbox = svc.create_sandbox(tenant_id=tenant.id, slug="test-sandbox", name="Test Sandbox", expires_at="2027-01-01")
+    sandbox = svc.create_sandbox(
+        tenant_id=tenant.id,
+        slug="test-sandbox",
+        name="Test Sandbox",
+        expires_at="2027-01-01",
+    )
     assert sandbox.slug.startswith("test-sandbox")
 
 
@@ -183,19 +245,28 @@ def test_fraud_review(tenant):
 
 def test_consent_and_data_request(tenant):
     svc = ComplianceService()
-    c = svc.record_consent(tenant_id=tenant.id, customer_email="user@test.com", consent_type="marketing", granted=True)
+    c = svc.record_consent(
+        tenant_id=tenant.id,
+        customer_email="user@test.com",
+        consent_type="marketing",
+        granted=True,
+    )
     assert c.customer_email == "user@test.com"
     assert c.consent_type == "marketing"
     assert c.granted is True
 
-    req = svc.create_data_request(tenant_id=tenant.id, customer_email="user@test.com", request_type="access")
+    req = svc.create_data_request(
+        tenant_id=tenant.id, customer_email="user@test.com", request_type="access"
+    )
     assert req.request_type == "access"
 
 
 def test_workflow_definition(tenant):
     svc = WorkflowService()
     wf = svc.create_definition(
-        tenant_id=tenant.id, name="OrderConfirmation", trigger_event="order.placed",
+        tenant_id=tenant.id,
+        name="OrderConfirmation",
+        trigger_event="order.placed",
         actions=[{"type": "send_email", "template": "order_confirmation"}],
     )
     assert wf.name == "OrderConfirmation"
@@ -204,7 +275,9 @@ def test_workflow_definition(tenant):
 
 def test_synonym_and_boost(tenant):
     svc = SearchMerchandisingService()
-    s = svc.add_synonym(tenant_id=tenant.id, term="laptop", synonyms=["notebook", "ultrabook"])
+    s = svc.add_synonym(
+        tenant_id=tenant.id, term="laptop", synonyms=["notebook", "ultrabook"]
+    )
     assert s.term == "laptop"
     assert "notebook" in s.synonyms
 
@@ -212,8 +285,12 @@ def test_synonym_and_boost(tenant):
 def test_affiliate_program(tenant):
     svc = AffiliateService()
     prog = svc.create_program(
-        tenant_id=tenant.id, name="Gold Partners", code="GOLD",
-        commission_type="percentage", commission_value="15.00", cookie_days=30,
+        tenant_id=tenant.id,
+        name="Gold Partners",
+        code="GOLD",
+        commission_type="percentage",
+        commission_value="15.00",
+        cookie_days=30,
     )
     assert prog.name == "Gold Partners"
     assert float(prog.commission_value) == 15.00
@@ -222,8 +299,11 @@ def test_affiliate_program(tenant):
 def test_gift_registry(tenant):
     svc = GiftRegistryService()
     r = svc.create_registry(
-        tenant_id=tenant.id, customer_email="gifter@test.com",
-        registry_name="Wedding", event_type="wedding", is_public=True,
+        tenant_id=tenant.id,
+        customer_email="gifter@test.com",
+        registry_name="Wedding",
+        event_type="wedding",
+        is_public=True,
     )
     assert r.registry_name == "Wedding"
     assert r.event_type == "wedding"
@@ -233,7 +313,12 @@ def test_gift_registry(tenant):
 
 def test_dropship_supplier(tenant):
     svc = DropshipService()
-    s = svc.create_supplier(tenant_id=tenant.id, name="FastShip Inc", contact_email="orders@fastship.com", fulfillment_time_days=3)
+    s = svc.create_supplier(
+        tenant_id=tenant.id,
+        name="FastShip Inc",
+        contact_email="orders@fastship.com",
+        fulfillment_time_days=3,
+    )
     assert s.name == "FastShip Inc"
     assert s.fulfillment_time_days == 3
 
@@ -241,8 +326,10 @@ def test_dropship_supplier(tenant):
 def test_schema_markup(tenant, product):
     svc = SchemaMarkupService()
     m = svc.set_markup(
-        tenant_id=tenant.id, product_id=product.id,
-        schema_type="Product", json_ld={"name": "Test Product", "price": "29.99"},
+        tenant_id=tenant.id,
+        product_id=product.id,
+        schema_type="Product",
+        json_ld={"name": "Test Product", "price": "29.99"},
     )
     assert m.schema_type == "Product"
 
@@ -252,7 +339,12 @@ def test_schema_markup(tenant, product):
 
 def test_accessibility_audit(tenant):
     svc = AccessibilityService()
-    audit = svc.record_audit(tenant_id=tenant.id, page_url="/products", score=92, issues={"contrast": ["low contrast on button"]})
+    audit = svc.record_audit(
+        tenant_id=tenant.id,
+        page_url="/products",
+        score=92,
+        issues={"contrast": ["low contrast on button"]},
+    )
     assert audit.page_url == "/products"
     assert audit.score == 92
 
@@ -262,7 +354,12 @@ def test_live_chat_session(tenant):
     session = svc.create_session(tenant_id=tenant.id, customer_email="chat@test.com")
     assert session.status == "pending"
 
-    msg = svc.send_message(tenant_id=tenant.id, session_id=session.id, sender_type="customer", message="Hello!")
+    msg = svc.send_message(
+        tenant_id=tenant.id,
+        session_id=session.id,
+        sender_type="customer",
+        message="Hello!",
+    )
     assert msg.message == "Hello!"
     assert msg.sender_type == "customer"
 
@@ -275,7 +372,13 @@ def test_reconciliation_run(tenant):
     run = svc.create_run(tenant_id=tenant.id)
     assert run.status == "pending"
 
-    item = svc.add_item(tenant_id=tenant.id, run_id=run.id, financial_event_id=1, expected_amount="100.00", actual_amount="100.00")
+    item = svc.add_item(
+        tenant_id=tenant.id,
+        run_id=run.id,
+        financial_event_id=1,
+        expected_amount="100.00",
+        actual_amount="100.00",
+    )
     assert float(item.expected_amount) == 100.00
     assert float(item.actual_amount) == 100.00
 
@@ -288,19 +391,24 @@ def test_audit_log_and_report():
     log = svc.log_action(user_id=1, action="user.login", details={"ip": "192.168.1.1"})
     assert log.action == "user.login"
 
-    report = svc.create_report(report_type="security_review", generated_by=1, summary={"findings": []})
+    report = svc.create_report(
+        report_type="security_review", generated_by=1, summary={"findings": []}
+    )
     assert report.report_type == "security_review"
 
 
 def test_inventory_transfer(tenant):
     svc = InventoryTransferService()
     from oms.warehouse import Warehouse
+
     wh1 = Warehouse(name="WH1", tenant_id=tenant.id, code="WH1")
     wh2 = Warehouse(name="WH2", tenant_id=tenant.id, code="WH2")
     db.session.add_all([wh1, wh2])
     db.session.commit()
 
-    transfer = svc.create_transfer(tenant_id=tenant.id, from_warehouse_id=wh1.id, to_warehouse_id=wh2.id)
+    transfer = svc.create_transfer(
+        tenant_id=tenant.id, from_warehouse_id=wh1.id, to_warehouse_id=wh2.id
+    )
     assert transfer.status == "draft"
     assert transfer.from_warehouse_id == wh1.id
     assert transfer.to_warehouse_id == wh2.id

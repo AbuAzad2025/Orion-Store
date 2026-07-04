@@ -19,7 +19,17 @@ def test_render_order_confirmation():
 
 
 def test_send_smtp_email(app):
-    _prev = {k: app.config.get(k) for k in ("SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "SMTP_USE_TLS")}
+    _prev = {
+        k: app.config.get(k)
+        for k in (
+            "SMTP_HOST",
+            "SMTP_PORT",
+            "SMTP_USER",
+            "SMTP_PASSWORD",
+            "SMTP_FROM",
+            "SMTP_USE_TLS",
+        )
+    }
     try:
         app.config.update(
             {
@@ -50,7 +60,10 @@ def test_send_smtp_email(app):
 
 
 def test_notification_sends_when_smtp_configured(app):
-    _prev = {k: app.config.get(k) for k in ("SMTP_HOST", "SMTP_PORT", "CELERY_TASK_ALWAYS_EAGER")}
+    _prev = {
+        k: app.config.get(k)
+        for k in ("SMTP_HOST", "SMTP_PORT", "CELERY_TASK_ALWAYS_EAGER")
+    }
     try:
         app.config.update(
             {

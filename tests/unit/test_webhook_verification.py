@@ -7,7 +7,6 @@ import hmac
 import time
 
 import pytest
-
 from webhook_svc.verification_service import WebhookVerificationService
 
 
@@ -58,12 +57,12 @@ class TestVerifyStripeSignature:
         assert not svc.verify_stripe_signature(raw, header, self.SECRET)
 
     def test_malformed_header(self, app):
-        raw = b'{}'
+        raw = b"{}"
         svc = WebhookVerificationService()
         assert not svc.verify_stripe_signature(raw, "not-a-valid-header", self.SECRET)
 
     def test_empty_secret(self, app):
-        raw = b'{}'
+        raw = b"{}"
         svc = WebhookVerificationService()
         assert not svc.verify_stripe_signature(raw, "t=1,v1=sig", "")
 
@@ -87,23 +86,21 @@ class TestVerifyHmacSignature:
         raw = b'{"status":"authorized"}'
         sig = _sign_hmac(self.SECRET, raw)
         svc = WebhookVerificationService()
-        assert not svc.verify_hmac_signature(
-            b'{"status":"declined"}', sig, self.SECRET
-        )
+        assert not svc.verify_hmac_signature(b'{"status":"declined"}', sig, self.SECRET)
 
     def test_wrong_secret(self, app):
-        raw = b'{}'
+        raw = b"{}"
         sig = _sign_hmac(self.SECRET, raw)
         svc = WebhookVerificationService()
         assert not svc.verify_hmac_signature(raw, sig, "wrong_secret")
 
     def test_empty_signature(self, app):
         svc = WebhookVerificationService()
-        assert not svc.verify_hmac_signature(b'{}', "", self.SECRET)
+        assert not svc.verify_hmac_signature(b"{}", "", self.SECRET)
 
     def test_empty_secret(self, app):
         svc = WebhookVerificationService()
-        assert not svc.verify_hmac_signature(b'{}', "sig", "")
+        assert not svc.verify_hmac_signature(b"{}", "sig", "")
 
 
 class TestBootstrapTenantContext:
