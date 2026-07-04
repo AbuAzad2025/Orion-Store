@@ -19,8 +19,8 @@ from orion.app import create_app
 app = create_app("testing")
 
 with app.app_context():
-    from alembic.config import Config
     from alembic import command
+    from alembic.config import Config
     from sqlalchemy import inspect
 
     from orion.extensions import db

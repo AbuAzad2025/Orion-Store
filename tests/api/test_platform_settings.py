@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from flask_jwt_extended import create_access_token
-from platform_svc.platform_settings_service import PlatformSettingsService
 from support.http import bearer_headers
+
+from platform_svc.platform_settings_service import PlatformSettingsService
 
 
 def test_get_platform_settings(client, app, platform_admin):

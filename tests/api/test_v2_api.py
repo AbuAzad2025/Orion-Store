@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import pytest
+from feature_flag_svc.feature_flag_service import FeatureFlagService
 from support.http import auth_headers
 
 from auth.auth_service import AuthService
 from catalog_svc.product_service import ProductService
-from feature_flag_svc.feature_flag_service import FeatureFlagService
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant_svc.tenant_service import TenantService
 

@@ -203,8 +203,8 @@ def test_bootstrap_blocked_when_admin_exists(client):
     """The trusted bootstrap path refuses to create a second platform
     administrator when the same email is used."""
     from auth.auth_service import AuthService
-    from user.user import User
     from core.exceptions import ValidationError
+    from user.user import User
 
     with client.app.app_context():
         User.query.filter_by(email="existing@bootstrap.com", tenant_id=None).delete()
