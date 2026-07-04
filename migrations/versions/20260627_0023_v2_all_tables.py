@@ -1235,4 +1235,7 @@ def downgrade() -> None:
         ),
     )
 
-    op.drop_column("feature_flags", "rollout_percent")
+    conn = op.get_bind()
+    column_names = [row[1] for row in conn.execute(sa.text("SELECT column_name FROM information_schema.columns WHERE table_name='feature_flags' AND column_name='rollout_percent'")).fetchall()]
+    if "rollout_percent" in column_names:
+        op.drop_column("feature_flags", "rollout_percent")
