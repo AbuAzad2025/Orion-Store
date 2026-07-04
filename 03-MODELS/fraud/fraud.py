@@ -13,8 +13,15 @@ from orion.extensions import db
 class FraudRule(db.Model, TimestampMixin):
     __tablename__ = "fraud_rules"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     rule_type: Mapped[str] = mapped_column(String(50), nullable=False)
     operator: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -37,12 +44,26 @@ class FraudRule(db.Model, TimestampMixin):
 class FraudReview(db.Model, TimestampMixin):
     __tablename__ = "fraud_reviews"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
-    order_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    order_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("orders.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     risk_score: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
-    reviewed_by: Mapped[int | None] = mapped_column(PrimaryKeyType, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    reviewed_by: Mapped[int | None] = mapped_column(
+        PrimaryKeyType, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     def to_dict(self) -> dict:
@@ -57,10 +78,24 @@ class FraudReview(db.Model, TimestampMixin):
 class Chargeback(db.Model, TimestampMixin):
     __tablename__ = "chargebacks"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
-    payment_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("payments.id", ondelete="RESTRICT"), nullable=False, index=True)
-    order_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("orders.id", ondelete="RESTRICT"), nullable=False)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    payment_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("payments.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    order_id: Mapped[int] = mapped_column(
+        PrimaryKeyType, ForeignKey("orders.id", ondelete="RESTRICT"), nullable=False
+    )
     amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(3), default="ILS", nullable=False)
     reason_code: Mapped[str | None] = mapped_column(String(50), nullable=True)

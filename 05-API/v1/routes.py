@@ -57,16 +57,48 @@ def platform_status():
 
 
 API_BLUEPRINTS: list[Blueprint] = [
-    auth_bp, tenant_bp, users_bp, products_bp, categories_bp,
-    payments_bp, platform_settings_bp, storefront_bp, store_account_bp,
-    i18n_bp, shipping_bp, vouchers_bp, returns_bp, b2b_bp, oms_bp,
-    tenant_portal_bp, platform_bp, webhooks_bp,
-    subscriptions_bp, store_credit_bp, draft_orders_bp, tax_bp,
-    bundles_bp, metafields_bp, bopis_bp, currency_bp, import_export_bp,
-    stock_notifications_bp, fraud_bp, compliance_bp, workflow_bp,
-    search_bp, affiliates_bp, gift_registries_bp, dropship_bp,
-    schema_markup_bp, accessibility_bp, live_chat_bp,
-    reconciliation_v2_bp, audit_bp, app_platform_bp, oms_ext_bp,
+    auth_bp,
+    tenant_bp,
+    users_bp,
+    products_bp,
+    categories_bp,
+    payments_bp,
+    platform_settings_bp,
+    storefront_bp,
+    store_account_bp,
+    i18n_bp,
+    shipping_bp,
+    vouchers_bp,
+    returns_bp,
+    b2b_bp,
+    oms_bp,
+    tenant_portal_bp,
+    platform_bp,
+    webhooks_bp,
+    subscriptions_bp,
+    store_credit_bp,
+    draft_orders_bp,
+    tax_bp,
+    bundles_bp,
+    metafields_bp,
+    bopis_bp,
+    currency_bp,
+    import_export_bp,
+    stock_notifications_bp,
+    fraud_bp,
+    compliance_bp,
+    workflow_bp,
+    search_bp,
+    affiliates_bp,
+    gift_registries_bp,
+    dropship_bp,
+    schema_markup_bp,
+    accessibility_bp,
+    live_chat_bp,
+    reconciliation_v2_bp,
+    audit_bp,
+    app_platform_bp,
+    oms_ext_bp,
 ]
 
 
@@ -101,7 +133,9 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(bopis_bp, url_prefix="/api/v1/bopis")
     app.register_blueprint(currency_bp, url_prefix="/api/v1/currency")
     app.register_blueprint(import_export_bp, url_prefix="/api/v1/import-export")
-    app.register_blueprint(stock_notifications_bp, url_prefix="/api/v1/stock-notifications")
+    app.register_blueprint(
+        stock_notifications_bp, url_prefix="/api/v1/stock-notifications"
+    )
     app.register_blueprint(fraud_bp, url_prefix="/api/v1/fraud")
     app.register_blueprint(compliance_bp, url_prefix="/api/v1/compliance")
     app.register_blueprint(workflow_bp, url_prefix="/api/v1/workflow")

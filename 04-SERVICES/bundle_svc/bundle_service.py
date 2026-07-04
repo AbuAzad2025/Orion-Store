@@ -9,17 +9,39 @@ from orion.extensions import db
 
 
 class BundleService:
-    def create_bundle(self, *, tenant_id: int, name: str, slug: str, bundle_price: str | Decimal) -> ProductBundle:
-        b = ProductBundle(tenant_id=tenant_id, name=name, slug=slug, bundle_price=Decimal(str(bundle_price)))
+    def create_bundle(
+        self, *, tenant_id: int, name: str, slug: str, bundle_price: str | Decimal
+    ) -> ProductBundle:
+        b = ProductBundle(
+            tenant_id=tenant_id,
+            name=name,
+            slug=slug,
+            bundle_price=Decimal(str(bundle_price)),
+        )
         db.session.add(b)
         db.session.commit()
         return b
 
-    def add_item(self, *, tenant_id: int, bundle_id: int, product_id: int, quantity: int = 1, discount_percent: str | Decimal = "0") -> BundleItem:
-        bundle = ProductBundle.query.filter_by(id=bundle_id, tenant_id=tenant_id).first()
+    def add_item(
+        self,
+        *,
+        tenant_id: int,
+        bundle_id: int,
+        product_id: int,
+        quantity: int = 1,
+        discount_percent: str | Decimal = "0",
+    ) -> BundleItem:
+        bundle = ProductBundle.query.filter_by(
+            id=bundle_id, tenant_id=tenant_id
+        ).first()
         if not bundle:
             raise NotFoundError("Bundle not found.")
-        item = BundleItem(bundle_id=bundle_id, product_id=product_id, quantity=quantity, discount_percent=Decimal(str(discount_percent)))
+        item = BundleItem(
+            bundle_id=bundle_id,
+            product_id=product_id,
+            quantity=quantity,
+            discount_percent=Decimal(str(discount_percent)),
+        )
         db.session.add(item)
         db.session.commit()
         return item

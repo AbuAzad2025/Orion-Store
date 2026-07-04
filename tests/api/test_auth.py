@@ -98,14 +98,22 @@ def test_register_platform_admin_privileged_fields_rejected(client):
     """Privileged fields in the request payload cannot create a platform
     administrator — the route is unconditionally disabled."""
     payloads = [
-        {"email": "hacker1@platform.com", "password": "password123",
-         "is_superuser": True},
-        {"email": "hacker2@platform.com", "password": "password123",
-         "is_platform_admin": True},
-        {"email": "hacker3@platform.com", "password": "password123",
-         "is_owner": True},
-        {"email": "hacker4@platform.com", "password": "password123",
-         "role": "superadmin"},
+        {
+            "email": "hacker1@platform.com",
+            "password": "password123",
+            "is_superuser": True,
+        },
+        {
+            "email": "hacker2@platform.com",
+            "password": "password123",
+            "is_platform_admin": True,
+        },
+        {"email": "hacker3@platform.com", "password": "password123", "is_owner": True},
+        {
+            "email": "hacker4@platform.com",
+            "password": "password123",
+            "role": "superadmin",
+        },
     ]
     for payload in payloads:
         response = client.post(
@@ -126,8 +134,9 @@ def test_register_platform_admin_no_creation_after_bootstrap(client):
         # Ensure no platform admin exists
         from user.user import User
 
-        User.query.filter_by(email="bootstrap-test@platform.com",
-                             tenant_id=None).delete()
+        User.query.filter_by(
+            email="bootstrap-test@platform.com", tenant_id=None
+        ).delete()
         db.session.commit()
 
         # Bootstrap first admin via trusted internal path
@@ -180,8 +189,7 @@ def test_bootstrap_creates_first_admin_when_none_exists(client):
     from user.user import User
 
     with client.app.app_context():
-        User.query.filter_by(email="first@bootstrap.com",
-                             tenant_id=None).delete()
+        User.query.filter_by(email="first@bootstrap.com", tenant_id=None).delete()
         db.session.commit()
 
         admin = AuthService().register_super_admin(
@@ -199,8 +207,7 @@ def test_bootstrap_blocked_when_admin_exists(client):
     from core.exceptions import ValidationError
 
     with client.app.app_context():
-        User.query.filter_by(email="existing@bootstrap.com",
-                             tenant_id=None).delete()
+        User.query.filter_by(email="existing@bootstrap.com", tenant_id=None).delete()
         db.session.commit()
 
         AuthService().register_super_admin(
@@ -208,6 +215,7 @@ def test_bootstrap_blocked_when_admin_exists(client):
         )
 
         import pytest
+
         with pytest.raises(ValidationError, match="Super admin already exists"):
             AuthService().register_super_admin(
                 email="existing@bootstrap.com", password="password123"

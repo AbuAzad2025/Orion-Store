@@ -24,8 +24,10 @@ def create_report():
         require_platform_admin()
         data = request.get_json(silent=True) or {}
         report = _svc.create_report(
-            report_type=data["report_type"], generated_by=int(data["generated_by"]),
-            summary=data.get("summary", {}), details=data.get("details"),
+            report_type=data["report_type"],
+            generated_by=int(data["generated_by"]),
+            summary=data.get("summary", {}),
+            details=data.get("details"),
         )
         return jsonify({"report": report.to_dict()}), 201
     except OrionError as exc:
@@ -50,8 +52,10 @@ def log_action():
         require_platform_admin()
         data = request.get_json(silent=True) or {}
         log = _svc.log_action(
-            user_id=int(data["user_id"]), action=data["action"],
-            target_type=data.get("target_type"), target_id=data.get("target_id"),
+            user_id=int(data["user_id"]),
+            action=data["action"],
+            target_type=data.get("target_type"),
+            target_id=data.get("target_id"),
             details=data.get("details"),
         )
         return jsonify({"log": log.to_dict()}), 201

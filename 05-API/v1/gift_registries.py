@@ -25,9 +25,12 @@ def create_registry():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         r = _svc.create_registry(
-            tenant_id=g.tenant_id, customer_email=data["customer_email"],
-            registry_name=data["registry_name"], event_type=data.get("event_type"),
-            event_date=data.get("event_date"), is_public=data.get("is_public", True),
+            tenant_id=g.tenant_id,
+            customer_email=data["customer_email"],
+            registry_name=data["registry_name"],
+            event_type=data.get("event_type"),
+            event_date=data.get("event_date"),
+            is_public=data.get("is_public", True),
         )
         return jsonify({"registry": r.to_dict()}), 201
     except OrionError as exc:

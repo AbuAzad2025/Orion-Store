@@ -24,7 +24,9 @@ def create_bundle():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         bundle = _svc.create_bundle(
-            tenant_id=g.tenant_id, name=data["name"], slug=data["slug"],
+            tenant_id=g.tenant_id,
+            name=data["name"],
+            slug=data["slug"],
             bundle_price=data["bundle_price"],
         )
         return jsonify({"bundle": bundle.to_dict()}), 201
@@ -40,7 +42,9 @@ def add_bundle_item(bundle_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         item = _svc.add_item(
-            tenant_id=g.tenant_id, bundle_id=bundle_id, product_id=int(data["product_id"]),
+            tenant_id=g.tenant_id,
+            bundle_id=bundle_id,
+            product_id=int(data["product_id"]),
             quantity=int(data.get("quantity", 1)),
             discount_percent=data.get("discount_percent", "0"),
         )

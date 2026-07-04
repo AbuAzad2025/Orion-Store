@@ -20,10 +20,16 @@ def setup(app):
     t1 = TenantService().create_tenant(name="T1", slug="t1-auth", email="t1@test.com")
     t2 = TenantService().create_tenant(name="T2", slug="t2-auth", email="t2@test.com")
     admin_t1 = AuthService().register_tenant_user(
-        tenant_id=t1.id, email="admin@t1.com", password="password123", is_admin=True,
+        tenant_id=t1.id,
+        email="admin@t1.com",
+        password="password123",
+        is_admin=True,
     )
     customer_t1 = AuthService().register_tenant_user(
-        tenant_id=t1.id, email="cust@t1.com", password="password123", is_admin=False,
+        tenant_id=t1.id,
+        email="cust@t1.com",
+        password="password123",
+        is_admin=False,
     )
     admin_t1_headers = auth_headers(admin_t1, app=app, tenant_id=t1.slug)
     customer_headers = auth_headers(customer_t1, app=app, tenant_id=t1.slug)
@@ -33,7 +39,10 @@ def setup(app):
 
 
 def _assert_denied(resp):
-    assert resp.status_code in (401, 403), f"Expected 401/403, got {resp.status_code}: {resp.get_json()}"
+    assert resp.status_code in (
+        401,
+        403,
+    ), f"Expected 401/403, got {resp.status_code}: {resp.get_json()}"
 
 
 class TestFraud:
@@ -58,19 +67,61 @@ class TestFraud:
 
     def test_create_rule_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/rules", headers=no_auth, json={"name": "x", "rule_type": "amount", "operator": "gt", "threshold_value": "100"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/rules",
+                headers=no_auth,
+                json={
+                    "name": "x",
+                    "rule_type": "amount",
+                    "operator": "gt",
+                    "threshold_value": "100",
+                },
+            )
+        )
 
     def test_create_rule_denies_customer(self, client, setup):
         _, _, cust, _, _ = setup
-        _assert_denied(client.post(f"{self.BASE}/rules", headers=cust, json={"name": "x", "rule_type": "amount", "operator": "gt", "threshold_value": "100"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/rules",
+                headers=cust,
+                json={
+                    "name": "x",
+                    "rule_type": "amount",
+                    "operator": "gt",
+                    "threshold_value": "100",
+                },
+            )
+        )
 
     def test_create_rule_denies_wrong_tenant(self, client, setup):
         _, _, _, wrong, _ = setup
-        _assert_denied(client.post(f"{self.BASE}/rules", headers=wrong, json={"name": "x", "rule_type": "amount", "operator": "gt", "threshold_value": "100"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/rules",
+                headers=wrong,
+                json={
+                    "name": "x",
+                    "rule_type": "amount",
+                    "operator": "gt",
+                    "threshold_value": "100",
+                },
+            )
+        )
 
     def test_create_rule_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/rules", headers=admin, json={"name": "Rule1", "rule_type": "amount", "operator": "gt", "threshold_value": "100"})
+        resp = client.post(
+            f"{self.BASE}/rules",
+            headers=admin,
+            json={
+                "name": "Rule1",
+                "rule_type": "amount",
+                "operator": "gt",
+                "threshold_value": "100",
+            },
+        )
         assert resp.status_code == 201
 
 
@@ -106,16 +157,42 @@ class TestSubscriptions:
 
     def test_create_plan_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/plans", headers=no_auth, json={"name": "P", "code": "p", "billing_period_days": 30, "price": "10"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/plans",
+                headers=no_auth,
+                json={
+                    "name": "P",
+                    "code": "p",
+                    "billing_period_days": 30,
+                    "price": "10",
+                },
+            )
+        )
 
     def test_create_plan_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/plans", headers=admin, json={"name": "Pro", "code": "pro", "billing_period_days": 30, "price": "29.99"})
+        resp = client.post(
+            f"{self.BASE}/plans",
+            headers=admin,
+            json={
+                "name": "Pro",
+                "code": "pro",
+                "billing_period_days": 30,
+                "price": "29.99",
+            },
+        )
         assert resp.status_code == 201
 
     def test_subscribe_denies_anonymous(self, client, app, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/subscribe", headers=no_auth, json={"plan_id": 1, "customer_email": "a@b.com"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/subscribe",
+                headers=no_auth,
+                json={"plan_id": 1, "customer_email": "a@b.com"},
+            )
+        )
 
     def test_list_subscriptions_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
@@ -128,15 +205,38 @@ class TestSubscriptions:
 
     def test_create_asset_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/digital-assets", headers=no_auth, json={"product_id": 1, "file_url": "http://x.com/f", "file_name": "f.pdf"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/digital-assets",
+                headers=no_auth,
+                json={
+                    "product_id": 1,
+                    "file_url": "http://x.com/f",
+                    "file_name": "f.pdf",
+                },
+            )
+        )
 
     def test_create_asset_allows_admin(self, client, app, setup):
         from catalog_svc.product_service import ProductService
+
         t1, admin, _, _, _ = setup
         product = ProductService().create(
-            tenant_id=t1.id, name="Auth Test Product", slug="auth-test-p", price="10", quantity=10,
+            tenant_id=t1.id,
+            name="Auth Test Product",
+            slug="auth-test-p",
+            price="10",
+            quantity=10,
         )
-        resp = client.post(f"{self.BASE}/digital-assets", headers=admin, json={"product_id": product.id, "file_url": "http://x.com/f", "file_name": "f.pdf"})
+        resp = client.post(
+            f"{self.BASE}/digital-assets",
+            headers=admin,
+            json={
+                "product_id": product.id,
+                "file_url": "http://x.com/f",
+                "file_name": "f.pdf",
+            },
+        )
         assert resp.status_code == 201
 
 
@@ -145,7 +245,9 @@ class TestStoreCredit:
 
     def test_get_balance_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.get(f"{self.BASE}/balance?customer_email=a@b.com", headers=no_auth))
+        _assert_denied(
+            client.get(f"{self.BASE}/balance?customer_email=a@b.com", headers=no_auth)
+        )
 
     def test_get_balance_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
@@ -154,11 +256,21 @@ class TestStoreCredit:
 
     def test_add_funds_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/add", headers=no_auth, json={"customer_email": "a@b.com", "amount": "10"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/add",
+                headers=no_auth,
+                json={"customer_email": "a@b.com", "amount": "10"},
+            )
+        )
 
     def test_add_funds_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/add", headers=admin, json={"customer_email": "a@b.com", "amount": "10"})
+        resp = client.post(
+            f"{self.BASE}/add",
+            headers=admin,
+            json={"customer_email": "a@b.com", "amount": "10"},
+        )
         assert resp.status_code == 200
 
 
@@ -176,7 +288,9 @@ class TestDraftOrders:
 
     def test_create_draft_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(self.BASE, headers=no_auth, json={"customer_email": "a@b.com"}))
+        _assert_denied(
+            client.post(self.BASE, headers=no_auth, json={"customer_email": "a@b.com"})
+        )
 
     def test_create_draft_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
@@ -185,7 +299,13 @@ class TestDraftOrders:
 
     def test_convert_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/1/convert", headers=no_auth, json={"customer_email": "a@b.com"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/1/convert",
+                headers=no_auth,
+                json={"customer_email": "a@b.com"},
+            )
+        )
 
 
 class TestDropship:
@@ -202,11 +322,21 @@ class TestDropship:
 
     def test_create_pod_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/pod", headers=no_auth, json={"provider": "test", "api_key": "k"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/pod",
+                headers=no_auth,
+                json={"provider": "test", "api_key": "k"},
+            )
+        )
 
     def test_create_pod_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/pod", headers=admin, json={"provider": "TestProvider", "api_key": "sk_test"})
+        resp = client.post(
+            f"{self.BASE}/pod",
+            headers=admin,
+            json={"provider": "TestProvider", "api_key": "sk_test"},
+        )
         assert resp.status_code == 201
 
     def test_list_suppliers_allows_admin(self, client, setup):
@@ -216,7 +346,11 @@ class TestDropship:
 
     def test_create_supplier_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/suppliers", headers=admin, json={"name": "S1", "contact_email": "s@t.com"})
+        resp = client.post(
+            f"{self.BASE}/suppliers",
+            headers=admin,
+            json={"name": "S1", "contact_email": "s@t.com"},
+        )
         assert resp.status_code == 201
 
     def test_dropship_orders_denies_anonymous(self, client, setup):
@@ -253,24 +387,63 @@ class TestAffiliates:
 
     def test_create_program_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/programs", headers=no_auth, json={"name": "P", "code": "p", "commission_type": "percentage", "commission_value": "10"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/programs",
+                headers=no_auth,
+                json={
+                    "name": "P",
+                    "code": "p",
+                    "commission_type": "percentage",
+                    "commission_value": "10",
+                },
+            )
+        )
 
     def test_create_program_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/programs", headers=admin, json={"name": "Referral", "code": "REF", "commission_type": "percentage", "commission_value": "10"})
+        resp = client.post(
+            f"{self.BASE}/programs",
+            headers=admin,
+            json={
+                "name": "Referral",
+                "code": "REF",
+                "commission_type": "percentage",
+                "commission_value": "10",
+            },
+        )
         assert resp.status_code == 201
 
     def test_register_affiliate_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        prog_resp = client.post(f"{self.BASE}/programs", headers=admin, json={"name": "RegTest", "code": "RT", "commission_type": "percentage", "commission_value": "5"})
+        prog_resp = client.post(
+            f"{self.BASE}/programs",
+            headers=admin,
+            json={
+                "name": "RegTest",
+                "code": "RT",
+                "commission_type": "percentage",
+                "commission_value": "5",
+            },
+        )
         assert prog_resp.status_code == 201
         program_id = prog_resp.get_json()["program"]["id"]
-        resp = client.post(f"{self.BASE}/register", headers=admin, json={"program_id": program_id, "email": "a@t.com"})
+        resp = client.post(
+            f"{self.BASE}/register",
+            headers=admin,
+            json={"program_id": program_id, "email": "a@t.com"},
+        )
         assert resp.status_code == 201
 
     def test_record_commission_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/commissions", headers=no_auth, json={"affiliate_id": 1, "order_id": 1, "amount": "10"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/commissions",
+                headers=no_auth,
+                json={"affiliate_id": 1, "order_id": 1, "amount": "10"},
+            )
+        )
 
 
 class TestAppPlatform:
@@ -292,7 +465,9 @@ class TestAppPlatform:
 
     def test_register_app_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/apps", headers=no_auth, json={"name": "App1"}))
+        _assert_denied(
+            client.post(f"{self.BASE}/apps", headers=no_auth, json={"name": "App1"})
+        )
 
     def test_register_app_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
@@ -301,7 +476,11 @@ class TestAppPlatform:
 
     def test_create_sandbox_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/sandboxes", headers=admin, json={"slug": "sand1", "name": "Sand1", "expires_at": "2026-12-31"})
+        resp = client.post(
+            f"{self.BASE}/sandboxes",
+            headers=admin,
+            json={"slug": "sand1", "name": "Sand1", "expires_at": "2026-12-31"},
+        )
         assert resp.status_code == 201
 
 
@@ -329,16 +508,38 @@ class TestCompliance:
 
     def test_record_consent_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/consent", headers=no_auth, json={"customer_email": "a@b.com", "consent_type": "marketing", "granted": True}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/consent",
+                headers=no_auth,
+                json={
+                    "customer_email": "a@b.com",
+                    "consent_type": "marketing",
+                    "granted": True,
+                },
+            )
+        )
 
     def test_record_consent_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/consent", headers=admin, json={"customer_email": "a@t.com", "consent_type": "marketing", "granted": True})
+        resp = client.post(
+            f"{self.BASE}/consent",
+            headers=admin,
+            json={
+                "customer_email": "a@t.com",
+                "consent_type": "marketing",
+                "granted": True,
+            },
+        )
         assert resp.status_code == 201
 
     def test_create_data_request_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/data-requests", headers=admin, json={"customer_email": "a@t.com", "request_type": "access"})
+        resp = client.post(
+            f"{self.BASE}/data-requests",
+            headers=admin,
+            json={"customer_email": "a@t.com", "request_type": "access"},
+        )
         assert resp.status_code == 201
 
     def test_list_sso_allows_admin(self, client, setup):
@@ -348,7 +549,15 @@ class TestCompliance:
 
     def test_create_sso_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/sso", headers=admin, json={"provider_type": "google", "client_id": "cid", "client_secret": "sec"})
+        resp = client.post(
+            f"{self.BASE}/sso",
+            headers=admin,
+            json={
+                "provider_type": "google",
+                "client_id": "cid",
+                "client_secret": "sec",
+            },
+        )
         assert resp.status_code == 201
 
 
@@ -366,11 +575,21 @@ class TestGiftRegistries:
 
     def test_create_registry_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(self.BASE, headers=no_auth, json={"customer_email": "a@b.com", "registry_name": "Wedding"}))
+        _assert_denied(
+            client.post(
+                self.BASE,
+                headers=no_auth,
+                json={"customer_email": "a@b.com", "registry_name": "Wedding"},
+            )
+        )
 
     def test_create_registry_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(self.BASE, headers=admin, json={"customer_email": "a@t.com", "registry_name": "Wedding"})
+        resp = client.post(
+            self.BASE,
+            headers=admin,
+            json={"customer_email": "a@t.com", "registry_name": "Wedding"},
+        )
         assert resp.status_code == 201
 
     def test_get_registry_public(self, client, setup):
@@ -397,7 +616,9 @@ class TestLiveChat:
 
     def test_create_session_allows_admin(self, client, setup):
         _, admin, _, _, _ = setup
-        resp = client.post(f"{self.BASE}/sessions", headers=admin, json={"customer_email": "a@t.com"})
+        resp = client.post(
+            f"{self.BASE}/sessions", headers=admin, json={"customer_email": "a@t.com"}
+        )
         assert resp.status_code == 201
 
 
@@ -536,17 +757,29 @@ class TestAudit:
 
     def test_log_action_denies_anonymous(self, client, setup):
         _, _, _, _, no_auth = setup
-        _assert_denied(client.post(f"{self.BASE}/logs", headers=no_auth, json={"user_id": 1, "action": "test"}))
+        _assert_denied(
+            client.post(
+                f"{self.BASE}/logs",
+                headers=no_auth,
+                json={"user_id": 1, "action": "test"},
+            )
+        )
 
     def test_log_action_allows_platform_admin(self, client, app, setup):
         from auth.auth_service import AuthService
         from platform_svc.platform_settings_service import PlatformSettingsService
+
         PlatformSettingsService().ensure_seeded()
         platform_admin = AuthService().register_super_admin(
-            email="pa@test.com", password="password123",
+            email="pa@test.com",
+            password="password123",
         )
         pa_headers = auth_headers(platform_admin, app=app)
-        resp = client.post(f"{self.BASE}/logs", headers=pa_headers, json={"user_id": 1, "action": "test_action"})
+        resp = client.post(
+            f"{self.BASE}/logs",
+            headers=pa_headers,
+            json={"user_id": 1, "action": "test_action"},
+        )
         assert resp.status_code == 201
 
 
@@ -555,12 +788,24 @@ class TestCrossTenantIsolation:
 
     def test_fraud_rules_isolated(self, client, app, setup):
         t1, admin_t1, _, _, _ = setup
-        client.post("/api/v1/fraud/rules", headers=admin_t1, json={
-            "name": "T1 Rule", "rule_type": "amount", "operator": "gt", "threshold_value": "100",
-        })
-        t2 = TenantService().create_tenant(name="T2 Iso", slug="t2-iso", email="t2i@test.com")
+        client.post(
+            "/api/v1/fraud/rules",
+            headers=admin_t1,
+            json={
+                "name": "T1 Rule",
+                "rule_type": "amount",
+                "operator": "gt",
+                "threshold_value": "100",
+            },
+        )
+        t2 = TenantService().create_tenant(
+            name="T2 Iso", slug="t2-iso", email="t2i@test.com"
+        )
         admin_t2 = AuthService().register_tenant_user(
-            tenant_id=t2.id, email="admin@t2i.com", password="password123", is_admin=True,
+            tenant_id=t2.id,
+            email="admin@t2i.com",
+            password="password123",
+            is_admin=True,
         )
         headers_t2 = auth_headers(admin_t2, app=app, tenant_id=t2.slug)
         resp = client.get("/api/v1/fraud/rules", headers=headers_t2)
@@ -569,14 +814,28 @@ class TestCrossTenantIsolation:
 
     def test_subscriptions_isolated(self, client, app, setup):
         _, admin_t1, _, _, _ = setup
-        client.post("/api/v1/subscriptions/plans", headers=admin_t1, json={
-            "name": "T1 Plan", "code": "t1p", "billing_period_days": 30, "price": "10",
-        })
-        t2 = TenantService().create_tenant(name="T2 Sub Iso", slug="t2-sub-iso", email="t2s@test.com")
+        client.post(
+            "/api/v1/subscriptions/plans",
+            headers=admin_t1,
+            json={
+                "name": "T1 Plan",
+                "code": "t1p",
+                "billing_period_days": 30,
+                "price": "10",
+            },
+        )
+        t2 = TenantService().create_tenant(
+            name="T2 Sub Iso", slug="t2-sub-iso", email="t2s@test.com"
+        )
         admin_t2 = AuthService().register_tenant_user(
-            tenant_id=t2.id, email="admin@t2s.com", password="password123", is_admin=True,
+            tenant_id=t2.id,
+            email="admin@t2s.com",
+            password="password123",
+            is_admin=True,
         )
         headers_t2 = auth_headers(admin_t2, app=app, tenant_id=t2.slug)
-        resp = client.get("/api/v1/subscriptions/plans", headers={"X-Tenant-ID": t2.slug})
+        resp = client.get(
+            "/api/v1/subscriptions/plans", headers={"X-Tenant-ID": t2.slug}
+        )
         assert resp.status_code == 200
         assert len(resp.get_json()["plans"]) == 0

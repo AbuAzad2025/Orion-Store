@@ -12,7 +12,10 @@ _svc = SubscriptionService()
 def list_plans():
     try:
         tenant = require_tenant_context()
-        return jsonify({"plans": [p.to_dict() for p in _svc.list_plans(tenant.id)]}), 200
+        return (
+            jsonify({"plans": [p.to_dict() for p in _svc.list_plans(tenant.id)]}),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -23,9 +26,12 @@ def create_plan():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         plan = _svc.create_plan(
-            tenant_id=g.tenant_id, name=data["name"], code=data["code"],
+            tenant_id=g.tenant_id,
+            name=data["name"],
+            code=data["code"],
             billing_period_days=int(data["billing_period_days"]),
-            price=data["price"], trial_period_days=int(data.get("trial_period_days", 0)),
+            price=data["price"],
+            trial_period_days=int(data.get("trial_period_days", 0)),
             currency=data.get("currency", "ILS"),
             max_orders_per_cycle=data.get("max_orders_per_cycle"),
             max_products=data.get("max_products"),
@@ -43,7 +49,8 @@ def subscribe():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         sub = _svc.subscribe(
-            tenant_id=g.tenant_id, plan_id=int(data["plan_id"]),
+            tenant_id=g.tenant_id,
+            plan_id=int(data["plan_id"]),
             customer_email=data["customer_email"],
         )
         return jsonify({"subscription": sub.to_dict()}), 201
@@ -57,7 +64,16 @@ def subscribe():
 def list_subscriptions():
     try:
         require_tenant_admin()
-        return jsonify({"subscriptions": [s.to_dict() for s in _svc.list_subscriptions(g.tenant_id)]}), 200
+        return (
+            jsonify(
+                {
+                    "subscriptions": [
+                        s.to_dict() for s in _svc.list_subscriptions(g.tenant_id)
+                    ]
+                }
+            ),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -78,8 +94,10 @@ def create_asset():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         asset = _svc.create_digital_asset(
-            tenant_id=g.tenant_id, product_id=int(data["product_id"]),
-            file_url=data["file_url"], file_name=data["file_name"],
+            tenant_id=g.tenant_id,
+            product_id=int(data["product_id"]),
+            file_url=data["file_url"],
+            file_name=data["file_name"],
             mime_type=data.get("mime_type", "application/octet-stream"),
             max_downloads=int(data.get("max_downloads", 5)),
         )
@@ -96,7 +114,9 @@ def create_download(asset_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         download = _svc.create_download(
-            tenant_id=g.tenant_id, asset_id=asset_id, order_id=int(data["order_id"]),
+            tenant_id=g.tenant_id,
+            asset_id=asset_id,
+            order_id=int(data["order_id"]),
         )
         return jsonify({"download": download.to_dict()}), 201
     except OrionError as exc:
@@ -111,7 +131,8 @@ def generate_license():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         lic = _svc.generate_license(
-            tenant_id=g.tenant_id, order_item_id=int(data["order_item_id"]),
+            tenant_id=g.tenant_id,
+            order_item_id=int(data["order_item_id"]),
             product_id=int(data["product_id"]),
         )
         return jsonify({"license": lic.to_dict()}), 201

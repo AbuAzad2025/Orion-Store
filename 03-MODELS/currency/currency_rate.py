@@ -13,14 +13,20 @@ from orion.extensions import db
 class CurrencyRate(db.Model, TimestampMixin):
     __tablename__ = "currency_rates"
     __table_args__ = (
-        UniqueConstraint("from_currency", "to_currency", "rate_date", name="uq_currency_rates"),
+        UniqueConstraint(
+            "from_currency", "to_currency", "rate_date", name="uq_currency_rates"
+        ),
     )
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
     from_currency: Mapped[str] = mapped_column(String(3), nullable=False)
     to_currency: Mapped[str] = mapped_column(String(3), nullable=False)
     rate: Mapped[Decimal] = mapped_column(Numeric(12, 6), nullable=False)
-    rate_date: Mapped[str] = mapped_column(Date, server_default=func.current_date(), nullable=False)
+    rate_date: Mapped[str] = mapped_column(
+        Date, server_default=func.current_date(), nullable=False
+    )
     source: Mapped[str] = mapped_column(String(50), default="manual")
 
     def to_dict(self) -> dict:

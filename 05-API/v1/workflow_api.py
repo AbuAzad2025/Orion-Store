@@ -13,7 +13,11 @@ _svc = WorkflowService()
 def list_runs():
     try:
         require_tenant_admin()
-        runs = WorkflowRun.query.filter_by(tenant_id=g.tenant_id).order_by(WorkflowRun.created_at.desc()).all()
+        runs = (
+            WorkflowRun.query.filter_by(tenant_id=g.tenant_id)
+            .order_by(WorkflowRun.created_at.desc())
+            .all()
+        )
         return jsonify({"runs": [r.to_dict() for r in runs]}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
@@ -35,8 +39,11 @@ def create_definition():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         wf = _svc.create_definition(
-            tenant_id=g.tenant_id, name=data["name"], trigger_event=data["trigger_event"],
-            actions=data["actions"], conditions=data.get("conditions"),
+            tenant_id=g.tenant_id,
+            name=data["name"],
+            trigger_event=data["trigger_event"],
+            actions=data["actions"],
+            conditions=data.get("conditions"),
         )
         return jsonify({"definition": wf.to_dict()}), 201
     except OrionError as exc:

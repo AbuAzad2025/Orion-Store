@@ -25,8 +25,10 @@ def add_funds():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         credit = _svc.add_funds(
-            tenant_id=g.tenant_id, customer_email=data["customer_email"],
-            amount=data["amount"], reason=data.get("reason"),
+            tenant_id=g.tenant_id,
+            customer_email=data["customer_email"],
+            amount=data["amount"],
+            reason=data.get("reason"),
         )
         return jsonify({"credit": credit.to_dict()}), 200
     except OrionError as exc:
@@ -41,8 +43,10 @@ def deduct_funds():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         credit = _svc.deduct(
-            tenant_id=g.tenant_id, customer_email=data["customer_email"],
-            amount=data["amount"], reference_type=data.get("reference_type"),
+            tenant_id=g.tenant_id,
+            customer_email=data["customer_email"],
+            amount=data["amount"],
+            reference_type=data.get("reference_type"),
             reference_id=data.get("reference_id"),
         )
         return jsonify({"credit": credit.to_dict()}), 200

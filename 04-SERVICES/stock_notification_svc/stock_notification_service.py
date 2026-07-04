@@ -6,17 +6,30 @@ from stock_notification.stock_notification import StockNotification
 
 
 class StockNotificationService:
-    def subscribe(self, *, tenant_id: int, product_id: int, customer_email: str) -> StockNotification:
-        existing = StockNotification.query.filter_by(tenant_id=tenant_id, product_id=product_id, customer_email=customer_email.strip().lower(), is_notified=False).first()
+    def subscribe(
+        self, *, tenant_id: int, product_id: int, customer_email: str
+    ) -> StockNotification:
+        existing = StockNotification.query.filter_by(
+            tenant_id=tenant_id,
+            product_id=product_id,
+            customer_email=customer_email.strip().lower(),
+            is_notified=False,
+        ).first()
         if existing:
             return existing
-        n = StockNotification(tenant_id=tenant_id, product_id=product_id, customer_email=customer_email.strip().lower())
+        n = StockNotification(
+            tenant_id=tenant_id,
+            product_id=product_id,
+            customer_email=customer_email.strip().lower(),
+        )
         db.session.add(n)
         db.session.commit()
         return n
 
     def notify_for_product(self, *, tenant_id: int, product_id: int) -> int:
-        subscribers = StockNotification.query.filter_by(tenant_id=tenant_id, product_id=product_id, is_notified=False).all()
+        subscribers = StockNotification.query.filter_by(
+            tenant_id=tenant_id, product_id=product_id, is_notified=False
+        ).all()
         from datetime import datetime, timezone
 
         now = datetime.now(timezone.utc)

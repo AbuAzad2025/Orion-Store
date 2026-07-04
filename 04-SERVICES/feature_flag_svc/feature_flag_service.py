@@ -66,6 +66,7 @@ class FeatureFlagService:
                 }
                 if override.set_by:
                     from user.user import User
+
                     user = User.query.get(override.set_by)
                     if user:
                         override_info["override_set_by_name"] = user.name or user.email
@@ -93,7 +94,13 @@ class FeatureFlagService:
         return self._evaluate_rollout(flag, tenant_id)
 
     def set_tenant_override(
-        self, *, tenant_id: int, code: str, value: bool, reason: str | None = None, set_by: int | None = None,
+        self,
+        *,
+        tenant_id: int,
+        code: str,
+        value: bool,
+        reason: str | None = None,
+        set_by: int | None = None,
     ) -> dict:
         flag = self.get_by_code(code)
         override = TenantFeatureFlagOverride.query.filter_by(
@@ -101,7 +108,9 @@ class FeatureFlagService:
         ).first()
         if not override:
             override = TenantFeatureFlagOverride(
-                flag_id=flag.id, tenant_id=tenant_id, enabled=value,
+                flag_id=flag.id,
+                tenant_id=tenant_id,
+                enabled=value,
             )
             db.session.add(override)
         override.enabled = value

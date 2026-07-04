@@ -69,4 +69,11 @@ def register_platform_admin():
     This endpoint exists only for backward compatibility and always rejects
     requests. No configuration flag can re-enable it.
     """
-    return jsonify({"error": "Platform admin registration is not available through this endpoint."}), 404
+    return (
+        jsonify(
+            {
+                "error": "Platform admin registration is not available through this endpoint."
+            }
+        ),
+        404,
+    )

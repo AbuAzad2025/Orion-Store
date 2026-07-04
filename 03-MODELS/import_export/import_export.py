@@ -11,8 +11,15 @@ from orion.extensions import db
 class ImportExportJob(db.Model, TimestampMixin):
     __tablename__ = "import_export_jobs"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     job_type: Mapped[str] = mapped_column(String(20), nullable=False)
     entity_type: Mapped[str] = mapped_column(String(50), nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
@@ -21,7 +28,9 @@ class ImportExportJob(db.Model, TimestampMixin):
     processed_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     failed_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     total_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    user_id: Mapped[int | None] = mapped_column(PrimaryKeyType, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    user_id: Mapped[int | None] = mapped_column(
+        PrimaryKeyType, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
 
     def to_dict(self) -> dict:
         return {

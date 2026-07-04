@@ -13,7 +13,12 @@ _svc = SearchMerchandisingService()
 def list_synonyms():
     try:
         require_tenant_admin()
-        return jsonify({"synonyms": [s.to_dict() for s in _svc.list_synonyms(g.tenant_id)]}), 200
+        return (
+            jsonify(
+                {"synonyms": [s.to_dict() for s in _svc.list_synonyms(g.tenant_id)]}
+            ),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -23,7 +28,9 @@ def add_synonym():
     try:
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
-        s = _svc.add_synonym(tenant_id=g.tenant_id, term=data["term"], synonyms=data["synonyms"])
+        s = _svc.add_synonym(
+            tenant_id=g.tenant_id, term=data["term"], synonyms=data["synonyms"]
+        )
         return jsonify({"synonym": s.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
@@ -46,7 +53,11 @@ def add_redirect():
     try:
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
-        r = _svc.add_redirect(tenant_id=g.tenant_id, query_term=data["query_term"], redirect_url=data["redirect_url"])
+        r = _svc.add_redirect(
+            tenant_id=g.tenant_id,
+            query_term=data["query_term"],
+            redirect_url=data["redirect_url"],
+        )
         return jsonify({"redirect": r.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
@@ -70,7 +81,8 @@ def add_boost():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         b = _svc.add_boost(
-            tenant_id=g.tenant_id, product_id=data.get("product_id"),
+            tenant_id=g.tenant_id,
+            product_id=data.get("product_id"),
             category_id=data.get("category_id"),
             boost_factor=int(data.get("boost_factor", 1)),
             query_keyword=data.get("query_keyword"),

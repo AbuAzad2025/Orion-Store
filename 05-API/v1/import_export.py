@@ -24,8 +24,10 @@ def create_job():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         job = _svc.create_job(
-            tenant_id=g.tenant_id, job_type=data["job_type"],
-            entity_type=data["entity_type"], file_url=data.get("file_url"),
+            tenant_id=g.tenant_id,
+            job_type=data["job_type"],
+            entity_type=data["entity_type"],
+            file_url=data.get("file_url"),
         )
         return jsonify({"job": job.to_dict()}), 201
     except OrionError as exc:
@@ -40,8 +42,10 @@ def update_progress(job_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         job = _svc.update_progress(
-            job_id=job_id, tenant_id=g.tenant_id,
-            processed=int(data.get("processed", 0)), failed=int(data.get("failed", 0)),
+            job_id=job_id,
+            tenant_id=g.tenant_id,
+            processed=int(data.get("processed", 0)),
+            failed=int(data.get("failed", 0)),
             total=int(data.get("total", 0)),
         )
         return jsonify({"job": job.to_dict()}), 200

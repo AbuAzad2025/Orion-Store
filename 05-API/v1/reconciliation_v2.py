@@ -34,8 +34,11 @@ def add_item(run_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         item = _svc.add_item(
-            tenant_id=g.tenant_id, run_id=run_id, financial_event_id=int(data["financial_event_id"]),
-            expected_amount=data["expected_amount"], actual_amount=data["actual_amount"],
+            tenant_id=g.tenant_id,
+            run_id=run_id,
+            financial_event_id=int(data["financial_event_id"]),
+            expected_amount=data["expected_amount"],
+            actual_amount=data["actual_amount"],
         )
         return jsonify({"item": item.to_dict()}), 201
     except OrionError as exc:

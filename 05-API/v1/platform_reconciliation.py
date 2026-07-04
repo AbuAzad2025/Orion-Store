@@ -27,14 +27,19 @@ def register_platform_reconciliation_routes(bp: Blueprint) -> None:
             active_user_count = User.query.filter(
                 User.deleted_at.is_(None), User.is_active.is_(True)
             ).count()
-            return jsonify({
-                "stats": {
-                    "tenants": tenant_count,
-                    "users": user_count,
-                    "active_tenants": active_tenant_count,
-                    "active_users": active_user_count,
-                }
-            }), 200
+            return (
+                jsonify(
+                    {
+                        "stats": {
+                            "tenants": tenant_count,
+                            "users": user_count,
+                            "active_tenants": active_tenant_count,
+                            "active_users": active_user_count,
+                        }
+                    }
+                ),
+                200,
+            )
         except OrionError as exc:
             return jsonify({"error": exc.message}), exc.status_code
 

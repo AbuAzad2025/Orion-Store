@@ -13,8 +13,15 @@ from orion.extensions import db
 class FinancialReconciliationRun(db.Model, TimestampMixin):
     __tablename__ = "financial_reconciliation_runs"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     run_number: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
     total_events: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -36,9 +43,20 @@ class FinancialReconciliationRun(db.Model, TimestampMixin):
 class FinancialReconciliationItem(db.Model):
     __tablename__ = "financial_reconciliation_items"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    run_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("financial_reconciliation_runs.id", ondelete="CASCADE"), nullable=False, index=True)
-    financial_event_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("financial_events.id", ondelete="CASCADE"), nullable=False)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    run_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("financial_reconciliation_runs.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    financial_event_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("financial_events.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     expected_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     actual_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)

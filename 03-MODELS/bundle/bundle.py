@@ -13,8 +13,15 @@ from orion.extensions import db
 class ProductBundle(db.Model, TimestampMixin):
     __tablename__ = "product_bundles"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -38,11 +45,22 @@ class ProductBundle(db.Model, TimestampMixin):
 class BundleItem(db.Model):
     __tablename__ = "bundle_items"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    bundle_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("product_bundles.id", ondelete="CASCADE"), nullable=False, index=True)
-    product_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    bundle_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("product_bundles.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    product_id: Mapped[int] = mapped_column(
+        PrimaryKeyType, ForeignKey("products.id", ondelete="CASCADE"), nullable=False
+    )
     quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    discount_percent: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=Decimal("0"), nullable=False)
+    discount_percent: Mapped[Decimal] = mapped_column(
+        Numeric(5, 2), default=Decimal("0"), nullable=False
+    )
 
     def to_dict(self) -> dict:
         return {

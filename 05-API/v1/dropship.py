@@ -45,7 +45,9 @@ def create_pod():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         c = _svc.create_pod_connection(
-            tenant_id=g.tenant_id, provider=data["provider"], api_key=data["api_key"],
+            tenant_id=g.tenant_id,
+            provider=data["provider"],
+            api_key=data["api_key"],
             api_url=data.get("api_url"),
         )
         return jsonify({"connection": c.to_dict()}), 201
@@ -61,7 +63,9 @@ def create_supplier():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         s = _svc.create_supplier(
-            tenant_id=g.tenant_id, name=data["name"], contact_email=data["contact_email"],
+            tenant_id=g.tenant_id,
+            name=data["name"],
+            contact_email=data["contact_email"],
             fulfillment_time_days=int(data.get("fulfillment_time_days", 0)),
         )
         return jsonify({"supplier": s.to_dict()}), 201
@@ -77,8 +81,10 @@ def create_dropship_order():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         d = _svc.create_order(
-            tenant_id=g.tenant_id, supplier_id=int(data["supplier_id"]),
-            order_id=int(data["order_id"]), cost=data["cost"],
+            tenant_id=g.tenant_id,
+            supplier_id=int(data["supplier_id"]),
+            order_id=int(data["order_id"]),
+            cost=data["cost"],
         )
         return jsonify({"dropship_order": d.to_dict()}), 201
     except OrionError as exc:

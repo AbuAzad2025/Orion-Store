@@ -20,9 +20,14 @@ def list_users():
     try:
         require_platform_admin()
         page, per_page = pagination_params()
-        query = User.query.filter(User.deleted_at.is_(None)).order_by(User.created_at.desc())
+        query = User.query.filter(User.deleted_at.is_(None)).order_by(
+            User.created_at.desc()
+        )
         items, meta = paginate_query(query, page, per_page)
-        return jsonify(paginated_payload("users", items, meta, lambda u: u.to_dict())), 200
+        return (
+            jsonify(paginated_payload("users", items, meta, lambda u: u.to_dict())),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

@@ -45,8 +45,11 @@ def create_program():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         program = _svc.create_program(
-            tenant_id=g.tenant_id, name=data["name"], code=data["code"],
-            commission_type=data["commission_type"], commission_value=data["commission_value"],
+            tenant_id=g.tenant_id,
+            name=data["name"],
+            code=data["code"],
+            commission_type=data["commission_type"],
+            commission_value=data["commission_value"],
             cookie_days=int(data.get("cookie_days", 30)),
         )
         return jsonify({"program": program.to_dict()}), 201
@@ -62,7 +65,9 @@ def register_affiliate():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         affiliate = _svc.register_affiliate(
-            tenant_id=g.tenant_id, program_id=int(data["program_id"]), email=data["email"],
+            tenant_id=g.tenant_id,
+            program_id=int(data["program_id"]),
+            email=data["email"],
         )
         return jsonify({"affiliate": affiliate.to_dict()}), 201
     except OrionError as exc:
@@ -77,8 +82,10 @@ def record_commission():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         c = _svc.record_commission(
-            tenant_id=g.tenant_id, affiliate_id=int(data["affiliate_id"]),
-            order_id=int(data["order_id"]), amount=data["amount"],
+            tenant_id=g.tenant_id,
+            affiliate_id=int(data["affiliate_id"]),
+            order_id=int(data["order_id"]),
+            amount=data["amount"],
         )
         return jsonify({"commission": c.to_dict()}), 201
     except OrionError as exc:

@@ -1,6 +1,10 @@
 from flask import Blueprint, g, jsonify, request
 
-from compliance.compliance import ConsentRecord, CookieConsentSetting, DataSubjectRequest
+from compliance.compliance import (
+    ConsentRecord,
+    CookieConsentSetting,
+    DataSubjectRequest,
+)
 from compliance_svc.compliance_service import ComplianceService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
@@ -45,8 +49,10 @@ def record_consent():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         rec = _svc.record_consent(
-            tenant_id=g.tenant_id, customer_email=data["customer_email"],
-            consent_type=data["consent_type"], granted=data.get("granted", True),
+            tenant_id=g.tenant_id,
+            customer_email=data["customer_email"],
+            consent_type=data["consent_type"],
+            granted=data.get("granted", True),
             ip_address=data.get("ip_address"),
         )
         return jsonify({"consent": rec.to_dict()}), 201
@@ -62,7 +68,8 @@ def create_data_request():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         req = _svc.create_data_request(
-            tenant_id=g.tenant_id, customer_email=data["customer_email"],
+            tenant_id=g.tenant_id,
+            customer_email=data["customer_email"],
             request_type=data["request_type"],
         )
         return jsonify({"request": req.to_dict()}), 201
@@ -78,7 +85,8 @@ def upsert_cookie_settings():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         settings = _svc.upsert_cookie_settings(
-            tenant_id=g.tenant_id, banner_message=data.get("banner_message"),
+            tenant_id=g.tenant_id,
+            banner_message=data.get("banner_message"),
             is_active=data.get("is_active", True),
         )
         return jsonify({"settings": settings.to_dict()}), 200
@@ -104,8 +112,10 @@ def create_sso():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         provider = _svc.create_sso(
-            tenant_id=g.tenant_id, provider_type=data["provider_type"],
-            client_id=data["client_id"], client_secret=data["client_secret"],
+            tenant_id=g.tenant_id,
+            provider_type=data["provider_type"],
+            client_id=data["client_id"],
+            client_secret=data["client_secret"],
             issuer_url=data.get("issuer_url"),
         )
         return jsonify({"sso_provider": provider.to_dict()}), 201

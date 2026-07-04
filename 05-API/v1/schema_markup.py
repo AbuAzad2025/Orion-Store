@@ -25,8 +25,10 @@ def set_markup():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         m = _svc.set_markup(
-            tenant_id=g.tenant_id, product_id=int(data["product_id"]),
-            schema_type=data.get("schema_type", "Product"), json_ld=data.get("json_ld", {}),
+            tenant_id=g.tenant_id,
+            product_id=int(data["product_id"]),
+            schema_type=data.get("schema_type", "Product"),
+            json_ld=data.get("json_ld", {}),
         )
         return jsonify({"markup": m.to_dict()}), 201
     except OrionError as exc:

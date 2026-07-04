@@ -151,8 +151,13 @@ def _resolve_authenticated_user() -> None:
         if user:
             g.user = user
             g.is_platform_admin = user.is_superuser
-            g.role = "platform_admin" if user.is_superuser else ("tenant_admin" if user.is_admin else "customer")
+            g.role = (
+                "platform_admin"
+                if user.is_superuser
+                else ("tenant_admin" if user.is_admin else "customer")
+            )
             return
+
 
 def _bind_user_to_context(user_public_id: str) -> None:
     try:

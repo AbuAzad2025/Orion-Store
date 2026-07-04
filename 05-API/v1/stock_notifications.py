@@ -14,7 +14,8 @@ def subscribe():
         tenant = require_tenant_context()
         data = request.get_json(silent=True) or {}
         n = _svc.subscribe(
-            tenant_id=tenant.id, product_id=int(data["product_id"]),
+            tenant_id=tenant.id,
+            product_id=int(data["product_id"]),
             customer_email=data["customer_email"],
         )
         return jsonify({"notification": n.to_dict()}), 201

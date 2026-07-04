@@ -16,8 +16,10 @@ def create_transfer():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         transfer = _svc.create_transfer(
-            tenant_id=g.tenant_id, from_warehouse_id=int(data["from_warehouse_id"]),
-            to_warehouse_id=int(data["to_warehouse_id"]), notes=data.get("notes"),
+            tenant_id=g.tenant_id,
+            from_warehouse_id=int(data["from_warehouse_id"]),
+            to_warehouse_id=int(data["to_warehouse_id"]),
+            notes=data.get("notes"),
         )
         return jsonify({"transfer": transfer.to_dict()}), 201
     except OrionError as exc:
@@ -32,7 +34,9 @@ def add_transfer_item(transfer_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         item = _svc.add_item(
-            tenant_id=g.tenant_id, transfer_id=transfer_id, product_id=int(data["product_id"]),
+            tenant_id=g.tenant_id,
+            transfer_id=transfer_id,
+            product_id=int(data["product_id"]),
             quantity=int(data.get("quantity", 1)),
         )
         return jsonify({"item": item.to_dict()}), 201
@@ -46,7 +50,9 @@ def add_transfer_item(transfer_id: int):
 def complete_transfer(transfer_id: int):
     try:
         require_tenant_admin()
-        transfer = _svc.complete_transfer(tenant_id=g.tenant_id, transfer_id=transfer_id)
+        transfer = _svc.complete_transfer(
+            tenant_id=g.tenant_id, transfer_id=transfer_id
+        )
         return jsonify({"transfer": transfer.to_dict()}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

@@ -35,7 +35,8 @@ def register_app():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         app = _svc.register_app(
-            tenant_id=g.tenant_id, name=data["name"],
+            tenant_id=g.tenant_id,
+            name=data["name"],
             redirect_uris=data.get("redirect_uris", []),
             scopes=data.get("scopes"),
         )
@@ -52,7 +53,9 @@ def install_app(app_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         inst = _svc.install_app(
-            tenant_id=g.tenant_id, app_id=app_id, installed_by=data.get("installed_by", 0),
+            tenant_id=g.tenant_id,
+            app_id=app_id,
+            installed_by=data.get("installed_by", 0),
         )
         return jsonify({"installation": inst.to_dict()}), 201
     except OrionError as exc:
@@ -61,14 +64,18 @@ def install_app(app_id: int):
         return jsonify({"error": "Invalid request."}), 400
 
 
-@app_platform_bp.route("/installations/<int:installation_id>/webhooks", methods=["POST"])
+@app_platform_bp.route(
+    "/installations/<int:installation_id>/webhooks", methods=["POST"]
+)
 def subscribe_webhook(installation_id: int):
     try:
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         sub = _svc.subscribe_webhook(
-            tenant_id=g.tenant_id, installation_id=installation_id,
-            topic=data["topic"], callback_url=data["callback_url"],
+            tenant_id=g.tenant_id,
+            installation_id=installation_id,
+            topic=data["topic"],
+            callback_url=data["callback_url"],
         )
         return jsonify({"webhook": sub.to_dict()}), 201
     except OrionError as exc:
@@ -83,7 +90,9 @@ def create_sandbox():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         sb = _svc.create_sandbox(
-            tenant_id=g.tenant_id, slug=data["slug"], name=data["name"],
+            tenant_id=g.tenant_id,
+            slug=data["slug"],
+            name=data["name"],
             expires_at=data["expires_at"],
         )
         return jsonify({"sandbox": sb.to_dict()}), 201

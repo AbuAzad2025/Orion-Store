@@ -24,8 +24,11 @@ def create_location():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         loc = _svc.create_location(
-            tenant_id=g.tenant_id, code=data["code"], name=data["name"],
-            address=data.get("address", {}), warehouse_id=data.get("warehouse_id"),
+            tenant_id=g.tenant_id,
+            code=data["code"],
+            name=data["name"],
+            address=data.get("address", {}),
+            warehouse_id=data.get("warehouse_id"),
         )
         return jsonify({"location": loc.to_dict()}), 201
     except OrionError as exc:
@@ -40,9 +43,12 @@ def create_slot(location_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         slot = _svc.create_slot(
-            location_id=location_id, tenant_id=g.tenant_id,
-            day_of_week=int(data["day_of_week"]), start_time=data["start_time"],
-            end_time=data["end_time"], max_orders=int(data.get("max_orders", 10)),
+            location_id=location_id,
+            tenant_id=g.tenant_id,
+            day_of_week=int(data["day_of_week"]),
+            start_time=data["start_time"],
+            end_time=data["end_time"],
+            max_orders=int(data.get("max_orders", 10)),
         )
         return jsonify({"slot": slot.to_dict()}), 201
     except OrionError as exc:

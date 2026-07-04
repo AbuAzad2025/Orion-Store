@@ -1,4 +1,5 @@
 """Check Alembic autogenerate + verify all FK relationships in v2 tables."""
+
 from __future__ import annotations
 
 import os
@@ -33,23 +34,50 @@ with app.app_context():
 
     # Known v1 tables (pre-v2)
     v1_tables = {
-        "tenants", "tenant_configs", "users", "roles",
-        "brands", "categories", "products",
+        "tenants",
+        "tenant_configs",
+        "users",
+        "roles",
+        "brands",
+        "categories",
+        "products",
         "alembic_version",
-        "carts", "cart_items", "orders", "order_items", "order_events",
-        "payments", "refunds",
-        "financial_events", "commission_ledger", "invoices",
-        "platform_settings", "tenant_gateways",
-        "shipping_zones", "shipping_rates",
-        "vouchers", "voucher_redemptions",
-        "locales", "translations", "glossaries", "pages",
-        "feature_flags", "feature_flag_overrides",
-        "price_lists", "price_list_items",
-        "customer_groups", "customer_group_members",
-        "return_requests", "return_items",
-        "warehouses", "inventory_levels", "fulfillments", "fulfillment_items",
-        "b2b_quotes", "b2b_quote_items",
-        "store_accounts", "store_addresses",
+        "carts",
+        "cart_items",
+        "orders",
+        "order_items",
+        "order_events",
+        "payments",
+        "refunds",
+        "financial_events",
+        "commission_ledger",
+        "invoices",
+        "platform_settings",
+        "tenant_gateways",
+        "shipping_zones",
+        "shipping_rates",
+        "vouchers",
+        "voucher_redemptions",
+        "locales",
+        "translations",
+        "glossaries",
+        "pages",
+        "feature_flags",
+        "feature_flag_overrides",
+        "price_lists",
+        "price_list_items",
+        "customer_groups",
+        "customer_group_members",
+        "return_requests",
+        "return_items",
+        "warehouses",
+        "inventory_levels",
+        "fulfillments",
+        "fulfillment_items",
+        "b2b_quotes",
+        "b2b_quote_items",
+        "store_accounts",
+        "store_addresses",
     }
 
     v2_tables = all_tables - v1_tables - {"alembic_version"}
@@ -71,7 +99,9 @@ with app.app_context():
             print(f"        {constrained} -> {ref}")
             # Verify referred table exists
             if fk["referred_table"] not in all_tables:
-                issues.append(f"  {t}: FK {constrained} -> {ref} — referred table MISSING!")
+                issues.append(
+                    f"  {t}: FK {constrained} -> {ref} — referred table MISSING!"
+                )
         print()
 
     # Now try autogenerate to see if alembic detects any changes
@@ -93,7 +123,9 @@ with app.app_context():
 
     # Check if our new reason/set_by columns exist in tenant_feature_flag_overrides
     if "tenant_feature_flag_overrides" in all_tables:
-        tffo_cols = {c["name"]: c for c in inspector.get_columns("tenant_feature_flag_overrides")}
+        tffo_cols = {
+            c["name"]: c for c in inspector.get_columns("tenant_feature_flag_overrides")
+        }
         print(f"\ntenant_feature_flag_overrides columns: {list(tffo_cols.keys())}")
         if "reason" in tffo_cols:
             print("  ✅ 'reason' column present")

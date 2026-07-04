@@ -13,7 +13,11 @@ _svc = LiveChatService()
 def list_sessions():
     try:
         require_tenant_admin()
-        sessions = LiveChatSession.query.filter_by(tenant_id=g.tenant_id).order_by(LiveChatSession.created_at.desc()).all()
+        sessions = (
+            LiveChatSession.query.filter_by(tenant_id=g.tenant_id)
+            .order_by(LiveChatSession.created_at.desc())
+            .all()
+        )
         return jsonify({"sessions": [s.to_dict() for s in sessions]}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
@@ -24,7 +28,9 @@ def create_session():
     try:
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
-        session = _svc.create_session(tenant_id=g.tenant_id, customer_email=data.get("customer_email"))
+        session = _svc.create_session(
+            tenant_id=g.tenant_id, customer_email=data.get("customer_email")
+        )
         return jsonify({"session": session.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
@@ -48,7 +54,10 @@ def send_message(session_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         msg = _svc.send_message(
-            tenant_id=g.tenant_id, session_id=session_id, sender_type=data["sender_type"], message=data["message"],
+            tenant_id=g.tenant_id,
+            session_id=session_id,
+            sender_type=data["sender_type"],
+            message=data["message"],
         )
         return jsonify({"message": msg.to_dict()}), 201
     except OrionError as exc:

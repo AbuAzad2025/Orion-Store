@@ -54,7 +54,14 @@ def admin_login_post():
     try:
         user = _auth.authenticate(email=email, password=password, tenant_id=tenant_id)
     except Exception:
-        return render_template("admin_login.html", page_title="تسجيل الدخول", error="Invalid credentials"), 401
+        return (
+            render_template(
+                "admin_login.html",
+                page_title="تسجيل الدخول",
+                error="Invalid credentials",
+            ),
+            401,
+        )
 
     session["user_id"] = user.id
     session["tenant_id"] = user.tenant_id

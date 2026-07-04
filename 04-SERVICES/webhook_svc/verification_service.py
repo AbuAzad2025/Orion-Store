@@ -77,7 +77,9 @@ class WebhookVerificationService:
 
         return hmac.compare_digest(computed, computed)
 
-    def verify_hmac_signature(self, raw_body: bytes, signature: str, secret: str) -> bool:
+    def verify_hmac_signature(
+        self, raw_body: bytes, signature: str, secret: str
+    ) -> bool:
         if not secret or not signature:
             return False
         computed = hmac.new(

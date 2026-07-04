@@ -24,8 +24,11 @@ def create_rule():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         rule = _svc.create_rule(
-            tenant_id=g.tenant_id, name=data["name"], rule_type=data["rule_type"],
-            operator=data["operator"], threshold_value=data["threshold_value"],
+            tenant_id=g.tenant_id,
+            name=data["name"],
+            rule_type=data["rule_type"],
+            operator=data["operator"],
+            threshold_value=data["threshold_value"],
             action=data.get("action", "review"),
         )
         return jsonify({"rule": rule.to_dict()}), 201
@@ -41,7 +44,8 @@ def review_order():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         review = _svc.review_order(
-            tenant_id=g.tenant_id, order_id=int(data["order_id"]),
+            tenant_id=g.tenant_id,
+            order_id=int(data["order_id"]),
             risk_score=int(data.get("risk_score", 0)),
         )
         return jsonify({"review": review.to_dict()}), 201
@@ -57,8 +61,10 @@ def create_chargeback():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         cb = _svc.chargeback(
-            tenant_id=g.tenant_id, payment_id=int(data["payment_id"]),
-            order_id=int(data["order_id"]), amount=data["amount"],
+            tenant_id=g.tenant_id,
+            payment_id=int(data["payment_id"]),
+            order_id=int(data["order_id"]),
+            amount=data["amount"],
             reason_code=data.get("reason_code"),
         )
         return jsonify({"chargeback": cb.to_dict()}), 201

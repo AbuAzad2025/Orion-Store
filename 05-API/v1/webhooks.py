@@ -39,7 +39,9 @@ def paypal_webhook(tenant_id: int):
     try:
         raw = request.get_data()
         secret = _svc.get_secret(tenant_id, "paypal")
-        if not secret or not _svc.verify_paypal_signature(raw, dict(request.headers), secret):
+        if not secret or not _svc.verify_paypal_signature(
+            raw, dict(request.headers), secret
+        ):
             return jsonify({"error": "Invalid signature."}), 400
         _svc.bootstrap_tenant_context(tenant_id)
         payload = request.get_json(silent=True) or {}

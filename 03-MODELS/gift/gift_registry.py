@@ -13,9 +13,18 @@ from orion.extensions import db
 class GiftRegistry(db.Model, TimestampMixin):
     __tablename__ = "gift_registries"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
-    user_id: Mapped[int | None] = mapped_column(PrimaryKeyType, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    user_id: Mapped[int | None] = mapped_column(
+        PrimaryKeyType, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     customer_email: Mapped[str] = mapped_column(String(255), nullable=False)
     registry_name: Mapped[str] = mapped_column(String(255), nullable=False)
     event_type: Mapped[str] = mapped_column(String(50), nullable=True)
@@ -39,9 +48,18 @@ class GiftRegistry(db.Model, TimestampMixin):
 class GiftRegistryItem(db.Model):
     __tablename__ = "gift_registry_items"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    registry_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("gift_registries.id", ondelete="CASCADE"), nullable=False, index=True)
-    product_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    registry_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("gift_registries.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    product_id: Mapped[int] = mapped_column(
+        PrimaryKeyType, ForeignKey("products.id", ondelete="CASCADE"), nullable=False
+    )
     requested_quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     purchased_quantity: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 

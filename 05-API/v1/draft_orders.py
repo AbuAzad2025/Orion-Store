@@ -24,8 +24,10 @@ def create_draft():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         draft = _svc.create_draft(
-            tenant_id=g.tenant_id, customer_email=data.get("customer_email"),
-            notes=data.get("notes"), shipping_address=data.get("shipping_address"),
+            tenant_id=g.tenant_id,
+            customer_email=data.get("customer_email"),
+            notes=data.get("notes"),
+            shipping_address=data.get("shipping_address"),
             send_email_invite=data.get("send_email_invite", False),
         )
         return jsonify({"draft_order": draft.to_dict()}), 201
@@ -41,8 +43,10 @@ def add_item(draft_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         item = _svc.add_item(
-            tenant_id=g.tenant_id, draft_id=draft_id,
-            product_id=int(data["product_id"]), quantity=int(data.get("quantity", 1)),
+            tenant_id=g.tenant_id,
+            draft_id=draft_id,
+            product_id=int(data["product_id"]),
+            quantity=int(data.get("quantity", 1)),
         )
         return jsonify({"item": item.to_dict()}), 201
     except OrionError as exc:
@@ -57,7 +61,9 @@ def convert(draft_id: int):
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         order = _svc.convert_to_order(
-            tenant_id=g.tenant_id, draft_id=draft_id, customer_email=data["customer_email"],
+            tenant_id=g.tenant_id,
+            draft_id=draft_id,
+            customer_email=data["customer_email"],
         )
         return jsonify({"order": order.to_dict()}), 201
     except OrionError as exc:

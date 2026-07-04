@@ -206,7 +206,12 @@ def tenant_metafields():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("metafields_management.html", tenant=tenant, page_title="البيانات الوصفية", active_nav="metafields")
+    return render_template(
+        "metafields_management.html",
+        tenant=tenant,
+        page_title="البيانات الوصفية",
+        active_nav="metafields",
+    )
 
 
 @tenant_admin_bp.get("/currency")
@@ -214,7 +219,12 @@ def tenant_currency():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("currency_management.html", tenant=tenant, page_title="العملات", active_nav="currency")
+    return render_template(
+        "currency_management.html",
+        tenant=tenant,
+        page_title="العملات",
+        active_nav="currency",
+    )
 
 
 @tenant_admin_bp.get("/import-export")
@@ -222,7 +232,12 @@ def tenant_import_export():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("import_export_management.html", tenant=tenant, page_title="استيراد وتصدير", active_nav="import_export")
+    return render_template(
+        "import_export_management.html",
+        tenant=tenant,
+        page_title="استيراد وتصدير",
+        active_nav="import_export",
+    )
 
 
 @tenant_admin_bp.get("/app-platform")
@@ -230,7 +245,12 @@ def tenant_app_platform():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("app_platform_management.html", tenant=tenant, page_title="منصة التطبيقات", active_nav="app_platform")
+    return render_template(
+        "app_platform_management.html",
+        tenant=tenant,
+        page_title="منصة التطبيقات",
+        active_nav="app_platform",
+    )
 
 
 @tenant_admin_bp.get("/fraud")
@@ -238,7 +258,12 @@ def tenant_fraud():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("fraud_management.html", tenant=tenant, page_title="الاحتيال", active_nav="fraud")
+    return render_template(
+        "fraud_management.html",
+        tenant=tenant,
+        page_title="الاحتيال",
+        active_nav="fraud",
+    )
 
 
 @tenant_admin_bp.get("/compliance")
@@ -246,7 +271,12 @@ def tenant_compliance():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("compliance_management.html", tenant=tenant, page_title="الامتثال", active_nav="compliance")
+    return render_template(
+        "compliance_management.html",
+        tenant=tenant,
+        page_title="الامتثال",
+        active_nav="compliance",
+    )
 
 
 @tenant_admin_bp.get("/workflows")
@@ -254,7 +284,12 @@ def tenant_workflows():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("workflows_management.html", tenant=tenant, page_title="سير العمل", active_nav="workflows")
+    return render_template(
+        "workflows_management.html",
+        tenant=tenant,
+        page_title="سير العمل",
+        active_nav="workflows",
+    )
 
 
 @tenant_admin_bp.get("/search")
@@ -262,7 +297,9 @@ def tenant_search():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("search_management.html", tenant=tenant, page_title="البحث", active_nav="search")
+    return render_template(
+        "search_management.html", tenant=tenant, page_title="البحث", active_nav="search"
+    )
 
 
 @tenant_admin_bp.get("/affiliates")
@@ -270,7 +307,12 @@ def tenant_affiliates():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("affiliates_management.html", tenant=tenant, page_title="المسوقين", active_nav="affiliates")
+    return render_template(
+        "affiliates_management.html",
+        tenant=tenant,
+        page_title="المسوقين",
+        active_nav="affiliates",
+    )
 
 
 @tenant_admin_bp.get("/gift-registries")
@@ -278,7 +320,12 @@ def tenant_gift_registries():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("gift_registry_management.html", tenant=tenant, page_title="قوائم الهدايا", active_nav="gift_registries")
+    return render_template(
+        "gift_registry_management.html",
+        tenant=tenant,
+        page_title="قوائم الهدايا",
+        active_nav="gift_registries",
+    )
 
 
 @tenant_admin_bp.get("/dropship")
@@ -286,7 +333,12 @@ def tenant_dropship():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("dropship_management.html", tenant=tenant, page_title="الدروبشيبنج", active_nav="dropship")
+    return render_template(
+        "dropship_management.html",
+        tenant=tenant,
+        page_title="الدروبشيبنج",
+        active_nav="dropship",
+    )
 
 
 @tenant_admin_bp.get("/schema-markup")
@@ -294,7 +346,12 @@ def tenant_schema_markup():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("schema_markup_management.html", tenant=tenant, page_title="Schema Markup", active_nav="schema_markup")
+    return render_template(
+        "schema_markup_management.html",
+        tenant=tenant,
+        page_title="Schema Markup",
+        active_nav="schema_markup",
+    )
 
 
 @tenant_admin_bp.get("/accessibility")
@@ -302,7 +359,12 @@ def tenant_accessibility():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("accessibility_management.html", tenant=tenant, page_title="إمكانية الوصول", active_nav="accessibility")
+    return render_template(
+        "accessibility_management.html",
+        tenant=tenant,
+        page_title="إمكانية الوصول",
+        active_nav="accessibility",
+    )
 
 
 @tenant_admin_bp.get("/live-chat")
@@ -310,7 +372,12 @@ def tenant_live_chat():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("live_chat_management.html", tenant=tenant, page_title="الدردشة المباشرة", active_nav="live_chat")
+    return render_template(
+        "live_chat_management.html",
+        tenant=tenant,
+        page_title="الدردشة المباشرة",
+        active_nav="live_chat",
+    )
 
 
 @tenant_admin_bp.get("/reconciliation")
@@ -318,7 +385,12 @@ def tenant_reconciliation():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("reconciliation_management.html", tenant=tenant, page_title="التسوية المالية", active_nav="reconciliation")
+    return render_template(
+        "reconciliation_management.html",
+        tenant=tenant,
+        page_title="التسوية المالية",
+        active_nav="reconciliation",
+    )
 
 
 @tenant_admin_bp.get("/platform-audit")
@@ -326,4 +398,9 @@ def tenant_platform_audit():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
-    return render_template("platform_audit_management.html", tenant=tenant, page_title="تدقيق المنصة", active_nav="platform_audit")
+    return render_template(
+        "platform_audit_management.html",
+        tenant=tenant,
+        page_title="تدقيق المنصة",
+        active_nav="platform_audit",
+    )

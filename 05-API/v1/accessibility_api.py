@@ -24,8 +24,10 @@ def record_audit():
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
         audit = _svc.record_audit(
-            tenant_id=g.tenant_id, page_url=data["page_url"],
-            score=int(data["score"]), issues=data.get("issues"),
+            tenant_id=g.tenant_id,
+            page_url=data["page_url"],
+            score=int(data["score"]),
+            issues=data.get("issues"),
         )
         return jsonify({"audit": audit.to_dict()}), 201
     except OrionError as exc:

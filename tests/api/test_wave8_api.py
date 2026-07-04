@@ -37,9 +37,7 @@ def _paypal_headers(raw: bytes) -> dict[str, str]:
 
 
 def _hmac_signature(raw: bytes) -> str:
-    return hmac.new(
-        WEBHOOK_SECRET.encode("utf-8"), raw, hashlib.sha256
-    ).hexdigest()
+    return hmac.new(WEBHOOK_SECRET.encode("utf-8"), raw, hashlib.sha256).hexdigest()
 
 
 def test_paypal_connect_and_payment_methods(client, app):

@@ -214,9 +214,10 @@ def platform_admin(app: Flask):
         auth = AuthService()
         # Delete any existing platform admin first to ensure test isolation
         from user.user import User
+
         User.query.filter_by(email="owner@azadexa.com", tenant_id=None).delete()
         db.session.commit()
-        
+
         # Create platform admin through AuthService (trusted internal path)
         user = auth.register_super_admin(
             email="owner@azadexa.com", password="password123"

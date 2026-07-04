@@ -13,8 +13,15 @@ from orion.extensions import db
 class ConsentRecord(db.Model, TimestampMixin):
     __tablename__ = "consent_records"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     customer_email: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     consent_type: Mapped[str] = mapped_column(String(50), nullable=False)
     granted: Mapped[bool] = mapped_column(Boolean, nullable=False)
@@ -34,12 +41,21 @@ class ConsentRecord(db.Model, TimestampMixin):
 class DataSubjectRequest(db.Model, TimestampMixin):
     __tablename__ = "data_subject_requests"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     customer_email: Mapped[str] = mapped_column(String(255), nullable=False)
     request_type: Mapped[str] = mapped_column(String(50), nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     def to_dict(self) -> dict:
         return {
@@ -53,11 +69,24 @@ class DataSubjectRequest(db.Model, TimestampMixin):
 class CookieConsentSetting(db.Model, TimestampMixin):
     __tablename__ = "cookie_consent_settings"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
-    necessary_cookies: Mapped[list] = mapped_column(db.JSON, default=list, nullable=False)
-    analytics_cookies: Mapped[list] = mapped_column(db.JSON, default=list, nullable=False)
-    marketing_cookies: Mapped[list] = mapped_column(db.JSON, default=list, nullable=False)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    necessary_cookies: Mapped[list] = mapped_column(
+        db.JSON, default=list, nullable=False
+    )
+    analytics_cookies: Mapped[list] = mapped_column(
+        db.JSON, default=list, nullable=False
+    )
+    marketing_cookies: Mapped[list] = mapped_column(
+        db.JSON, default=list, nullable=False
+    )
     banner_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
@@ -72,8 +101,15 @@ class CookieConsentSetting(db.Model, TimestampMixin):
 class SsoProvider(db.Model, TimestampMixin):
     __tablename__ = "sso_providers"
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     provider_type: Mapped[str] = mapped_column(String(50), nullable=False)
     client_id: Mapped[str] = mapped_column(String(255), nullable=False)
     client_secret_hash: Mapped[str] = mapped_column(String(255), nullable=False)

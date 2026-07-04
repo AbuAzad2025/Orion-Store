@@ -14,12 +14,21 @@ class MetafieldDefinition(db.Model, TimestampMixin):
         UniqueConstraint("tenant_id", "owner_type", "key", name="uq_metafield_def"),
     )
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     owner_type: Mapped[str] = mapped_column(String(50), nullable=False)
     key: Mapped[str] = mapped_column(String(100), nullable=False)
     label: Mapped[str] = mapped_column(String(255), nullable=False)
-    field_type: Mapped[str] = mapped_column(String(50), default="string", nullable=False)
+    field_type: Mapped[str] = mapped_column(
+        String(50), default="string", nullable=False
+    )
     is_required: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     default_value: Mapped[str | None] = mapped_column(Text, nullable=True)
     validation_rules: Mapped[dict | None] = mapped_column(db.JSON, nullable=True)
@@ -42,9 +51,21 @@ class Metafield(db.Model, TimestampMixin):
         UniqueConstraint("definition_id", "owner_id", name="uq_metafield_value"),
     )
 
-    id: Mapped[int] = mapped_column(PrimaryKeyType, primary_key=True, autoincrement=True)
-    tenant_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
-    definition_id: Mapped[int] = mapped_column(PrimaryKeyType, ForeignKey("metafield_definitions.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[int] = mapped_column(
+        PrimaryKeyType, primary_key=True, autoincrement=True
+    )
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    definition_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("metafield_definitions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     owner_id: Mapped[int] = mapped_column(PrimaryKeyType, nullable=False, index=True)
     value: Mapped[str | None] = mapped_column(Text, nullable=True)
     json_value: Mapped[dict | None] = mapped_column(db.JSON, nullable=True)
