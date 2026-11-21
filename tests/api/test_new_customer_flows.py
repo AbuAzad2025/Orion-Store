@@ -77,9 +77,10 @@ def test_customer_service_flows(client, store):
         json={"product_id": product.id, "quantity": 2, "notes": "bulk"},
     )
     assert quote.status_code == 201
-    assert client.get(
-        "/api/v1/store/account/quote-requests", headers=headers
-    ).status_code == 200
+    assert (
+        client.get("/api/v1/store/account/quote-requests", headers=headers).status_code
+        == 200
+    )
 
     registry = client.post(
         "/api/v1/store/account/gift-registries",
@@ -88,9 +89,10 @@ def test_customer_service_flows(client, store):
     )
     assert registry.status_code == 201
     slug = registry.get_json()["registry"]["slug"]
-    assert client.get(
-        "/api/v1/store/account/gift-registries", headers=headers
-    ).status_code == 200
+    assert (
+        client.get("/api/v1/store/account/gift-registries", headers=headers).status_code
+        == 200
+    )
     item = client.post(
         f"/api/v1/store/account/gift-registries/{slug}/items",
         headers=headers,
