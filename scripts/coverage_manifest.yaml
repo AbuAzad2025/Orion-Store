@@ -155,6 +155,13 @@ files:
   "04-SERVICES/notification_svc/tasks.py": { wave: 15, min: 75 }
   "04-SERVICES/integrations/payments/palpay.py": { wave: 15, min: 80 }
   "05-API/v1/store_account.py": { wave: 15, min: 70 }
+  # wave 16 — customer self-service, revocation and verification helpers
+  "05-API/v1/customer_flows.py": { wave: 16, min: 70 }
+  "05-API/v1/storefront_pickup.py": { wave: 16, min: 70 }
+  "05-API/v1/order_access.py": { wave: 16, min: 70 }
+  "05-API/v1/brands.py": { wave: 16, min: 70 }
+  "04-SERVICES/payment_svc/external_refund_service.py": { wave: 16, min: 70 }
+  "03-MODELS/platform_models/revoked_token.py": { wave: 16, min: 60 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 80

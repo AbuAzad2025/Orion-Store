@@ -100,9 +100,9 @@ def create_quote_request():
     try:
         tenant, user = _ctx()
         data = request.get_json(silent=True) or {}
-        from b2b_svc.b2b_service import B2BService
+        from b2b_svc.b2b_service import B2bService
 
-        svc = B2BService()
+        svc = B2bService()
         quote = svc.create_quote(
             tenant_id=tenant.id,
             user_id=user.id,
