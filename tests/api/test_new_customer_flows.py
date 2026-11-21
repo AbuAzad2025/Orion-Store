@@ -101,6 +101,31 @@ def test_customer_service_flows(client, store):
     assert item.status_code == 201
 
 
+def test_platform_user_management(client, store, platform_admin_headers):
+    tenant, _product, _customer, _admin = store
+    headers = platform_admin_headers
+    created = client.post(
+        "/api/v1/users/",
+        headers=headers,
+        json={
+            "email": "new-admin@flow.com",
+            "password": "password123",
+            "tenant_id": tenant.id,
+            "is_admin": True,
+        },
+    )
+    assert created.status_code == 201
+    user_id = created.get_json()["user"]["id"]
+    assert client.get("/api/v1/users/", headers=headers).status_code == 200
+    assert (
+        client.put(
+            f"/api/v1/users/{user_id}", headers=headers, json={"first_name": "New"}
+        ).status_code
+        == 200
+    )
+    assert client.delete(f"/api/v1/users/{user_id}", headers=headers).status_code == 200
+
+
 def test_gdpr_self_service(client, store):
     tenant, _product, customer, _admin = store
     headers = auth_headers(customer, tenant_id=tenant.slug)

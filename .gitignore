@@ -26,7 +26,7 @@ env/
 .pytest_cache/
 .coverage
 .coverage.*
-coverage.json
+coverage*.json
 coverage.xml
 htmlcov/
 instance/
