@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import Boolean, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from base.base_model import TimestampMixin
@@ -39,6 +39,11 @@ class FeatureFlag(db.Model, TimestampMixin):
 
 class TenantFeatureFlagOverride(db.Model, TimestampMixin):
     __tablename__ = "tenant_feature_flag_overrides"
+    __table_args__ = (
+        UniqueConstraint(
+            "tenant_id", "flag_id", name="uq_tenant_feature_flag_override_tenant"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True

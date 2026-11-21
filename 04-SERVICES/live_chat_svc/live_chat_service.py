@@ -30,7 +30,10 @@ class LiveChatService:
         if not session:
             raise NotFoundError("Chat session not found.")
         msg = LiveChatMessage(
-            session_id=session_id, sender_type=sender_type, message=message
+            tenant_id=tenant_id,
+            session_id=session_id,
+            sender_type=sender_type,
+            message=message,
         )
         db.session.add(msg)
         if session.status == "pending":

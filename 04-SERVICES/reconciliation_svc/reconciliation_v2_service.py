@@ -36,6 +36,7 @@ class ReconciliationV2Service:
         if not run:
             raise NotFoundError("Reconciliation run not found.")
         item = FinancialReconciliationItem(
+            tenant_id=tenant_id,
             run_id=run_id,
             financial_event_id=financial_event_id,
             expected_amount=Decimal(str(expected_amount)),

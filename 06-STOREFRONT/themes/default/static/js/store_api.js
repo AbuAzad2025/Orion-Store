@@ -50,6 +50,7 @@ const StoreAPI = {
       if (extras.voucher_code) body.voucher_code = extras.voucher_code;
       if (extras.idempotency_key) body.idempotency_key = extras.idempotency_key;
       if (extras.use_store_credit) body.use_store_credit = true;
+      if (extras.pickup_location_id) body.pickup_location_id = extras.pickup_location_id;
     }
     return this.request("POST", "/checkout", body);
   },

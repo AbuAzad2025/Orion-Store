@@ -41,6 +41,7 @@ from v1.stock_notifications import stock_notifications_bp
 from v1.store_account import store_account_bp
 from v1.store_credit import store_credit_bp
 from v1.storefront import storefront_bp
+from v1.storefront_pickup import storefront_pickup_bp
 from v1.subscriptions import subscriptions_bp
 from v1.tax_api import tax_bp
 from v1.tenant_portal import tenant_portal_bp
@@ -69,6 +70,7 @@ API_BLUEPRINTS: list[Blueprint] = [
     payments_bp,
     platform_settings_bp,
     storefront_bp,
+    storefront_pickup_bp,
     store_account_bp,
     i18n_bp,
     shipping_bp,
@@ -116,6 +118,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(payments_bp, url_prefix="/api/v1/payments")
     app.register_blueprint(platform_settings_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(storefront_bp, url_prefix="/api/v1/store")
+    app.register_blueprint(storefront_pickup_bp, url_prefix="/api/v1/store")
     app.register_blueprint(store_account_bp, url_prefix="/api/v1/store/account")
     app.register_blueprint(i18n_bp, url_prefix="/api/v1/i18n")
     app.register_blueprint(shipping_bp, url_prefix="/api/v1/shipping")

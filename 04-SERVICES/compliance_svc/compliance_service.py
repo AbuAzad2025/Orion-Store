@@ -244,6 +244,12 @@ class ComplianceService:
             "consent_records_anonymised": len(consents),
         }
 
+    def get_data_request(
+        self, *, tenant_id: int, request_id: int
+    ) -> DataSubjectRequest:
+        """Public tenant-scoped lookup used by self-service GDPR endpoints."""
+        return self._get_data_request(tenant_id=tenant_id, request_id=request_id)
+
     @staticmethod
     def _get_data_request(*, tenant_id: int, request_id: int) -> DataSubjectRequest:
         req = DataSubjectRequest.query.filter_by(

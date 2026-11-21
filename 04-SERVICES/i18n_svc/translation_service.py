@@ -38,6 +38,7 @@ class TranslationService:
         description: str | None = None,
         meta_title: str | None = None,
         meta_description: str | None = None,
+        slug: str | None = None,
     ) -> ProductTranslation:
         self._i18n.get_locale(locale)
         row = ProductTranslation.query.filter_by(
@@ -52,6 +53,7 @@ class TranslationService:
             )
             db.session.add(row)
         row.name = name.strip()
+        row.slug = slug
         row.description = description
         row.meta_title = meta_title
         row.meta_description = meta_description
@@ -110,6 +112,7 @@ class TranslationService:
             {
                 "locale": locale,
                 "name": trans.name,
+                "slug": trans.slug or product.slug,
                 "description": trans.description or product.description,
                 "meta_title": trans.meta_title,
                 "meta_description": trans.meta_description,
@@ -135,6 +138,31 @@ class TranslationService:
             }
         )
         return data
+
+    def get_product_by_localized_slug(
+        self, tenant_id: int, slug: str, locale: str
+    ) -> Product:
+        """Resolve a product by its native or translated slug (tenant-scoped)."""
+        from catalog.product import Product
+
+        product = Product.query.filter_by(
+            tenant_id=tenant_id, slug=slug, deleted_at=None
+        ).first()
+        if product:
+            return product
+        if locale == "ar":
+            raise NotFoundError("Product not found.")
+        trans = ProductTranslation.query.filter_by(
+            tenant_id=tenant_id, locale=locale, slug=slug
+        ).first()
+        if not trans:
+            raise NotFoundError("Product not found.")
+        product = Product.query.filter_by(
+            id=trans.product_id, tenant_id=tenant_id, deleted_at=None
+        ).first()
+        if not product:
+            raise NotFoundError("Product not found.")
+        return product
 
     def get_category_by_localized_slug(
         self, tenant_id: int, slug: str, locale: str

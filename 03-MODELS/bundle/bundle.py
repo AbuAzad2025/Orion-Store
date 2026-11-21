@@ -44,6 +44,12 @@ class ProductBundle(db.Model, TimestampMixin):
 
 class BundleItem(db.Model):
     __tablename__ = "bundle_items"
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
 
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True

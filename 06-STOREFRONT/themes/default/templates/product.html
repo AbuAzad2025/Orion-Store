@@ -8,15 +8,15 @@
   {% set p_name = (product_i18n.name or product.name) if product_i18n else product.name %}
   {% set p_price = (product_i18n.price or product.price) if product_i18n else product.price %}
   <h1 class="orion-title text-2xl mb-2">{{ p_name }}</h1>
-  <p class="orion-eyebrow text-2xl mb-4">{{ p_price }} ₪</p>
+  <p class="orion-eyebrow text-2xl mb-4">{{ p_price }} {{ currency }}</p>
   {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}
-  <p class="orion-muted text-sm line-through">{{ product_i18n.compare_at_price }} ₪</p>
+  <p class="orion-muted text-sm line-through">{{ product_i18n.compare_at_price }} {{ currency }}</p>
   {% endif %}
   {% set desc = (product_i18n.description or product_i18n.short_description) if product_i18n else product.short_description %}
   {% if desc %}<p class="orion-muted mb-6">{{ desc }}</p>{% endif %}
   <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold">أضف للسلة</button>
   <a href="/cart" class="mr-4 text-sm text-gray-600 underline">عرض السلة</a>
-  {% set wa_order = whatsapp_url(tenant.phone, 'مرحباً، أريد طلب: ' ~ product.name ~ ' - السعر: ' ~ product.price ~ ' ₪') %}
+  {% set wa_order = whatsapp_url(tenant.phone, 'مرحباً، أريد طلب: ' ~ p_name ~ ' - السعر: ' ~ p_price ~ ' {{ currency }}') %}
   {% if wa_order %}
   <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn mt-3 block"
      aria-label="اطلب {{ product.name }} عبر واتساب">اطلب عبر واتساب</a>

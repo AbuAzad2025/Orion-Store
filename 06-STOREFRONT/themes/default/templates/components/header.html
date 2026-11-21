@@ -5,6 +5,8 @@
       <a href="/" class="orion-muted orion-header-link">الرئيسية</a>
       <a href="/account" class="orion-muted orion-header-link">حسابي</a>
       <a href="/cart" class="orion-muted orion-header-link">السلة</a>
+      <a href="{{ request.path }}?locale=ar" class="orion-muted orion-header-link" hreflang="ar" aria-label="العربية">ع</a>
+      <a href="{{ request.path }}?locale=en" class="orion-muted orion-header-link" hreflang="en" aria-label="English">EN</a>
       {% set wa_link = whatsapp_url(tenant.phone, 'مرحباً، عندي استفسار من متجر ' ~ tenant.name) %}
       {% if wa_link %}
       <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn orion-btn-gold text-xs"

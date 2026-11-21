@@ -213,11 +213,15 @@ def checkout():
             voucher_code=data.get("voucher_code"),
             use_store_credit=bool(data.get("use_store_credit", False)),
         )
+        from v1.storefront_pickup import book_pickup_for_order
+
+        pickup = book_pickup_for_order(tenant.id, order, data)
         return (
             jsonify(
                 {
                     "order": order.to_dict(),
                     "order_access_token": _order_access_token(order),
+                    "pickup": pickup,
                 }
             ),
             201,

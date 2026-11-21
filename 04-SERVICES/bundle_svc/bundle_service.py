@@ -38,6 +38,7 @@ class BundleService:
         if not bundle:
             raise NotFoundError("Bundle not found.")
         item = BundleItem(
+            tenant_id=tenant_id,
             bundle_id=bundle_id,
             product_id=product_id,
             quantity=quantity,

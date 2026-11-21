@@ -96,6 +96,7 @@ class RmaService:
             refund_total += line_refund
             db.session.add(
                 ReturnItem(
+                    tenant_id=tenant_id,
                     return_id=return_row.id,
                     order_item_id=oi.id,
                     product_id=oi.product_id,

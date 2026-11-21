@@ -49,9 +49,12 @@ def record_external_refund(
         raise ValidationError("Refund amount exceeds payment amount.")
 
     # One row per provider refund id: duplicate webhooks cannot double-post.
-    if provider_refund_id and Refund.query.filter_by(
-        tenant_id=tenant_id, provider_refund_id=provider_refund_id
-    ).first():
+    if (
+        provider_refund_id
+        and Refund.query.filter_by(
+            tenant_id=tenant_id, provider_refund_id=provider_refund_id
+        ).first()
+    ):
         raise ConflictError("Refund already recorded.")
 
     refund_row = Refund(

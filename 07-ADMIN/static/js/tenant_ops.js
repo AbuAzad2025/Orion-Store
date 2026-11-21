@@ -90,7 +90,78 @@ const OrionTenantOps = {
     }
   },
 
+  async loadTransfers() {
+    const el = document.getElementById("oms-transfers-list");
+    if (!el) return;
+    try {
+      const [data, wh] = await Promise.all([
+        OrionAPI.get("/oms-ext/transfers"),
+        OrionAPI.get("/oms/warehouses"),
+      ]);
+      const rows = data.transfers || [];
+      const warehouses = wh.warehouses || [];
+      for (const name of ["from_warehouse_id", "to_warehouse_id"]) {
+        const select = document.querySelector(`#oms-transfer-form [name=${name}]`);
+        if (!select) continue;
+        const current = select.value;
+        SafeDOM.clear(select);
+        select.appendChild(SafeDOM.elem("option", { value: "" }, [name === "from_warehouse_id" ? "من مستودع..." : "إلى مستودع..."]));
+        for (const w of warehouses) select.appendChild(SafeDOM.elem("option", { value: w.id }, [w.name]));
+        select.value = current;
+      }
+      SafeDOM.clear(el);
+      if (!rows.length) { el.textContent = "لا توجد تحويلات."; return; }
+      for (const t of rows) {
+        const complete = t.status === "draft"
+          ? SafeDOM.actionBtn("إكمال", "orion-btn", async () => {
+              try {
+                await OrionAPI.post(`/oms-ext/transfers/${t.id}/complete`);
+                OrionUI.toast("تم إكمال التحويل", "success");
+                OrionTenantOps.loadTransfers();
+              } catch (err) { OrionUI.toast(err.message, "error"); }
+            })
+          : null;
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex items-center justify-between" }, [
+          SafeDOM.elem("span", {}, [`#${t.id} — ${t.status}`]), complete,
+        ].filter(Boolean)));
+      }
+    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+  },
+
   initOms() {
+    const transferForm = document.getElementById("oms-transfer-form");
+    if (transferForm) {
+      transferForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(transferForm);
+        try {
+          await OrionAPI.post("/oms-ext/transfers", {
+            from_warehouse_id: Number(fd.get("from_warehouse_id")),
+            to_warehouse_id: Number(fd.get("to_warehouse_id")),
+            notes: fd.get("notes") || undefined,
+          });
+          transferForm.reset();
+          OrionUI.toast("تم إنشاء التحويل", "success");
+          OrionTenantOps.loadTransfers();
+        } catch (err) { OrionUI.toast(err.message, "error"); }
+      });
+    }
+    const itemForm = document.getElementById("oms-transfer-item-form");
+    if (itemForm) {
+      itemForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(itemForm);
+        try {
+          await OrionAPI.post(`/oms-ext/transfers/${fd.get("transfer_id")}/items`, {
+            product_id: Number(fd.get("product_id")),
+            quantity: Number(fd.get("quantity")),
+          });
+          itemForm.reset();
+          OrionUI.toast("تمت إضافة الصنف", "success");
+          OrionTenantOps.loadTransfers();
+        } catch (err) { OrionUI.toast(err.message, "error"); }
+      });
+    }
     const form = document.getElementById("oms-warehouse-form");
     if (form) {
       form.addEventListener("submit", async (e) => {
@@ -106,6 +177,7 @@ const OrionTenantOps = {
       });
     }
     OrionTenantOps.loadWarehouses();
+    OrionTenantOps.loadTransfers();
   },
 
   async loadPlans() {

@@ -10,6 +10,16 @@ _svc = InventoryTransferService()
 _oms = OmsService()
 
 
+@oms_ext_bp.route("/transfers", methods=["GET"])
+def list_transfers():
+    try:
+        require_tenant_admin()
+        rows = _svc.list_transfers(g.tenant_id)
+        return jsonify({"transfers": [t.to_dict() for t in rows]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
 @oms_ext_bp.route("/transfers", methods=["POST"])
 def create_transfer():
     try:

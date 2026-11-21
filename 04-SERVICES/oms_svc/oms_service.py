@@ -137,6 +137,7 @@ class OmsService:
                 level.reserved_quantity += oi.quantity
             db.session.add(
                 FulfillmentItem(
+                    tenant_id=tenant_id,
                     fulfillment_id=fulfillment.id,
                     order_item_id=oi.id,
                     quantity=oi.quantity,

@@ -114,6 +114,16 @@ class FeatureFlagService:
                 enabled=value,
             )
             db.session.add(override)
+            try:
+                db.session.flush()  # unique (tenant_id, flag_id) guard
+            except Exception:
+                db.session.rollback()
+                override = TenantFeatureFlagOverride.query.filter_by(
+                    flag_id=flag.id, tenant_id=tenant_id
+                ).first()
+                if override is None:
+                    raise
+                db.session.add(override)
         override.enabled = value
         override.reason = reason
         override.set_by = set_by

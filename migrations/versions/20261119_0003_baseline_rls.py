@@ -108,6 +108,16 @@ TENANT_TABLES = (
     "warehouses",
     "workflow_definitions",
     "workflow_runs",
+    "affiliate_links",
+    "bundle_items",
+    "financial_reconciliation_items",
+    "fulfillment_items",
+    "gift_registry_items",
+    "inventory_transfer_items",
+    "live_chat_messages",
+    "price_list_items",
+    "quote_items",
+    "return_items",
 )
 
 POLICY = "current_setting('app.is_platform_admin', true) = 'true'\n        OR tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::bigint"

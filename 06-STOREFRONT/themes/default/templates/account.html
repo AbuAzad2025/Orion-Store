@@ -21,6 +21,14 @@
   <p class="mb-4 text-gray-600" id="account-email"></p>
   <h2 class="font-semibold mb-2">طلباتي</h2>
   <div id="account-orders" class="text-sm text-gray-600">جاري التحميل...</div>
+  <section class="orion-card mt-6 max-w-md space-y-2">
+    <h2 class="font-semibold">الخصوصية والبيانات</h2>
+    <div class="flex gap-2">
+      <button id="gdpr-export-btn" class="orion-btn text-sm">طلب نسخة من بياناتي</button>
+      <button id="gdpr-delete-btn" class="orion-btn text-sm">طلب حذف بياناتي</button>
+    </div>
+    <p id="gdpr-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
+  </section>
   <button id="logout-btn" class="mt-4 text-sm text-red-700 underline">خروج</button>
 </section>
 {% endblock %}

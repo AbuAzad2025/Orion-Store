@@ -72,6 +72,22 @@ def refresh():
     return response, 200
 
 
+@auth_bp.post("/logout")
+@jwt_required()
+@limiter.limit("10 per minute")
+def logout():
+    """Invalidate the access and refresh tokens server-side, then clear cookies."""
+    from flask_jwt_extended import unset_access_cookies, unset_refresh_cookies
+
+    from core.jwt_auth import revoke_current_tokens
+
+    revoke_current_tokens()
+    response = jsonify({"message": "Logged out."})
+    unset_access_cookies(response)
+    unset_refresh_cookies(response)
+    return response, 200
+
+
 @auth_bp.post("/register/platform")
 def register_platform_admin():
     """Public platform-admin registration is permanently disabled.

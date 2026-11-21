@@ -73,6 +73,9 @@ def create_app(config_name: str | None = None) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    from core.jwt_auth import install_token_blocklist
+
+    install_token_blocklist(jwt)
     csrf.init_app(app)
 
     import discount.voucher  # noqa: F401
@@ -108,6 +111,7 @@ def create_app(config_name: str | None = None) -> Flask:
     import platform_models.financial_event  # noqa: F401
     import platform_models.invoice  # noqa: F401
     import platform_models.platform_settings  # noqa: F401
+    import platform_models.revoked_token  # noqa: F401
     import platform_models.tenant_gateway  # noqa: F401
     import returns.merchandise_return  # noqa: F401
     import returns.return_reason  # noqa: F401

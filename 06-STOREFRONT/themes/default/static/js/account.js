@@ -77,6 +77,29 @@ const AccountUI = {
       if (!ok) { this.showError(data.error); return; }
       this.loadProfile();
     });
+    const gdpr = async (type) => {
+      const msg = document.getElementById("gdpr-msg");
+      try {
+        const { data } = await this.api("POST", "/data-requests", { request_type: type });
+        const req = data.request;
+        if (type === "export") {
+          const payload = await this.api("GET", `/data-requests/${req.id}/export`);
+          const blob = new Blob([JSON.stringify(payload.data, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url; a.download = "orion-my-data.json"; a.click();
+          URL.revokeObjectURL(url);
+          msg.textContent = "تم تنزيل نسخة بياناتك.";
+        } else {
+          if (!window.confirm("سيتم إخفاء بياناتك الشخصية نهائياً. متابعة؟")) return;
+          await this.api("POST", `/data-requests/${req.id}/delete`, {});
+          msg.textContent = "تم تنفيذ طلب الحذف.";
+          this.loadProfile();
+        }
+      } catch (err) { msg.textContent = err.message; }
+    };
+    document.getElementById("gdpr-export-btn")?.addEventListener("click", () => gdpr("export"));
+    document.getElementById("gdpr-delete-btn")?.addEventListener("click", () => gdpr("delete"));
     document.getElementById("logout-btn")?.addEventListener("click", async () => {
       await fetch("/api/v1/store/account/logout", { method: "POST", headers: this.headers() });
       this.loadProfile();

@@ -103,9 +103,87 @@ def login_customer():
 def customer_logout():
     from flask_jwt_extended import unset_jwt_cookies
 
+    from core.jwt_auth import revoke_current_tokens
+
+    revoke_current_tokens()
     response = jsonify({"ok": True})
     unset_jwt_cookies(response)
     return response, 200
+
+
+@store_account_bp.post("/data-requests")
+@jwt_required()
+@limiter.limit("5 per minute")
+def create_own_data_request():
+    """A logged-in customer files their own GDPR export/delete request."""
+    from compliance_svc.compliance_service import ComplianceService
+
+    try:
+        tenant = require_tenant_context()
+        data = request.get_json(silent=True) or {}
+        request_type = str(data.get("request_type", "")).strip().lower()
+        if request_type not in ("export", "delete"):
+            return jsonify({"error": "request_type must be export or delete."}), 400
+        req = ComplianceService().create_data_request(
+            tenant_id=tenant.id,
+            customer_email=g.user.email,
+            request_type=request_type,
+        )
+        return jsonify({"request": req.to_dict()}), 201
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@store_account_bp.get("/data-requests/<int:request_id>/export")
+@jwt_required()
+@limiter.limit("10 per minute")
+def export_own_data(request_id: int):
+    from compliance_svc.compliance_service import ComplianceService
+
+    try:
+        tenant = require_tenant_context()
+        req = ComplianceService().get_data_request(
+            tenant_id=tenant.id, request_id=request_id
+        )
+        if req.customer_email.lower() != g.user.email.lower():
+            return jsonify({"error": "Permission denied."}), 403
+        return (
+            jsonify(
+                ComplianceService().export_subject_data(
+                    tenant_id=tenant.id, request_id=request_id
+                )
+            ),
+            200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@store_account_bp.post("/data-requests/<int:request_id>/delete")
+@jwt_required()
+@limiter.limit("5 per minute")
+def delete_own_data(request_id: int):
+    from compliance_svc.compliance_service import ComplianceService
+
+    try:
+        tenant = require_tenant_context()
+        req = ComplianceService().get_data_request(
+            tenant_id=tenant.id, request_id=request_id
+        )
+        if req.customer_email.lower() != g.user.email.lower():
+            return jsonify({"error": "Permission denied."}), 403
+        if req.request_type != "delete":
+            return jsonify({"error": "Request is not a deletion request."}), 400
+        return (
+            jsonify(
+                ComplianceService().execute_subject_deletion(
+                    tenant_id=tenant.id, request_id=request_id
+                )
+            ),
+            200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @store_account_bp.get("/me")

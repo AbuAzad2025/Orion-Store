@@ -11,13 +11,13 @@
     </div>
     {% endif %}
     <h3 class="orion-title mb-1">{{ p_name }}</h3>
-    <p class="orion-eyebrow">{{ p_price }} ₪</p>
+    <p class="orion-eyebrow">{{ p_price }} {{ currency }}</p>
     {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}
-    <p class="orion-muted text-xs line-through">{{ product_i18n.compare_at_price }} ₪</p>
+    <p class="orion-muted text-xs line-through">{{ product_i18n.compare_at_price }} {{ currency }}</p>
     {% endif %}
   </a>
   <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold mt-3 w-full text-sm">أضف للسلة</button>
-  {% set wa_order = whatsapp_url(tenant.phone, 'مرحباً، أريد طلب: ' ~ p_name ~ ' - السعر: ' ~ p_price ~ ' ₪') %}
+  {% set wa_order = whatsapp_url(tenant.phone, 'مرحباً، أريد طلب: ' ~ p_name ~ ' - السعر: ' ~ p_price ~ ' {{ currency }}') %}
   {% if wa_order %}
   <a href="{{ wa_order }}" target="_blank" rel="noopener"
      class="orion-btn mt-2 w-full text-sm" aria-label="اطلب {{ p_name }} عبر واتساب">

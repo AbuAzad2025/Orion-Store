@@ -39,6 +39,12 @@ class PriceList(db.Model, TimestampMixin):
 
 class PriceListItem(db.Model):
     __tablename__ = "price_list_items"
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     __table_args__ = (
         UniqueConstraint(
             "price_list_id",

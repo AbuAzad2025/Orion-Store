@@ -78,6 +78,7 @@ class B2bService:
         if not pl:
             raise NotFoundError("Price list not found.")
         item = PriceListItem(
+            tenant_id=tenant_id,
             price_list_id=price_list_id,
             product_id=product_id,
             price=Decimal(str(price)),
@@ -162,6 +163,7 @@ class B2bService:
             customer_group_id=quote.customer_group_id,
         )
         item = QuoteItem(
+            tenant_id=tenant_id,
             quote_id=quote.id,
             product_id=product_id,
             quantity=quantity,

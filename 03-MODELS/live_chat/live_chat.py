@@ -43,6 +43,12 @@ class LiveChatSession(db.Model, TimestampMixin):
 
 class LiveChatMessage(db.Model):
     __tablename__ = "live_chat_messages"
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
 
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True

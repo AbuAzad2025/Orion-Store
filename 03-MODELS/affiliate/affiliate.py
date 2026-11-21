@@ -131,6 +131,12 @@ class AffiliateCommission(db.Model, TimestampMixin):
 
 class AffiliateLink(db.Model, TimestampMixin):
     __tablename__ = "affiliate_links"
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
 
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True

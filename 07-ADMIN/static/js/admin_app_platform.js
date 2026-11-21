@@ -9,12 +9,54 @@ const OrionAdminAppPlatform = {
       if (!rows.length) { el.textContent = "لا توجد تطبيقات."; return; }
       SafeDOM.clear(el);
       for (const a of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          SafeDOM.elem("strong", {}, [a.name]),
-          " — ", a.client_id
+        const install = SafeDOM.actionBtn("تثبيت", "orion-btn", async () => {
+          try {
+            await OrionAPI.post(`/app-platform/apps/${a.id}/install`);
+            OrionUI.toast("تم تثبيت التطبيق", "success");
+            OrionAdminAppPlatform.loadInstallations();
+          } catch (err) { OrionUI.toast(err.message, "error"); }
+        });
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex items-center justify-between" }, [
+          SafeDOM.elem("span", {}, [SafeDOM.elem("strong", {}, [a.name]), " — ", a.client_id]),
+          install
         ]));
       }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+  },
+
+  async loadInstallations() {
+    const el = document.getElementById("app-installations-list");
+    if (!el) return;
+    try {
+      const apps = await OrionAPI.get("/app-platform/apps");
+      SafeDOM.clear(el);
+      for (const a of apps.apps || []) {
+        const data = await OrionAPI.get(`/app-platform/apps/${a.id}/installations`);
+        for (const inst of data.installations || []) {
+          el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
+            `${a.name} — تثبيت #${inst.id} (${inst.status || "active"})`
+          ]));
+        }
+      }
+      if (!el.children.length) el.textContent = "لا توجد تثبيتات.";
+    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+  },
+
+  subscribeWebhook() {
+    const form = document.getElementById("app-webhook-form");
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      try {
+        await OrionAPI.post(`/app-platform/installations/${fd.get("installation_id")}/webhooks`, {
+          topic: fd.get("topic"),
+          callback_url: fd.get("callback_url"),
+        });
+        OrionUI.toast("تم الاشتراك في الـ webhook", "success");
+        form.reset();
+      } catch (err) { OrionUI.toast(err.message, "error"); }
+    });
   },
 
   async loadSandboxes() {
@@ -94,5 +136,7 @@ const OrionAdminAppPlatform = {
     }
     OrionAdminAppPlatform.loadApps();
     OrionAdminAppPlatform.loadSandboxes();
+    OrionAdminAppPlatform.loadInstallations();
+    OrionAdminAppPlatform.subscribeWebhook();
   },
 };

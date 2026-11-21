@@ -9,6 +9,13 @@ from orion.extensions import db
 
 
 class InventoryTransferService:
+    def list_transfers(self, tenant_id: int) -> list[InventoryTransfer]:
+        return (
+            InventoryTransfer.query.filter_by(tenant_id=tenant_id)
+            .order_by(InventoryTransfer.id.desc())
+            .all()
+        )
+
     def create_transfer(
         self,
         *,
@@ -49,7 +56,10 @@ class InventoryTransferService:
         if transfer.status != "draft":
             raise ValidationError("Transfer is not in draft status.")
         item = InventoryTransferItem(
-            transfer_id=transfer_id, product_id=product_id, quantity=quantity
+            tenant_id=tenant_id,
+            transfer_id=transfer_id,
+            product_id=product_id,
+            quantity=quantity,
         )
         db.session.add(item)
         db.session.commit()

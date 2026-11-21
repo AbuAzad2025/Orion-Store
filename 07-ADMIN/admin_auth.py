@@ -84,6 +84,9 @@ def admin_login_post():
 
 @admin_auth_bp.get("/logout")
 def admin_logout():
+    from core.jwt_auth import revoke_current_tokens
+
+    revoke_current_tokens()
     session.clear()
     resp = redirect("/admin/login")
     resp.set_cookie("session", "", expires=0)

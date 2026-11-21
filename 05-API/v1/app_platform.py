@@ -1,4 +1,9 @@
-from app_platform.app_platform import OAuthApplication, SandboxStore
+from app_platform.app_platform import (
+    AppInstallation,
+    AppWebhookSubscription,
+    OAuthApplication,
+    SandboxStore,
+)
 from app_platform_svc.app_platform_service import AppPlatformService
 from flask import Blueprint, g, jsonify, request
 
@@ -55,6 +60,30 @@ def register_app():
         return jsonify({"error": exc.message}), exc.status_code
     except (KeyError, TypeError, ValueError):
         return jsonify({"error": "Invalid request."}), 400
+
+
+@app_platform_bp.route("/apps/<int:app_id>/installations", methods=["GET"])
+def list_installations(app_id: int):
+    try:
+        require_tenant_admin()
+        rows = AppInstallation.query.filter_by(
+            tenant_id=g.tenant_id, app_id=app_id
+        ).all()
+        return jsonify({"installations": [r.to_dict() for r in rows]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@app_platform_bp.route("/installations/<int:installation_id>/webhooks", methods=["GET"])
+def list_webhook_subscriptions(installation_id: int):
+    try:
+        require_tenant_admin()
+        rows = AppWebhookSubscription.query.filter_by(
+            tenant_id=g.tenant_id, installation_id=installation_id
+        ).all()
+        return jsonify({"webhooks": [r.to_dict() for r in rows]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @app_platform_bp.route("/apps/<int:app_id>/install", methods=["POST"])

@@ -17,10 +17,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         0
       );
     }
-    const [methodsRes, payRes] = await Promise.all([
+    const [methodsRes, payRes, pickupRes] = await Promise.all([
       StoreAPI.listShippingMethods(),
       StoreAPI.listPaymentMethods(),
+      StoreAPI.request("GET", "/pickup-locations").catch(() => ({ locations: [] })),
     ]);
+    const pickupSelect = document.getElementById("pickup-location");
+    const pickupRow = document.getElementById("pickup-row");
+    if (pickupSelect && pickupRow && (pickupRes.locations || []).length) {
+      for (const loc of pickupRes.locations) {
+        pickupSelect.appendChild(
+          SafeDOM.elem("option", { value: loc.id }, [`${loc.name} — ${loc.code}`])
+        );
+      }
+      pickupRow.classList.remove("hidden");
+    }
     SafeDOM.clear(methodSelect);
     (methodsRes.methods || []).forEach((m) => {
       const opt = document.createElement("option");
@@ -64,17 +75,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!token) throw new Error("لا توجد سلة.");
       const email = document.getElementById("customer-email").value;
       const city = document.getElementById("shipping-city").value;
+      const countryCode = document.getElementById("shipping-country")?.value.trim() || "";
+      const region = document.getElementById("shipping-region")?.value.trim() || "";
       const method = document.getElementById("payment-method").value;
       const shippingMethod = methodSelect.value || undefined;
       const voucherCode = document.getElementById("voucher-code").value.trim();
       const idempotencyKey = crypto.randomUUID
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const orderRes = await StoreAPI.checkout(token, email, { city }, {
+      const shippingAddress = {
+        city,
+        country_code: countryCode || undefined,
+        region: region || undefined,
+      };
+      const orderRes = await StoreAPI.checkout(token, email, shippingAddress, {
         shipping_method_code: shippingMethod,
         voucher_code: voucherCode || undefined,
         idempotency_key: idempotencyKey,
         use_store_credit: document.getElementById("use-store-credit")?.checked || false,
+        pickup_location_id: document.getElementById("pickup-location")?.value || undefined,
       });
       const order = orderRes.order;
       summaryEl.textContent = `المجموع: ${order.total} (شحن: ${order.shipping_cost})`;

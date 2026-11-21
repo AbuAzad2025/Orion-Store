@@ -82,11 +82,12 @@ def store_product(slug: str):
     tenant = _tenant_or_404()
     if not tenant:
         return "Store not found.", 404
-    product = _products.get_by_slug(tenant.id, slug)
     from i18n_svc.translation_service import TranslationService
 
     locale = get_locale()
-    product_i18n = TranslationService().merge_product(product, locale)
+    ts = TranslationService()
+    product = ts.get_product_by_localized_slug(tenant.id, slug, locale)
+    product_i18n = ts.merge_product(product, locale)
     return _engine.render(
         "product.html",
         tenant=tenant,

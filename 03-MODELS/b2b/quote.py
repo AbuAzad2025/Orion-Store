@@ -61,6 +61,12 @@ class Quote(db.Model, TimestampMixin):
 
 class QuoteItem(db.Model):
     __tablename__ = "quote_items"
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
 
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True

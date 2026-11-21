@@ -299,6 +299,7 @@ def upsert_product_translation(public_id: str, locale: str):
             description=data.get("description"),
             meta_title=data.get("meta_title"),
             meta_description=data.get("meta_description"),
+            slug=data.get("slug"),
         )
         return jsonify({"translation": row.to_dict()}), 200
     except OrionError as exc:

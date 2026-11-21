@@ -71,7 +71,16 @@ class AffiliateService:
     def create_link(
         self, *, affiliate_id: int, url: str, product_id: int | None = None
     ) -> AffiliateLink:
-        link = AffiliateLink(affiliate_id=affiliate_id, product_id=product_id, url=url)
+        affiliate = Affiliate.query.filter_by(id=affiliate_id).first()
+        if affiliate is None:
+            raise NotFoundError("Affiliate not found.")
+        tenant_id = affiliate.tenant_id
+        link = AffiliateLink(
+            tenant_id=tenant_id,
+            affiliate_id=affiliate_id,
+            product_id=product_id,
+            url=url,
+        )
         db.session.add(link)
         db.session.commit()
         return link

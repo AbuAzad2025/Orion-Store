@@ -31,6 +31,7 @@ class ProductTranslation(db.Model):
     )
     locale: Mapped[str] = mapped_column(String(5), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    slug: Mapped[str | None] = mapped_column(String(255), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     meta_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
     meta_description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -39,6 +40,7 @@ class ProductTranslation(db.Model):
         return {
             "locale": self.locale,
             "name": self.name,
+            "slug": self.slug,
             "description": self.description,
             "meta_title": self.meta_title,
             "meta_description": self.meta_description,

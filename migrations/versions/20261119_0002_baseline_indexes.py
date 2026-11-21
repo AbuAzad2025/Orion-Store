@@ -19,6 +19,7 @@ depends_on = None
 def upgrade() -> None:
     if op.get_bind().dialect.name != "postgresql":
         return
+    op.execute("CREATE UNIQUE INDEX ix_revoked_tokens_jti ON revoked_tokens (jti)")
     op.execute(
         "CREATE INDEX ix_accessibility_audits_tenant_id ON accessibility_audits (tenant_id)"
     )
@@ -124,6 +125,9 @@ def upgrade() -> None:
         "CREATE INDEX ix_financial_reconciliation_items_run_id ON financial_reconciliation_items (run_id)"
     )
     op.execute(
+        "CREATE INDEX ix_financial_reconciliation_items_tenant_id ON financial_reconciliation_items (tenant_id)"
+    )
+    op.execute(
         "CREATE INDEX ix_gift_registries_tenant_id ON gift_registries (tenant_id)"
     )
     op.execute(
@@ -190,6 +194,9 @@ def upgrade() -> None:
         "CREATE INDEX ix_affiliate_links_affiliate_id ON affiliate_links (affiliate_id)"
     )
     op.execute(
+        "CREATE INDEX ix_affiliate_links_tenant_id ON affiliate_links (tenant_id)"
+    )
+    op.execute(
         "CREATE INDEX ix_app_webhook_subscriptions_tenant_id ON app_webhook_subscriptions (tenant_id)"
     )
     op.execute(
@@ -199,6 +206,7 @@ def upgrade() -> None:
         "CREATE INDEX ix_bnpl_transactions_tenant_id ON bnpl_transactions (tenant_id)"
     )
     op.execute("CREATE INDEX ix_bundle_items_bundle_id ON bundle_items (bundle_id)")
+    op.execute("CREATE INDEX ix_bundle_items_tenant_id ON bundle_items (tenant_id)")
     op.execute("CREATE INDEX ix_cart_items_tenant_id ON cart_items (tenant_id)")
     op.execute(
         "CREATE INDEX ix_customer_group_members_tenant_id ON customer_group_members (tenant_id)"
@@ -223,13 +231,22 @@ def upgrade() -> None:
         "CREATE INDEX ix_gift_registry_items_registry_id ON gift_registry_items (registry_id)"
     )
     op.execute(
+        "CREATE INDEX ix_gift_registry_items_tenant_id ON gift_registry_items (tenant_id)"
+    )
+    op.execute(
         "CREATE INDEX ix_inventory_levels_tenant_id ON inventory_levels (tenant_id)"
+    )
+    op.execute(
+        "CREATE INDEX ix_inventory_transfer_items_tenant_id ON inventory_transfer_items (tenant_id)"
     )
     op.execute(
         "CREATE INDEX ix_inventory_transfer_items_transfer_id ON inventory_transfer_items (transfer_id)"
     )
     op.execute(
         "CREATE INDEX ix_live_chat_messages_session_id ON live_chat_messages (session_id)"
+    )
+    op.execute(
+        "CREATE INDEX ix_live_chat_messages_tenant_id ON live_chat_messages (tenant_id)"
     )
     op.execute("CREATE INDEX ix_order_events_tenant_id ON order_events (tenant_id)")
     op.execute("CREATE INDEX ix_order_items_tenant_id ON order_items (tenant_id)")
@@ -238,6 +255,9 @@ def upgrade() -> None:
     op.execute("CREATE INDEX ix_pickup_slots_tenant_id ON pickup_slots (tenant_id)")
     op.execute(
         "CREATE INDEX ix_price_list_items_price_list_id ON price_list_items (price_list_id)"
+    )
+    op.execute(
+        "CREATE INDEX ix_price_list_items_tenant_id ON price_list_items (tenant_id)"
     )
     op.execute(
         "CREATE UNIQUE INDEX ix_product_schema_markup_product_id ON product_schema_markup (product_id)"
@@ -292,6 +312,9 @@ def upgrade() -> None:
     op.execute(
         "CREATE INDEX ix_fulfillment_items_fulfillment_id ON fulfillment_items (fulfillment_id)"
     )
+    op.execute(
+        "CREATE INDEX ix_fulfillment_items_tenant_id ON fulfillment_items (tenant_id)"
+    )
     op.execute("CREATE INDEX ix_invoices_tenant_id ON invoices (tenant_id)")
     op.execute(
         "CREATE INDEX ix_license_keys_order_item_id ON license_keys (order_item_id)"
@@ -304,8 +327,10 @@ def upgrade() -> None:
         "CREATE INDEX ix_platform_commission_ledger_tenant_id ON platform_commission_ledger (tenant_id)"
     )
     op.execute("CREATE INDEX ix_quote_items_quote_id ON quote_items (quote_id)")
+    op.execute("CREATE INDEX ix_quote_items_tenant_id ON quote_items (tenant_id)")
     op.execute("CREATE INDEX ix_refunds_tenant_id ON refunds (tenant_id)")
     op.execute("CREATE INDEX ix_return_items_return_id ON return_items (return_id)")
+    op.execute("CREATE INDEX ix_return_items_tenant_id ON return_items (tenant_id)")
     op.execute(
         "CREATE INDEX ix_subscription_invoices_subscription_id ON subscription_invoices (subscription_id)"
     )
@@ -336,6 +361,9 @@ def upgrade() -> None:
     )
     op.execute(
         "CREATE UNIQUE INDEX product_schema_markup_product_id_key ON product_schema_markup USING btree (product_id)"
+    )
+    op.execute(
+        "CREATE UNIQUE INDEX uq_payments_order_active ON payments USING btree (order_id) WHERE (status IN ('pending', 'processing', 'completed', 'refunded'))"
     )
 
 

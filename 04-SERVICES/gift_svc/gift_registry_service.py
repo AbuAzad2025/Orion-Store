@@ -51,7 +51,10 @@ class GiftRegistryService:
         if quantity < 1:
             raise ValidationError("Quantity must be positive.")
         item = GiftRegistryItem(
-            registry_id=registry_id, product_id=product_id, requested_quantity=quantity
+            tenant_id=tenant_id,
+            registry_id=registry_id,
+            product_id=product_id,
+            requested_quantity=quantity,
         )
         db.session.add(item)
         db.session.commit()

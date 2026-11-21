@@ -129,6 +129,17 @@ TENANT_TABLES = (
     "warehouses",
     "workflow_definitions",
     "workflow_runs",
+    # Child tables now carry tenant_id so RLS can isolate them directly.
+    "affiliate_links",
+    "bundle_items",
+    "financial_reconciliation_items",
+    "fulfillment_items",
+    "gift_registry_items",
+    "inventory_transfer_items",
+    "live_chat_messages",
+    "price_list_items",
+    "quote_items",
+    "return_items",
 )
 
 LEGACY_TABLE_SQL = """CREATE TABLE platform_payment_integrations (
@@ -156,6 +167,8 @@ EXTRA_INDEXES = (
     "CREATE INDEX ix_products_tenant_published_active ON products USING btree (tenant_id, created_at DESC) WHERE ((deleted_at IS NULL) AND (is_published = true))",
     "CREATE INDEX ix_tenant_gateways_tenant ON tenant_payment_gateways USING btree (tenant_id)",
     "CREATE UNIQUE INDEX product_schema_markup_product_id_key ON product_schema_markup USING btree (product_id)",
+    # One active/successful payment per order; failed attempts may be retried.
+    "CREATE UNIQUE INDEX uq_payments_order_active ON payments USING btree (order_id) WHERE (status IN ('pending', 'processing', 'completed', 'refunded'))",
 )
 
 

@@ -53,6 +53,12 @@ class InventoryTransfer(db.Model, TimestampMixin):
 
 class InventoryTransferItem(db.Model):
     __tablename__ = "inventory_transfer_items"
+    tenant_id: Mapped[int] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
 
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True
