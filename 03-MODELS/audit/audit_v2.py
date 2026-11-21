@@ -30,6 +30,7 @@ class PlatformAuditReport(db.Model, TimestampMixin):
             "report_number": self.report_number,
             "report_type": self.report_type,
             "summary": self.summary,
+            "generated_by": self.generated_by,
         }
 
 

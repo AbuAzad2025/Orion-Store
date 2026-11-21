@@ -71,6 +71,15 @@ def reconciliation_dashboard():
     )
 
 
+@platform_admin_bp.get("/audit")
+def platform_audit():
+    return render_template(
+        "platform_audit_management.html",
+        page_title="تدقيق المنصة",
+        active_nav="audit",
+    )
+
+
 @platform_admin_bp.get("/stores/<int:tenant_id>/finance")
 def store_financial_report(tenant_id: int):
     return render_template(

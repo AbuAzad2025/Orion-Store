@@ -9,10 +9,22 @@ const OrionAdminReconciliation = {
       if (!rows.length) { el.textContent = "لا توجد تشغيلات."; return; }
       SafeDOM.clear(el);
       for (const r of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          SafeDOM.elem("strong", {}, [r.run_number]),
-          " — ", r.status, " — ", r.matched_count || 0, "/", r.total_events || 0, " متطابق"
-        ]));
+        const children = [
+          SafeDOM.elem("span", {}, [
+            SafeDOM.elem("strong", {}, [r.run_number]),
+            " — ", r.status, " — ", r.matched_count || 0, "/", r.total_events || 0, " متطابق"
+          ])
+        ];
+        if (r.status === "pending" || r.status === "draft") {
+          children.push(SafeDOM.actionBtn("إكمال", "orion-btn", async () => {
+            try {
+              await OrionAPI.post(`/reconciliation/runs/${r.id}/complete`);
+              OrionUI.toast("تم إكمال التسوية", "success");
+              OrionAdminReconciliation.loadRuns();
+            } catch (err) { OrionUI.toast(err.message, "error"); }
+          }));
+        }
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex items-center justify-between" }, children));
       }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },

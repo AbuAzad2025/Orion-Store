@@ -60,6 +60,7 @@ def create_product():
             image_url=_safe_image_url(data.get("image_url")),
             short_description=data.get("short_description"),
             description=data.get("description"),
+            compare_at_price=data.get("compare_at_price"),
         )
         return jsonify({"product": product.to_dict()}), 201
     except OrionError as exc:
@@ -99,6 +100,7 @@ def update_product(public_id: str):
                 "image_url",
                 "short_description",
                 "description",
+                "compare_at_price",
             )
             if k in data
         }

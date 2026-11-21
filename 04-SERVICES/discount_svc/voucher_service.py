@@ -52,6 +52,8 @@ class VoucherService:
         max_discount_amount: str | Decimal | None = None,
         usage_limit: int | None = None,
         is_free_shipping: bool = False,
+        start_date=None,
+        end_date=None,
     ) -> Voucher:
         voucher = Voucher(
             tenant_id=tenant_id,
@@ -69,6 +71,8 @@ class VoucherService:
             ),
             usage_limit=usage_limit,
             is_free_shipping=is_free_shipping,
+            start_date=start_date,
+            end_date=end_date,
         )
         db.session.add(voucher)
         db.session.commit()

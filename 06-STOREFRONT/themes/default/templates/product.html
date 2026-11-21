@@ -5,9 +5,10 @@
   <img src="{{ product.image_url }}" alt="{{ product.name }}"
        class="w-full h-72 object-cover rounded mb-5 border border-slate-800">
   {% endif %}
-  <h1 class="orion-title text-2xl mb-2">{{ product.name }}</h1>
-  <p class="orion-eyebrow text-2xl mb-4">{{ product.price }} ₪</p>
-  {% if product.short_description %}<p class="text-gray-600 mb-6">{{ product.short_description }}</p>{% endif %}
+  <h1 class="orion-title text-2xl mb-2">{{ product_i18n.name if product_i18n else product.name }}</h1>
+  <p class="orion-eyebrow text-2xl mb-4">{{ product_i18n.price if product_i18n else product.price }} ₪</p>
+  {% set desc = (product_i18n.description or product_i18n.short_description) if product_i18n else product.short_description %}
+  {% if desc %}<p class="orion-muted mb-6">{{ desc }}</p>{% endif %}
   <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold">أضف للسلة</button>
   <a href="/cart" class="mr-4 text-sm text-gray-600 underline">عرض السلة</a>
   {% set wa_order = whatsapp_url(tenant.phone, 'مرحباً، أريد طلب: ' ~ product.name ~ ' - السعر: ' ~ product.price ~ ' ₪') %}

@@ -7,7 +7,7 @@ from compliance_svc.compliance_service import ComplianceService
 from flask import Blueprint, g, jsonify, request
 
 from core.exceptions import OrionError
-from core.middleware import require_tenant_admin
+from core.middleware import require_tenant_admin, require_tenant_context
 
 compliance_bp = Blueprint("compliance", __name__)
 _svc = ComplianceService()
@@ -19,6 +19,27 @@ def list_consent():
         require_tenant_admin()
         records = ConsentRecord.query.filter_by(tenant_id=g.tenant_id).all()
         return jsonify({"consent_records": [r.to_dict() for r in records]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@compliance_bp.route("/consent/public", methods=["POST"])
+def record_visitor_consent():
+    """Store a storefront visitor's cookie choice (no auth required)."""
+    try:
+        tenant = require_tenant_context()
+        data = request.get_json(silent=True) or {}
+        choice = str(data.get("choice", "")).strip().lower()
+        if choice not in ("all", "necessary"):
+            return jsonify({"error": "Invalid choice."}), 400
+        rec = _svc.record_consent(
+            tenant_id=tenant.id,
+            customer_email=data.get("email") or "anonymous",
+            consent_type="cookie_banner",
+            granted=choice == "all",
+            ip_address=request.remote_addr,
+        )
+        return jsonify({"consent": rec.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

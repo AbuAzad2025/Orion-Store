@@ -48,6 +48,7 @@ const StoreAPI = {
         body.shipping_method_code = extras.shipping_method_code;
       }
       if (extras.voucher_code) body.voucher_code = extras.voucher_code;
+      if (extras.idempotency_key) body.idempotency_key = extras.idempotency_key;
     }
     return this.request("POST", "/checkout", body);
   },

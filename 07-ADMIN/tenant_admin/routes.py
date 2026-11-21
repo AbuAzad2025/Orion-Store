@@ -188,6 +188,19 @@ def tenant_subscriptions():
     )
 
 
+@tenant_admin_bp.get("/vouchers")
+def tenant_vouchers():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "vouchers_management.html",
+        tenant=tenant,
+        page_title="قسائم الخصم",
+        active_nav="vouchers",
+    )
+
+
 @tenant_admin_bp.get("/tax")
 def tenant_tax():
     tenant = _require_tenant()

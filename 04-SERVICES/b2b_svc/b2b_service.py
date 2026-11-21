@@ -213,6 +213,14 @@ class B2bService:
                 db.session.rollback()
                 raise ValidationError("Insufficient stock for quote conversion.")
             prod.quantity -= qi.quantity
+        try:
+            from oms_svc.oms_service import OmsService
+
+            OmsService().sync_product_to_warehouse(
+                tenant_id=prod.tenant_id, product_id=prod.id
+            )
+        except Exception:
+            pass
             line = qi.unit_price * qi.quantity
             discount = line * (qi.discount_percent / Decimal("100"))
             db.session.add(

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="orion-consent max-w-3xl mx-auto" id="cookie-consent"
-         data-active="{{ 'true' if (cookie_settings and cookie_settings.is_active) else 'false' }}">
+         data-active="{{ 'true' if (cookie_settings and cookie_settings.is_active) else 'false' }}"
+         data-tenant-id="{{ tenant.slug }}">
   <h1 class="orion-title orion-eyebrow text-2xl mb-4">الخصوصية وملفات تعريف الارتباط</h1>
   <p class="orion-muted mb-6">
     {{ (cookie_settings.banner_message if cookie_settings and cookie_settings.banner_message else 'نستخدم ملفات تعريف الارتباط لتحسين تجربة التصفح وتحليل الاستخدام.') }}
@@ -27,6 +28,11 @@
   function save(choice) {
     try { localStorage.setItem("orion_cookie_consent", choice); } catch (e) { /* storage disabled */ }
     if (status) { status.textContent = "تم حفظ اختيارك: " + choice; }
+    fetch("/api/v1/compliance/consent/public", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Tenant-ID": (document.body.dataset.tenantId || section.dataset.tenantId || "") },
+      body: JSON.stringify({ choice: choice })
+    }).catch(function () { /* best effort */ });
   }
   var accept = document.getElementById("consent-accept-all");
   var necessary = document.getElementById("consent-necessary-only");

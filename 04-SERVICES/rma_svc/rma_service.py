@@ -162,6 +162,14 @@ class RmaService:
                 ).first()
                 if prod:
                     prod.quantity += item.quantity
+        try:
+            from oms_svc.oms_service import OmsService
+
+            OmsService().sync_product_to_warehouse(
+                tenant_id=prod.tenant_id, product_id=prod.id
+            )
+        except Exception:
+            pass
 
         refund_result = None
         if process_refund and row.return_type == "refund" and row.refund_amount > 0:

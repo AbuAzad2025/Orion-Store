@@ -67,6 +67,8 @@ class Voucher(db.Model, TenantCatalogMixin):
                 else None
             ),
             "usage_limit": self.usage_limit,
+            "start_date": self.start_date.isoformat() if self.start_date else None,
+            "end_date": self.end_date.isoformat() if self.end_date else None,
             "usage_count": self.usage_count,
             "is_free_shipping": self.is_free_shipping,
             "is_active": self.is_active,

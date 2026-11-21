@@ -21,7 +21,7 @@ const OrionAdminCompliance = {
     if (!el) return;
     try {
       const data = await OrionAPI.get("/compliance/data-requests");
-      const rows = data.requests || [];
+      const rows = data.data_requests || [];
       if (!rows.length) { el.textContent = "لا توجد طلبات."; return; }
       SafeDOM.clear(el);
       for (const r of rows) {
@@ -50,7 +50,7 @@ const OrionAdminCompliance = {
     if (!el) return;
     try {
       const data = await OrionAPI.get("/compliance/cookie-settings");
-      const s = data.settings;
+      const s = data.cookie_settings;
       if (!s) { el.textContent = "لا توجد إعدادات."; return; }
       SafeDOM.clear(el);
       el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [

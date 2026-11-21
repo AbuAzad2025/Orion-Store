@@ -90,6 +90,8 @@ class StoreCreditTransaction(db.Model):
             "id": self.id,
             "credit_id": self.credit_id,
             "transaction_type": self.transaction_type,
+            "type": self.transaction_type,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
             "amount": str(self.amount),
             "balance_after": str(self.balance_after),
             "reference_type": self.reference_type,

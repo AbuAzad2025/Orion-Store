@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         customer_name: document.getElementById("wa-customer-name")?.value || "",
         notes: document.getElementById("wa-notes")?.value || "",
       });
+      if (!result.url) throw new Error("رقم واتساب غير مُضبط لهذا المتجر.");
       window.open(result.url, "_blank", "noopener,noreferrer");
       if (waMsg) waMsg.textContent = "تم تجهيز الطلب — أكمل الإرسال في واتساب.";
     } catch (err) {

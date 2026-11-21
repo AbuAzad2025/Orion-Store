@@ -8,8 +8,11 @@
       لا توجد صورة
     </div>
     {% endif %}
-    <h3 class="orion-title mb-1">{{ product.name }}</h3>
-    <p class="orion-eyebrow">{{ product.price }} ₪</p>
+    <h3 class="orion-title mb-1">{{ product_i18n.name if product_i18n else product.name }}</h3>
+    <p class="orion-eyebrow">{{ product_i18n.price if product_i18n else product.price }} ₪</p>
+    {% if product_i18n and product_i18n.compare_at_price and product_i18n.compare_at_price > product_i18n.price %}
+    <p class="orion-muted text-xs line-through">{{ product_i18n.compare_at_price }} ₪</p>
+    {% endif %}
   </a>
   <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold mt-3 w-full text-sm">أضف للسلة</button>
   {% set wa_order = whatsapp_url(tenant.phone, 'مرحباً، أريد طلب: ' ~ product.name) %}

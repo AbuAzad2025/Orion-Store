@@ -57,13 +57,20 @@ def store_index():
     tenant = _tenant_or_404()
     if not tenant:
         return "Store not found.", 404
+    from i18n_svc.translation_service import TranslationService
+
+    locale = get_locale()
     products = _products.list_published(tenant.id)
+    ts = TranslationService()
+    products_i18n = [ts.merge_product(p, locale) for p in products]
+    products_i18n.sort(key=lambda p: (not p.get("is_featured"), p.get("name") or ""))
     return _engine.render(
         "index.html",
         tenant=tenant,
         products=products,
+        products_i18n=products_i18n,
         page_title=tenant.name,
-        locale=get_locale(),
+        locale=locale,
     )
 
 
@@ -73,12 +80,17 @@ def store_product(slug: str):
     if not tenant:
         return "Store not found.", 404
     product = _products.get_by_slug(tenant.id, slug)
+    from i18n_svc.translation_service import TranslationService
+
+    locale = get_locale()
+    product_i18n = TranslationService().merge_product(product, locale)
     return _engine.render(
         "product.html",
         tenant=tenant,
         product=product,
-        page_title=product.name,
-        locale=get_locale(),
+        product_i18n=product_i18n,
+        page_title=product_i18n.get("name") or product.name,
+        locale=locale,
     )
 
 
@@ -87,17 +99,22 @@ def store_category(slug: str):
     tenant = _tenant_or_404()
     if not tenant:
         return "Store not found.", 404
-    category = _categories.get_by_slug(tenant.id, slug)
+    from i18n_svc.translation_service import TranslationService
+
+    locale = get_locale()
+    ts = TranslationService()
+    category = ts.get_category_by_localized_slug(tenant.id, slug, locale)
+    category_i18n = ts.merge_category(category, locale)
     products = [
         p for p in _products.list_published(tenant.id) if p.category_id == category.id
     ]
     return _engine.render(
         "category.html",
         tenant=tenant,
-        category=category,
+        category=category_i18n,
         products=products,
-        page_title=category.name,
-        locale=get_locale(),
+        page_title=category_i18n.get("name") or category.name,
+        locale=locale,
     )
 
 

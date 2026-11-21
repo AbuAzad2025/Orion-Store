@@ -219,7 +219,8 @@ const OrionTenantOps = {
         e.preventDefault();
         const fd = new FormData(form);
         await OrionAPI.post("/bopis/locations", {
-          name: fd.get("name"), address: fd.get("address"), phone: fd.get("phone") || undefined,
+          code: fd.get("code") || String(fd.get("name") || "").trim().toLowerCase().replace(/\s+/g, "-"),
+          name: fd.get("name"), address: { text: fd.get("address") },
         });
         form.reset();
         OrionTenantOps.loadBopisLocations();

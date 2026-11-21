@@ -22,6 +22,9 @@ _PUBLISHED_COLUMNS = load_only(
     Product.sku,
     Product.image_url,
     Product.short_description,
+    Product.description,
+    Product.is_featured,
+    Product.compare_at_price,
     Product.price,
     Product.quantity,
     Product.is_published,
@@ -120,6 +123,7 @@ class ProductService:
         image_url: str | None = None,
         short_description: str | None = None,
         description: str | None = None,
+        compare_at_price: str | Decimal | None = None,
     ) -> Product:
         if Product.query.filter_by(tenant_id=tenant_id, slug=slug).first():
             raise ValidationError("Product slug already exists.")
@@ -140,6 +144,9 @@ class ProductService:
             image_url=image_url,
             short_description=short_description,
             description=description,
+            compare_at_price=(
+                Decimal(str(compare_at_price)) if compare_at_price is not None else None
+            ),
         )
         db.session.add(product)
         db.session.commit()

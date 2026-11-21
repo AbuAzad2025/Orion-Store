@@ -61,6 +61,12 @@ def list_transactions():
     try:
         require_tenant_admin()
         credit_id = int(request.args.get("credit_id", "0"))
+        email = request.args.get("customer_email", "")
+        if email:
+            credit = _svc.get_or_create(
+                tenant_id=g.tenant_id, customer_email=email, commit=False
+            )
+            credit_id = credit.id
         txns = _svc.list_transactions(tenant_id=g.tenant_id, credit_id=credit_id)
         return jsonify({"transactions": [t.to_dict() for t in txns]}), 200
     except OrionError as exc:

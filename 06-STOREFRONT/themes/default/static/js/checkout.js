@@ -65,9 +65,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       const method = document.getElementById("payment-method").value;
       const shippingMethod = methodSelect.value || undefined;
       const voucherCode = document.getElementById("voucher-code").value.trim();
+      if (form.dataset.busy) return;
+      form.dataset.busy = "1";
+      const idempotencyKey = crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const orderRes = await StoreAPI.checkout(token, email, { city }, {
         shipping_method_code: shippingMethod,
         voucher_code: voucherCode || undefined,
+        idempotency_key: idempotencyKey,
       });
       const order = orderRes.order;
       summaryEl.textContent = `المجموع: ${order.total} (شحن: ${order.shipping_cost})`;
@@ -75,7 +81,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       SafeDOM.clear(resultEl);
       resultEl.appendChild(SafeDOM.elem("p", { className: "text-green-700" }, [`تم الدفع — رقم الطلب ${order.order_number}`]));
       if (payRes.invoice) {
-        resultEl.appendChild(SafeDOM.elem("p", { className: "text-sm" }, [`فاتورة: ${payRes.invoice.invoice_number}`]));
+        resultEl.appendChild(SafeDOM.elem("p", { className: "text-sm" }, [
+          `فاتورة: ${payRes.invoice.invoice_number} `,
+          SafeDOM.elem("a", {
+            href: `/api/v1/store/orders/${order.public_id}/invoice.pdf`,
+            className: "orion-header-link underline",
+            target: "_blank",
+            rel: "noopener",
+          }, ["تحميل PDF"])
+        ]));
       }
       localStorage.removeItem(StoreAPI.cartTokenKey);
     } catch (err) {

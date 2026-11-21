@@ -46,12 +46,31 @@ def create_voucher():
             max_discount_amount=data.get("max_discount_amount"),
             usage_limit=data.get("usage_limit"),
             is_free_shipping=bool(data.get("is_free_shipping", False)),
+            start_date=data.get("start_date"),
+            end_date=data.get("end_date"),
         )
         return jsonify({"voucher": voucher.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
     except KeyError:
         return jsonify({"error": "Missing required fields."}), 400
+
+
+@vouchers_bp.delete("/<code>")
+def delete_voucher(code: str):
+    """Deactivate a voucher (soft delete) for the tenant."""
+    try:
+        require_tenant_admin()
+        voucher = _vouchers.get_by_code(g.tenant_id, code)
+        if not voucher:
+            return jsonify({"error": "Voucher not found."}), 404
+        voucher.is_active = False
+        from orion.extensions import db
+
+        db.session.commit()
+        return jsonify({"deleted": True}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
 
 @vouchers_bp.get("/<code>/validate")

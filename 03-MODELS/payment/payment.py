@@ -50,5 +50,6 @@ class Payment(db.Model, TimestampMixin):
             "currency": self.currency,
             "payment_method": self.payment_method,
             "status": self.status,
+            "provider_payment_id": self.provider_payment_id,
             "order_id": self.order_id,
         }
