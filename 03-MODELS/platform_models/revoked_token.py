@@ -17,10 +17,16 @@ class RevokedToken(db.Model):
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True
     )
-    jti: Mapped[str] = mapped_column(String(36), nullable=False, unique=True, index=True)
-    token_type: Mapped[str] = mapped_column(String(20), nullable=False, default="access")
+    jti: Mapped[str] = mapped_column(
+        String(36), nullable=False, unique=True, index=True
+    )
+    token_type: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="access"
+    )
     user_public_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
     revoked_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=db.func.now()
     )

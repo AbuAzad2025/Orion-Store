@@ -28,6 +28,25 @@
     </div>
     <button type="submit" class="orion-btn orion-btn-gold w-full">دخول</button>
   </form>
+  <details class="bg-white p-6 rounded-lg shadow w-full max-w-md">
+    <summary class="cursor-pointer text-sm text-blue-700">تسجيل الدخول عبر SSO</summary>
+    <form action="/admin/sso/exchange" method="post" class="mt-4 space-y-3 text-sm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div>
+        <label class="block text-sm mb-1" for="sso-provider-code">رمز مزوّد SSO</label>
+        <input id="sso-provider-code" name="provider_code" type="text" required class="w-full border rounded px-3 py-2" aria-label="SSO provider code">
+      </div>
+      <div>
+        <label class="block text-sm mb-1" for="sso-email">البريد الخارجي</label>
+        <input id="sso-email" name="external_email" type="email" required class="w-full border rounded px-3 py-2" aria-label="SSO external email">
+      </div>
+      <div>
+        <label class="block text-sm mb-1" for="sso-tenant">Slug المتجر</label>
+        <input id="sso-tenant" name="tenant_slug" type="text" required class="w-full border rounded px-3 py-2" placeholder="my-store">
+      </div>
+      <button type="submit" class="orion-btn w-full">دخول عبر SSO</button>
+    </form>
+  </details>
   <script src="{{ url_for('admin_assets.static', filename='js/admin_utils.js') }}"></script>
   <script src="{{ url_for('admin_assets.static', filename='js/api_client.js') }}"></script>
   <script src="{{ url_for('admin_assets.static', filename='js/admin_login.js') }}"></script>

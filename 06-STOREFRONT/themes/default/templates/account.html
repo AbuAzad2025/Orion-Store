@@ -21,6 +21,41 @@
   <p class="mb-4 text-gray-600" id="account-email"></p>
   <h2 class="font-semibold mb-2">طلباتي</h2>
   <div id="account-orders" class="text-sm text-gray-600">جاري التحميل...</div>
+  <section class="orion-card mt-6 space-y-4">
+    <h2 class="font-semibold text-lg">خدماتي</h2>
+    <p id="account-credit" class="orion-muted text-sm">رصيد المتجر: ...</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+      <div>
+        <h3 class="font-semibold mb-2">الاشتراكات</h3>
+        <div id="account-plans" class="space-y-2 orion-muted">جاري التحميل...</div>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-2">طلب عرض سعر (B2B)</h3>
+        <form id="quote-request-form" class="space-y-2">
+          <input name="notes" class="orion-input w-full" placeholder="ملاحظات الطلب" aria-label="ملاحظات الطلب">
+          <input name="product_id" type="number" min="1" placeholder="رقم المنتج" class="orion-input w-full" aria-label="رقم المنتج">
+          <input name="quantity" type="number" min="1" value="1" class="orion-input w-full" aria-label="الكمية">
+          <button type="submit" class="orion-btn w-full">إرسال طلب العرض</button>
+        </form>
+        <div id="account-quotes" class="mt-2 space-y-1 orion-muted"></div>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-2">قوائم الهدايا</h3>
+        <form id="gift-registry-form" class="space-y-2">
+          <input name="registry_name" required class="orion-input w-full" placeholder="اسم القائمة" aria-label="اسم القائمة">
+          <input name="event_type" class="orion-input w-full" placeholder="المناسبة" aria-label="المناسبة">
+          <input name="event_date" type="date" class="orion-input w-full" aria-label="تاريخ المناسبة">
+          <button type="submit" class="orion-btn w-full">إنشاء القائمة</button>
+        </form>
+        <form id="gift-item-form" class="space-y-2 mt-2">
+          <input name="slug" class="orion-input w-full" placeholder="رمز القائمة" aria-label="رمز القائمة">
+          <input name="product_id" type="number" min="1" class="orion-input w-full" placeholder="رقم المنتج" aria-label="رقم المنتج">
+          <button type="submit" class="orion-btn w-full">إضافة منتج للقائمة</button>
+        </form>
+        <div id="account-registries" class="mt-2 space-y-1 orion-muted"></div>
+      </div>
+    </div>
+  </section>
   <section class="orion-card mt-6 max-w-md space-y-2">
     <h2 class="font-semibold">الخصوصية والبيانات</h2>
     <div class="flex gap-2">

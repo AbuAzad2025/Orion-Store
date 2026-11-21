@@ -19,23 +19,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!token) {
       if (listEl) { SafeDOM.clear(listEl); listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["السلة فارغة."])); }
       if (waBtn) waBtn.disabled = true;
+      const totalEl = document.getElementById("cart-total");
+      if (totalEl) totalEl.textContent = "";
       return;
     }
     const data = await StoreAPI.getCart(token);
     if (!data.items.length) {
       if (listEl) { SafeDOM.clear(listEl); listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["السلة فارغة."])); }
       if (waBtn) waBtn.disabled = true;
+      const totalEl = document.getElementById("cart-total");
+      if (totalEl) totalEl.textContent = "";
       return;
     }
     if (waBtn) waBtn.disabled = false;
     if (listEl) {
       SafeDOM.clear(listEl);
+      const currency = document.body.dataset.currency || "ILS";
+      let total = 0;
       data.items.forEach((i) => {
+        const line = parseFloat(i.total_price || 0) || 0;
+        total += line;
         listEl.appendChild(SafeDOM.elem("div", { className: "flex justify-between border-b py-2" }, [
           SafeDOM.elem("span", {}, [i.product_name || i.product_id]),
-          SafeDOM.elem("span", {}, [`${i.quantity} × ${i.unit_price}`]),
+          SafeDOM.elem("span", {}, [`${i.quantity} × ${i.unit_price} ${currency}`]),
         ]));
       });
+      const totalEl = document.getElementById("cart-total");
+      if (totalEl) totalEl.textContent = `المجموع: ${total.toFixed(2)} ${currency}`;
     }
   }
 

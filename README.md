@@ -71,6 +71,15 @@ Local testing options:
 
 Production: `https://{tenant.slug}.azadexa.com/` or custom domain.
 
+## Customer & storefront self-service
+
+- `/account` lets a logged-in customer view orders, export/delete personal data (GDPR),
+  subscribe to plans, view store credit, submit B2B quote requests and create gift registries.
+- Storefront header includes locale (`?locale=ar|en`) and currency (`?currency=ILS|USD|...`)
+  switchers; translated product slugs and locale-aware UI strings are supported.
+- Checkout supports address-based tax, store credit, coupons and optional BOPIS pickup.
+- Admin login supports SSO exchange for enabled tenant identity providers.
+
 ## Wave 0–1 deliverables
 
 - Flask app factory + `/health`

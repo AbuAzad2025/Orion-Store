@@ -52,7 +52,65 @@ const AccountUI = {
         list.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["لا توجد طلبات."]));
       }
     }
+    await this.loadServices();
   },
+  notify(message, kind) {
+    let el = document.getElementById("account-notice");
+    if (!el) {
+      el = document.createElement("p");
+      el.id = "account-notice";
+      el.setAttribute("role", "status");
+      document.getElementById("account-user")?.prepend(el);
+    }
+    el.textContent = message;
+    el.className = kind === "error" ? "text-red-600 text-sm" : "orion-muted text-sm";
+  },
+
+  async loadServices() {
+    const creditEl = document.getElementById("account-credit");
+    if (!creditEl) return;
+    try {
+      const [credit, plans, quotes, registries] = await Promise.all([
+        this.api("GET", "/credit"),
+        this.api("GET", "/plans"),
+        this.api("GET", "/quote-requests"),
+        this.api("GET", "/gift-registries"),
+      ]);
+      creditEl.textContent = `رصيد المتجر: ${credit.data.credit?.balance || "0.00"}`;
+      const plansEl = document.getElementById("account-plans");
+      if (plansEl) {
+        SafeDOM.clear(plansEl);
+        const rows = plans.data.plans || [];
+        if (!rows.length) plansEl.textContent = "لا توجد خطط متاحة.";
+        for (const p of rows) {
+          plansEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 flex items-center justify-between" }, [
+            SafeDOM.elem("span", {}, [`${p.name} — ${p.price} ${p.currency || ""}`]),
+            SafeDOM.actionBtn("اشترك", "text-blue-700 text-xs", async () => {
+              try {
+                await this.api("POST", "/subscribe", { plan_id: p.id });
+                this.notify("تم الاشتراك", "success");
+              } catch (err) { this.notify(err.message, "error"); }
+            }),
+          ]));
+        }
+      }
+      const quotesEl = document.getElementById("account-quotes");
+      if (quotesEl) {
+        SafeDOM.clear(quotesEl);
+        for (const q of quotes.data.quotes || []) {
+          quotesEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1" }, [`${q.quote_number} — ${q.status}`]));
+        }
+      }
+      const regsEl = document.getElementById("account-registries");
+      if (regsEl) {
+        SafeDOM.clear(regsEl);
+        for (const r of registries.data.registries || []) {
+          regsEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1" }, [`${r.registry_name} — ${r.slug}`]));
+        }
+      }
+    } catch (err) { creditEl.textContent = err.message; }
+  },
+
   init() {
     document.getElementById("login-form")?.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -76,6 +134,47 @@ const AccountUI = {
       });
       if (!ok) { this.showError(data.error); return; }
       this.loadProfile();
+    });
+    document.getElementById("quote-request-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      try {
+        const body = { notes: fd.get("notes") || undefined };
+        if (fd.get("product_id")) {
+          body.product_id = Number(fd.get("product_id"));
+          body.quantity = Number(fd.get("quantity") || 1);
+        }
+        await this.api("POST", "/quote-requests", body);
+        e.target.reset();
+        this.notify("تم إرسال طلب العرض", "success");
+        this.loadServices();
+      } catch (err) { this.notify(err.message, "error"); }
+    });
+    document.getElementById("gift-registry-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      try {
+        await this.api("POST", "/gift-registries", {
+          registry_name: fd.get("registry_name"),
+          event_type: fd.get("event_type") || undefined,
+          event_date: fd.get("event_date") || undefined,
+        });
+        e.target.reset();
+        this.notify("تم إنشاء القائمة", "success");
+        this.loadServices();
+      } catch (err) { this.notify(err.message, "error"); }
+    });
+    document.getElementById("gift-item-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      try {
+        await this.api("POST", `/gift-registries/${encodeURIComponent(fd.get("slug"))}/items`, {
+          product_id: Number(fd.get("product_id")),
+        });
+        e.target.reset();
+        this.notify("تمت إضافة المنتج", "success");
+        this.loadServices();
+      } catch (err) { this.notify(err.message, "error"); }
     });
     const gdpr = async (type) => {
       const msg = document.getElementById("gdpr-msg");

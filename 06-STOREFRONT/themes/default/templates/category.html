@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<span class="orion-eyebrow">تصنيف</span>
+<span class="orion-eyebrow">{{ t('category') }}</span>
 <h1 class="orion-title text-2xl mb-6">{{ category.name }}</h1>
 {% if products %}
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -11,7 +11,7 @@
   {% endfor %}
 </div>
 {% else %}
-<div class="orion-card orion-empty">لا توجد منتجات في هذا التصنيف.</div>
+<div class="orion-card orion-empty">{{ t('no_category_products') }}</div>
 {% endif %}
 {% endblock %}
 {% block scripts %}

@@ -1,37 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="orion-title text-2xl mb-6">سلة التسوق</h1>
+<h1 class="orion-title text-2xl mb-6">{{ t('shopping_cart') }}</h1>
 <div id="cart-items" class="orion-card mb-6"><span class="orion-skeleton"></span></div>
+<p id="cart-total" class="orion-muted text-sm mb-4" role="status" aria-live="polite"></p>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   <section class="orion-card flex flex-col justify-between">
     <div>
-      <span class="orion-eyebrow">الخيار 1</span>
-      <h2 class="orion-title mt-2">إتمام الشراء</h2>
+      <span class="orion-eyebrow">{{ t('option_one') }}</span>
+      <h2 class="orion-title mt-2">{{ t('checkout') }}</h2>
       <p class="orion-muted text-sm mt-2">
-        الدفع الإلكتروني عبر بوابات الدفع المتاحة. يبقى هذا الخيار متاحاً دائماً.
+        {{ t('checkout_desc') }}
       </p>
     </div>
-    <a href="/checkout" class="orion-btn orion-btn-gold mt-4 w-full">إتمام الشراء</a>
+    <a href="/checkout" class="orion-btn orion-btn-gold mt-4 w-full">{{ t('checkout') }}</a>
   </section>
 
   {% if tenant.phone %}
   <section class="orion-card flex flex-col justify-between" id="whatsapp-order-card">
     <div>
-      <span class="orion-eyebrow">الخيار 2</span>
-      <h2 class="orion-title mt-2">إرسال الطلب عبر واتساب</h2>
+      <span class="orion-eyebrow">{{ t('option_two') }}</span>
+      <h2 class="orion-title mt-2">{{ t('whatsapp_order') }}</h2>
       <p class="orion-muted text-sm mt-2">
-        نرسل ملخّص السلة كاملاً إلى المتجر، بدون بطاقة ائتمان.
+        {{ t('whatsapp_desc') }}
       </p>
       <div class="grid gap-3 mt-4">
-        <input id="wa-customer-name" class="orion-input" aria-label="الاسم (اختياري)"
-               placeholder="الاسم (اختياري)">
-        <input id="wa-notes" class="orion-input" aria-label="ملاحظات (اختياري)"
-               placeholder="ملاحظات (اختياري)">
+        <input id="wa-customer-name" class="orion-input" aria-label="{{ t('name_optional') }}"
+               placeholder="{{ t('name_optional') }}">
+        <input id="wa-notes" class="orion-input" aria-label="{{ t('notes_optional') }}"
+               placeholder="{{ t('notes_optional') }}">
       </div>
     </div>
     <button type="button" id="whatsapp-order-btn" class="orion-btn mt-4 w-full">
-      إرسال الطلب عبر واتساب
+      {{ t('whatsapp_order') }}
     </button>
     <p id="wa-msg" class="orion-muted text-sm mt-2" role="status" aria-live="polite"></p>
   </section>

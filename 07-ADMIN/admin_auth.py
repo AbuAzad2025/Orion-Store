@@ -82,6 +82,60 @@ def admin_login_post():
     return resp
 
 
+@admin_auth_bp.post("/sso/exchange")
+@limiter.limit("5 per minute")
+def admin_sso_exchange():
+    """Log an admin/customer in through an enabled tenant SSO provider."""
+    from compliance_svc.compliance_service import ComplianceService
+
+    from core.middleware import bind_rls_context
+
+    provider_code = request.form.get("provider_code", "").strip()
+    external_email = request.form.get("external_email", "").strip().lower()
+    tenant_slug = request.form.get("tenant_slug", "").strip()
+    tenant = (
+        Tenant.query.filter_by(slug=tenant_slug, deleted_at=None).first()
+        if tenant_slug
+        else None
+    )
+    if not tenant:
+        return (
+            render_template(
+                "admin_login.html", page_title="تسجيل الدخول", error="Tenant not found."
+            ),
+            404,
+        )
+    g.tenant_id = tenant.id
+    g.tenant = tenant
+    bind_rls_context()
+    try:
+        user = ComplianceService().exchange_sso_code(
+            tenant_id=tenant.id,
+            provider_code=provider_code,
+            external_email=external_email,
+        )
+    except Exception:
+        return (
+            render_template(
+                "admin_login.html",
+                page_title="تسجيل الدخول",
+                error="Invalid SSO credentials.",
+            ),
+            401,
+        )
+    session["user_id"] = user.id
+    session["tenant_id"] = user.tenant_id
+    session["is_platform_admin"] = bool(user.is_superuser)
+    session.permanent = True
+    tokens = issue_tokens_for_user(user)
+    resp = redirect(
+        "/admin/platform/dashboard" if user.is_superuser else "/admin/store/dashboard"
+    )
+    set_access_cookies(resp, tokens["access_token"])
+    set_refresh_cookies(resp, tokens["refresh_token"])
+    return resp
+
+
 @admin_auth_bp.get("/logout")
 def admin_logout():
     from core.jwt_auth import revoke_current_tokens

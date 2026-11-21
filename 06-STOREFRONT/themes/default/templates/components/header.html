@@ -2,15 +2,21 @@
   <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
     <a href="/" class="orion-title orion-eyebrow text-xl">{{ tenant.name }}</a>
     <nav class="space-x-4 space-x-reverse text-sm flex items-center">
-      <a href="/" class="orion-muted orion-header-link">الرئيسية</a>
-      <a href="/account" class="orion-muted orion-header-link">حسابي</a>
-      <a href="/cart" class="orion-muted orion-header-link">السلة</a>
-      <a href="{{ request.path }}?locale=ar" class="orion-muted orion-header-link" hreflang="ar" aria-label="العربية">ع</a>
-      <a href="{{ request.path }}?locale=en" class="orion-muted orion-header-link" hreflang="en" aria-label="English">EN</a>
-      {% set wa_link = whatsapp_url(tenant.phone, 'مرحباً، عندي استفسار من متجر ' ~ tenant.name) %}
+      <a href="/" class="orion-muted orion-header-link">{{ t('home') }}</a>
+      <a href="/account" class="orion-muted orion-header-link">{{ t('account') }}</a>
+      <a href="/cart" class="orion-muted orion-header-link">{{ t('cart') }}</a>
+      <a href="{{ request.path }}?locale=ar&currency={{ currency }}" class="orion-muted orion-header-link" hreflang="ar" aria-label="العربية">ع</a>
+      <a href="{{ request.path }}?locale=en&currency={{ currency }}" class="orion-muted orion-header-link" hreflang="en" aria-label="English">EN</a>
+      <select id="currency-switch" class="orion-input text-xs w-auto" aria-label="Currency"
+              onchange="if(this.value) location.href='{{ request.path }}?locale={{ locale }}&currency='+this.value">
+        {% for code in currencies %}
+        <option value="{{ code }}"{% if code == currency %} selected{% endif %}>{{ code }}</option>
+        {% endfor %}
+      </select>
+      {% set wa_link = whatsapp_url(tenant.phone, t('order_request') ~ tenant.name) %}
       {% if wa_link %}
       <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn orion-btn-gold text-xs"
-         aria-label="التواصل مع المتجر عبر واتساب">واتساب</a>
+         aria-label="{{ t('whatsapp') }}">{{ t('whatsapp') }}</a>
       {% endif %}
     </nav>
   </div>

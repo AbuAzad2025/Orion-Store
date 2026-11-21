@@ -16,6 +16,7 @@ from v1.bundles import bundles_bp
 from v1.categories import categories_bp
 from v1.compliance import compliance_bp
 from v1.currency_api import currency_bp
+from v1.customer_flows import customer_flows_bp
 from v1.draft_orders import draft_orders_bp
 from v1.dropship import dropship_bp
 from v1.fraud import fraud_bp
@@ -72,6 +73,7 @@ API_BLUEPRINTS: list[Blueprint] = [
     storefront_bp,
     storefront_pickup_bp,
     store_account_bp,
+    customer_flows_bp,
     i18n_bp,
     shipping_bp,
     vouchers_bp,
@@ -120,6 +122,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(storefront_bp, url_prefix="/api/v1/store")
     app.register_blueprint(storefront_pickup_bp, url_prefix="/api/v1/store")
     app.register_blueprint(store_account_bp, url_prefix="/api/v1/store/account")
+    app.register_blueprint(customer_flows_bp, url_prefix="/api/v1/store/account")
     app.register_blueprint(i18n_bp, url_prefix="/api/v1/i18n")
     app.register_blueprint(shipping_bp, url_prefix="/api/v1/shipping")
     app.register_blueprint(vouchers_bp, url_prefix="/api/v1/vouchers")

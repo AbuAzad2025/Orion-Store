@@ -8,28 +8,28 @@
   {% set p_name = (product_i18n.name or product.name) if product_i18n else product.name %}
   {% set p_price = (product_i18n.price or product.price) if product_i18n else product.price %}
   <h1 class="orion-title text-2xl mb-2">{{ p_name }}</h1>
-  <p class="orion-eyebrow text-2xl mb-4">{{ p_price }} {{ currency }}</p>
+  <p class="orion-eyebrow text-2xl mb-4">{{ money(p_price) }} {{ currency }}</p>
   {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}
-  <p class="orion-muted text-sm line-through">{{ product_i18n.compare_at_price }} {{ currency }}</p>
+  <p class="orion-muted text-sm line-through">{{ money(product_i18n.compare_at_price) }} {{ currency }}</p>
   {% endif %}
   {% set desc = (product_i18n.description or product_i18n.short_description) if product_i18n else product.short_description %}
   {% if desc %}<p class="orion-muted mb-6">{{ desc }}</p>{% endif %}
-  <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold">أضف للسلة</button>
-  <a href="/cart" class="mr-4 text-sm text-gray-600 underline">عرض السلة</a>
-  {% set wa_order = whatsapp_url(tenant.phone, 'مرحباً، أريد طلب: ' ~ p_name ~ ' - السعر: ' ~ p_price ~ ' {{ currency }}') %}
+  <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold">{{ t('add_to_cart') }}</button>
+  <a href="/cart" class="mr-4 text-sm text-gray-600 underline">{{ t('view_cart') }}</a>
+  {% set wa_order = whatsapp_url(tenant.phone, t('order_request') ~ p_name ~ ' - ' ~ money(p_price) ~ ' ' ~ currency) %}
   {% if wa_order %}
   <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn mt-3 block"
-     aria-label="اطلب {{ product.name }} عبر واتساب">اطلب عبر واتساب</a>
+     aria-label="{{ t('order_whatsapp') }} {{ p_name }}">{{ t('order_whatsapp') }}</a>
   {% endif %}
 
   <hr class="my-6">
   <div class="text-center">
-    <p class="text-sm text-gray-500 mb-2">نفد المخزون؟ اشترك ليصلك إشعار عند التوفر</p>
+    <p class="text-sm text-gray-500 mb-2">{{ t('out_of_stock') }}</p>
     <form id="stock-notify-form" class="flex gap-2 max-w-sm mx-auto">
       <input type="hidden" name="product_id" value="{{ product.id }}">
-      <input type="email" name="customer_email" placeholder="بريدك الإلكتروني" required
+      <input type="email" name="customer_email" placeholder="{{ t('your_email') }}" required
         class="orion-input flex-1 text-sm">
-      <button type="submit" class="orion-btn text-sm whitespace-nowrap">إشعرني</button>
+      <button type="submit" class="orion-btn text-sm whitespace-nowrap">{{ t('notify_me') }}</button>
     </form>
     <p id="stock-notify-msg" class="text-sm mt-2 hidden"></p>
   </div>
