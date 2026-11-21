@@ -358,6 +358,9 @@ def upgrade() -> None:
     op.execute(
         "CREATE TABLE platform_payment_integrations (\n    id BIGSERIAL NOT NULL,\n    provider VARCHAR(30) NOT NULL,\n    display_name VARCHAR(100) NOT NULL,\n    is_enabled BOOLEAN NOT NULL,\n    config JSON NOT NULL,\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP) NOT NULL,\n    PRIMARY KEY (id),\n    UNIQUE (provider)\n)"
     )
+    op.execute(
+        "INSERT INTO platform_settings (\n    platform_name, footer_html, owner_name, owner_phone, owner_phone_intl,\n    support_email, default_currency, default_language,\n    default_commission_percent, singleton, valuepayment_enabled, valuepayment_config\n) VALUES (\n    'Azadexa',\n    '<footer id=\"azadexa-platform-footer\" class=\"azadexa-platform-footer\" data-immutable=\"true\">Powered by Azadexa &mdash; Ahmad Ghannam</footer>',\n    'Ahmad Ghannam', '0562150193', '+972562150193',\n    'support@azadexa.com', 'ILS', 'ar', 0.0100, '1', true, '{}'::json\n) ON CONFLICT (singleton) DO NOTHING"
+    )
 
 
 def downgrade() -> None:

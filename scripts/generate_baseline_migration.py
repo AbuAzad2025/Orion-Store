@@ -153,6 +153,17 @@ LEGACY_TABLE_SQL = """CREATE TABLE platform_payment_integrations (
     UNIQUE (provider)
 )"""
 
+PLATFORM_SETTINGS_SEED_SQL = """INSERT INTO platform_settings (
+    platform_name, footer_html, owner_name, owner_phone, owner_phone_intl,
+    support_email, default_currency, default_language,
+    default_commission_percent, singleton, valuepayment_enabled, valuepayment_config
+) VALUES (
+    'Azadexa',
+    '<footer id="azadexa-platform-footer" class="azadexa-platform-footer" data-immutable="true">Powered by Azadexa &mdash; Ahmad Ghannam</footer>',
+    'Ahmad Ghannam', '0562150193', '+972562150193',
+    'support@azadexa.com', 'ILS', 'ar', 0.0100, '1', true, '{}'::json
+) ON CONFLICT (singleton) DO NOTHING"""
+
 POLICY = """current_setting('app.is_platform_admin', true) = 'true'
         OR tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::bigint"""
 
@@ -231,6 +242,7 @@ def main() -> None:
             ddl = str(CreateTable(table).compile(dialect=dialect)).strip()
             lines.append(f"    op.execute({ddl!r})")
         lines.append(f"    op.execute({LEGACY_TABLE_SQL!r})")
+        lines.append(f"    op.execute({PLATFORM_SETTINGS_SEED_SQL!r})")
         lines += [
             "",
             "",
