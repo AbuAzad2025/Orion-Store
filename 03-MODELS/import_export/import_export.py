@@ -22,7 +22,8 @@ class ImportExportJob(db.Model, TimestampMixin):
     )
     job_type: Mapped[str] = mapped_column(String(20), nullable=False)
     entity_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
+    # "completed_with_errors" is 21 chars — allow the real completion status.
+    status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False)
     file_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     error_log: Mapped[str | None] = mapped_column(Text, nullable=True)
     processed_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)

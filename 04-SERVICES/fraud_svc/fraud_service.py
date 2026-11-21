@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from flask import g, has_request_context
 from fraud.fraud import Chargeback, FraudReview, FraudRule
@@ -99,7 +99,7 @@ class FraudService:
         if rt in context:
             try:
                 return Decimal(str(context[rt]))
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, InvalidOperation):
                 return Decimal(0)
         return Decimal(0)
 

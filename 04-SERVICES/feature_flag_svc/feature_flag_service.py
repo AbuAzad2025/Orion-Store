@@ -70,7 +70,10 @@ class FeatureFlagService:
 
                     user = User.query.get(override.set_by)
                     if user:
-                        override_info["override_set_by_name"] = user.name or user.email
+                        full_name = " ".join(
+                            part for part in (user.first_name, user.last_name) if part
+                        ).strip()
+                        override_info["override_set_by_name"] = full_name or user.email
             else:
                 value = self._evaluate_rollout(flag, tenant_id)
                 override_info = {}

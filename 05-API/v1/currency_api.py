@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from currency.currency_rate import CurrencyRate
 from currency_svc.currency_service import CurrencyService
@@ -61,5 +61,5 @@ def convert():
         )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, InvalidOperation):
         return jsonify({"error": "Invalid request."}), 400

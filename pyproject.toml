@@ -64,7 +64,7 @@ relative_files = true
 [tool.coverage.report]
 precision = 1
 show_missing = true
-fail_under = 85
+fail_under = 89
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "02-CORE/tests"]
@@ -89,6 +89,8 @@ paths = [
     { glob = "migrations/versions/20261119_0002_baseline_indexes.py", max = 400 },
     { glob = "tests/api/test_auth_tenant_admin.py", max = 900 },
     { glob = "tests/api/test_v2_api.py", max = 700 },
+    { glob = "tests/api/test_coverage_expansion_api.py", max = 1500 },
+    { glob = "tests/services/test_coverage_expansion_services.py", max = 1100 },
     { glob = "**/*_service.py", max = 400 },
     { glob = "05-API/v1/*.py", max = 300 },
     { glob = "03-MODELS/**/*.py", max = 250 },

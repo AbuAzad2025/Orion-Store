@@ -270,12 +270,12 @@ client_secret/token حقيقي، object storage للفواتير + عملات م
 ### المرحلة 5 — الجودة والـ CI (2 أيام) — `P1`
 **الهدف:** بوابات تمنع الكود المكسور من الدمج.
 **المهام:**
-- التشغيل الفعلي: `.\scripts\dev.ps1 test` على PostgreSQL حقيقي؛ التأكد أن تغطية ≥85% تمرّ فعلاً (الإعداد موجود في `pyproject.toml:62` لكنه لم يُشغّل بعد).
+- التشغيل الفعلي: `.\scripts\dev.ps1 test` على PostgreSQL حقيقي؛ التأكد أن تغطية ≥89% تمرّ فعلاً (الإعداد موجود في `pyproject.toml:62` لكنه لم يُشغّل بعد).
 - إضافة `bandit` (SAST) و`pip-audit` (موجود) و`check_migrations.py` و`check_file_length.py` إلى نفس الـ workflow.
 - إزالة ملفات debug المؤقتة بالجذر (`debug_health.py`, `debug_imp.py`, `probe_rls.py`) أو نقلها إلى `scripts/diagnostics/` مع توثيق.
 - تثبيت pre-commit محلياً وتشغيله على كل الملفات مرة واحدة.
 
-**DoD:** CI أخضر من صفر؛ التغطية ≥85%؛ لا ملفات debug في الجذر.
+**DoD:** CI أخضر من صفر؛ التغطية ≥89%؛ لا ملفات debug في الجذر.
 
 ---
 
@@ -344,7 +344,7 @@ client_secret/token حقيقي، object storage للفواتير + عملات م
 - [ ] كل جدول بـ `tenant_id` محمي بـ RLS + اختبار رفض سلبي + سياق في Celery.
 - [ ] عملية دفع حقيقية (sandbox) بـ idempotency + webhook موقّع بمكافحة replay.
 - [ ] قاعدة تُبنى من الصفر بأمر واحد + backup/restore مُختبر.
-- [ ] CI أخضر: lint + pytest(≥85%) + migration check + pip-audit + SAST + secret scan.
+- [ ] CI أخضر: lint + pytest(≥89%) + migration check + pip-audit + SAST + secret scan.
 - [ ] `/health` و`/ready` + تنبيه مُختبر + runbook.
 - [ ] لا CDN خارجي، صفر `innerHTML`، 3 مسارات E2E خضراء.
 - [ ] README وADR وRUNBOOK مطابقة للكود.
@@ -358,7 +358,7 @@ client_secret/token حقيقي، object storage للفواتير + عملات م
 | اختبارات عزل سلبية | من 0 → ≥5 |
 | جداول بـ RLS / جداول بـ tenant_id | 100% |
 | تكاملات دفع حقيقية | من 0 → 4 |
-| التغطية | ≥85% فعلياً (مُشغّلة) |
+| التغطية | ≥89% فعلياً (مُشغّلة) |
 | thresholds أمنية مفتوحة (P0) | 0 |
 | زمن استعادة backup | مُقاس وموثّق |
 
