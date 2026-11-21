@@ -108,11 +108,13 @@ def store_category(slug: str):
     products = [
         p for p in _products.list_published(tenant.id) if p.category_id == category.id
     ]
+    products_i18n = [ts.merge_product(p, locale) for p in products]
     return _engine.render(
         "category.html",
         tenant=tenant,
         category=category_i18n,
         products=products,
+        products_i18n=products_i18n,
         page_title=category_i18n.get("name") or category.name,
         locale=locale,
     )

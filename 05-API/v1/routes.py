@@ -11,6 +11,7 @@ from v1.audit_api import audit_bp
 from v1.auth import auth_bp
 from v1.b2b import b2b_bp
 from v1.bopis import bopis_bp
+from v1.brands import brands_bp
 from v1.bundles import bundles_bp
 from v1.categories import categories_bp
 from v1.compliance import compliance_bp
@@ -64,6 +65,7 @@ API_BLUEPRINTS: list[Blueprint] = [
     users_bp,
     products_bp,
     categories_bp,
+    brands_bp,
     payments_bp,
     platform_settings_bp,
     storefront_bp,
@@ -110,6 +112,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(users_bp, url_prefix="/api/v1/users")
     app.register_blueprint(products_bp, url_prefix="/api/v1/products")
     app.register_blueprint(categories_bp, url_prefix="/api/v1/categories")
+    app.register_blueprint(brands_bp, url_prefix="/api/v1/brands")
     app.register_blueprint(payments_bp, url_prefix="/api/v1/payments")
     app.register_blueprint(platform_settings_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(storefront_bp, url_prefix="/api/v1/store")

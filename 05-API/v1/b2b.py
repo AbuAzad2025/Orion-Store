@@ -84,6 +84,7 @@ def create_quote():
         quote = _b2b.create_quote(
             tenant_id=g.tenant_id,
             customer_group_id=data.get("customer_group_id"),
+            user_id=getattr(g.user, "id", None) if g.user else None,
             notes=data.get("notes"),
         )
         return jsonify({"quote": quote.to_dict()}), 201

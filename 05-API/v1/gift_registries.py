@@ -57,6 +57,7 @@ def create_registry():
             event_type=data.get("event_type"),
             event_date=data.get("event_date"),
             is_public=data.get("is_public", True),
+            user_id=getattr(g.user, "id", None) if g.user else None,
         )
         return jsonify({"registry": r.to_dict()}), 201
     except OrionError as exc:

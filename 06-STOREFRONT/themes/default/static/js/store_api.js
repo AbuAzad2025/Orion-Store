@@ -49,6 +49,7 @@ const StoreAPI = {
       }
       if (extras.voucher_code) body.voucher_code = extras.voucher_code;
       if (extras.idempotency_key) body.idempotency_key = extras.idempotency_key;
+      if (extras.use_store_credit) body.use_store_credit = true;
     }
     return this.request("POST", "/checkout", body);
   },

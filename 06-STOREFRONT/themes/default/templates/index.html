@@ -4,7 +4,9 @@
 <h1 class="orion-title text-2xl mb-6">منتجاتنا</h1>
 {% if products %}
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-  {% for product in products %}
+  {% for product in products_i18n or products %}
+    {% set product_i18n = product %}
+    {% set product = products[loop.index0] if products_i18n else product %}
     {% include "components/product_card.html" %}
   {% endfor %}
 </div>

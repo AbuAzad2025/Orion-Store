@@ -18,11 +18,13 @@ class GiftRegistryService:
         event_type: str | None = None,
         event_date: str | None = None,
         is_public: bool = True,
+        user_id: int | None = None,
     ) -> GiftRegistry:
         slug = f"{registry_name.lower().replace(' ', '-')}-{uuid.uuid4().hex[:6]}"
         r = GiftRegistry(
             tenant_id=tenant_id,
             customer_email=customer_email.strip().lower(),
+            user_id=user_id,
             registry_name=registry_name,
             event_type=event_type,
             event_date=event_date,

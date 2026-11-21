@@ -56,6 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
+    if (form.dataset.busy) return;
+    form.dataset.busy = "1";
     resultEl.textContent = "جاري المعالجة...";
     try {
       const token = StoreAPI.getCartToken();
@@ -65,8 +67,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const method = document.getElementById("payment-method").value;
       const shippingMethod = methodSelect.value || undefined;
       const voucherCode = document.getElementById("voucher-code").value.trim();
-      if (form.dataset.busy) return;
-      form.dataset.busy = "1";
       const idempotencyKey = crypto.randomUUID
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         shipping_method_code: shippingMethod,
         voucher_code: voucherCode || undefined,
         idempotency_key: idempotencyKey,
+        use_store_credit: document.getElementById("use-store-credit")?.checked || false,
       });
       const order = orderRes.order;
       summaryEl.textContent = `المجموع: ${order.total} (شحن: ${order.shipping_cost})`;
@@ -94,6 +95,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       localStorage.removeItem(StoreAPI.cartTokenKey);
     } catch (err) {
       resultEl.textContent = err.message;
+    } finally {
+      delete form.dataset.busy;
     }
   });
 });

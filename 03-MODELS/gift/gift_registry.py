@@ -37,6 +37,7 @@ class GiftRegistry(db.Model, TimestampMixin):
         return {
             "id": self.id,
             "customer_email": self.customer_email,
+            "user_id": self.user_id,
             "registry_name": self.registry_name,
             "event_type": self.event_type,
             "event_date": self.event_date,

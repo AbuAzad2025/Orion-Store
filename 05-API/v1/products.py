@@ -14,14 +14,12 @@ _products = ProductService()
 
 
 def _safe_image_url(value) -> str | None:
-    """Only http(s) or local paths — never javascript:/data: image URLs."""
+    """Only https:// or local paths — CSP blocks http:// images, so reject them."""
     if not value:
         return None
     url = str(value).strip()
-    if not (
-        url.startswith("https://") or url.startswith("http://") or url.startswith("/")
-    ):
-        raise ValidationError("رابط الصورة يجب أن يبدأ بـ http(s) أو /")
+    if not (url.startswith("https://") or url.startswith("/")):
+        raise ValidationError("رابط الصورة يجب أن يبدأ بـ https:// أو /")
     return url
 
 

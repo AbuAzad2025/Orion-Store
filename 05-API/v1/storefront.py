@@ -208,6 +208,7 @@ def checkout():
             idempotency_key=data.get("idempotency_key"),
             shipping_method_code=data.get("shipping_method_code"),
             voucher_code=data.get("voucher_code"),
+            use_store_credit=bool(data.get("use_store_credit", False)),
         )
         return jsonify({"order": order.to_dict()}), 201
     except OrionError as exc:

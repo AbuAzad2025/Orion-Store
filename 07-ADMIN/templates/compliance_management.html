@@ -50,6 +50,14 @@
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة مزود</button>
     </form>
     <div id="sso-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+    <h3 class="orion-title mt-4">تبادل SSO (اختبار)</h3>
+    <form id="sso-exchange-form" class="grid gap-2 max-w-md text-sm">
+      <input name="provider_code" type="text" placeholder="رمز المزود" required aria-label="رمز مزود SSO">
+      <input name="external_email" type="email" placeholder="البريد الخارجي" required aria-label="البريد الخارجي">
+      <input name="tenant_id" type="text" placeholder="Tenant ID (اختياري)" aria-label="معرّف المتجر">
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">تبادل</button>
+    </form>
+    <p id="sso-exchange-result" class="orion-muted text-sm" role="status" aria-live="polite"></p>
   </section>
 </div>
 {% endblock %}

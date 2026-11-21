@@ -42,12 +42,26 @@
         </select>
       </div>
       <div>
+        <label class="orion-stat-label" for="p-brand">العلامة التجارية (اختياري)</label>
+        <select id="p-brand" class="orion-select" aria-label="العلامة التجارية">
+          <option value="">بدون علامة</option>
+        </select>
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-compare">سعر قبل الخصم (اختياري)</label>
+        <input id="p-compare" type="number" step="0.01" min="0" class="orion-input" aria-label="السعر قبل الخصم">
+      </div>
+      <div>
         <label class="orion-stat-label" for="p-image">رابط الصورة</label>
         <input id="p-image" class="orion-input" dir="ltr" placeholder="https://..." aria-label="رابط صورة المنتج">
       </div>
       <div>
         <label class="orion-stat-label" for="p-short">وصف مختصر</label>
         <input id="p-short" class="orion-input" aria-label="وصف مختصر">
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-description">الوصف الكامل</label>
+        <textarea id="p-description" rows="3" class="orion-input" aria-label="الوصف الكامل"></textarea>
       </div>
       <label class="flex items-center gap-2 text-sm">
         <input id="p-published" type="checkbox" aria-label="منشور في المتجر"> منشور في المتجر

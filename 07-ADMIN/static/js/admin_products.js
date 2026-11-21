@@ -19,6 +19,21 @@ const OrionAdminProducts = {
     }
   },
 
+  async loadBrands() {
+    const select = document.getElementById("p-brand");
+    if (!select) return;
+    try {
+      const data = await OrionAPI.get("/brands/");
+      const current = select.value;
+      SafeDOM.clear(select);
+      select.appendChild(SafeDOM.elem("option", { value: "" }, ["بدون علامة"]));
+      for (const brand of data.brands || []) {
+        select.appendChild(SafeDOM.elem("option", { value: brand.id }, [brand.name]));
+      }
+      select.value = current;
+    } catch (err) { /* brands API optional — leave empty */ }
+  },
+
   async loadProducts() {
     const list = document.getElementById("products-list");
     if (!list) return;
@@ -78,6 +93,9 @@ const OrionAdminProducts = {
     document.getElementById("p-quantity").value = product.quantity ?? 0;
     document.getElementById("p-sku").value = product.sku || "";
     document.getElementById("p-category").value = product.category_id || "";
+    document.getElementById("p-brand").value = product.brand_id || "";
+    document.getElementById("p-compare").value = product.compare_at_price || "";
+    document.getElementById("p-description").value = product.description || "";
     document.getElementById("p-image").value = product.image_url || "";
     document.getElementById("p-short").value = product.short_description || "";
     document.getElementById("p-published").checked = Boolean(product.is_published);
@@ -99,6 +117,9 @@ const OrionAdminProducts = {
       quantity: parseInt(document.getElementById("p-quantity").value || "0", 10),
       sku: document.getElementById("p-sku").value.trim() || null,
       category_id: document.getElementById("p-category").value || null,
+      brand_id: document.getElementById("p-brand").value || null,
+      compare_at_price: document.getElementById("p-compare").value || null,
+      description: document.getElementById("p-description").value.trim() || null,
       image_url: document.getElementById("p-image").value.trim() || null,
       short_description: document.getElementById("p-short").value.trim() || null,
       is_published: document.getElementById("p-published").checked,
@@ -110,6 +131,7 @@ const OrionAdminProducts = {
     const form = document.getElementById("product-form");
     if (!form) return;
     this.loadCategories();
+    this.loadBrands();
     this.loadProducts();
 
     form.addEventListener("submit", async (event) => {
