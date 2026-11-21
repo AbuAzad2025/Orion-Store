@@ -14,15 +14,15 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from discount.voucher import Voucher
 from support.http import auth_headers, tenant_headers
 
 from auth.auth_service import AuthService
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
 from core.utils import utc_now
-from discount.voucher import Voucher
-from orion.extensions import db
 from order.order import Order
+from orion.extensions import db
 from payment.payment import Payment
 from platform_models.impersonation_session import ImpersonationSession
 from tenant_svc.tenant_service import TenantService

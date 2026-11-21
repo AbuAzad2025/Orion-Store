@@ -12,22 +12,30 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
-
 from affiliate.affiliate import AffiliateCommission, AffiliateLink
 from affiliate_svc.affiliate_service import AffiliateService
 from bopis.bopis import PickupLocation, PickupSlot
 from bopis_svc.bopis_service import BopisService
 from bundle.bundle import BundleItem
 from bundle_svc.bundle_service import BundleService
-from catalog.product import Product
-from core.exceptions import ConflictError, NotFoundError, ValidationError
-from core.utils import utc_now
 from feature_flag.feature_flag import FeatureFlag, TenantFeatureFlagOverride
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 from fraud.fraud import Chargeback, FraudReview, FraudRule
 from fraud_svc.fraud_service import FraudService, on_order_created
 from import_export.import_export import ImportExportJob
 from import_export_svc.import_export_service import ImportExportService
+from subscription.subscription import (
+    CustomerSubscription,
+    DigitalAsset,
+    DigitalDownload,
+    LicenseKey,
+    SubscriptionEvent,
+)
+from subscription_svc.subscription_service import SubscriptionService
+
+from catalog.product import Product
+from core.exceptions import ConflictError, NotFoundError, ValidationError
+from core.utils import utc_now
 from order.order import Order, OrderItem
 from orion.extensions import db
 from payment.payment import Payment
@@ -37,14 +45,6 @@ from platform_models.commission_ledger import PlatformCommissionLedger
 from platform_models.financial_event import FinancialEvent
 from platform_svc.commission_service import CommissionService
 from platform_svc.financial_events_service import FinancialEventsService
-from subscription.subscription import (
-    CustomerSubscription,
-    DigitalAsset,
-    DigitalDownload,
-    LicenseKey,
-    SubscriptionEvent,
-)
-from subscription_svc.subscription_service import SubscriptionService
 from tenant_svc.tenant_service import TenantService
 from user.user import User
 
