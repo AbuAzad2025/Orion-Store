@@ -23,10 +23,16 @@ class OmsService:
         is_default: bool = False,
         address: dict | None = None,
     ) -> Warehouse:
+        normalized_code = code.strip().lower()
+        existing = Warehouse.query.filter_by(
+            tenant_id=tenant_id, code=normalized_code
+        ).first()
+        if existing:
+            return existing
         row = Warehouse(
             tenant_id=tenant_id,
             name=name,
-            code=code.strip().lower(),
+            code=normalized_code,
             address=address,
             is_active=True,
             priority=0 if not is_default else 10,
@@ -40,6 +46,15 @@ class OmsService:
             Warehouse.query.filter_by(tenant_id=tenant_id, is_active=True)
             .order_by(Warehouse.priority.desc(), Warehouse.name)
             .all()
+        )
+
+    def ensure_default_warehouse(self, tenant_id: int) -> Warehouse:
+        """Idempotent main warehouse — every tenant gets exactly one."""
+        return self.create_warehouse(
+            tenant_id=tenant_id,
+            name="المستودع الرئيسي",
+            code="main",
+            is_default=True,
         )
 
     def get_default_warehouse(self, tenant_id: int) -> Warehouse:
@@ -92,7 +107,11 @@ class OmsService:
         if order.payment_status != "paid":
             raise ValidationError("Order must be paid before fulfillment.")
         wh_id = warehouse_id
-        if not wh_id:
+        if wh_id:
+            wh = Warehouse.query.filter_by(id=wh_id, tenant_id=tenant_id).first()
+            if not wh:
+                raise NotFoundError("Warehouse not found.")
+        else:
             wh_id = self.get_default_warehouse(tenant_id).id
 
         fulfillment = Fulfillment(
@@ -170,7 +189,7 @@ class OmsService:
         product = Product.query.filter_by(id=product_id, tenant_id=tenant_id).first()
         if not product:
             raise NotFoundError("Product not found.")
-        wh_id = warehouse_id or self.get_default_warehouse(tenant_id).id
+        wh_id = warehouse_id or self.ensure_default_warehouse(tenant_id).id
         return self.upsert_inventory(
             tenant_id=tenant_id,
             warehouse_id=wh_id,

@@ -5,25 +5,25 @@
 <form id="settings-form" class="bg-white rounded border p-6 max-w-lg space-y-4">
   <div>
     <label class="block text-sm mb-1">اسم المنصة</label>
-    <input name="platform_name" id="setting-platform-name" class="w-full border rounded px-3 py-2">
+    <input name="platform_name" id="setting-platform-name" class="orion-input w-full" aria-label="Platform Name">
   </div>
   <div>
     <label class="block text-sm mb-1">اسم المالك</label>
-    <input name="owner_name" id="setting-owner-name" class="w-full border rounded px-3 py-2">
+    <input name="owner_name" id="setting-owner-name" class="orion-input w-full" aria-label="Owner Name">
   </div>
   <div>
     <label class="block text-sm mb-1">Email الدعم</label>
-    <input name="support_email" id="setting-support-email" type="email" class="w-full border rounded px-3 py-2">
+    <input name="support_email" id="setting-support-email" type="email" class="orion-input w-full" aria-label="Support Email">
   </div>
   <div>
     <label class="block text-sm mb-1">العملة الافتراضية</label>
-    <input name="default_currency" id="setting-default-currency" class="w-full border rounded px-3 py-2">
+    <input name="default_currency" id="setting-default-currency" class="orion-input w-full" aria-label="Default Currency">
   </div>
   <div>
     <label class="block text-sm mb-1">اللغة الافتراضية</label>
-    <input name="default_language" id="setting-default-language" class="w-full border rounded px-3 py-2">
+    <input name="default_language" id="setting-default-language" class="orion-input w-full" aria-label="Default Language">
   </div>
-  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm">حفظ الإعدادات</button>
+  <button type="submit" class="orion-btn orion-btn-gold text-sm">حفظ الإعدادات</button>
 </form>
 {% endblock %}
 {% block scripts %}

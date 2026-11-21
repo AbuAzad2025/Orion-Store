@@ -33,6 +33,14 @@ class PlatformCommissionLedger(db.Model):
         unique=True,
         nullable=False,
     )
+    # Self-reference: a reversal points at the original commission entry it
+    # offsets. Enables idempotent reversals (never reverse twice per event).
+    reverses_ledger_id: Mapped[int | None] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("platform_commission_ledger.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     direction: Mapped[str] = mapped_column(String(10), default="credit")
     entry_type: Mapped[str] = mapped_column(String(30), default="commission")
     payment_id: Mapped[int | None] = mapped_column(

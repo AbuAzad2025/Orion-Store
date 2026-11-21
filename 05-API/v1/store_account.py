@@ -11,6 +11,7 @@ from flask_jwt_extended import (
     set_access_cookies,
     set_refresh_cookies,
 )
+from sqlalchemy import and_, or_
 
 from auth.auth_service import AuthService
 from core.audit_log import audit_log
@@ -124,8 +125,19 @@ def customer_orders():
     try:
         require_tenant_context()
         user = _current_customer()
+        # New orders are tied to the account id; legacy guest orders are still
+        # matched by email so existing customers do not lose their history.
         rows = (
-            Order.query.filter_by(tenant_id=g.tenant_id, customer_email=user.email)
+            Order.query.filter(
+                Order.tenant_id == g.tenant_id,
+                or_(
+                    Order.user_id == user.id,
+                    and_(
+                        Order.user_id.is_(None),
+                        Order.customer_email == user.email,
+                    ),
+                ),
+            )
             .order_by(Order.created_at.desc())
             .limit(50)
             .all()

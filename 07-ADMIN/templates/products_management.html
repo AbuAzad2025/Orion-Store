@@ -1,0 +1,70 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  <section class="orion-card lg:col-span-2">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="orion-title">المنتجات</h2>
+      <button type="button" id="btn-refresh" class="orion-btn">تحديث</button>
+    </div>
+    <div id="products-list" class="space-y-2">جاري التحميل...</div>
+  </section>
+
+  <section class="orion-card">
+    <h2 class="orion-title mb-4" id="form-title">إضافة منتج</h2>
+    <form id="product-form" class="space-y-3">
+      <input type="hidden" id="product-edit-id" value="">
+      <div>
+        <label class="orion-stat-label" for="p-name">الاسم</label>
+        <input id="p-name" class="orion-input" required aria-label="اسم المنتج">
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-slug">الرابط (slug)</label>
+        <input id="p-slug" class="orion-input" dir="ltr" required aria-label="رابط المنتج">
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="orion-stat-label" for="p-price">السعر</label>
+          <input id="p-price" type="number" step="0.01" min="0" class="orion-input" required aria-label="السعر">
+        </div>
+        <div>
+          <label class="orion-stat-label" for="p-quantity">الكمية</label>
+          <input id="p-quantity" type="number" min="0" class="orion-input" value="0" aria-label="الكمية">
+        </div>
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-sku">SKU (اختياري)</label>
+        <input id="p-sku" class="orion-input" dir="ltr" aria-label="رمز المنتج">
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-category">التصنيف</label>
+        <select id="p-category" class="orion-select" aria-label="تصنيف المنتج">
+          <option value="">بدون تصنيف</option>
+        </select>
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-image">رابط الصورة</label>
+        <input id="p-image" class="orion-input" dir="ltr" placeholder="https://..." aria-label="رابط صورة المنتج">
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-short">وصف مختصر</label>
+        <input id="p-short" class="orion-input" aria-label="وصف مختصر">
+      </div>
+      <label class="flex items-center gap-2 text-sm">
+        <input id="p-published" type="checkbox" aria-label="منشور في المتجر"> منشور في المتجر
+      </label>
+      <label class="flex items-center gap-2 text-sm">
+        <input id="p-featured" type="checkbox" aria-label="منتج مميز"> منتج مميز
+      </label>
+      <div class="flex gap-2">
+        <button type="submit" class="orion-btn orion-btn-gold flex-1">حفظ المنتج</button>
+        <button type="button" id="btn-cancel" class="orion-btn">إلغاء</button>
+      </div>
+      <p id="product-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_products.js') }}"></script>
+<script>OrionAdminProducts.init();</script>
+{% endblock %}

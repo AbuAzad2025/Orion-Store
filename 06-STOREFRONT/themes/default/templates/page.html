@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+{% if page %}
+<article class="orion-card max-w-2xl mx-auto">
+  <h1 class="orion-title text-2xl mb-4">{{ page.title }}</h1>
+  {% if page.body %}
+  <div class="text-gray-700 whitespace-pre-line leading-relaxed">{{ page.body }}</div>
+  {% else %}
+  <p class="orion-muted">لا يوجد محتوى لهذه الصفحة بعد.</p>
+  {% endif %}
+</article>
+{% else %}
+<section class="orion-card max-w-lg mx-auto text-center">
+  <p class="orion-eyebrow text-4xl mb-2">404</p>
+  <h1 class="orion-title text-xl mb-3">الصفحة غير موجودة</h1>
+  <p class="orion-muted mb-5">{{ message|default('ربما تم حذف الصفحة أو أنها غير منشورة.') }}</p>
+  <a href="/" class="orion-btn">العودة للرئيسية</a>
+</section>
+{% endif %}
+{% endblock %}

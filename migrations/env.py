@@ -45,10 +45,38 @@ target_db = current_app.extensions["migrate"].db
 
 def get_metadata():
     # Import models so autogenerate sees wave-1 tables.
+    import accessibility.accessibility  # noqa: F401
+    import affiliate.affiliate  # noqa: F401
+    import app_platform.app_platform  # noqa: F401
+    import audit.audit_v2  # noqa: F401
+    import bopis.bopis  # noqa: F401
+    import bundle.bundle  # noqa: F401
+    import compliance.compliance  # noqa: F401
+    import currency.currency_rate  # noqa: F401
+    import draft_order.draft_order  # noqa: F401
+    import dropship.dropship  # noqa: F401
+    import feature_flag.feature_flag  # noqa: F401
+    import fraud.fraud  # noqa: F401
+    import gift.gift_registry  # noqa: F401
+    import import_export.import_export  # noqa: F401
+    import live_chat.live_chat  # noqa: F401
+    import metafield.metafield  # noqa: F401
+    import reconciliation.reconciliation_v2  # noqa: F401
+    import schema_markup.schema_markup  # noqa: F401
+    import search.search  # noqa: F401
+    import stock_notification.stock_notification  # noqa: F401
+    import store_credit.store_credit  # noqa: F401
+
+    # v2 models
+    import subscription.subscription  # noqa: F401
+    import tax.tax  # noqa: F401
+    import workflow.workflow  # noqa: F401
+
     import base.base_model  # noqa: F401
     import catalog.brand  # noqa: F401
     import catalog.category  # noqa: F401
     import catalog.product  # noqa: F401
+    import oms.inventory_transfer  # noqa: F401
     import order.cart  # noqa: F401
     import order.order  # noqa: F401
     import payment.payment  # noqa: F401
@@ -62,32 +90,6 @@ def get_metadata():
     import tenant.tenant_config  # noqa: F401
     import user.role  # noqa: F401
     import user.user  # noqa: F401
-    # v2 models
-    import subscription.subscription  # noqa: F401
-    import store_credit.store_credit  # noqa: F401
-    import draft_order.draft_order  # noqa: F401
-    import tax.tax  # noqa: F401
-    import bundle.bundle  # noqa: F401
-    import metafield.metafield  # noqa: F401
-    import bopis.bopis  # noqa: F401
-    import currency.currency_rate  # noqa: F401
-    import oms.inventory_transfer  # noqa: F401
-    import import_export.import_export  # noqa: F401
-    import stock_notification.stock_notification  # noqa: F401
-    import app_platform.app_platform  # noqa: F401
-    import fraud.fraud  # noqa: F401
-    import compliance.compliance  # noqa: F401
-    import workflow.workflow  # noqa: F401
-    import search.search  # noqa: F401
-    import affiliate.affiliate  # noqa: F401
-    import gift.gift_registry  # noqa: F401
-    import dropship.dropship  # noqa: F401
-    import schema_markup.schema_markup  # noqa: F401
-    import accessibility.accessibility  # noqa: F401
-    import live_chat.live_chat  # noqa: F401
-    import reconciliation.reconciliation_v2  # noqa: F401
-    import audit.audit_v2  # noqa: F401
-    import feature_flag.feature_flag  # noqa: F401
 
     if hasattr(target_db, "metadatas"):
         return target_db.metadatas[None]

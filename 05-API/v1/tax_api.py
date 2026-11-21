@@ -1,8 +1,10 @@
+from decimal import Decimal, InvalidOperation
+
 from flask import Blueprint, g, jsonify, request
 from tax_svc.tax_service import TaxService
 
 from core.exceptions import OrionError
-from core.middleware import require_tenant_admin
+from core.middleware import require_tenant_admin, require_tenant_context
 
 tax_bp = Blueprint("tax", __name__)
 _svc = TaxService()
@@ -24,6 +26,28 @@ def list_jurisdictions():
         )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
+
+
+@tax_bp.post("/calculate")
+def calculate_tax():
+    """Public (within tenant context) tax preview for a shipping address."""
+    try:
+        tenant = require_tenant_context()
+        data = request.get_json(silent=True) or {}
+        shipping_cost = data.get("shipping_cost")
+        tax = _svc.compute_tax(
+            tenant_id=tenant.id,
+            subtotal=Decimal(str(data.get("subtotal", "0"))),
+            shipping_address=data.get("shipping_address") or {},
+            shipping_cost=(
+                Decimal(str(shipping_cost)) if shipping_cost is not None else None
+            ),
+        )
+        return jsonify({"tax_amount": str(tax)}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except (KeyError, TypeError, ValueError, InvalidOperation):
+        return jsonify({"error": "Invalid request."}), 400
 
 
 @tax_bp.route("/jurisdictions", methods=["POST"])

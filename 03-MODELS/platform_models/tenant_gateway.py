@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from base.pk import PrimaryKeyType
@@ -13,6 +13,9 @@ from orion.extensions import db
 
 class TenantPaymentGateway(db.Model):
     __tablename__ = "tenant_payment_gateways"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "provider", name="uq_tenant_gateway"),
+    )
 
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True

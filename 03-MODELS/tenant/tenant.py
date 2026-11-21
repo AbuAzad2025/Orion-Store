@@ -84,7 +84,10 @@ class Tenant(db.Model):
 
     def to_dict(self) -> dict:
         return {
+            "id": self.id,
             "public_id": str(self.public_id),
+            "is_active": self.is_active,
+            "custom_domain": self.custom_domain,
             "name": self.name,
             "slug": self.slug,
             "domain": self.domain,

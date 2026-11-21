@@ -2,8 +2,13 @@
 
 Multi-tenant e-commerce SaaS — **Waves 0–12 complete** ✅ + **Admin shell hardened** ✅ (login/logout/profile/footer + 10 beta stores + tenant subdomain resolution).
 
-**Current phase:** 13 — Frontend Deep Dive (luxury UI refactor for admin + storefront).  
+**Current phase:** 13 — Frontend Deep Dive (مخطط له؛ آخر العمل المنفّذ فعلياً كان hardening الأمان AZ-0.10/0.11).
 **Repository:** [github.com/AbuAzad2025/Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
+
+> **أرقام مُتحقَّق منها من الكود (2026-11-19):** 112 صنف `db.Model`، 113 `create_table()` في
+> الهجرات، 43 سياسة RLS، 100 نقطة API، 42 blueprint، 68 ملف اختبار. الأرقام الأكبر الواردة
+> في `ORION-Project-Plan-Report.md` هي أهداف تخطيطية وليست حالة الكود. انظر
+> `PRODUCTION-READINESS-PLAN.md` و `ADR/0001-source-of-truth.md`.
 
 ## Database
 
@@ -49,8 +54,8 @@ Health check: `GET http://127.0.0.1:5000/health`
 
 | Role | URL | Credentials | Notes |
 |------|-----|-------------|-------|
-| Platform admin | `/admin/login` | `admin@azadexa.com` / `Admin2026!` | Leave tenant slug empty |
-| Tenant admin (e.g. beta-ramallah) | `/admin/login` | `ramallah@beta.azadexa.com` / `BetaStore2026!` | Tenant slug: `beta-ramallah` |
+| Platform admin | `/admin/login` | **يُنشأ يدوياً** — لا توجد كلمة مرور ثابتة في الكود | شغّل `python scripts/bootstrap_cli.py` وأدخل الإيميل/كلمة المرور (المسار الوحيد لأول أدمن). `setup-local` لا ينشئ أدمن منصة. |
+| Tenant admin (e.g. beta-ramallah) | `/admin/login` | `ramallah@beta.azadexa.com` / `BetaStore2026!` | Tenant slug: `beta-ramallah` — مُنشأ فعلياً في `scripts/seed_beta.py` |
 
 Logout and profile links are available in the sidebar on every admin page.
 
@@ -73,5 +78,5 @@ Production: `https://{tenant.slug}.azadexa.com/` or custom domain.
 - `core/constants.py`, `core/crypto.py`, `core/events.py`
 - `tests/security/test_tenant_isolation.py` — tenant isolation on real PostgreSQL
 
-See `ORION-Project-Plan-Report.md` §0.12 for build order and §0.16 for the next phase (Frontend Deep Dive).  
+See `ORION-Project-Plan-Report.md` §0.12 for build order and §0.16 for the next phase (Frontend Deep Dive).
 **تتبع التنفيذ:** §0.15–§0.16 في الخطة (علامات ✅ 🟡 📋 ⬜ 🔒§0).

@@ -1,33 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">إتمام الطلب</h1>
-<form id="checkout-form" class="max-w-md bg-white rounded shadow p-6 space-y-4">
+<h1 class="orion-title text-2xl mb-6">إتمام الطلب</h1>
+<form id="checkout-form" class="orion-card max-w-md space-y-4">
   <div>
-    <label class="block text-sm mb-1" for="customer-email">البريد الإلكتروني</label>
-    <input id="customer-email" type="email" required class="w-full border rounded px-3 py-2">
+    <label class="orion-stat-label block" for="customer-email">البريد الإلكتروني</label>
+    <input id="customer-email" type="email" required class="orion-input w-full" aria-label="Customer Email">
   </div>
   <div>
-    <label class="block text-sm mb-1" for="shipping-city">المدينة</label>
-    <input id="shipping-city" type="text" required class="w-full border rounded px-3 py-2">
+    <label class="orion-stat-label block" for="shipping-city">المدينة</label>
+    <input id="shipping-city" type="text" required class="orion-input w-full" aria-label="Shipping City">
   </div>
   <div>
-    <label class="block text-sm mb-1" for="shipping-method">طريقة الشحن</label>
-    <select id="shipping-method" class="w-full border rounded px-3 py-2">
+    <label class="orion-stat-label block" for="shipping-method">طريقة الشحن</label>
+    <select id="shipping-method" class="orion-input w-full">
       <option value="">جاري التحميل...</option>
     </select>
   </div>
   <div>
-    <label class="block text-sm mb-1" for="voucher-code">كود الخصم (اختياري)</label>
-    <input id="voucher-code" type="text" class="w-full border rounded px-3 py-2" placeholder="SAVE10">
+    <label class="orion-stat-label block" for="voucher-code">كود الخصم (اختياري)</label>
+    <input id="voucher-code" type="text" class="orion-input w-full" placeholder="SAVE10">
   </div>
   <div>
-    <label class="block text-sm mb-1" for="payment-method">طريقة الدفع</label>
-    <select id="payment-method" class="w-full border rounded px-3 py-2">
+    <label class="orion-stat-label block" for="payment-method">طريقة الدفع</label>
+    <select id="payment-method" class="orion-input w-full">
       <option value="">جاري التحميل...</option>
     </select>
   </div>
   <p id="checkout-summary" class="text-sm text-gray-600"></p>
-  <button type="submit" class="w-full rounded bg-emerald-600 py-2 text-white font-medium">ادفع الآن</button>
+  <button type="submit" class="orion-btn orion-btn-gold w-full">ادفع الآن</button>
 </form>
 <div id="checkout-result" class="mt-4 text-sm"></div>
 {% endblock %}

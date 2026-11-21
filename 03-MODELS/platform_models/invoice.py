@@ -23,6 +23,7 @@ class TenantDocumentTemplate(db.Model):
         PrimaryKeyType,
         ForeignKey("tenants.id", ondelete="CASCADE"),
         nullable=False,
+        index=True,
     )
     document_type: Mapped[str] = mapped_column(String(30), nullable=False)
     locale: Mapped[str] = mapped_column(String(5), default="ar")
@@ -67,6 +68,7 @@ class Invoice(db.Model):
     platform_footer_applied: Mapped[bool] = mapped_column(Boolean, default=True)
     rendered_html: Mapped[str | None] = mapped_column(Text, nullable=True)
     pdf_artifact_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    storage_key: Mapped[str | None] = mapped_column(String(500), nullable=True)
     document_template_id: Mapped[int | None] = mapped_column(
         PrimaryKeyType,
         ForeignKey("tenant_document_templates.id", ondelete="SET NULL"),
@@ -82,7 +84,9 @@ class Invoice(db.Model):
             "invoice_number": self.invoice_number,
             "total_amount": str(self.total_amount),
             "commission_amount": str(self.commission_amount),
+            "currency": self.currency,
             "platform_footer_applied": self.platform_footer_applied,
             "pdf_artifact_path": self.pdf_artifact_path,
+            "storage_key": self.storage_key,
             "has_rendered_html": bool(self.rendered_html),
         }

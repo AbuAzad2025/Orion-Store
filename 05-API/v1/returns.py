@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from flask import Blueprint, g, jsonify, request
+from flask_jwt_extended import jwt_required
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin, require_tenant_context
@@ -26,14 +27,25 @@ def list_reasons():
 
 
 @returns_bp.post("/")
+@jwt_required()
 def create_return():
     try:
         tenant = require_tenant_context()
         data = request.get_json(silent=True) or {}
         order = _orders.get_by_public_id(tenant.id, data["order_public_id"])
+        current_user_id = g.user.id if g.user else None
+        if (
+            order.user_id is not None
+            and current_user_id is not None
+            and order.user_id != current_user_id
+            and not g.is_platform_admin
+            and not (g.user and g.user.is_admin)
+        ):
+            return jsonify({"error": "Order not found."}), 404
         row = _rma.create_return(
             tenant_id=tenant.id,
             order_id=order.id,
+            user_id=current_user_id,
             items=data.get("items", []),
             return_type=data.get("return_type", "refund"),
             reason_code=data.get("reason_code"),
@@ -56,10 +68,20 @@ def create_return():
 
 
 @returns_bp.get("/<int:return_id>")
+@jwt_required()
 def get_return(return_id: int):
     try:
         tenant = require_tenant_context()
         row = _rma.get_return(tenant.id, return_id)
+        current_user_id = g.user.id if g.user else None
+        if (
+            row.user_id is not None
+            and current_user_id is not None
+            and row.user_id != current_user_id
+            and not g.is_platform_admin
+            and not (g.user and g.user.is_admin)
+        ):
+            return jsonify({"error": "Return not found."}), 404
         items = ReturnItem.query.filter_by(return_id=row.id).all()
         return (
             jsonify(

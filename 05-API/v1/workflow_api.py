@@ -1,8 +1,8 @@
 from flask import Blueprint, g, jsonify, request
-from workflow.workflow import WorkflowRun
+from workflow.workflow import WorkflowDefinition, WorkflowRun
 from workflow_svc.workflow_service import WorkflowService
 
-from core.exceptions import OrionError
+from core.exceptions import NotFoundError, OrionError
 from core.middleware import require_tenant_admin
 
 workflow_bp = Blueprint("workflow", __name__)
@@ -50,3 +50,23 @@ def create_definition():
         return jsonify({"error": exc.message}), exc.status_code
     except (KeyError, TypeError, ValueError):
         return jsonify({"error": "Invalid request."}), 400
+
+
+@workflow_bp.route("/definitions/<int:definition_id>/run", methods=["POST"])
+def run_definition(definition_id: int):
+    """Manually execute one workflow definition for the current tenant."""
+    try:
+        require_tenant_admin()
+        definition = WorkflowDefinition.query.filter_by(
+            id=definition_id, tenant_id=g.tenant_id
+        ).first()
+        if definition is None:
+            raise NotFoundError("Workflow definition not found.")
+        data = request.get_json(silent=True) or {}
+        payload = data.get("payload") if isinstance(data.get("payload"), dict) else data
+        payload = dict(payload)
+        payload["tenant_id"] = g.tenant_id
+        run = _svc.run_definition(definition, g.tenant_id, payload, force=True)
+        return jsonify({"run": run.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code

@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="text-2xl font-bold mb-4">حسابي</h1>
-<section id="account-guest" class="max-w-md space-y-3">
+<section id="account-guest" class="orion-card max-w-md space-y-3">
   <h2 class="font-semibold">تسجيل الدخول</h2>
   <form id="login-form" class="grid gap-2 text-sm">
-    <input name="email" type="email" placeholder="البريد" class="border rounded px-3 py-2" required>
-    <input name="password" type="password" placeholder="كلمة المرور" class="border rounded px-3 py-2" required>
-    <button type="submit" class="rounded bg-emerald-600 py-2 text-white">دخول</button>
+    <input name="email" type="email" placeholder="البريد" class="orion-input w-full" required>
+    <input name="password" type="password" placeholder="كلمة المرور" class="orion-input w-full" required>
+    <button type="submit" class="orion-btn orion-btn-gold w-full">دخول</button>
   </form>
   <h2 class="font-semibold pt-4">حساب جديد</h2>
   <form id="register-form" class="grid gap-2 text-sm">
-    <input name="first_name" type="text" placeholder="الاسم" class="border rounded px-3 py-2">
-    <input name="email" type="email" placeholder="البريد" class="border rounded px-3 py-2" required>
-    <input name="password" type="password" placeholder="كلمة المرور" class="border rounded px-3 py-2" required>
-    <button type="submit" class="rounded bg-blue-600 py-2 text-white">تسجيل</button>
+    <input name="first_name" type="text" placeholder="الاسم" class="orion-input w-full">
+    <input name="email" type="email" placeholder="البريد" class="orion-input w-full" required>
+    <input name="password" type="password" placeholder="كلمة المرور" class="orion-input w-full" required>
+    <button type="submit" class="orion-btn w-full">تسجيل</button>
   </form>
   <p id="account-error" class="text-red-600 text-sm hidden"></p>
 </section>

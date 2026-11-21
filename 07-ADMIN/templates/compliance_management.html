@@ -7,7 +7,7 @@
       <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
       <input name="consent_type" type="text" placeholder="نوع الموافقة (مثال: marketing)" required>
       <label class="inline-flex items-center gap-2">
-        <input name="granted" type="checkbox" checked> ممنوحة
+        <input name="granted" type="checkbox" checked aria-label="Granted"> ممنوحة
       </label>
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">تسجيل موافقة</button>
     </form>
@@ -31,7 +31,7 @@
     <form id="cookie-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <textarea name="banner_message" rows="2" placeholder="نص البانر" class="border rounded px-2 py-1"></textarea>
       <label class="inline-flex items-center gap-2">
-        <input name="is_active" type="checkbox" checked> مفعّل
+        <input name="is_active" type="checkbox" checked aria-label="Is Active"> مفعّل
       </label>
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">حفظ الإعدادات</button>
     </form>

@@ -1,0 +1,376 @@
+/* Orion luxury theme — shared tokens and components.
+   Build: copied into both storefront and admin static/css by `npm run build:css`.
+   Uses logical properties so the same file works for LTR and RTL. */
+
+:root {
+  --orion-bg: #0b1220;
+  --orion-panel: #111c2e;
+  --orion-panel-2: #16243a;
+  --orion-text: #e8eef7;
+  --orion-muted: #a9b8cc;
+  --orion-gold: #e6c479;
+  --orion-gold-strong: #f2d99b;
+  --orion-border: #2a3b55;
+  --orion-accent: #7cb0f8;
+  --orion-danger: #ff9b9b;
+  --orion-success: #8fe0b0;
+  --orion-radius: 14px;
+  --orion-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.orion-surface {
+  background: var(--orion-bg);
+  color: var(--orion-text);
+  min-height: 100vh;
+}
+
+/* Coherent dark-luxury surface over the existing Tailwind utility classes.
+   Scoped so third-party/static pages outside .orion-surface stay untouched. */
+.orion-surface .bg-white,
+.orion-surface .bg-gray-50,
+.orion-surface .bg-slate-50,
+.orion-surface .bg-slate-100 {
+  background: var(--orion-panel) !important;
+  color: var(--orion-text) !important;
+}
+
+.orion-surface .text-gray-900,
+.orion-surface .text-slate-900,
+.orion-surface .text-gray-800,
+.orion-surface .text-slate-800 {
+  color: var(--orion-text) !important;
+}
+
+.orion-surface .text-gray-600,
+.orion-surface .text-slate-600,
+.orion-surface .text-gray-500,
+.orion-surface .text-slate-500 {
+  color: var(--orion-muted) !important;
+}
+
+.orion-surface .border-gray-200,
+.orion-surface .border-slate-200,
+.orion-surface .border-gray-300 {
+  border-color: var(--orion-border) !important;
+}
+
+.orion-surface input:not([type="hidden"]):not([type="submit"]),
+.orion-surface select,
+.orion-surface textarea {
+  background: var(--orion-panel);
+  color: var(--orion-text);
+  border: 1px solid var(--orion-border);
+  border-radius: 8px;
+}
+
+.orion-surface input::placeholder,
+.orion-surface textarea::placeholder {
+  color: var(--orion-muted);
+  opacity: 0.85;
+}
+
+.orion-card {
+  background: linear-gradient(160deg, var(--orion-panel), var(--orion-panel-2));
+  color: var(--orion-text);
+  border: 1px solid var(--orion-border);
+  border-radius: var(--orion-radius);
+  box-shadow: var(--orion-shadow);
+  padding: 1.5rem;
+}
+
+.orion-empty {
+  color: var(--orion-muted);
+  text-align: center;
+  padding-block: 2rem;
+}
+
+.orion-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 6.5rem;
+}
+
+.orion-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--orion-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.orion-stat-label {
+  color: var(--orion-muted);
+  font-size: 0.8rem;
+}
+
+.orion-skeleton {
+  display: inline-block;
+  width: 3.5rem;
+  height: 1.6rem;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--orion-panel-2) 25%,
+    #24395a 50%,
+    var(--orion-panel-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: orion-shimmer 1.2s linear infinite;
+}
+
+@keyframes orion-shimmer {
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orion-skeleton { animation: none; }
+}
+
+.orion-eyebrow {
+  color: var(--orion-gold);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.orion-store-header {
+  border-bottom: 1px solid var(--orion-border);
+  background: rgba(11, 18, 32, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.orion-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.5rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--orion-border);
+  background: rgba(11, 18, 32, 0.85);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+}
+
+.orion-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--orion-text);
+  font-weight: 600;
+}
+
+.orion-breadcrumb-sep {
+  color: var(--orion-gold);
+  opacity: 0.7;
+}
+
+.orion-header-link {
+  text-decoration: none;
+}
+
+.orion-header-link:hover {
+  color: var(--orion-gold);
+}
+
+.orion-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--orion-border);
+}
+
+.orion-title {
+  color: var(--orion-text);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.orion-muted {
+  color: var(--orion-muted);
+}
+
+.orion-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding-inline: 1.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--orion-border);
+  background: var(--orion-panel-2);
+  color: var(--orion-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.orion-btn:hover {
+  background: #1d2f4b;
+  border-color: var(--orion-gold);
+  transform: translateY(-1px);
+}
+
+.orion-btn-gold {
+  background: var(--orion-gold);
+  color: #1b1405;
+  border-color: var(--orion-gold);
+}
+
+.orion-btn-gold:hover {
+  background: var(--orion-gold-strong);
+}
+
+.orion-input,
+.orion-select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--orion-border);
+  background: var(--orion-panel);
+  color: var(--orion-text);
+}
+
+.orion-input::placeholder {
+  color: var(--orion-muted);
+  opacity: 0.8;
+}
+
+.orion-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid var(--orion-border);
+  border-radius: var(--orion-radius);
+  background: var(--orion-panel);
+  color: var(--orion-text);
+}
+
+.orion-table th,
+.orion-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--orion-border);
+  text-align: start;
+}
+
+.orion-table th {
+  color: var(--orion-gold);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.orion-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.orion-nav-link {
+  display: block;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  color: var(--orion-muted);
+  text-decoration: none;
+  border-inline-start: 3px solid transparent;
+}
+
+.orion-nav-link:hover {
+  background: var(--orion-panel-2);
+  color: var(--orion-text);
+}
+
+.orion-nav-link[aria-current="page"],
+.orion-nav-link.is-active {
+  background: var(--orion-panel-2);
+  color: var(--orion-gold);
+  border-inline-start-color: var(--orion-gold);
+}
+
+.orion-badge {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(230, 196, 121, 0.15);
+  color: var(--orion-gold);
+  border: 1px solid rgba(230, 196, 121, 0.35);
+}
+
+.orion-toast-host {
+  position: fixed;
+  inset-block-start: 1rem;
+  inset-inline-start: 1rem;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: min(24rem, 90vw);
+}
+
+.orion-toast {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--orion-border);
+  background: var(--orion-panel-2);
+  color: var(--orion-text);
+  box-shadow: var(--orion-shadow);
+  font-size: 0.875rem;
+}
+
+.orion-toast-error {
+  border-inline-start: 4px solid var(--orion-danger);
+}
+
+.orion-toast-success {
+  border-inline-start: 4px solid var(--orion-success);
+}
+
+.orion-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.orion-skip-link {
+  position: absolute;
+  inset-inline-start: -9999px;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--orion-gold);
+  color: #1b1405;
+  border-radius: 8px;
+}
+
+.orion-skip-link:focus {
+  inset-inline-start: 1rem;
+  top: 1rem;
+}
+
+/* WCAG 2.4.7 — visible keyboard focus everywhere. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--orion-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+  .orion-topbar {
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+  }
+
+  .orion-user-pill {
+    border-inline-start: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orion-btn {
+    transition: none;
+  }
+}

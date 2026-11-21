@@ -24,6 +24,11 @@ class NotFoundError(OrionError):
     message = "Resource not found."
 
 
+class ConflictError(OrionError):
+    status_code = 409
+    message = "Conflicting operation already in progress."
+
+
 class AuthenticationError(OrionError):
     status_code = 401
     message = "Authentication required."

@@ -29,7 +29,8 @@ def is_tenant_beta_allowed(tenant_slug: str | None) -> bool:
     if not beta_mode_enabled():
         return True
     if not tenant_slug:
-        return True
+        # In closed-beta mode an unresolved tenant must not slip through.
+        return False
     return tenant_slug in beta_allowlist()
 
 

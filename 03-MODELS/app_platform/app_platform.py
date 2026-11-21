@@ -89,6 +89,10 @@ class AppWebhookSubscription(db.Model, TimestampMixin):
     )
     topic: Mapped[str] = mapped_column(String(100), nullable=False)
     callback_url: Mapped[str] = mapped_column(String(1024), nullable=False)
+    # Shared HMAC signing secret returned to the subscriber once. Consistent
+    # with tenant_payment_gateways.webhook_secret (raw, not a password hash):
+    # the verifier needs the key itself to recompute the signature.
+    webhook_secret: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     def to_dict(self) -> dict:
@@ -96,6 +100,7 @@ class AppWebhookSubscription(db.Model, TimestampMixin):
             "id": self.id,
             "topic": self.topic,
             "callback_url": self.callback_url,
+            "webhook_secret": self.webhook_secret,
             "is_active": self.is_active,
         }
 

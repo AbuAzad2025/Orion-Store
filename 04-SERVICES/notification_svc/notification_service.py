@@ -52,3 +52,20 @@ class NotificationService:
                 "total": str(order.total),
             },
         )
+
+    def send_action_email(
+        self,
+        *,
+        tenant_id: int,
+        recipient: str,
+        template: str,
+        context: dict | None = None,
+    ) -> dict:
+        """Dispatch an email produced by a workflow ``send_email`` action."""
+        return self.enqueue(
+            tenant_id=tenant_id,
+            channel="email",
+            template=template,
+            recipient=recipient,
+            context=context or {},
+        )

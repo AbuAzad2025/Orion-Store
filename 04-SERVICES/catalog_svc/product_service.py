@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import uuid
 from decimal import Decimal
 
@@ -19,12 +20,47 @@ _PUBLISHED_COLUMNS = load_only(
     Product.name,
     Product.slug,
     Product.sku,
+    Product.image_url,
+    Product.short_description,
     Product.price,
     Product.quantity,
     Product.is_published,
     Product.category_id,
     Product.brand_id,
 )
+
+
+def _sync_stock_to_warehouse(product: Product) -> None:
+    """Keep the per-tenant warehouse aligned with the saleable product stock."""
+    try:
+        from oms_svc.oms_service import OmsService
+
+        OmsService().sync_product_to_warehouse(
+            tenant_id=product.tenant_id, product_id=product.id
+        )
+    except Exception as exc:  # inventory must never block catalog edits
+        logging.getLogger(__name__).warning(
+            "warehouse sync failed for product %s: %s", product.id, exc
+        )
+
+
+def _validate_category_brand(tenant_id: int, fields: dict) -> None:
+    """Reject category/brand ids belonging to another tenant."""
+    from catalog.brand import Brand
+    from catalog.category import Category
+
+    category_id = fields.get("category_id")
+    if (
+        category_id is not None
+        and not Category.query.filter_by(id=category_id, tenant_id=tenant_id).first()
+    ):
+        raise ValidationError("Category not found.")
+    brand_id = fields.get("brand_id")
+    if (
+        brand_id is not None
+        and not Brand.query.filter_by(id=brand_id, tenant_id=tenant_id).first()
+    ):
+        raise ValidationError("Brand not found.")
 
 
 class ProductService:
@@ -80,9 +116,16 @@ class ProductService:
         category_id: int | None = None,
         brand_id: int | None = None,
         is_published: bool = False,
+        is_featured: bool = False,
+        image_url: str | None = None,
+        short_description: str | None = None,
+        description: str | None = None,
     ) -> Product:
         if Product.query.filter_by(tenant_id=tenant_id, slug=slug).first():
             raise ValidationError("Product slug already exists.")
+        _validate_category_brand(
+            tenant_id, {"category_id": category_id, "brand_id": brand_id}
+        )
         product = Product(
             tenant_id=tenant_id,
             name=name,
@@ -93,19 +136,32 @@ class ProductService:
             category_id=category_id,
             brand_id=brand_id,
             is_published=is_published,
+            is_featured=is_featured,
+            image_url=image_url,
+            short_description=short_description,
+            description=description,
         )
         db.session.add(product)
         db.session.commit()
+        _sync_stock_to_warehouse(product)
         invalidate_tenant_catalog(tenant_id)
         return product
 
     def update(self, product: Product, **fields) -> Product:
+        was_out_of_stock = product.quantity == 0
         if "slug" in fields and fields["slug"] != product.slug:
             clash = Product.query.filter_by(
                 tenant_id=product.tenant_id, slug=fields["slug"]
             ).first()
             if clash and clash.id != product.id:
                 raise ValidationError("Product slug already exists.")
+        _validate_category_brand(
+            product.tenant_id,
+            {
+                "category_id": fields.get("category_id"),
+                "brand_id": fields.get("brand_id"),
+            },
+        )
         for key, value in fields.items():
             if key == "price" and value is not None:
                 value = Decimal(str(value))
@@ -113,6 +169,23 @@ class ProductService:
                 setattr(product, key, value)
         product.version += 1
         db.session.commit()
+        if "quantity" in fields:
+            _sync_stock_to_warehouse(product)
+            if was_out_of_stock and product.quantity > 0:
+                try:
+                    from stock_notification_svc.stock_notification_service import (
+                        StockNotificationService,
+                    )
+
+                    StockNotificationService().notify_for_product(
+                        tenant_id=product.tenant_id, product_id=product.id
+                    )
+                except Exception as exc:  # notifications must not block catalog edits
+                    logging.getLogger(__name__).warning(
+                        "restock notification failed for product %s: %s",
+                        product.id,
+                        exc,
+                    )
         invalidate_tenant_catalog(product.tenant_id)
         return product
 

@@ -120,13 +120,17 @@ def test_send_email_task(app):
 
 
 def test_check_trial_expiry_task(app):
+    from datetime import timedelta
+
     from base.types import TenantStatus
+    from core.utils import utc_now
     from tenant_svc.tenant_service import TenantService
 
     tenant = TenantService().create_tenant(
         name="Trial", slug="trial-exp", email="trial@test.com"
     )
     tenant.status = TenantStatus.TRIAL.value
+    tenant.trial_ends_at = utc_now() - timedelta(days=1)
     from orion.extensions import db
 
     db.session.commit()

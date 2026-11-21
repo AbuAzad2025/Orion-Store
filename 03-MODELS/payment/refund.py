@@ -36,3 +36,6 @@ class Refund(db.Model, TimestampMixin):
     currency: Mapped[str] = mapped_column(String(3), default="ILS")
     status: Mapped[str] = mapped_column(String(20), default="pending")
     reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    # Identifier returned by the payment provider for this refund. Also acts as
+    # the idempotency marker that prevents a second refund of the same payment.
+    provider_refund_id: Mapped[str | None] = mapped_column(String(255), nullable=True)

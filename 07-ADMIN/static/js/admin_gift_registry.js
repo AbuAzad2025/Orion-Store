@@ -4,7 +4,7 @@ const OrionAdminGiftRegistry = {
     const el = document.getElementById("gift-registries-list");
     if (!el) return;
     try {
-      const data = await OrionAPI.get("/gift-registries/");
+      const data = await OrionAPI.get("/gift-registries");
       const rows = data.registries || [];
       if (!rows.length) { el.textContent = "لا توجد قوائم."; return; }
       SafeDOM.clear(el);
@@ -23,7 +23,7 @@ const OrionAdminGiftRegistry = {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
-        await OrionAPI.post("/gift-registries/", {
+        await OrionAPI.post("/gift-registries", {
           customer_email: fd.get("customer_email"), registry_name: fd.get("registry_name"),
           event_type: fd.get("event_type") || undefined, event_date: fd.get("event_date") || undefined,
           is_public: fd.get("is_public") === "on",

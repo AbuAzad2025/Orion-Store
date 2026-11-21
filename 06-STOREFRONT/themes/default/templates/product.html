@@ -1,11 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
-<article class="max-w-lg mx-auto bg-white rounded-lg shadow p-6">
-  <h1 class="text-2xl font-bold mb-2">{{ product.name }}</h1>
-  <p class="text-2xl text-emerald-700 font-bold mb-4">{{ product.price }} ₪</p>
+<article class="orion-card max-w-lg mx-auto">
+  {% if product.image_url %}
+  <img src="{{ product.image_url }}" alt="{{ product.name }}"
+       class="w-full h-72 object-cover rounded mb-5 border border-slate-800">
+  {% endif %}
+  <h1 class="orion-title text-2xl mb-2">{{ product.name }}</h1>
+  <p class="orion-eyebrow text-2xl mb-4">{{ product.price }} ₪</p>
   {% if product.short_description %}<p class="text-gray-600 mb-6">{{ product.short_description }}</p>{% endif %}
-  <button data-add-cart="{{ product.id }}" class="rounded bg-emerald-600 px-6 py-2 text-white">أضف للسلة</button>
+  <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold">أضف للسلة</button>
   <a href="/cart" class="mr-4 text-sm text-gray-600 underline">عرض السلة</a>
+  {% set wa_order = whatsapp_url(tenant.phone, 'مرحباً، أريد طلب: ' ~ product.name ~ ' - السعر: ' ~ product.price ~ ' ₪') %}
+  {% if wa_order %}
+  <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn mt-3 block"
+     aria-label="اطلب {{ product.name }} عبر واتساب">اطلب عبر واتساب</a>
+  {% endif %}
 
   <hr class="my-6">
   <div class="text-center">
@@ -13,8 +22,8 @@
     <form id="stock-notify-form" class="flex gap-2 max-w-sm mx-auto">
       <input type="hidden" name="product_id" value="{{ product.id }}">
       <input type="email" name="customer_email" placeholder="بريدك الإلكتروني" required
-        class="flex-1 border rounded px-3 py-2 text-sm">
-      <button type="submit" class="rounded bg-amber-600 px-4 py-2 text-white text-sm whitespace-nowrap">إشعرني</button>
+        class="orion-input flex-1 text-sm">
+      <button type="submit" class="orion-btn text-sm whitespace-nowrap">إشعرني</button>
     </form>
     <p id="stock-notify-msg" class="text-sm mt-2 hidden"></p>
   </div>

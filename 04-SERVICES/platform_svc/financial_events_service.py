@@ -73,12 +73,16 @@ class FinancialEventsService:
         currency: str = "ILS",
         description: str | None = None,
         apply_commission: bool = True,
+        allow_negative: bool = False,
+        metadata: dict | None = None,
     ) -> FinancialEvent:
         value = Decimal(str(amount))
-        if value <= 0:
-            raise ValueError("amount must be positive")
+        if value == 0 or (value < 0 and not allow_negative):
+            raise ValueError("amount must be non-zero (negative only for reversals)")
         percent = (
-            self.resolve_commission_percent(tenant_id) if apply_commission else None
+            self.resolve_commission_percent(tenant_id)
+            if (apply_commission and value > 0)
+            else None
         )
         commission_amount = (
             (value * percent).quantize(Decimal("0.01")) if percent is not None else None
@@ -92,6 +96,7 @@ class FinancialEventsService:
             source_entity=source_entity,
             source_id=source_id,
             description=description,
+            metadata_json=metadata or {},
             commission_applied=apply_commission,
             commission_percent=percent,
             commission_amount=commission_amount,

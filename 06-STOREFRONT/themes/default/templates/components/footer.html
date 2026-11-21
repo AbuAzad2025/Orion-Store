@@ -1,3 +1,22 @@
-<footer class="mt-12 border-t bg-white py-6 text-center text-sm text-gray-500">
+{% set policy = namespace(privacy=None, terms=None) %}
+{% for p in footer_pages|default([]) %}
+  {% set s = (p.slug|default(''))|lower %}
+  {% if s in ('privacy', 'privacy-policy', 'privacy_policy') and policy.privacy is none %}
+    {% set policy.privacy = p %}
+  {% elif s in ('terms', 'terms-and-conditions', 'terms_conditions', 'terms-conditions') and policy.terms is none %}
+    {% set policy.terms = p %}
+  {% endif %}
+{% endfor %}
+<footer class="orion-muted mt-12 border-t py-6 text-center text-sm">
+  {% if policy.privacy or policy.terms %}
+  <nav class="flex flex-wrap justify-center gap-4 mb-3" aria-label="روابط السياسات">
+    {% if policy.privacy %}
+    <a class="underline hover:no-underline" href="/pages/{{ policy.privacy.slug }}">{{ policy.privacy.title|default('سياسة الخصوصية') }}</a>
+    {% endif %}
+    {% if policy.terms %}
+    <a class="underline hover:no-underline" href="/pages/{{ policy.terms.slug }}">{{ policy.terms.title|default('الشروط والأحكام') }}</a>
+    {% endif %}
+  </nav>
+  {% endif %}
   <p>مدعوم من <strong>Azadexa</strong></p>
 </footer>

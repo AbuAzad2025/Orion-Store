@@ -14,7 +14,7 @@ const OrionTenantOps = {
       for (const r of rows) {
         const row = SafeDOM.elem("div", { className: "border-b py-2 flex justify-between items-center gap-2" });
         row.appendChild(SafeDOM.elem("span", null, [`#${r.id} — ${r.status} — ${r.return_type || ""}`]));
-        if (r.status === "pending") {
+        if (r.status === "requested") {
           row.appendChild(SafeDOM.elem("button", { "data-approve": r.id, className: "text-emerald-700 text-xs" }, ["موافقة"]));
         }
         el.appendChild(row);
@@ -232,7 +232,7 @@ const OrionTenantOps = {
     const el = document.getElementById("bundles-list");
     if (!el) return;
     try {
-      const data = await OrionAPI.get("/bundles/");
+      const data = await OrionAPI.get("/bundles");
       const rows = data.bundles || [];
       if (!rows.length) { el.textContent = "لا توجد حزم بعد."; return; }
       SafeDOM.clear(el);
@@ -251,7 +251,7 @@ const OrionTenantOps = {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
-        await OrionAPI.post("/bundles/", {
+        await OrionAPI.post("/bundles", {
           name: fd.get("name"), code: fd.get("code"),
           discount_percent: String(fd.get("discount_percent") || "0"),
         });
@@ -307,7 +307,7 @@ const OrionTenantOps = {
     const el = document.getElementById("draft-orders-list");
     if (!el) return;
     try {
-      const data = await OrionAPI.get("/draft-orders/");
+      const data = await OrionAPI.get("/draft-orders");
       const rows = data.draft_orders || [];
       if (!rows.length) { el.textContent = "لا توجد مسودات."; return; }
       SafeDOM.clear(el);
@@ -337,7 +337,7 @@ const OrionTenantOps = {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
-        await OrionAPI.post("/draft-orders/", {
+        await OrionAPI.post("/draft-orders", {
           customer_email: fd.get("customer_email"), notes: fd.get("notes") || undefined,
         });
         form.reset();

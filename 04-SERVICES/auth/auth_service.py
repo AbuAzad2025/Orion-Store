@@ -5,9 +5,16 @@ from __future__ import annotations
 import bcrypt
 from flask import g
 
-from core.exceptions import AuthenticationError, ValidationError
+from core.context import get_user
+from core.exceptions import (
+    AuthenticationError,
+    AuthorizationError,
+    NotFoundError,
+    ValidationError,
+)
 from core.utils import utc_now
 from orion.extensions import db
+from user.role import Role, UserRole
 from user.user import User
 
 
@@ -73,3 +80,34 @@ class AuthService:
         db.session.commit()
         g.user = user
         return user
+
+    def assign_role(self, tenant_id: int, user_id: int, role_code: str) -> UserRole:
+        """Assign a tenant-scoped role to a user after ownership checks.
+
+        Both sides must belong to ``tenant_id``: a user from another tenant
+        (or a role owned by another tenant) is rejected. Re-assigning an
+        existing role is idempotent.
+        """
+        user = db.session.get(User, user_id)
+        if not user or user.deleted_at is not None:
+            raise NotFoundError("User not found.")
+        if user.tenant_id != tenant_id:
+            raise AuthorizationError("User does not belong to this tenant.")
+
+        role = Role.query.filter_by(tenant_id=tenant_id, code=role_code).first()
+        if not role:
+            raise NotFoundError("Role not found for this tenant.")
+
+        existing = UserRole.query.filter_by(user_id=user.id, role_id=role.id).first()
+        if existing:
+            return existing
+
+        actor = get_user()
+        assignment = UserRole(
+            user_id=user.id,
+            role_id=role.id,
+            assigned_by=actor.id if actor is not None else None,
+        )
+        db.session.add(assignment)
+        db.session.commit()
+        return assignment

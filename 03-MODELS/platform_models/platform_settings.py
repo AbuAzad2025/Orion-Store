@@ -25,10 +25,19 @@ class PlatformSettings(db.Model):
     owner_phone: Mapped[str] = mapped_column(String(50), default="0562150193")
     owner_phone_intl: Mapped[str] = mapped_column(String(50), default="+972562150193")
     owner_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    support_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    default_currency: Mapped[str] = mapped_column(
+        String(3), default="ILS", server_default="ILS", nullable=False
+    )
+    default_language: Mapped[str] = mapped_column(
+        String(5), default="ar", server_default="ar", nullable=False
+    )
     default_commission_percent: Mapped[Decimal] = mapped_column(
         Numeric(5, 4), default=Decimal("0.0100")
     )
-    singleton: Mapped[str] = mapped_column(String(1), default="1", nullable=False)
+    singleton: Mapped[str] = mapped_column(
+        String(1), default="1", nullable=False, unique=True
+    )
     valuepayment_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     valuepayment_config: Mapped[dict] = mapped_column(db.JSON, default=dict)
     updated_at: Mapped[datetime] = mapped_column(
@@ -46,6 +55,9 @@ class PlatformSettings(db.Model):
             "owner_phone": self.owner_phone,
             "owner_phone_intl": self.owner_phone_intl,
             "owner_email": self.owner_email,
+            "support_email": self.support_email,
+            "default_currency": self.default_currency,
+            "default_language": self.default_language,
             "default_commission_percent": str(self.default_commission_percent),
             "valuepayment_enabled": self.valuepayment_enabled,
         }

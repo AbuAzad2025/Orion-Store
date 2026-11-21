@@ -12,6 +12,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    UniqueConstraint,
     Uuid,
     func,
 )
@@ -32,6 +33,7 @@ class User(db.Model):
             "NOT is_superuser OR NOT is_customer",
             name="ck_users_tenant_customer",
         ),
+        UniqueConstraint("tenant_id", "email", name="uq_users_tenant_email"),
     )
 
     id: Mapped[int] = mapped_column(
@@ -77,7 +79,11 @@ class User(db.Model):
 
     def to_dict(self) -> dict:
         return {
+            "id": self.id,
             "public_id": str(self.public_id),
+            "is_active": self.is_active,
+            "is_admin": self.is_admin,
+            "is_customer": self.is_customer,
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,

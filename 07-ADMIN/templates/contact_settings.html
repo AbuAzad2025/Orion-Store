@@ -1,0 +1,44 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<section class="orion-card max-w-xl space-y-4">
+  <div>
+    <span class="orion-eyebrow">واتساب</span>
+    <h2 class="orion-title">رقم تواصل المتجر</h2>
+    <p class="orion-muted text-sm">
+      يُستخدم الرقم في زر التواصل وزر «اطلب عبر واتساب» في المتجر.
+      اكتبه بصيغة دولية مثل <span dir="ltr">+970501234567</span>.
+    </p>
+  </div>
+  <form id="contact-form" class="space-y-3">
+    <label class="orion-stat-label" for="contact-phone">رقم الهاتف</label>
+    <input id="contact-phone" name="phone" class="orion-input" dir="ltr"
+           placeholder="+970501234567" aria-label="رقم الهاتف للواتساب">
+    <button type="submit" class="orion-btn orion-btn-gold">حفظ</button>
+    <p id="contact-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("contact-form");
+  const input = document.getElementById("contact-phone");
+  const msg = document.getElementById("contact-msg");
+  if (!form) return;
+  OrionAPI.get("/tenant/contact").then((data) => { input.value = data.phone || ""; })
+    .catch((err) => { msg.textContent = err.message; });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const data = await OrionUI.withLoading(form, () =>
+        OrionAPI.put("/tenant/contact", { phone: input.value.trim() })
+      );
+      input.value = data.phone || "";
+      msg.textContent = "تم الحفظ بنجاح";
+    } catch (err) {
+      msg.textContent = err.message;
+    }
+  });
+});
+</script>
+{% endblock %}

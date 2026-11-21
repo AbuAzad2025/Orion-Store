@@ -1,14 +1,14 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="space-y-6">
-  <section class="rounded border bg-white p-4">
+  <section class="orion-card">
     <h2 class="text-lg font-semibold mb-3">المناطق الضريبية</h2>
     <form id="tax-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="name" type="text" placeholder="اسم المنطقة (مثال: إسرائيل)" required>
       <input name="code" type="text" placeholder="رمز المنطقة (مثال: IL)" required>
       <input name="country" type="text" placeholder="الدولة" value="IL">
       <input name="region" type="text" placeholder="المنطقة (اختياري)">
-      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة منطقة</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة منطقة</button>
     </form>
     <div id="tax-jurisdictions-list" class="text-gray-500 text-sm">جاري التحميل...</div>
   </section>

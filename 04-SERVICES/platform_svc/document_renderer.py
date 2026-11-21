@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import os
 import uuid
 from decimal import Decimal
-from pathlib import Path
 
 from core.exceptions import TemplateValidationError
 from order.order import Order
@@ -14,7 +12,7 @@ from payment.payment import Payment
 from platform_models.financial_event import FinancialEvent
 from platform_models.invoice import Invoice, TenantDocumentTemplate
 from platform_models.platform_settings import PlatformSettings
-from platform_svc.pdf_service import html_to_pdf
+from platform_svc.pdf_service import get_invoice_storage, html_to_pdf
 from platform_svc.platform_settings_service import PlatformSettingsService
 
 DEFAULT_INVOICE_BODY = (
@@ -71,11 +69,13 @@ class DocumentRenderer:
     def _store_pdf_artifact(
         self, tenant_id: int, invoice_number: str, pdf: bytes
     ) -> str:
-        root = Path(os.environ.get("INVOICE_ARTIFACT_DIR", "instance/invoices"))
-        target = root / str(tenant_id) / f"{invoice_number}.pdf"
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(pdf)
-        return str(target.as_posix())
+        """Persist the PDF through the configured object storage backend.
+
+        The returned key is what Invoice.storage_key records; callers resolve
+        bytes back through ``get_invoice_storage().get(key)``.
+        """
+        key = f"{tenant_id}/{invoice_number}.pdf"
+        return get_invoice_storage().put(key, pdf)
 
     def generate_invoice(
         self,
@@ -95,7 +95,9 @@ class DocumentRenderer:
         )
         pdf_bytes = html_to_pdf(rendered)
         invoice_number = f"INV-{order.tenant_id}-{uuid.uuid4().hex[:8].upper()}"
-        pdf_path = self._store_pdf_artifact(order.tenant_id, invoice_number, pdf_bytes)
+        storage_key = self._store_pdf_artifact(
+            order.tenant_id, invoice_number, pdf_bytes
+        )
         invoice = Invoice(
             tenant_id=order.tenant_id,
             order_id=order.id,
@@ -110,7 +112,8 @@ class DocumentRenderer:
             currency=payment.currency,
             platform_footer_applied=bool(footer),
             rendered_html=rendered,
-            pdf_artifact_path=pdf_path,
+            pdf_artifact_path=storage_key,
+            storage_key=storage_key,
         )
         db.session.add(invoice)
         db.session.commit()

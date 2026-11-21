@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, g, jsonify, request
 from i18n_svc.translation_service import TranslationService
 from shipping_svc.shipping_service import ShippingService
 
@@ -15,7 +15,12 @@ from core.caching import (
     store_products_list_key,
 )
 from core.context import get_locale
-from core.exceptions import OrionError
+from core.exceptions import (
+    AuthenticationError,
+    AuthorizationError,
+    NotFoundError,
+    OrionError,
+)
 from core.middleware import require_tenant_context
 from core.pagination import paginate_query, paginated_payload, pagination_params
 from core.rate_limit import limiter
@@ -24,6 +29,7 @@ from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
 from payment_svc.payment_service import PaymentService
 from tenant_gateway_svc.gateway_service import GatewayService
+from v1.store_whatsapp import cart_items_with_names, register_store_whatsapp_routes
 
 storefront_bp = Blueprint("storefront", __name__)
 _carts = CartService()
@@ -141,10 +147,13 @@ def get_cart(cart_token: str):
     try:
         tenant = require_tenant_context()
         cart = _carts.get_cart(tenant.id, cart_token)
-        items = [_i.to_dict() for _i in _carts.list_items(cart)]
+        items = cart_items_with_names(_carts, cart)
         return jsonify({"cart": cart.to_dict(), "items": items}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
+
+
+register_store_whatsapp_routes(storefront_bp, _carts)
 
 
 @storefront_bp.post("/cart/<cart_token>/items")
@@ -183,9 +192,18 @@ def checkout():
         tenant = require_tenant_context()
         data = request.get_json(silent=True) or {}
         cart = _carts.get_cart(tenant.id, data["cart_token"])
+        customer = g.user
+        is_registered_customer = bool(
+            customer
+            and customer.is_customer
+            and not customer.is_admin
+            and customer.tenant_id == tenant.id
+        )
         order = _checkout.checkout(
             cart=cart,
             customer_email=data["customer_email"],
+            user_id=customer.id if is_registered_customer else None,
+            is_guest=not is_registered_customer,
             shipping_address=data.get("shipping_address", {}),
             idempotency_key=data.get("idempotency_key"),
             shipping_method_code=data.get("shipping_method_code"),
@@ -254,6 +272,52 @@ def get_order_invoice(public_id: str):
                 }
             ),
             200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@storefront_bp.get("/orders/<public_id>/invoice.pdf")
+def download_order_invoice_pdf(public_id: str):
+    """Stream the stored invoice PDF to the order owner or a store admin."""
+    try:
+        from platform_models.invoice import Invoice
+        from platform_svc.pdf_service import get_invoice_storage
+
+        tenant = require_tenant_context()
+        order = _orders.get_by_public_id(tenant.id, public_id)
+        invoice = Invoice.query.filter_by(
+            tenant_id=tenant.id, order_id=order.id
+        ).first()
+        if not invoice:
+            raise NotFoundError("Invoice not found.")
+
+        user = getattr(g, "user", None)
+        if user is None:
+            raise AuthenticationError("Authentication required.")
+        is_admin = bool(
+            getattr(g, "is_platform_admin", False)
+            or (getattr(user, "is_admin", False) and user.tenant_id == tenant.id)
+        )
+        is_owner = (order.user_id is not None and order.user_id == user.id) or (
+            order.customer_email or ""
+        ).lower() == (getattr(user, "email", None) or "").lower()
+        if not is_admin and not is_owner:
+            raise AuthorizationError("Permission denied.")
+
+        key = invoice.storage_key or invoice.pdf_artifact_path
+        if not key:
+            raise NotFoundError("Invoice PDF not found.")
+        try:
+            pdf = get_invoice_storage().get(key)
+        except (KeyError, ValueError) as exc:
+            raise NotFoundError("Invoice PDF not found.") from exc
+        return Response(
+            pdf,
+            mimetype="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{invoice.invoice_number}.pdf"',
+            },
         )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

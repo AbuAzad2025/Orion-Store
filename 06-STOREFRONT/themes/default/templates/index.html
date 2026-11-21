@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">منتجاتنا</h1>
+<span class="orion-eyebrow">{{ tenant.name }}</span>
+<h1 class="orion-title text-2xl mb-6">منتجاتنا</h1>
 {% if products %}
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
   {% for product in products %}
@@ -8,7 +9,7 @@
   {% endfor %}
 </div>
 {% else %}
-<p class="text-gray-500">لا توجد منتجات منشورة بعد.</p>
+<div class="orion-card orion-empty">لا توجد منتجات منشورة بعد.</div>
 {% endif %}
 {% endblock %}
 {% block scripts %}

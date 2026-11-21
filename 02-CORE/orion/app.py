@@ -19,6 +19,24 @@ from orion.extensions import csrf, db, jwt, migrate
 from v1.routes import API_BLUEPRINTS, register_blueprints, register_ui_blueprints
 
 
+def _validate_production_secrets(app: Flask) -> None:
+    """Refuse to boot production with placeholder or missing secrets."""
+    invalid: list[str] = []
+    secret = str(app.config.get("SECRET_KEY") or "")
+    if not secret or secret == "dev-only-change-me":
+        invalid.append("SECRET_KEY")
+    jwt_secret = str(app.config.get("JWT_SECRET_KEY") or "")
+    if not jwt_secret or jwt_secret == "dev-only-change-me" or len(jwt_secret) < 16:
+        invalid.append("JWT_SECRET_KEY")
+    if not app.config.get("ENCRYPTION_KEY"):
+        invalid.append("ENCRYPTION_KEY")
+    if invalid:
+        raise RuntimeError(
+            "Production startup blocked — missing or placeholder secrets: "
+            + ", ".join(invalid)
+        )
+
+
 def create_app(config_name: str | None = None) -> Flask:
     load_dotenv()
 
@@ -26,11 +44,31 @@ def create_app(config_name: str | None = None) -> Flask:
     env = config_name or os.environ.get("FLASK_ENV", "development")
     app.config.from_object(config_by_name.get(env, config_by_name["default"]))
 
-    if app.config.get("ENV") == "production" and app.debug:
-        raise RuntimeError(
-            "Production mode requires DEBUG=False; "
-            "check FLASK_ENV and DEBUG env vars."
-        )
+    # Config class attributes are evaluated at import time, before load_dotenv()
+    # runs. Re-apply critical environment values so .env and late-set vars win.
+    for key in (
+        "SECRET_KEY",
+        "JWT_SECRET_KEY",
+        "ENCRYPTION_KEY",
+        "DATABASE_URL",
+        "REDIS_URL",
+    ):
+        value = os.environ.get(key)
+        if value is not None:
+            app.config[key] = value
+
+    # JWT_SECRET_KEY defaults to the import-time SECRET_KEY (placeholder).
+    # Derive it from the real, re-applied secret when not explicitly provided.
+    if "JWT_SECRET_KEY" not in os.environ:
+        app.config["JWT_SECRET_KEY"] = app.config["SECRET_KEY"]
+
+    if app.config.get("ENV") == "production":
+        if app.debug:
+            raise RuntimeError(
+                "Production mode requires DEBUG=False; "
+                "check FLASK_ENV and DEBUG env vars."
+            )
+        _validate_production_secrets(app)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -87,6 +125,10 @@ def create_app(config_name: str | None = None) -> Flask:
     register_monitoring(app)
     init_rate_limiter(app)
     app.extensions["redis_cache"] = RedisCache(app.config.get("REDIS_URL"))
+    from engine.whatsapp import whatsapp_url
+
+    app.jinja_env.globals["whatsapp_url"] = whatsapp_url
+
     from orion.celery_app import init_celery
 
     init_celery(app)

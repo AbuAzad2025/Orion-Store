@@ -8,6 +8,11 @@ audit_bp = Blueprint("audit", __name__)
 _svc = AuditV2Service()
 
 
+def _actor_id() -> int:
+    """Actor is the authenticated principal — never a client-supplied value."""
+    return g.user.id
+
+
 @audit_bp.route("/reports", methods=["GET"])
 def list_reports():
     try:
@@ -25,7 +30,7 @@ def create_report():
         data = request.get_json(silent=True) or {}
         report = _svc.create_report(
             report_type=data["report_type"],
-            generated_by=int(data["generated_by"]),
+            generated_by=_actor_id(),
             summary=data.get("summary", {}),
             details=data.get("details"),
         )
@@ -52,7 +57,7 @@ def log_action():
         require_platform_admin()
         data = request.get_json(silent=True) or {}
         log = _svc.log_action(
-            user_id=int(data["user_id"]),
+            user_id=_actor_id(),
             action=data["action"],
             target_type=data.get("target_type"),
             target_id=data.get("target_id"),

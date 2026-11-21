@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from decimal import Decimal, InvalidOperation
+
 from flask import Blueprint, g, jsonify, request
 
-from core.exceptions import OrionError
+from core.exceptions import OrionError, ValidationError
 from core.middleware import require_tenant_admin
 from payment_svc.payment_service import PaymentService
 
@@ -32,9 +34,17 @@ def refund_payment(payment_public_id: str):
     try:
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
+        raw_amount = data.get("amount")
+        amount = None
+        if raw_amount is not None:
+            try:
+                amount = Decimal(str(raw_amount))
+            except (InvalidOperation, ValueError, TypeError) as exc:
+                raise ValidationError("Invalid refund amount.") from exc
         result = _payments.refund(
             tenant_id=g.tenant_id,
             payment_public_id=payment_public_id,
+            amount=amount,
             reason=data.get("reason"),
         )
         return jsonify(result), 200

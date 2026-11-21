@@ -40,7 +40,17 @@ def register_app():
             redirect_uris=data.get("redirect_uris", []),
             scopes=data.get("scopes"),
         )
-        return jsonify({"app": app.to_dict()}), 201
+        # The raw client_secret exists only in this response. It is never
+        # persisted (only a salted SHA-256 digest is) and never returned by
+        # list_apps / to_dict afterwards.
+        raw_secret = getattr(app, "_raw_client_secret", None)
+        app_data = app.to_dict()
+        if raw_secret:
+            app_data["client_secret"] = raw_secret
+        body = {"app": app_data}
+        if raw_secret:
+            body["client_secret"] = raw_secret
+        return jsonify(body), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
     except (KeyError, TypeError, ValueError):
@@ -51,11 +61,12 @@ def register_app():
 def install_app(app_id: int):
     try:
         require_tenant_admin()
-        data = request.get_json(silent=True) or {}
+        # Installership is an authenticated fact, never client input. Ignore
+        # any "installed_by" supplied in the body (previously defaulted to 0).
         inst = _svc.install_app(
             tenant_id=g.tenant_id,
             app_id=app_id,
-            installed_by=data.get("installed_by", 0),
+            installed_by=g.user.id,
         )
         return jsonify({"installation": inst.to_dict()}), 201
     except OrionError as exc:
@@ -100,3 +111,47 @@ def create_sandbox():
         return jsonify({"error": exc.message}), exc.status_code
     except (KeyError, TypeError, ValueError):
         return jsonify({"error": "Invalid request."}), 400
+
+
+def _oauth_request_data() -> dict:
+    """Accept JSON, form-encoded bodies, and HTTP Basic client credentials."""
+    if request.is_json:
+        data = dict(request.get_json(silent=True) or {})
+    else:
+        data = request.form.to_dict()
+    auth = request.authorization
+    if auth:
+        data.setdefault("client_id", auth.username)
+        data.setdefault("client_secret", auth.password)
+    return data
+
+
+def _issue_oauth_token(*, require_grant_type: bool):
+    try:
+        data = _oauth_request_data()
+        grant_type = data.get("grant_type") or "client_credentials"
+        if require_grant_type and grant_type != "client_credentials":
+            return jsonify({"error": "Unsupported grant_type."}), 400
+        result = _svc.issue_oauth_token(
+            client_id=data["client_id"],
+            client_secret=data["client_secret"],
+            scope=data.get("scope"),
+            grant_type=grant_type,
+        )
+        return jsonify(result), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except (KeyError, TypeError, ValueError):
+        return jsonify({"error": "Invalid client credentials."}), 400
+
+
+@app_platform_bp.route("/oauth/authorize", methods=["POST"])
+def oauth_authorize():
+    """Issue a signed access token for a registered app (implicit-style)."""
+    return _issue_oauth_token(require_grant_type=False)
+
+
+@app_platform_bp.route("/oauth/token", methods=["POST"])
+def oauth_token():
+    """OAuth2 client_credentials token endpoint for external applications."""
+    return _issue_oauth_token(require_grant_type=True)

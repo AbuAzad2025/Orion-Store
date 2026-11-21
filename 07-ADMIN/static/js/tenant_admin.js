@@ -7,21 +7,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const s = data.stats;
         SafeDOM.clear(statsEl);
         statsEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-4" }, [
-          SafeDOM.elem("div", { className: "rounded-lg bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["الطلبات"]),
-            SafeDOM.elem("p", { className: "text-2xl font-bold" }, [s.orders_total])
+          SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
+            SafeDOM.elem("p", { className: "orion-stat-label" }, ["الطلبات"]),
+            SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.orders_total || 0).toLocaleString("ar")])
           ]),
-          SafeDOM.elem("div", { className: "rounded-lg bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["مدفوعة"]),
-            SafeDOM.elem("p", { className: "text-2xl font-bold" }, [s.orders_paid])
+          SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
+            SafeDOM.elem("p", { className: "orion-stat-label" }, ["مدفوعة"]),
+            SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.orders_paid || 0).toLocaleString("ar")])
           ]),
-          SafeDOM.elem("div", { className: "rounded-lg bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["المنتجات"]),
-            SafeDOM.elem("p", { className: "text-2xl font-bold" }, [s.products_total])
+          SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
+            SafeDOM.elem("p", { className: "orion-stat-label" }, ["المنتجات"]),
+            SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.products_total || 0).toLocaleString("ar")])
           ]),
-          SafeDOM.elem("div", { className: "rounded-lg bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["منشورة"]),
-            SafeDOM.elem("p", { className: "text-2xl font-bold" }, [s.products_published])
+          SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
+            SafeDOM.elem("p", { className: "orion-stat-label" }, ["منشورة"]),
+            SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.products_published || 0).toLocaleString("ar")])
           ])
         ]));
       })

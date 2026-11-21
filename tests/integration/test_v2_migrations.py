@@ -13,6 +13,11 @@ def test_v2_migration(app):
         from orion.extensions import db
 
         db.drop_all()
+        db.session.execute(db.text("DROP TABLE IF EXISTS alembic_version"))
+        db.session.execute(
+            db.text("DROP TABLE IF EXISTS platform_payment_integrations")
+        )
+        db.session.commit()
         cfg = Config("migrations/alembic.ini")
         cfg.set_main_option("script_location", "migrations")
         command.stamp(cfg, "base")

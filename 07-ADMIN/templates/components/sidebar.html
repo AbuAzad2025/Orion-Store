@@ -2,50 +2,54 @@
   <div class="mb-8 font-bold text-lg">{{ platform_settings.platform_name | default('Azadexa') }}</div>
   <nav class="space-y-2 text-sm flex-1">
     {% if tenant %}
-      <a href="/admin/store/dashboard" class="block py-2 px-3 rounded {% if active_nav == 'dashboard' %}bg-slate-700{% endif %}">لوحة المتجر</a>
-      <a href="/admin/store/gateways" class="block py-2 px-3 rounded {% if active_nav == 'gateways' %}bg-slate-700{% endif %}">بوابات الدفع</a>
-      <a href="/admin/store/documents" class="block py-2 px-3 rounded {% if active_nav == 'documents' %}bg-slate-700{% endif %}">قوالب المستندات</a>
-      <a href="/admin/store/feature-flags" class="block py-2 px-3 rounded {% if active_nav == 'feature_flags' %}bg-slate-700{% endif %}">ميزات المتجر</a>
-      <a href="/admin/store/subscriptions" class="block py-2 px-3 rounded {% if active_nav == 'subscriptions' %}bg-slate-700{% endif %}">الاشتراكات</a>
-      <a href="/admin/store/tax" class="block py-2 px-3 rounded {% if active_nav == 'tax' %}bg-slate-700{% endif %}">الضرائب</a>
-      <a href="/admin/store/bopis" class="block py-2 px-3 rounded {% if active_nav == 'bopis' %}bg-slate-700{% endif %}">استلام من المتجر</a>
-      <a href="/admin/store/bundles" class="block py-2 px-3 rounded {% if active_nav == 'bundles' %}bg-slate-700{% endif %}">الحزم</a>
-      <a href="/admin/store/store-credit" class="block py-2 px-3 rounded {% if active_nav == 'store_credit' %}bg-slate-700{% endif %}">رصيد المتجر</a>
-      <a href="/admin/store/draft-orders" class="block py-2 px-3 rounded {% if active_nav == 'draft_orders' %}bg-slate-700{% endif %}">المسودات</a>
-      <a href="/admin/store/returns" class="block py-2 px-3 rounded {% if active_nav == 'returns' %}bg-slate-700{% endif %}">المرتجعات</a>
-      <a href="/admin/store/b2b" class="block py-2 px-3 rounded {% if active_nav == 'b2b' %}bg-slate-700{% endif %}">B2B — الجملة</a>
-      <a href="/admin/store/oms" class="block py-2 px-3 rounded {% if active_nav == 'oms' %}bg-slate-700{% endif %}">المستودعات</a>
+      <a href="/admin/store/dashboard" class="orion-nav-link{% if active_nav == 'dashboard' %} is-active{% endif %}">لوحة المتجر</a>
+      <a href="/admin/store/products" class="orion-nav-link{% if active_nav == 'products' %} is-active{% endif %}">المنتجات</a>
+      <a href="/admin/store/pages" class="orion-nav-link{% if active_nav == 'pages' %} is-active{% endif %}">الصفحات</a>
+      <a href="/admin/store/contact" class="orion-nav-link{% if active_nav == 'contact' %} is-active{% endif %}">رقم واتساب</a>
+      <a href="/admin/store/ui-kit" class="orion-nav-link{% if active_nav == 'ui_kit' %} is-active{% endif %}">معاينة المكوّنات</a>
+      <a href="/admin/store/gateways" class="orion-nav-link{% if active_nav == 'gateways' %} is-active{% endif %}">بوابات الدفع</a>
+      <a href="/admin/store/documents" class="orion-nav-link{% if active_nav == 'documents' %} is-active{% endif %}">قوالب المستندات</a>
+      <a href="/admin/store/feature-flags" class="orion-nav-link{% if active_nav == 'feature_flags' %} is-active{% endif %}">ميزات المتجر</a>
+      <a href="/admin/store/subscriptions" class="orion-nav-link{% if active_nav == 'subscriptions' %} is-active{% endif %}">الاشتراكات</a>
+      <a href="/admin/store/tax" class="orion-nav-link{% if active_nav == 'tax' %} is-active{% endif %}">الضرائب</a>
+      <a href="/admin/store/bopis" class="orion-nav-link{% if active_nav == 'bopis' %} is-active{% endif %}">استلام من المتجر</a>
+      <a href="/admin/store/bundles" class="orion-nav-link{% if active_nav == 'bundles' %} is-active{% endif %}">الحزم</a>
+      <a href="/admin/store/store-credit" class="orion-nav-link{% if active_nav == 'store_credit' %} is-active{% endif %}">رصيد المتجر</a>
+      <a href="/admin/store/draft-orders" class="orion-nav-link{% if active_nav == 'draft_orders' %} is-active{% endif %}">المسودات</a>
+      <a href="/admin/store/returns" class="orion-nav-link{% if active_nav == 'returns' %} is-active{% endif %}">المرتجعات</a>
+      <a href="/admin/store/b2b" class="orion-nav-link{% if active_nav == 'b2b' %} is-active{% endif %}">B2B — الجملة</a>
+      <a href="/admin/store/oms" class="orion-nav-link{% if active_nav == 'oms' %} is-active{% endif %}">المستودعات</a>
       <hr class="border-slate-700 my-2">
-      <a href="/admin/store/metafields" class="block py-2 px-3 rounded {% if active_nav == 'metafields' %}bg-slate-700{% endif %}">البيانات الوصفية</a>
-      <a href="/admin/store/currency" class="block py-2 px-3 rounded {% if active_nav == 'currency' %}bg-slate-700{% endif %}">العملات</a>
-      <a href="/admin/store/import-export" class="block py-2 px-3 rounded {% if active_nav == 'import_export' %}bg-slate-700{% endif %}">استيراد وتصدير</a>
-      <a href="/admin/store/app-platform" class="block py-2 px-3 rounded {% if active_nav == 'app_platform' %}bg-slate-700{% endif %}">منصة التطبيقات</a>
-      <a href="/admin/store/fraud" class="block py-2 px-3 rounded {% if active_nav == 'fraud' %}bg-slate-700{% endif %}">الاحتيال</a>
-      <a href="/admin/store/compliance" class="block py-2 px-3 rounded {% if active_nav == 'compliance' %}bg-slate-700{% endif %}">الامتثال</a>
-      <a href="/admin/store/workflows" class="block py-2 px-3 rounded {% if active_nav == 'workflows' %}bg-slate-700{% endif %}">سير العمل</a>
-      <a href="/admin/store/search" class="block py-2 px-3 rounded {% if active_nav == 'search' %}bg-slate-700{% endif %}">البحث</a>
-      <a href="/admin/store/affiliates" class="block py-2 px-3 rounded {% if active_nav == 'affiliates' %}bg-slate-700{% endif %}">المسوقين</a>
-      <a href="/admin/store/gift-registries" class="block py-2 px-3 rounded {% if active_nav == 'gift_registries' %}bg-slate-700{% endif %}">قوائم الهدايا</a>
-      <a href="/admin/store/dropship" class="block py-2 px-3 rounded {% if active_nav == 'dropship' %}bg-slate-700{% endif %}">الدروبشيبنج</a>
-      <a href="/admin/store/schema-markup" class="block py-2 px-3 rounded {% if active_nav == 'schema_markup' %}bg-slate-700{% endif %}">Schema Markup</a>
-      <a href="/admin/store/accessibility" class="block py-2 px-3 rounded {% if active_nav == 'accessibility' %}bg-slate-700{% endif %}">إمكانية الوصول</a>
-      <a href="/admin/store/live-chat" class="block py-2 px-3 rounded {% if active_nav == 'live_chat' %}bg-slate-700{% endif %}">الدردشة المباشرة</a>
-      <a href="/admin/store/reconciliation" class="block py-2 px-3 rounded {% if active_nav == 'reconciliation' %}bg-slate-700{% endif %}">التسوية المالية</a>
-      <a href="/admin/store/platform-audit" class="block py-2 px-3 rounded {% if active_nav == 'platform_audit' %}bg-slate-700{% endif %}">تدقيق المنصة</a>
+      <a href="/admin/store/metafields" class="orion-nav-link{% if active_nav == 'metafields' %} is-active{% endif %}">البيانات الوصفية</a>
+      <a href="/admin/store/currency" class="orion-nav-link{% if active_nav == 'currency' %} is-active{% endif %}">العملات</a>
+      <a href="/admin/store/import-export" class="orion-nav-link{% if active_nav == 'import_export' %} is-active{% endif %}">استيراد وتصدير</a>
+      <a href="/admin/store/app-platform" class="orion-nav-link{% if active_nav == 'app_platform' %} is-active{% endif %}">منصة التطبيقات</a>
+      <a href="/admin/store/fraud" class="orion-nav-link{% if active_nav == 'fraud' %} is-active{% endif %}">الاحتيال</a>
+      <a href="/admin/store/compliance" class="orion-nav-link{% if active_nav == 'compliance' %} is-active{% endif %}">الامتثال</a>
+      <a href="/admin/store/workflows" class="orion-nav-link{% if active_nav == 'workflows' %} is-active{% endif %}">سير العمل</a>
+      <a href="/admin/store/search" class="orion-nav-link{% if active_nav == 'search' %} is-active{% endif %}">البحث</a>
+      <a href="/admin/store/affiliates" class="orion-nav-link{% if active_nav == 'affiliates' %} is-active{% endif %}">المسوقين</a>
+      <a href="/admin/store/gift-registries" class="orion-nav-link{% if active_nav == 'gift_registries' %} is-active{% endif %}">قوائم الهدايا</a>
+      <a href="/admin/store/dropship" class="orion-nav-link{% if active_nav == 'dropship' %} is-active{% endif %}">الدروبشيبنج</a>
+      <a href="/admin/store/schema-markup" class="orion-nav-link{% if active_nav == 'schema_markup' %} is-active{% endif %}">Schema Markup</a>
+      <a href="/admin/store/accessibility" class="orion-nav-link{% if active_nav == 'accessibility' %} is-active{% endif %}">إمكانية الوصول</a>
+      <a href="/admin/store/live-chat" class="orion-nav-link{% if active_nav == 'live_chat' %} is-active{% endif %}">الدردشة المباشرة</a>
+      <a href="/admin/store/reconciliation" class="orion-nav-link{% if active_nav == 'reconciliation' %} is-active{% endif %}">التسوية المالية</a>
+      <a href="/admin/store/platform-audit" class="orion-nav-link{% if active_nav == 'platform_audit' %} is-active{% endif %}">تدقيق المنصة</a>
       <hr class="border-slate-700 my-2">
-      <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="block py-2 px-3 rounded text-emerald-400 hover:bg-slate-800">
+      <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="orion-nav-link">
         رابط المتجر <span class="text-xs">↗</span>
       </a>
     {% else %}
-      <a href="/admin/platform/dashboard" class="block py-2 px-3 rounded {% if active_nav == 'dashboard' %}bg-slate-700{% endif %}">لوحة المنصة</a>
-      <a href="/admin/platform/tenants" class="block py-2 px-3 rounded {% if active_nav == 'tenants' %}bg-slate-700{% endif %}">المتاجر</a>
-      <a href="/admin/platform/users" class="block py-2 px-3 rounded {% if active_nav == 'users' %}bg-slate-700{% endif %}">المستخدمين</a>
-      <a href="/admin/platform/settings" class="block py-2 px-3 rounded {% if active_nav == 'settings' %}bg-slate-700{% endif %}">إعدادات المنصة</a>
-      <a href="/admin/platform/reconciliation" class="block py-2 px-3 rounded {% if active_nav == 'reconciliation' %}bg-slate-700{% endif %}">التسوية</a>
+      <a href="/admin/platform/dashboard" class="orion-nav-link{% if active_nav == 'dashboard' %} is-active{% endif %}">لوحة المنصة</a>
+      <a href="/admin/platform/tenants" class="orion-nav-link{% if active_nav == 'tenants' %} is-active{% endif %}">المتاجر</a>
+      <a href="/admin/platform/users" class="orion-nav-link{% if active_nav == 'users' %} is-active{% endif %}">المستخدمين</a>
+      <a href="/admin/platform/settings" class="orion-nav-link{% if active_nav == 'settings' %} is-active{% endif %}">إعدادات المنصة</a>
+      <a href="/admin/platform/reconciliation" class="orion-nav-link{% if active_nav == 'reconciliation' %} is-active{% endif %}">التسوية</a>
     {% endif %}
   </nav>
   <div class="mt-4 pt-4 border-t border-slate-700 space-y-2 text-sm">
-    <a href="/admin/profile" class="block py-2 px-3 rounded {% if active_nav == 'profile' %}bg-slate-700{% endif %}">الملف الشخصي</a>
-    <a href="/admin/logout" class="block py-2 px-3 rounded text-red-300 hover:bg-slate-800">تسجيل الخروج</a>
+    <a href="/admin/profile" class="orion-nav-link{% if active_nav == 'profile' %} is-active{% endif %}">الملف الشخصي</a>
+    <a href="/admin/logout" class="orion-nav-link" style="color:var(--orion-danger)">تسجيل الخروج</a>
   </div>
 </aside>

@@ -1,7 +1,8 @@
 /** Cart page interactions (wave 5 #56) — lazy cart init. */
 document.addEventListener("DOMContentLoaded", async () => {
   const listEl = document.getElementById("cart-items");
-  const summaryEl = document.getElementById("cart-summary");
+  const waBtn = document.getElementById("whatsapp-order-btn");
+  const waMsg = document.getElementById("wa-msg");
 
   async function ensureCart() {
     let token = StoreAPI.getCartToken();
@@ -17,15 +18,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const token = StoreAPI.getCartToken();
     if (!token) {
       if (listEl) { SafeDOM.clear(listEl); listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["السلة فارغة."])); }
-      if (summaryEl) summaryEl.textContent = "";
+      if (waBtn) waBtn.disabled = true;
       return;
     }
     const data = await StoreAPI.getCart(token);
     if (!data.items.length) {
       if (listEl) { SafeDOM.clear(listEl); listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["السلة فارغة."])); }
-      if (summaryEl) summaryEl.textContent = "";
+      if (waBtn) waBtn.disabled = true;
       return;
     }
+    if (waBtn) waBtn.disabled = false;
     if (listEl) {
       SafeDOM.clear(listEl);
       data.items.forEach((i) => {
@@ -35,11 +37,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         ]));
       });
     }
-    if (summaryEl) {
-      SafeDOM.clear(summaryEl);
-      summaryEl.appendChild(SafeDOM.elem("a", { href: "/checkout", className: "inline-block mt-4 rounded bg-emerald-600 px-4 py-2 text-white" }, ["إتمام الشراء"]));
-    }
   }
+
+  waBtn?.addEventListener("click", async () => {
+    const token = StoreAPI.getCartToken();
+    if (!token) {
+      if (waMsg) waMsg.textContent = "السلة فارغة.";
+      return;
+    }
+    waBtn.disabled = true;
+    try {
+      const result = await StoreAPI.whatsappMessage(token, {
+        customer_name: document.getElementById("wa-customer-name")?.value || "",
+        notes: document.getElementById("wa-notes")?.value || "",
+      });
+      window.open(result.url, "_blank", "noopener,noreferrer");
+      if (waMsg) waMsg.textContent = "تم تجهيز الطلب — أكمل الإرسال في واتساب.";
+    } catch (err) {
+      if (waMsg) waMsg.textContent = err.message;
+    } finally {
+      waBtn.disabled = false;
+    }
+  });
 
   // On cart page: load existing cart or show empty
   if (listEl) {

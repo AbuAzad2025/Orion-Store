@@ -14,6 +14,7 @@ from sqlalchemy import (
     Numeric,
     String,
     Text,
+    UniqueConstraint,
     Uuid,
     func,
 )
@@ -26,6 +27,11 @@ from orion.extensions import db
 
 class Order(db.Model, TimestampMixin, VersionMixin):
     __tablename__ = "orders"
+    __table_args__ = (
+        UniqueConstraint(
+            "tenant_id", "idempotency_key", name="uq_orders_tenant_idempotency"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(
         PrimaryKeyType, primary_key=True, autoincrement=True
@@ -76,6 +82,8 @@ class Order(db.Model, TimestampMixin, VersionMixin):
             "shipping_method_code": self.shipping_method_code,
             "total": str(self.total),
             "customer_email": self.customer_email,
+            "user_id": self.user_id,
+            "is_guest": self.is_guest,
         }
 
 

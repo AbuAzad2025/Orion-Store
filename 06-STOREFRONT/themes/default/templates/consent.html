@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="orion-consent max-w-3xl mx-auto" id="cookie-consent"
+         data-active="{{ 'true' if (cookie_settings and cookie_settings.is_active) else 'false' }}">
+  <h1 class="orion-title orion-eyebrow text-2xl mb-4">الخصوصية وملفات تعريف الارتباط</h1>
+  <p class="orion-muted mb-6">
+    {{ (cookie_settings.banner_message if cookie_settings and cookie_settings.banner_message else 'نستخدم ملفات تعريف الارتباط لتحسين تجربة التصفح وتحليل الاستخدام.') }}
+  </p>
+  <ul class="orion-muted text-sm mb-6 space-y-2">
+    <li>ملفات ضرورية: مطلوبة لعمل المتجر ولا يمكن تعطيلها.</li>
+    <li>ملفات تحليلية: تساعدنا على فهم استخدام المتجر.</li>
+    <li>ملفات تسويقية: تُستخدم لعرض محتوى مناسب لك.</li>
+  </ul>
+  <div class="flex gap-3">
+    <button type="button" id="consent-accept-all" class="orion-btn orion-btn-gold">قبول الكل</button>
+    <button type="button" id="consent-necessary-only" class="orion-btn">الضرورية فقط</button>
+  </div>
+  <p class="orion-muted text-xs mt-4" id="consent-status" role="status"></p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var section = document.getElementById("cookie-consent");
+  var status = document.getElementById("consent-status");
+  if (!section || section.dataset.active !== "true") { return; }
+  function save(choice) {
+    try { localStorage.setItem("orion_cookie_consent", choice); } catch (e) { /* storage disabled */ }
+    if (status) { status.textContent = "تم حفظ اختيارك: " + choice; }
+  }
+  var accept = document.getElementById("consent-accept-all");
+  var necessary = document.getElementById("consent-necessary-only");
+  if (accept) { accept.addEventListener("click", function () { save("all"); }); }
+  if (necessary) { necessary.addEventListener("click", function () { save("necessary"); }); }
+})();
+</script>
+{% endblock %}

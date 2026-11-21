@@ -23,11 +23,20 @@ def send_email_task(payload: dict) -> dict:
 @celery_app.task(name="orion.check_trial_expiry")
 def check_trial_expiry_task() -> int:
     from base.types import TenantStatus
+    from core.middleware import bind_task_rls_context
+    from core.utils import utc_now
     from orion.extensions import db
     from tenant.tenant import Tenant
 
+    # Tenant rows span all tenants → run with platform-admin context.
+    bind_task_rls_context(is_platform_admin=True)
     expired = (
-        Tenant.query.filter_by(status=TenantStatus.TRIAL.value, deleted_at=None)
+        Tenant.query.filter(
+            Tenant.status == TenantStatus.TRIAL.value,
+            Tenant.deleted_at.is_(None),
+            Tenant.trial_ends_at.isnot(None),
+            Tenant.trial_ends_at < utc_now(),
+        )
         .limit(200)
         .all()
     )
@@ -36,3 +45,15 @@ def check_trial_expiry_task() -> int:
     if expired:
         db.session.commit()
     return len(expired)
+
+
+@celery_app.task(name="orion.reconciliation.run_nightly")
+def run_nightly_reconciliation_task() -> dict:
+    """Settle confirmed commissions, one tenant at a time (§0.15 gap closure)."""
+    from core.middleware import bind_task_rls_context
+    from platform_svc.reconciliation_service import ReconciliationService
+
+    # Tenant enumeration spans all tenants → platform-admin context. Settlement
+    # itself is tenant-scoped inside ReconciliationService.
+    bind_task_rls_context(is_platform_admin=True)
+    return ReconciliationService().run()

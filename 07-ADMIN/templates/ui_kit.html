@@ -1,0 +1,72 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<section class="space-y-6">
+  <div class="orion-card">
+    <span class="orion-eyebrow">Design System</span>
+    <h2 class="orion-title text-xl mt-2">مكوّنات الواجهة</h2>
+    <p class="orion-muted text-sm">معاينة حيّة لكل مكوّن من `orion-theme.css`.</p>
+  </div>
+
+  <div>
+    <h3 class="orion-title mb-3">الأزرار</h3>
+    <div class="flex flex-wrap gap-3">
+      <button type="button" class="orion-btn">إجراء ثانوي</button>
+      <button type="button" class="orion-btn orion-btn-gold">إجراء أساسي</button>
+      <button type="button" class="orion-btn" disabled>معطّل</button>
+    </div>
+  </div>
+
+  <div>
+    <h3 class="orion-title mb-3">البطاقات والأرقام</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="orion-card orion-stat">
+        <span class="orion-stat-label">إجمالي الطلبات</span>
+        <span class="orion-stat-value">1,234</span>
+      </div>
+      <div class="orion-card orion-stat">
+        <span class="orion-stat-label">المبيعات</span>
+        <span class="orion-stat-value">٩٬٨٧٦</span>
+      </div>
+      <div class="orion-card">
+        <span class="orion-badge">نشط</span>
+        <p class="orion-muted text-sm mt-3">بطاقة محتوى عادية مع شارة حالة.</p>
+      </div>
+      <div class="orion-card orion-stat">
+        <span class="orion-stat-label">قيد التحميل</span>
+        <span class="orion-skeleton"></span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h3 class="orion-title mb-3">الحقول</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <input class="orion-input" aria-label="اسم المنتج" placeholder="اسم المنتج">
+      <select class="orion-select" aria-label="الحالة">
+        <option>نشط</option>
+        <option>متوقف</option>
+      </select>
+      <textarea class="orion-input" aria-label="ملاحظات" placeholder="ملاحظات"></textarea>
+    </div>
+  </div>
+
+  <div>
+    <h3 class="orion-title mb-3">جدول</h3>
+    <table class="orion-table">
+      <thead><tr><th>المنتج</th><th>السعر</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <tr><td>منتج تجريبي</td><td>٢٩٫٩٩</td><td><span class="orion-badge">نشط</span></td></tr>
+        <tr><td>منتج آخر</td><td>١٩٫٩٩</td><td><span class="orion-muted">مسودة</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3 class="orion-title mb-3">التنقّل</h3>
+    <div class="orion-card space-y-1">
+      <a class="orion-nav-link is-active" href="#main-content">عنصر نشط</a>
+      <a class="orion-nav-link" href="#main-content">عنصر عادي</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

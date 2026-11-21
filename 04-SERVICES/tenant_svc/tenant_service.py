@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from sqlalchemy.orm import joinedload
 
 from base.types import TenantStatus
@@ -9,6 +11,8 @@ from core.exceptions import NotFoundError, ValidationError
 from orion.extensions import db
 from tenant.tenant import Tenant
 from tenant.tenant_config import TenantConfig
+
+logger = logging.getLogger(__name__)
 
 
 class TenantService:
@@ -51,9 +55,30 @@ class TenantService:
         db.session.add(tenant)
         db.session.commit()
 
+        from core.audit_log import audit_log
+
+        audit_log(
+            action="tenant.created",
+            resource_type="tenant",
+            resource_id=str(tenant.id),
+            tenant_id=tenant.id,
+            details={"slug": tenant.slug, "name": tenant.name},
+        )
+
         from integrations.external_registry import register_tenant_subdomain
 
-        register_tenant_subdomain(slug=tenant.slug, tenant_id=tenant.id)
+        # DNS/routing registration is best-effort: a failed external call must
+        # not roll back an already-persisted (and audited) tenant or surface as
+        # a 5xx that would make the caller retry and create a duplicate.
+        try:
+            register_tenant_subdomain(slug=tenant.slug, tenant_id=tenant.id)
+        except Exception as exc:
+            logger.warning(
+                "Subdomain registration failed for tenant %s (%s): %s",
+                tenant.slug,
+                tenant.id,
+                exc,
+            )
         return tenant
 
     def list_users_for_tenant(self, tenant_id: int):

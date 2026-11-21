@@ -38,6 +38,24 @@ def create_rule():
         return jsonify({"error": "Invalid request."}), 400
 
 
+@fraud_bp.route("/evaluate", methods=["POST"])
+def evaluate_order():
+    """Manually evaluate active fraud rules for one of this tenant's orders."""
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        result = _svc.evaluate_order(
+            tenant_id=g.tenant_id,
+            order_id=int(data["order_id"]),
+            context={"reviewed_by": getattr(g.user, "id", None)},
+        )
+        return jsonify(result), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except (KeyError, TypeError, ValueError):
+        return jsonify({"error": "Invalid request."}), 400
+
+
 @fraud_bp.route("/reviews", methods=["POST"])
 def review_order():
     try:

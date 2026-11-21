@@ -59,6 +59,7 @@ def platform_status():
 
 API_BLUEPRINTS: list[Blueprint] = [
     auth_bp,
+    impersonation_bp,
     tenant_bp,
     users_bp,
     products_bp,

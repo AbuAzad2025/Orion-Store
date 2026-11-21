@@ -62,6 +62,14 @@ const OrionAdminCompliance = {
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
+  async ssoExchange(providerCode, externalEmail, tenantId) {
+    return OrionAPI.post("/auth/sso/exchange", {
+      provider_code: providerCode,
+      external_email: externalEmail,
+      tenant_id: tenantId || document.body.dataset.tenantId || undefined,
+    });
+  },
+
   init() {
     const consentForm = document.getElementById("consent-form");
     if (consentForm) {
@@ -110,6 +118,24 @@ const OrionAdminCompliance = {
         });
         ssoForm.reset();
         OrionAdminCompliance.loadSSO();
+      });
+    }
+    const ssoExchangeForm = document.getElementById("sso-exchange-form");
+    if (ssoExchangeForm) {
+      ssoExchangeForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(ssoExchangeForm);
+        const result = await OrionAdminCompliance.ssoExchange(
+          fd.get("provider_code"), fd.get("external_email"), fd.get("tenant_id")
+        );
+        const out = document.getElementById("sso-exchange-result");
+        if (out) {
+          SafeDOM.clear(out);
+          out.appendChild(SafeDOM.elem("span", {}, [
+            result && result.user ? result.user.email : "تم تسجيل الدخول"
+          ]));
+        }
+        ssoExchangeForm.reset();
       });
     }
     OrionAdminCompliance.loadConsent();

@@ -8,13 +8,15 @@ services:
     image: postgres:16-alpine
     container_name: azadexa-postgres-staging
     environment:
-      POSTGRES_USER: azadexa
+      POSTGRES_USER: orion_admin
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-azadexa_staging}
       POSTGRES_DB: azadexa_staging
+      POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:-orion_app_staging}
     volumes:
       - staging_postgres:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U azadexa -d azadexa_staging"]
+      test: ["CMD-SHELL", "pg_isready -U orion_admin -d azadexa_staging"]
       interval: 5s
       timeout: 5s
       retries: 8
@@ -35,7 +37,8 @@ services:
     container_name: azadexa-orion-staging
     environment:
       FLASK_ENV: production
-      DATABASE_URL: postgresql://azadexa:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
+      DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD:-orion_app_staging}@postgres:5432/azadexa_staging
+      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env.staging}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-}
@@ -102,7 +105,8 @@ services:
     command: celery -A orion.celery_app.celery_app worker --loglevel=info
     environment:
       FLASK_ENV: production
-      DATABASE_URL: postgresql://azadexa:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
+      DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD:-orion_app_staging}@postgres:5432/azadexa_staging
+      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env.staging}

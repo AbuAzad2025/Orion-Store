@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import uuid
+
 from flask import Blueprint, jsonify, request
 
 from auth.auth_service import AuthService
@@ -9,6 +11,7 @@ from core.exceptions import OrionError
 from core.middleware import require_platform_admin
 from core.pagination import paginate_query, paginated_payload, pagination_params
 from orion.extensions import db
+from user.role import Role
 from user.user import User
 
 users_bp = Blueprint("users", __name__)
@@ -89,5 +92,53 @@ def delete_user(user_id: int):
         user.deleted_at = db.func.now()
         db.session.commit()
         return jsonify({"message": "User deleted."}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@users_bp.post("/<public_id>/roles")
+def assign_user_role(public_id: str):
+    """Assign a tenant role to a user (platform admins only).
+
+    ``tenant_id`` in the body is validated against both the target user and
+    the role. When omitted, the user's own tenant is used.
+    """
+    try:
+        require_platform_admin()
+        try:
+            uid = uuid.UUID(public_id)
+        except (ValueError, TypeError, AttributeError):
+            return jsonify({"error": "Invalid public_id."}), 400
+        user = User.query.filter_by(public_id=uid, deleted_at=None).first()
+        if not user:
+            return jsonify({"error": "User not found."}), 404
+
+        data = request.get_json(silent=True) or {}
+        role_code = str(data.get("role_code") or "").strip()
+        if not role_code:
+            return jsonify({"error": "role_code required."}), 400
+
+        tenant_id = data.get("tenant_id")
+        if tenant_id is not None:
+            try:
+                tenant_id = int(tenant_id)
+            except (TypeError, ValueError):
+                return jsonify({"error": "Invalid tenant_id."}), 400
+
+        assignment = _auth.assign_role(
+            tenant_id=tenant_id if tenant_id is not None else user.tenant_id,
+            user_id=user.id,
+            role_code=role_code,
+        )
+        role = db.session.get(Role, assignment.role_id)
+        return (
+            jsonify(
+                {
+                    "user_role": assignment.to_dict(),
+                    "role": role.to_dict() if role else None,
+                }
+            ),
+            201,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

@@ -4,7 +4,7 @@ const OrionAdminSchema = {
     const el = document.getElementById("schema-list");
     if (!el) return;
     try {
-      const data = await OrionAPI.get("/schema-markup/");
+      const data = await OrionAPI.get("/schema-markup");
       const rows = data.markups || [];
       if (!rows.length) { el.textContent = "لا توجد إعدادات."; return; }
       SafeDOM.clear(el);
@@ -24,7 +24,7 @@ const OrionAdminSchema = {
         const fd = new FormData(form);
         let jsonLd;
         try { jsonLd = JSON.parse(fd.get("json_ld") || "{}"); } catch { jsonLd = {}; }
-        await OrionAPI.post("/schema-markup/", {
+        await OrionAPI.post("/schema-markup", {
           product_id: parseInt(fd.get("product_id")), schema_type: fd.get("schema_type"), json_ld: jsonLd,
         });
         form.reset();

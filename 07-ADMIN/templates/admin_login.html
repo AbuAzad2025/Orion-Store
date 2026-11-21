@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page_title }} — Azadexa</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+<body class="bg-slate-100 min-h-screen flex items-center justify-center orion-surface">
   <form id="login-form" action="/admin/login" method="post" class="bg-white p-8 rounded-lg shadow w-full max-w-md space-y-4">
     <h1 class="text-xl font-bold text-center">Azadexa Admin</h1>
     {% if error %}
@@ -15,17 +16,17 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div>
       <label class="block text-sm mb-1" for="email">البريد</label>
-      <input id="email" name="email" type="email" required class="w-full border rounded px-3 py-2">
+      <input id="email" name="email" type="email" required class="w-full border rounded px-3 py-2" aria-label="Email">
     </div>
     <div>
       <label class="block text-sm mb-1" for="password">كلمة المرور</label>
-      <input id="password" name="password" type="password" required class="w-full border rounded px-3 py-2">
+      <input id="password" name="password" type="password" required class="w-full border rounded px-3 py-2" aria-label="Password">
     </div>
     <div>
       <label class="block text-sm mb-1" for="tenant-slug">Slug المتجر (اختياري)</label>
       <input id="tenant-slug" name="tenant_slug" type="text" class="w-full border rounded px-3 py-2" placeholder="my-store">
     </div>
-    <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded">دخول</button>
+    <button type="submit" class="orion-btn orion-btn-gold w-full">دخول</button>
   </form>
   <script src="{{ url_for('admin_assets.static', filename='js/admin_utils.js') }}"></script>
   <script src="{{ url_for('admin_assets.static', filename='js/api_client.js') }}"></script>

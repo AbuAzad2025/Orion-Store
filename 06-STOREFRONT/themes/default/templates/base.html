@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ locale|default('ar') }}" dir="{{ 'rtl' if locale[:2]|lower in ['ar','he'] else 'ltr' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page_title }}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/tailwind.css') }}">
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/orion-theme.css') }}">
   <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/main.css') }}">
   <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/rtl.css') }}">
 </head>
-<body class="bg-gray-50 min-h-screen" data-tenant-id="{{ tenant.slug }}">
+<body class="bg-gray-50 min-h-screen orion-surface" data-tenant-id="{{ tenant.slug }}">
   {% include "components/header.html" %}
   <main class="max-w-6xl mx-auto px-4 py-8">
     {% block content %}{% endblock %}

@@ -8,7 +8,7 @@ dependencies = [
     "Flask==3.1.3",
     "Flask-SQLAlchemy==3.1.1",
     "Flask-Migrate==4.0.7",
-    "psycopg2-binary==2.9.9",
+    "psycopg2-binary==2.9.12",
     "redis==5.0.3",
     "Flask-Limiter==3.8.0",
     "prometheus-client==0.19.0",
@@ -18,6 +18,7 @@ dependencies = [
     "cryptography==48.0.1",
     "requests==2.33.0",
     "Flask-JWT-Extended==4.7.1",
+    "Flask-WTF==1.2.2",
     "bcrypt==4.1.2",
     "fpdf2==2.8.3",
 ]
@@ -33,8 +34,9 @@ dev = [
     "pytest-cov==5.0.0",
     "pytest-mock==3.14.0",
     "coverage==7.4.4",
-    "pyyaml==6.0.1",
+    "pyyaml==6.0.3",
     "vcrpy==8.2.1",
+    "pip-audit==2.7.0",
 ]
 
 [tool.black]
@@ -69,12 +71,21 @@ markers = [
     "unit: Pure logic — no route/HTTP.",
     "integration: Full-stack checks on PostgreSQL (CHECK, FK, RLS).",
     "external: Recorded or live third-party HTTP (VCR) — excluded from CI.",
+    "e2e: Browser tests (Playwright + Chromium) — excluded from default CI.",
 ]
 addopts = "-ra"
 
 [tool.orion.file_length]
 default_max = 500
 paths = [
+    # Legacy large files — split gradually; documented exceptions only.
+    { glob = "03-MODELS/subscription/subscription.py", max = 350 },
+    { glob = "05-API/v1/tenant_portal.py", max = 350 },
+    { glob = "05-API/v1/storefront.py", max = 350 },
+    { glob = "migrations/versions/20261119_0001_baseline_tables.py", max = 400 },
+    { glob = "migrations/versions/20261119_0002_baseline_indexes.py", max = 400 },
+    { glob = "tests/api/test_auth_tenant_admin.py", max = 900 },
+    { glob = "tests/api/test_v2_api.py", max = 700 },
     { glob = "**/*_service.py", max = 400 },
     { glob = "05-API/v1/*.py", max = 300 },
     { glob = "03-MODELS/**/*.py", max = 250 },

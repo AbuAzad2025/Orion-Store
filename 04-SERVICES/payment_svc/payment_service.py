@@ -2,14 +2,22 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
+from types import SimpleNamespace
+
+from currency_svc.currency_service import resolve_currency_for_tenant
 
 from core.events import publish
-from core.exceptions import NotFoundError, ValidationError
+from core.exceptions import ConflictError, NotFoundError, ValidationError
+from integrations.payments._http import live_calls_enabled
 from integrations.payments.bnpl import charge_bnpl
+from integrations.payments.bnpl import refund_payment as refund_bnpl
 from integrations.payments.palpay import charge_palpay
+from integrations.payments.palpay import refund_payment as refund_palpay
 from integrations.payments.paypal import charge_paypal
+from integrations.payments.paypal import refund_payment as refund_paypal
 from integrations.payments.stripe_connect import charge_stripe
+from integrations.payments.stripe_connect import refund_payment as refund_stripe
 from order.order import Order
 from order_svc.order_service import OrderService
 from orion.extensions import db
@@ -47,6 +55,18 @@ class PaymentService:
         payment_method: str = "cod",
     ) -> dict:
         order = self._orders.get_by_public_id(tenant_id, order_public_id)
+        prior = (
+            Payment.query.filter_by(tenant_id=tenant_id, order_id=order.id)
+            .order_by(Payment.id.desc())
+            .first()
+        )
+        if prior is not None:
+            if prior.status in ("completed", "refunded"):
+                raise ValidationError("Order already paid.")
+            if prior.status in ("pending", "processing"):
+                # A pending payment — including an uncertain network timeout —
+                # must never start a second charge.
+                raise ConflictError("Payment already in progress.")
         self._validate_payment_request(order)
         if payment_method == "cod":
             gateway = self._gateways.ensure_cod_gateway(tenant_id)
@@ -55,8 +75,15 @@ class PaymentService:
         payment = self._create_payment_record(order, gateway.provider, payment_method)
         charge = self._charge_external_gateway(order, gateway, payment)
         if not charge.get("success"):
-            payment.status = "failed"
+            if charge.get("uncertain"):
+                # The provider may have charged before the connection broke.
+                # Keep it pending so retries cannot start a second charge.
+                payment.status = "pending"
+            else:
+                payment.status = "failed"
             db.session.commit()
+            if charge.get("uncertain"):
+                raise ConflictError("Payment result uncertain; reconcile before retry.")
             raise ValidationError(charge.get("error", "Payment failed."))
         payment.provider_payment_id = charge.get("provider_payment_id")
         payment.status = "completed"
@@ -71,6 +98,7 @@ class PaymentService:
         *,
         tenant_id: int,
         payment_public_id: str,
+        amount: Decimal | None = None,
         reason: str | None = None,
     ) -> dict:
         import uuid
@@ -84,43 +112,94 @@ class PaymentService:
             raise NotFoundError("Payment not found.")
         if payment.status != "completed":
             raise ValidationError("Only completed payments can be refunded.")
+
+        try:
+            refund_amount = (
+                Decimal(str(payment.amount)) if amount is None else Decimal(str(amount))
+            )
+        except (InvalidOperation, ValueError, TypeError) as exc:
+            raise ValidationError("Invalid refund amount.") from exc
+        if refund_amount <= 0:
+            raise ValidationError("Refund amount must be positive.")
+        if refund_amount > Decimal(str(payment.amount)):
+            raise ValidationError("Refund amount exceeds payment amount.")
+
+        # A payment with an active (completed or pending) refund must never be
+        # sent to the provider a second time. This is the double-refund guard.
+        prior = (
+            Refund.query.filter_by(payment_id=payment.id)
+            .filter(Refund.status.in_(("pending", "completed")))
+            .first()
+        )
+        if prior is not None:
+            raise ConflictError("Payment already refunded.")
+
+        result = self._refund_external_gateway(tenant_id, payment, refund_amount)
+        if not result.get("success"):
+            if result.get("uncertain"):
+                # The provider may have refunded before the connection broke.
+                # Persist a pending marker so a retry cannot double-refund.
+                pending = Refund(
+                    tenant_id=tenant_id,
+                    payment_id=payment.id,
+                    amount=refund_amount,
+                    currency=payment.currency,
+                    status="pending",
+                    reason=reason,
+                    provider_refund_id=None,
+                )
+                db.session.add(pending)
+                db.session.commit()
+                raise ConflictError("Refund result uncertain; reconcile before retry.")
+            raise ValidationError(result.get("error", "Refund failed."))
+
         refund_row = Refund(
             tenant_id=tenant_id,
             payment_id=payment.id,
-            amount=payment.amount,
+            amount=refund_amount,
             currency=payment.currency,
             status="completed",
             reason=reason,
+            provider_refund_id=result.get("provider_refund_id"),
         )
         db.session.add(refund_row)
         db.session.flush()
         outbound = self._financial.record_outbound(
             tenant_id=tenant_id,
-            amount=payment.amount,
+            amount=-refund_amount,
             event_type="payment.refund",
             source_entity="refund",
             source_id=refund_row.id,
+            apply_commission=False,
+            allow_negative=True,
+            metadata={"reverses_financial_event_id": payment.financial_event_id},
         )
         refund_row.financial_event_id = outbound.id
-        ledger = self._commission.apply_from_event(
-            outbound, payment_id=payment.id, order_id=payment.order_id
-        )
-        payment.status = "refunded"
+        # A refund reverses the original commission; it must not create a new one.
+        ledger = None
+        # A full refund closes the payment; a partial one keeps it completed while
+        # the active Refund row still blocks any second refund attempt.
+        if refund_amount >= Decimal(str(payment.amount)):
+            payment.status = "refunded"
         db.session.commit()
         publish(
             "payment.refunded",
             order_id=payment.order_id,
             tenant_id=tenant_id,
             refund_id=refund_row.id,
+            provider_refund_id=refund_row.provider_refund_id,
         )
         return {
             "refund": {
                 "id": refund_row.id,
                 "amount": str(refund_row.amount),
                 "status": refund_row.status,
+                "provider_refund_id": refund_row.provider_refund_id,
             },
             "financial_event": outbound.to_dict(),
             "commission_ledger_id": ledger.id if ledger else None,
+            "provider_refund_id": refund_row.provider_refund_id,
+            "uncertain": False,
         }
 
     def _validate_payment_request(self, order: Order) -> None:
@@ -136,7 +215,7 @@ class PaymentService:
             tenant_id=order.tenant_id,
             order_id=order.id,
             amount=order.total,
-            currency="ILS",
+            currency=resolve_currency_for_tenant(order.tenant_id),
             payment_method=method,
             payment_provider=provider,
             status="pending",
@@ -187,6 +266,69 @@ class PaymentService:
             }
         return {"success": False, "error": "unsupported_provider"}
 
+    def _refund_external_gateway(
+        self, tenant_id: int, payment: Payment, amount: Decimal
+    ) -> dict:
+        """Dispatch a refund to the provider that originally captured the payment."""
+        provider = payment.payment_provider
+        if provider == "cod":
+            return {
+                "success": True,
+                "provider_refund_id": f"cod_refund_{payment.id}",
+                "uncertain": False,
+            }
+        if provider == "stripe":
+            gateway = self._refund_gateway(tenant_id, provider)
+            return refund_stripe(payment=payment, gateway=gateway, amount=amount)
+        if provider == "paypal":
+            gateway = self._refund_gateway(tenant_id, provider)
+            return refund_paypal(payment=payment, gateway=gateway, amount=amount)
+        if provider == "palpay":
+            gateway = self._refund_gateway(tenant_id, provider)
+            return refund_palpay(payment=payment, gateway=gateway, amount=amount)
+        if provider.startswith(BNPL_GATEWAY_PREFIX):
+            code = provider[len(BNPL_GATEWAY_PREFIX) :]
+            if live_calls_enabled():
+                provider_row = self._bnpl_service().get_enabled(tenant_id, code)
+            else:
+                provider_row = SimpleNamespace(
+                    tenant_id=tenant_id,
+                    provider=code,
+                    is_enabled=True,
+                    config={"is_sandbox": True},
+                    credentials_encrypted=None,
+                    api_credentials_encrypted=None,
+                )
+            return refund_bnpl(
+                payment=payment, provider_row=provider_row, amount=amount
+            )
+        return {
+            "success": False,
+            "provider_refund_id": None,
+            "uncertain": False,
+            "error": "unsupported_provider",
+        }
+
+    def _refund_gateway(self, tenant_id: int, provider: str):
+        """Return the stored gateway row, or a sandbox placeholder in stub mode."""
+        try:
+            return self._gateways.get_enabled(tenant_id, provider)
+        except NotFoundError:
+            if live_calls_enabled():
+                raise
+            # Local/test stubs need no stored gateway row or credentials.
+            return SimpleNamespace(
+                tenant_id=tenant_id,
+                provider=provider,
+                display_name=provider,
+                is_enabled=True,
+                is_sandbox=True,
+                status="active",
+                config={},
+                credentials_encrypted=None,
+                api_credentials_encrypted=None,
+            )
+
     def _on_payment_success(
         self,
         order: Order,
@@ -201,6 +343,7 @@ class PaymentService:
             event_type=event_type,
             source_entity="payment",
             source_id=payment.id,
+            currency=payment.currency,
         )
         payment.financial_event_id = event.id
         ledger = self._commission.apply_from_event(

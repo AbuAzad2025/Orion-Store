@@ -2,8 +2,9 @@
 const SafeDOM = {
   clear(el) { while (el.firstChild) el.removeChild(el.firstChild); },
   text(el, value) { el.textContent = value ?? ""; },
-  elem(tag, attrs = {}, children = []) {
+  elem(tag, attributes = {}, children = []) {
     const el = document.createElement(tag);
+    const attrs = attributes || {};
     for (const [k, v] of Object.entries(attrs)) {
       if (k === "className") el.className = v;
       else if (k === "textContent") el.textContent = v;
@@ -27,3 +28,39 @@ const SafeDOM = {
     return btn;
   },
 };
+
+/** Shared UI feedback layer — toasts, danger confirmation, loading states. */
+const OrionUI = {
+  toast(message, kind = "info") {
+    let host = document.querySelector(".orion-toast-host");
+    if (!host) {
+      host = SafeDOM.elem("div", { className: "orion-toast-host", role: "status", "aria-live": "polite" });
+      document.body.appendChild(host);
+    }
+    const toast = SafeDOM.elem("div", { className: `orion-toast orion-toast-${kind}`, role: "alert" }, [message]);
+    host.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+    return toast;
+  },
+
+  confirmDanger(message) {
+    return window.confirm(message);
+  },
+
+  async withLoading(element, task) {
+    if (!element) return task();
+    element.setAttribute("aria-busy", "true");
+    element.classList.add("orion-loading");
+    try {
+      return await task();
+    } finally {
+      element.removeAttribute("aria-busy");
+      element.classList.remove("orion-loading");
+    }
+  },
+};
+
+document.addEventListener("orion-api-error", (event) => {
+  const detail = event.detail || {};
+  OrionUI.toast(detail.error?.message || "حدث خطأ غير متوقع", "error");
+});

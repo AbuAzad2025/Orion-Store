@@ -123,3 +123,25 @@ def create_sso():
         return jsonify({"error": exc.message}), exc.status_code
     except (KeyError, TypeError, ValueError):
         return jsonify({"error": "Invalid request."}), 400
+
+
+@compliance_bp.route("/data-requests/<int:request_id>/export", methods=["POST"])
+def export_data_request(request_id: int):
+    try:
+        require_tenant_admin()
+        payload = _svc.export_subject_data(tenant_id=g.tenant_id, request_id=request_id)
+        return jsonify(payload), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@compliance_bp.route("/data-requests/<int:request_id>/execute-delete", methods=["POST"])
+def execute_delete_data_request(request_id: int):
+    try:
+        require_tenant_admin()
+        result = _svc.execute_subject_deletion(
+            tenant_id=g.tenant_id, request_id=request_id
+        )
+        return jsonify(result), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code

@@ -1,4 +1,4 @@
-"""Catalog tenant isolation (wave 2 #18 extension)."""
+"""Catalog tenant isolation — cross-tenant reads must be empty (P0)."""
 
 from __future__ import annotations
 
@@ -16,10 +16,23 @@ def test_tenant_a_cannot_see_tenant_b_products(app):
     products.create(tenant_id=t1.id, name="Widget A", slug="widget-a", price="10.00")
     products.create(tenant_id=t2.id, name="Widget B", slug="widget-b", price="20.00")
 
-    list_a = products.list_for_tenant(t1.id)
-    list_b = products.list_for_tenant(t2.id)
+    with app.app_context():
+        list_a = products.query_for_tenant(t1.id).all()
+        list_b = products.query_for_tenant(t2.id).all()
 
-    assert len(list_a) == 1
-    assert len(list_b) == 1
-    assert list_a[0].name == "Widget A"
-    assert list_b[0].name == "Widget B"
+    assert [p.name for p in list_a] == ["Widget A"]
+    assert [p.name for p in list_b] == ["Widget B"]
+    assert not any(p.tenant_id == t2.id for p in list_a)
+    assert not any(p.tenant_id == t1.id for p in list_b)
+
+
+def test_service_create_rejects_unknown_tenant(app):
+    products = ProductService()
+    with app.app_context():
+        try:
+            products.create(
+                tenant_id=999999, name="Orphan", slug="orphan", price="1.00"
+            )
+        except Exception:
+            return
+    raise AssertionError("Creating a product for a non-existent tenant must fail")

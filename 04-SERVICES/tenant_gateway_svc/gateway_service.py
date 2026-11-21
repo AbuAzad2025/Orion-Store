@@ -74,7 +74,11 @@ class GatewayService:
         if not client_id or not client_secret:
             raise ValidationError("PayPal client_id and client_secret are required.")
         crypto = CryptoService()
-        payload = crypto.encrypt(f"{client_id}:{client_secret}")
+        import json
+
+        payload = crypto.encrypt(
+            json.dumps({"client_id": client_id, "client_secret": client_secret})
+        )
         gateway = TenantPaymentGateway.query.filter_by(
             tenant_id=tenant_id, provider=PAYPAL_PROVIDER
         ).first()

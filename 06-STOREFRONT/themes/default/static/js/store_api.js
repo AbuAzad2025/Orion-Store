@@ -34,6 +34,9 @@ const StoreAPI = {
       quantity: quantity || 1,
     });
   },
+  whatsappMessage(token, payload) {
+    return this.request("POST", `/cart/${token}/whatsapp-message`, payload || {});
+  },
   checkout(cartToken, customerEmail, shippingAddress, extras) {
     const body = {
       cart_token: cartToken,

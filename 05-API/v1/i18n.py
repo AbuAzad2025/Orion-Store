@@ -30,6 +30,14 @@ def list_languages():
 def list_pages():
     try:
         tenant = require_tenant_context()
+        # `?all=1` is the admin listing used by the pages management UI.
+        # Public callers always get the published-only list.
+        if request.args.get("all") in ("1", "true", "True"):
+            require_tenant_admin()
+            return (
+                jsonify({"pages": [p.to_dict() for p in _pages.list_all(tenant.id)]}),
+                200,
+            )
         rows = _pages.list_published(tenant.id)
         locale = get_locale()
         return (
@@ -53,6 +61,70 @@ def get_page(slug: str):
         )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
+
+
+@i18n_bp.post("/pages")
+def create_page():
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        page = _pages.create_page(
+            tenant_id=g.tenant_id,
+            slug=data["slug"],
+            title=data["title"],
+            is_published=bool(data.get("is_published", False)),
+        )
+        return jsonify({"page": page.to_dict()}), 201
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except KeyError:
+        return jsonify({"error": "Missing required fields."}), 400
+
+
+@i18n_bp.put("/pages/<int:page_id>")
+def update_page(page_id: int):
+    try:
+        require_tenant_admin()
+        page = _pages.get_by_id(g.tenant_id, page_id)
+        data = request.get_json(silent=True) or {}
+        allowed = {
+            key: data[key] for key in ("slug", "title", "is_published") if key in data
+        }
+        page = _pages.update_page(page, **allowed)
+        return jsonify({"page": page.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@i18n_bp.delete("/pages/<int:page_id>")
+def delete_page(page_id: int):
+    try:
+        require_tenant_admin()
+        page = _pages.get_by_id(g.tenant_id, page_id)
+        _pages.delete_page(page)
+        return jsonify({"deleted": True}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@i18n_bp.put("/pages/<int:page_id>/translations/<locale>")
+def upsert_page_translation(page_id: int, locale: str):
+    try:
+        require_tenant_admin()
+        page = _pages.get_by_id(g.tenant_id, page_id)
+        data = request.get_json(silent=True) or {}
+        translation = _pages.upsert_translation(
+            page,
+            locale=locale,
+            title=data["title"],
+            body=data.get("body"),
+            slug=data.get("slug"),
+        )
+        return jsonify({"translation": translation.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except KeyError:
+        return jsonify({"error": "Missing required fields."}), 400
 
 
 @i18n_bp.get("/glossary")

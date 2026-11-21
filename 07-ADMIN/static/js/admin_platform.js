@@ -2,15 +2,23 @@
 const OrionAdminPlatform = {
 
   async initDashboard() {
+    const ids = {
+      tenants: "stat-tenants",
+      active_tenants: "stat-active-tenants",
+      users: "stat-users",
+      active_users: "stat-active-users",
+    };
+    const show = (key, value) => {
+      const el = document.getElementById(ids[key]);
+      if (el) el.textContent = Number(value || 0).toLocaleString("ar");
+    };
     try {
       const data = await OrionAPI.get("/platform/stats");
       const s = data.stats || {};
-      document.getElementById("stat-tenants").textContent = s.tenants || 0;
-      document.getElementById("stat-active-tenants").textContent = s.active_tenants || 0;
-      document.getElementById("stat-users").textContent = s.users || 0;
-      document.getElementById("stat-active-users").textContent = s.active_users || 0;
+      Object.keys(ids).forEach((key) => show(key, s[key]));
     } catch (err) {
-      console.error("stats", err);
+      Object.keys(ids).forEach((key) => show(key, "—"));
+      OrionUI.toast("تعذّر تحميل إحصاءات المنصة", "error");
     }
   },
 
@@ -32,7 +40,7 @@ const OrionAdminPlatform = {
           if (id) {
             await OrionAPI.put(`/tenants/${id}`, payload);
           } else {
-            await OrionAPI.post("/tenants", payload);
+            await OrionAPI.post("/tenants/", payload);
           }
           this.closeTenantModal();
           await this.loadTenants();
@@ -128,7 +136,7 @@ const OrionAdminPlatform = {
           tenant_id: type === "tenant_admin" ? parseInt(form.querySelector("[name='tenant_id']").value) : null,
         };
         try {
-          await OrionAPI.post("/users", payload);
+          await OrionAPI.post("/users/", payload);
           this.closeUserModal();
           await this.loadUsers();
         } catch (err) {
@@ -179,8 +187,9 @@ const OrionAdminPlatform = {
         const tenantTd = SafeDOM.elem("td", { className: "p-3" }, [u.tenant_id || "—"]);
         const roleTd = SafeDOM.elem("td", { className: "p-3" }, [u.is_superuser ? "مدير منصة" : (u.is_admin ? "مدير متجر" : "—")]);
         const activeTd = SafeDOM.elem("td", { className: "p-3" }, [u.is_active ? "نشط" : "معطل"]);
+        const roleBtn = SafeDOM.actionBtn("الأدوار", "text-purple-600 text-sm ml-2", () => OrionAdminPlatform.assignUserRole(u));
         const deleteBtn = SafeDOM.actionBtn("حذف", "text-red-600 text-sm", () => OrionAdminPlatform.deleteUser(u.id));
-        const actionsTd = SafeDOM.elem("td", { className: "p-3" }, [deleteBtn]);
+        const actionsTd = SafeDOM.elem("td", { className: "p-3" }, [roleBtn, deleteBtn]);
         el.appendChild(SafeDOM.elem("tr", { className: "border-b" }, [emailTd, nameTd, tenantTd, roleTd, activeTd, actionsTd]));
       }
     } catch (err) {
@@ -210,6 +219,26 @@ const OrionAdminPlatform = {
     }
   },
 
+  async assignUserRole(user) {
+    // Minimal assignment UI: no role-list endpoint exists yet, so the code is
+    // entered directly. Full role/permission management is deferred.
+    const roleCode = (prompt("رمز الدور (مثال: store_staff)") || "").trim();
+    if (!roleCode) return;
+    const tenantRaw = (prompt(
+      "معرّف المتجر (اتركه فارغاً لاستخدام متجر المستخدم)",
+      user.tenant_id || ""
+    ) || "").trim();
+    const payload = { role_code: roleCode };
+    if (tenantRaw) payload.tenant_id = parseInt(tenantRaw, 10);
+    try {
+      await OrionAPI.post(`/users/${user.public_id}/roles`, payload);
+      OrionUI.toast("تم تعيين الدور", "success");
+      await this.loadUsers();
+    } catch (err) {
+      OrionUI.toast(err.message || "فشل تعيين الدور", "error");
+    }
+  },
+
   async initSettings() {
     const form = document.getElementById("settings-form");
     if (!form) return;
@@ -218,7 +247,7 @@ const OrionAdminPlatform = {
       const s = data.settings || {};
       document.getElementById("setting-platform-name").value = s.platform_name || "";
       document.getElementById("setting-owner-name").value = s.owner_name || "";
-      document.getElementById("setting-support-email").value = s.owner_email || "";
+      document.getElementById("setting-support-email").value = s.support_email || "";
       document.getElementById("setting-default-currency").value = s.default_currency || "";
       document.getElementById("setting-default-language").value = s.default_language || "";
     } catch (err) {

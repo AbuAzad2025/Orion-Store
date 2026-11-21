@@ -118,26 +118,30 @@ def main() -> int:
 
     failures: list[str] = []
     rows: list[tuple[str, float, float, str]] = []
+    untracked: list[str] = []
 
-    for rel, spec in sorted(manifest_files.items()):
-        minimum = float(spec["min"])
+    checked: set[str] = set()
+
+    def _check(rel: str, minimum: float | None, label: str) -> None:
+        checked.add(rel)
+        if minimum is None:
+            failures.append(f"{rel}: no coverage rule (manifest/path_defaults)")
+            return
         actual = _coverage_percent(coverage_data, rel)
         if actual is None:
             failures.append(f"{rel}: not measured (add to pytest --cov paths)")
-            continue
-        wave = spec.get("wave", "?")
-        rows.append((rel, actual, minimum, f"wave-{wave}"))
+            return
+        rows.append((rel, actual, minimum, label))
         if actual + 1e-9 < minimum:
-            failures.append(f"{rel}: {actual:.1f}% < {minimum:.0f}% (wave-{wave})")
+            failures.append(f"{rel}: {actual:.1f}% < {minimum:.0f}% ({label})")
 
-    scanned = _scan_source_files(exclude)
-    manifest_keys = set(manifest_files.keys())
-    untracked = sorted(scanned - manifest_keys)
-    if untracked:
-        for rel in untracked:
-            failures.append(
-                f"{rel}: not in coverage_manifest.yaml — register before merge"
-            )
+    for rel, spec in sorted(manifest_files.items()):
+        _check(rel, float(spec["min"]), f"wave-{spec.get('wave', '?')}")
+
+    for rel in sorted(_scan_source_files(exclude) - checked):
+        if rel not in manifest_files:
+            untracked.append(rel)
+        _check(rel, _min_for_file(rel, manifest), "path-default")
 
     if args.diff_base:
         for rel in _git_changed_files(args.diff_base):

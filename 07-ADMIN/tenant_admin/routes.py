@@ -45,6 +45,58 @@ def tenant_dashboard():
     )
 
 
+@tenant_admin_bp.get("/products")
+def tenant_products():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "products_management.html",
+        tenant=tenant,
+        page_title="المنتجات",
+        active_nav="products",
+    )
+
+
+@tenant_admin_bp.get("/pages")
+def tenant_pages():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "pages_management.html",
+        tenant=tenant,
+        page_title="الصفحات",
+        active_nav="pages",
+    )
+
+
+@tenant_admin_bp.get("/ui-kit")
+def tenant_ui_kit():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "ui_kit.html",
+        tenant=tenant,
+        page_title="معاينة المكوّنات",
+        active_nav="ui_kit",
+    )
+
+
+@tenant_admin_bp.get("/contact")
+def tenant_contact():
+    tenant = _require_tenant()
+    if not tenant:
+        return "Tenant context required (X-Tenant-ID).", 404
+    return render_template(
+        "contact_settings.html",
+        tenant=tenant,
+        page_title="رقم التواصل (واتساب)",
+        active_nav="contact",
+    )
+
+
 @tenant_admin_bp.get("/gateways")
 def tenant_gateways():
     tenant = _require_tenant()

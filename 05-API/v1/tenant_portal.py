@@ -12,10 +12,13 @@ from catalog_svc.product_service import ProductService
 from core.exceptions import NotFoundError, OrionError
 from core.middleware import require_tenant_admin
 from core.pagination import paginate_query, paginated_payload, pagination_params
+from engine.whatsapp import normalize_phone
 from order_svc.order_service import OrderService
+from orion.extensions import db
 from payment_svc.payment_service import PaymentService
 from platform_models.tenant_gateway import TenantPaymentGateway
 from platform_svc.document_template_service import DocumentTemplateService
+from tenant.tenant import Tenant
 from tenant_gateway_svc.gateway_service import GatewayService
 
 tenant_portal_bp = Blueprint("tenant_portal", __name__)
@@ -68,6 +71,33 @@ def tenant_dashboard_api():
             ),
             200,
         )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.get("/contact")
+def get_contact():
+    try:
+        require_tenant_admin()
+        tenant = db.session.get(Tenant, g.tenant_id)
+        return jsonify({"phone": tenant.phone or ""}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.put("/contact")
+def update_contact():
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        phone = str(data.get("phone", "")).strip()
+        digits = normalize_phone(phone)
+        if phone and not (7 <= len(digits) <= 15):
+            return jsonify({"error": "رقم الهاتف غير صالح."}), 400
+        tenant = db.session.get(Tenant, g.tenant_id)
+        tenant.phone = phone or None
+        db.session.commit()
+        return jsonify({"phone": tenant.phone or ""}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

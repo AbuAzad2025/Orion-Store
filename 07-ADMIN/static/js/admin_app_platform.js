@@ -33,18 +33,51 @@ const OrionAdminAppPlatform = {
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
+  // One-time reveal: the button is shown once after registration and removes
+  // itself as soon as it is used — the raw secret is never persisted or shown
+  // again by any subsequent API call.
+  offerClientSecret(secret) {
+    const form = document.getElementById("app-form");
+    let panel = document.getElementById("oauth-secret-panel");
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.id = "oauth-secret-panel";
+      panel.className = "border border-amber-300 bg-amber-50 p-3 my-3 rounded";
+      if (form && form.parentNode) form.parentNode.insertBefore(panel, form.nextSibling);
+      else document.body.appendChild(panel);
+    }
+    SafeDOM.clear(panel);
+    panel.appendChild(SafeDOM.elem("span", {}, ["client_secret (يُعرض مرة واحدة فقط): "]));
+    const btn = SafeDOM.elem("button", {
+      type: "button",
+      className: "orion-btn ml-2",
+    }, ["إنشاء client_secret"]);
+    btn.addEventListener("click", async () => {
+      try {
+        if (navigator.clipboard) await navigator.clipboard.writeText(secret);
+      } catch (_) { /* clipboard may be blocked — secret is still displayed */ }
+      SafeDOM.clear(panel);
+      panel.appendChild(SafeDOM.elem("code", {}, [secret]));
+      btn.remove();
+    });
+    panel.appendChild(btn);
+  },
+
   init() {
     const appForm = document.getElementById("app-form");
     if (appForm) {
       appForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(appForm);
-        await OrionAPI.post("/app-platform/apps", {
+        const result = await OrionAPI.post("/app-platform/apps", {
           name: fd.get("name"), redirect_uris: (fd.get("redirect_uris") || "").split(",").map((s) => s.trim()).filter(Boolean),
           scopes: fd.get("scopes") || undefined,
         });
         appForm.reset();
         OrionAdminAppPlatform.loadApps();
+        // The API returns the raw client_secret exactly once, at registration.
+        const secret = result && (result.client_secret || (result.app && result.app.client_secret));
+        if (secret) OrionAdminAppPlatform.offerClientSecret(secret);
       });
     }
     const sbForm = document.getElementById("sandbox-form");

@@ -5,12 +5,24 @@ from __future__ import annotations
 from flask import Blueprint, g, jsonify, request
 
 from catalog_svc.product_service import ProductService
-from core.exceptions import OrionError
+from core.exceptions import OrionError, ValidationError
 from core.middleware import require_tenant_admin
 from core.pagination import paginate_query, paginated_payload, pagination_params
 
 products_bp = Blueprint("products", __name__)
 _products = ProductService()
+
+
+def _safe_image_url(value) -> str | None:
+    """Only http(s) or local paths — never javascript:/data: image URLs."""
+    if not value:
+        return None
+    url = str(value).strip()
+    if not (
+        url.startswith("https://") or url.startswith("http://") or url.startswith("/")
+    ):
+        raise ValidationError("رابط الصورة يجب أن يبدأ بـ http(s) أو /")
+    return url
 
 
 @products_bp.get("/")
@@ -44,6 +56,10 @@ def create_product():
             category_id=data.get("category_id"),
             brand_id=data.get("brand_id"),
             is_published=bool(data.get("is_published", False)),
+            is_featured=bool(data.get("is_featured", False)),
+            image_url=_safe_image_url(data.get("image_url")),
+            short_description=data.get("short_description"),
+            description=data.get("description"),
         )
         return jsonify({"product": product.to_dict()}), 201
     except OrionError as exc:
@@ -80,9 +96,14 @@ def update_product(public_id: str):
                 "brand_id",
                 "is_published",
                 "is_featured",
+                "image_url",
+                "short_description",
+                "description",
             )
             if k in data
         }
+        if "image_url" in allowed:
+            allowed["image_url"] = _safe_image_url(allowed["image_url"])
         product = _products.update(product, **allowed)
         return jsonify({"product": product.to_dict()}), 200
     except OrionError as exc:

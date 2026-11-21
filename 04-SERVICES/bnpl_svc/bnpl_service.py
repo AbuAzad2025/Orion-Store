@@ -64,7 +64,11 @@ class BnplService:
         if merchant_id is not None:
             row.merchant_id = merchant_id
         if api_key:
-            row.api_credentials_encrypted = CryptoService().encrypt(api_key)
+            import json
+
+            row.api_credentials_encrypted = CryptoService().encrypt(
+                json.dumps({"api_key": api_key})
+            )
         row.is_enabled = is_enabled
         merged = dict(row.config or {})
         merged["is_sandbox"] = is_sandbox

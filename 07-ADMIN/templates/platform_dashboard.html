@@ -1,21 +1,21 @@
 {% extends "admin_base.html" %}
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-  <div class="bg-white rounded border p-4">
-    <div class="text-sm text-gray-500">إجمالي المتاجر</div>
-    <div id="stat-tenants" class="text-2xl font-bold">0</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" aria-live="polite">
+  <div class="orion-card orion-stat">
+    <span class="orion-stat-label">إجمالي المتاجر</span>
+    <span id="stat-tenants" class="orion-stat-value"><span class="orion-skeleton"></span></span>
   </div>
-  <div class="bg-white rounded border p-4">
-    <div class="text-sm text-gray-500">المتاجر النشطة</div>
-    <div id="stat-active-tenants" class="text-2xl font-bold text-green-600">0</div>
+  <div class="orion-card orion-stat">
+    <span class="orion-stat-label">المتاجر النشطة</span>
+    <span id="stat-active-tenants" class="orion-stat-value"><span class="orion-skeleton"></span></span>
   </div>
-  <div class="bg-white rounded border p-4">
-    <div class="text-sm text-gray-500">إجمالي المستخدمين</div>
-    <div id="stat-users" class="text-2xl font-bold">0</div>
+  <div class="orion-card orion-stat">
+    <span class="orion-stat-label">إجمالي المستخدمين</span>
+    <span id="stat-users" class="orion-stat-value"><span class="orion-skeleton"></span></span>
   </div>
-  <div class="bg-white rounded border p-4">
-    <div class="text-sm text-gray-500">المستخدمين النشطين</div>
-    <div id="stat-active-users" class="text-2xl font-bold text-green-600">0</div>
+  <div class="orion-card orion-stat">
+    <span class="orion-stat-label">المستخدمون النشطون</span>
+    <span id="stat-active-users" class="orion-stat-value"><span class="orion-skeleton"></span></span>
   </div>
 </div>
 

@@ -46,3 +46,9 @@ logs/
 # Docker volumes (local)
 postgres_data/
 redis_data/
+
+# Node assets (Tailwind build)
+node_modules/
+
+# Browser E2E artifacts
+test-results/

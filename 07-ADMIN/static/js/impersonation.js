@@ -13,13 +13,8 @@
     exitBtn.textContent = "جاري الخروج...";
 
     try {
-      const res = await OrionAPI.post("/platform/impersonation/end");
-      if (res.ok) {
-        window.location.reload();
-      } else {
-        const err = await res.json().catch(() => ({ message: "فشل الخروج" }));
-        alert(err.message || "فشل إنهاء انتحال الهوية");
-      }
+      await OrionAPI.post("/end");
+      window.location.reload();
     } catch (e) {
       console.error("Exit impersonation error:", e);
       alert("حدث خطأ غير متوقع");

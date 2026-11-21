@@ -28,6 +28,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: CSS build is reproducible (committed assets are current)
+        run: |-
+          npm ci
+          npm run build:css
+          git diff --exit-code -- \
+            06-STOREFRONT/themes/default/static/css/tailwind.css \
+            06-STOREFRONT/themes/default/static/css/orion-theme.css \
+            07-ADMIN/static/css/tailwind.css \
+            07-ADMIN/static/css/orion-theme.css
+
       - name: Black
         run: black --check --exclude "tests/api/_*" 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN tests scripts
 
@@ -39,6 +54,18 @@ jobs:
 
       - name: File length check
         run: python scripts/check_file_length.py
+
+      - name: RLS coverage audit
+        run: python scripts/audit_rls.py --check
+
+      - name: RTL/WCAG static audit
+        run: python scripts/audit_a11y.py --check
+
+      - name: UI/API reference audit
+        run: python scripts/audit_ui_coverage.py --check
+
+      - name: Design token contrast audit
+        run: python scripts/audit_contrast.py --check
 
   test:
     name: Tests, PostgreSQL & coverage ≥85%
@@ -92,6 +119,14 @@ jobs:
               print('MIGRATION_OK')
           PY
 
+      - name: Schema FK/index audit
+        env:
+          DATABASE_URL: postgresql://postgres:123@localhost:5432/orion_test_db
+        run: python scripts/audit_schema.py --check
+
+      - name: Migration/model consistency (read-only, no revisions written)
+        run: python scripts/check_migrations.py
+
       - name: Pytest with PostgreSQL and coverage gate
         env:
           FLASK_ENV: testing
@@ -99,7 +134,7 @@ jobs:
           TEST_DATABASE_URL: postgresql://postgres:123@localhost:5432/orion_test_db
         run: |-
           export ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
-          pytest -v -m "not external" \
+          pytest -v -m "not external and not e2e" \
             --cov \
             --cov-fail-under=85 \
             --cov-report=term-missing \
@@ -161,3 +196,47 @@ jobs:
 
       - name: pip-audit
         run: pip-audit --strict
+
+      - name: Bandit (SAST)
+        run: |
+          pip install bandit
+          bandit -q -r 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN scripts
+
+      - name: Gitleaks (secret scanning)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  e2e:
+    name: Browser E2E (non-blocking)
+    runs-on: ubuntu-latest
+    needs: lint
+    continue-on-error: true
+    env:
+      FLASK_ENV: testing
+      USE_SQLITE_TESTS: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Install Chromium for Playwright
+        run: python -m playwright install --with-deps chromium
+
+      - name: Browser E2E tests (-m e2e)
+        run: pytest -v -m e2e
+
+      - name: Upload E2E snapshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-screenshots
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 14

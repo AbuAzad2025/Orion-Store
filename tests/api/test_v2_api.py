@@ -574,7 +574,19 @@ def test_live_chat_api(client, app, setup):
 
 
 def test_reconciliation_api(client, app, setup):
+    from platform_svc.financial_events_service import FinancialEventsService
+
     tenant, headers, product = setup
+    with app.app_context():
+        event = FinancialEventsService().record_inbound(
+            tenant_id=tenant.id,
+            amount="100.00",
+            event_type="test.reconciliation",
+            source_entity="test",
+            source_id=1,
+            apply_commission=False,
+        )
+        event_id = event.id
     res = client.post("/api/v1/reconciliation/runs", headers=headers)
     assert res.status_code == 201
     run_id = res.get_json()["run"]["id"]
@@ -583,7 +595,7 @@ def test_reconciliation_api(client, app, setup):
         f"/api/v1/reconciliation/runs/{run_id}/items",
         headers=headers,
         json={
-            "financial_event_id": 1,
+            "financial_event_id": event_id,
             "expected_amount": "100.00",
             "actual_amount": "100.00",
         },
@@ -603,7 +615,7 @@ def test_audit_api(client, app, setup):
     su_headers = auth_headers(super_admin, app=app)
     res = client.post(
         "/api/v1/audit/logs",
-        headers=headers,
+        headers=su_headers,
         json={
             "user_id": 1,
             "action": "user.login",

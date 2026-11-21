@@ -85,6 +85,16 @@ class Config:
     )
     WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET", "")
     WEBHOOK_MAX_AGE_SECONDS = int(os.environ.get("WEBHOOK_MAX_AGE_SECONDS", "300"))
+    # Local/CI may use deterministic sandbox stubs; production never may.
+    PAYMENT_STUB_ALLOWED = os.environ.get("PAYMENT_STUB_ALLOWED", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    # Real provider HTTP calls are off by default; production turns them on.
+    PAYMENT_LIVE_CALLS_ENABLED = os.environ.get(
+        "PAYMENT_LIVE_CALLS_ENABLED", "false"
+    ).lower() in ("1", "true", "yes")
 
 
 class DevelopmentConfig(Config):
@@ -109,6 +119,17 @@ class ProductionConfig(Config):
     DEBUG = False
     ENV = "production"
     # Production MUST use DATABASE_URL — PostgreSQL (managed or self-hosted).
+    # Cookies carrying JWTs must never travel over plain HTTP.
+    JWT_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    PREFERRED_URL_SCHEME = "https"
+    # HSTS is emitted by core/security_headers.py only when explicitly enabled.
+    ENFORCE_HSTS = True
+    PAYMENT_STUB_ALLOWED = False
+    PAYMENT_LIVE_CALLS_ENABLED = True
+    # Structured logs are required for production aggregation/alerting.
+    LOG_JSON = True
+    SENTRY_ENVIRONMENT = "production"
 
 
 config_by_name = {

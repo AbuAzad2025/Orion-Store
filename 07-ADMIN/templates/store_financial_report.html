@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page_title }} — Azadexa</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
   {% if admin_token %}
   <script>
     localStorage.setItem("orion_access_token", {{ admin_token | tojson }});
   </script>
   {% endif %}
 </head>
-<body class="bg-gray-100 min-h-screen" data-report-tenant-id="{{ tenant_id }}">
+<body class="bg-gray-100 min-h-screen orion-surface" data-report-tenant-id="{{ tenant_id }}">
   <div class="flex min-h-screen">
     {% include "components/sidebar.html" %}
     <main class="flex-1 p-6">

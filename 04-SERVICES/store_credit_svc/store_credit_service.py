@@ -10,7 +10,9 @@ from orion.extensions import db
 
 
 class StoreCreditService:
-    def get_or_create(self, *, tenant_id: int, customer_email: str) -> StoreCredit:
+    def get_or_create(
+        self, *, tenant_id: int, customer_email: str, commit: bool = True
+    ) -> StoreCredit:
         credit = StoreCredit.query.filter_by(
             tenant_id=tenant_id, customer_email=customer_email.strip().lower()
         ).first()
@@ -20,7 +22,10 @@ class StoreCreditService:
             tenant_id=tenant_id, customer_email=customer_email.strip().lower()
         )
         db.session.add(credit)
-        db.session.commit()
+        if commit:
+            db.session.commit()
+        else:
+            db.session.flush()
         return credit
 
     def add_funds(
@@ -57,8 +62,11 @@ class StoreCreditService:
         amount: str | Decimal,
         reference_type: str | None = None,
         reference_id: int | None = None,
+        commit: bool = True,
     ) -> StoreCredit:
-        credit = self.get_or_create(tenant_id=tenant_id, customer_email=customer_email)
+        credit = self.get_or_create(
+            tenant_id=tenant_id, customer_email=customer_email, commit=commit
+        )
         dec = Decimal(str(amount))
         if dec <= 0:
             raise ValidationError("Amount must be positive.")
@@ -76,7 +84,8 @@ class StoreCreditService:
                 reference_id=reference_id,
             )
         )
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return credit
 
     def get_balance(self, *, tenant_id: int, customer_email: str) -> Decimal:

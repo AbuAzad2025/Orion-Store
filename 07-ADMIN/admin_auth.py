@@ -5,7 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from flask import Blueprint, g, redirect, render_template, request, session, url_for
-from flask_jwt_extended import set_access_cookies, set_refresh_cookies
+from flask_jwt_extended import (
+    set_access_cookies,
+    set_refresh_cookies,
+    unset_access_cookies,
+    unset_refresh_cookies,
+)
 
 from auth.auth_service import AuthService
 from core.jwt_auth import issue_tokens_for_user
@@ -82,6 +87,8 @@ def admin_logout():
     session.clear()
     resp = redirect("/admin/login")
     resp.set_cookie("session", "", expires=0)
+    unset_access_cookies(resp)
+    unset_refresh_cookies(resp)
     return resp
 
 

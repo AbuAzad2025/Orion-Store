@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, jsonify, request
+from compliance_svc.compliance_service import ComplianceService
+from flask import Blueprint, g, jsonify, request
 from flask_jwt_extended import (
     create_access_token,
+    get_jwt,
     get_jwt_identity,
     jwt_required,
     set_access_cookies,
@@ -18,6 +20,7 @@ from core.rate_limit import limiter
 
 auth_bp = Blueprint("auth", __name__)
 _auth = AuthService()
+_compliance = ComplianceService()
 
 
 def _resolve_tenant_id(tenant_ref: str | int | None) -> int | None:
@@ -55,7 +58,16 @@ def login():
 @limiter.limit("5 per minute")
 def refresh():
     identity = get_jwt_identity()
-    return jsonify({"access_token": create_access_token(identity=identity)}), 200
+    claims = get_jwt()
+    additional = {
+        key: claims[key]
+        for key in ("is_superuser", "tenant_id", "impersonation")
+        if key in claims
+    }
+    token = create_access_token(identity=identity, additional_claims=additional)
+    response = jsonify({"access_token": token})
+    set_access_cookies(response, token)
+    return response, 200
 
 
 @auth_bp.post("/register/platform")
@@ -77,3 +89,37 @@ def register_platform_admin():
         ),
         404,
     )
+
+
+@auth_bp.post("/sso/exchange")
+@limiter.limit("10 per minute")
+def sso_exchange():
+    """Exchange a validated SSO provider code for the usual JWT token pair."""
+    data = request.get_json(silent=True) or {}
+    tenant_id = _resolve_tenant_id(data.get("tenant_id")) or g.tenant_id
+    if not tenant_id:
+        return jsonify({"error": "Tenant context required."}), 400
+    if tenant_id != g.tenant_id:
+        # The tenant was resolved from the payload rather than the request host.
+        g.tenant_id = tenant_id
+        from core.middleware import bind_rls_context
+
+        bind_rls_context()
+    try:
+        user = _compliance.exchange_sso_code(
+            tenant_id=tenant_id,
+            provider_code=data.get("provider_code") or data.get("token"),
+            external_email=data.get("external_email"),
+            provider_type=data.get("provider_type"),
+            client_id=data.get("client_id"),
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except (KeyError, TypeError, ValueError):
+        return jsonify({"error": "Invalid request."}), 400
+
+    tokens = issue_tokens_for_user(user)
+    response = jsonify({"user": user.to_dict(), **tokens})
+    set_access_cookies(response, tokens["access_token"])
+    set_refresh_cookies(response, tokens["refresh_token"])
+    return response, 200

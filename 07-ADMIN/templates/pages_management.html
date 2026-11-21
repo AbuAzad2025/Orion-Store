@@ -1,0 +1,60 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  <section class="orion-card lg:col-span-2">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="orion-title">الصفحات</h2>
+      <button type="button" id="btn-refresh" class="orion-btn">تحديث</button>
+    </div>
+    <div id="pages-list" class="space-y-2">جاري التحميل...</div>
+  </section>
+
+  <section class="orion-card">
+    <h2 class="orion-title mb-4" id="form-title">إضافة صفحة</h2>
+    <form id="page-form" class="space-y-3">
+      <input type="hidden" id="page-edit-id" value="">
+      <div>
+        <label class="orion-stat-label" for="p-title">العنوان</label>
+        <input id="p-title" class="orion-input" required aria-label="عنوان الصفحة">
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-slug">الرابط (slug)</label>
+        <input id="p-slug" class="orion-input" dir="ltr" required aria-label="رابط الصفحة">
+      </div>
+      <label class="flex items-center gap-2 text-sm">
+        <input id="p-published" type="checkbox" aria-label="صفحة منشورة"> صفحة منشورة
+      </label>
+
+      <hr class="border-slate-700">
+      <p class="orion-eyebrow text-sm">الترجمة (اختياري)</p>
+      <div>
+        <label class="orion-stat-label" for="p-locale">اللغة</label>
+        <select id="p-locale" class="orion-select" aria-label="لغة الترجمة">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+          <option value="he">עברית</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-trans-title">عنوان الترجمة</label>
+        <input id="p-trans-title" class="orion-input" aria-label="عنوان الترجمة">
+      </div>
+      <div>
+        <label class="orion-stat-label" for="p-trans-body">محتوى الترجمة</label>
+        <textarea id="p-trans-body" class="orion-input" rows="5" aria-label="محتوى الترجمة"></textarea>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="submit" class="orion-btn orion-btn-gold flex-1">حفظ الصفحة</button>
+        <button type="button" id="btn-cancel" class="orion-btn">إلغاء</button>
+      </div>
+      <p id="page-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_pages.js') }}"></script>
+<script>OrionAdminPages.init();</script>
+{% endblock %}

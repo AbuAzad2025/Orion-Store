@@ -1,139 +1,158 @@
-"""Check Alembic autogenerate + verify all FK relationships in v2 tables."""
+"""Read-only Alembic/model schema check plus v2 FK validation.
+
+This gate never writes files: schema drift is detected with Alembic's
+``compare_metadata`` instead of Alembic's file-writing autogenerate
+revision API, which used to create a revision file on every run.
+"""
 
 from __future__ import annotations
 
 import os
 import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "02-CORE"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "03-MODELS"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "04-SERVICES"))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "05-API"))
+ROOT = Path(__file__).resolve().parents[1]
+for _component in (
+    "02-CORE",
+    "03-MODELS",
+    "04-SERVICES",
+    "05-API",
+    "06-STOREFRONT",
+    "07-ADMIN",
+):
+    sys.path.insert(0, str(ROOT / _component))
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["ENCRYPTION_KEY"] = "test-key"
 os.environ["USE_SQLITE_TESTS"] = "1"
 
-from orion.app import create_app
+# Known v1 tables (pre-v2).
+V1_TABLES = {
+    "tenants",
+    "tenant_configs",
+    "users",
+    "roles",
+    "brands",
+    "categories",
+    "products",
+    "alembic_version",
+    "carts",
+    "cart_items",
+    "orders",
+    "order_items",
+    "order_events",
+    "payments",
+    "refunds",
+    "financial_events",
+    "commission_ledger",
+    "invoices",
+    "platform_settings",
+    "tenant_gateways",
+    "shipping_zones",
+    "shipping_rates",
+    "vouchers",
+    "voucher_redemptions",
+    "locales",
+    "translations",
+    "glossaries",
+    "pages",
+    "feature_flags",
+    "feature_flag_overrides",
+    "price_lists",
+    "price_list_items",
+    "customer_groups",
+    "customer_group_members",
+    "return_requests",
+    "return_items",
+    "warehouses",
+    "inventory_levels",
+    "fulfillments",
+    "fulfillment_items",
+    "b2b_quotes",
+    "b2b_quote_items",
+    "store_accounts",
+    "store_addresses",
+}
 
-app = create_app("testing")
 
-with app.app_context():
-    from alembic import command
-    from alembic.config import Config
+def _schema_diffs(connection, metadata) -> list[str]:
+    """Describe model-vs-database drift without emitting a revision file."""
+    from alembic.autogenerate import compare_metadata
+    from alembic.migration import MigrationContext
+
+    context = MigrationContext.configure(connection)
+    return [str(diff) for diff in compare_metadata(context, metadata)]
+
+
+def main() -> int:
     from sqlalchemy import inspect
 
+    from orion.app import create_app
     from orion.extensions import db
 
-    # Create tables from models
-    db.create_all()
+    app = create_app("testing")
+    issues: list[str] = []
 
-    # Inspect all tables
-    inspector = inspect(db.engine)
-    all_tables = set(inspector.get_table_names())
+    with app.app_context():
+        # Build the reference schema from the models in an in-memory database.
+        db.create_all()
 
-    # Known v1 tables (pre-v2)
-    v1_tables = {
-        "tenants",
-        "tenant_configs",
-        "users",
-        "roles",
-        "brands",
-        "categories",
-        "products",
-        "alembic_version",
-        "carts",
-        "cart_items",
-        "orders",
-        "order_items",
-        "order_events",
-        "payments",
-        "refunds",
-        "financial_events",
-        "commission_ledger",
-        "invoices",
-        "platform_settings",
-        "tenant_gateways",
-        "shipping_zones",
-        "shipping_rates",
-        "vouchers",
-        "voucher_redemptions",
-        "locales",
-        "translations",
-        "glossaries",
-        "pages",
-        "feature_flags",
-        "feature_flag_overrides",
-        "price_lists",
-        "price_list_items",
-        "customer_groups",
-        "customer_group_members",
-        "return_requests",
-        "return_items",
-        "warehouses",
-        "inventory_levels",
-        "fulfillments",
-        "fulfillment_items",
-        "b2b_quotes",
-        "b2b_quote_items",
-        "store_accounts",
-        "store_addresses",
-    }
-
-    v2_tables = all_tables - v1_tables - {"alembic_version"}
-    print(f"Total tables in DB: {len(all_tables)}")
-    print(f"v2 tables detected: {len(v2_tables)}")
-    print()
-
-    issues = []
-
-    for t in sorted(v2_tables):
-        cols = {c["name"]: c for c in inspector.get_columns(t)}
-        fks = inspector.get_foreign_keys(t)
-        print(f"  {t}:")
-        print(f"      columns: {list(cols.keys())}")
-        print(f"      FKs ({len(fks)}):")
-        for fk in fks:
-            ref = f"{fk['referred_table']}.{fk['referred_columns']}"
-            constrained = fk["constrained_columns"]
-            print(f"        {constrained} -> {ref}")
-            # Verify referred table exists
-            if fk["referred_table"] not in all_tables:
-                issues.append(
-                    f"  {t}: FK {constrained} -> {ref} — referred table MISSING!"
-                )
+        inspector = inspect(db.engine)
+        all_tables = set(inspector.get_table_names())
+        v2_tables = all_tables - V1_TABLES - {"alembic_version"}
+        print(f"Total tables in DB: {len(all_tables)}")
+        print(f"v2 tables detected: {len(v2_tables)}")
         print()
 
-    # Now try autogenerate to see if alembic detects any changes
-    print("--- Alembic autogenerate check ---")
-    cfg2 = Config("migrations/alembic.ini")
-    cfg2.set_main_option("script_location", "migrations")
-    try:
-        command.revision(cfg2, autogenerate=True, message="v2_autogenerate_check")
-        print("autogenerate completed successfully (no unexpected changes)")
-    except Exception as e:
-        print(f"autogenerate result: {e}")
+        for t in sorted(v2_tables):
+            cols = {c["name"]: c for c in inspector.get_columns(t)}
+            fks = inspector.get_foreign_keys(t)
+            print(f"  {t}:")
+            print(f"      columns: {list(cols.keys())}")
+            print(f"      FKs ({len(fks)}):")
+            for fk in fks:
+                ref = f"{fk['referred_table']}.{fk['referred_columns']}"
+                constrained = fk["constrained_columns"]
+                print(f"        {constrained} -> {ref}")
+                if fk["referred_table"] not in all_tables:
+                    issues.append(
+                        f"  {t}: FK {constrained} -> {ref} — referred table MISSING!"
+                    )
+            print()
+
+        print("--- Read-only model/schema comparison (no files written) ---")
+        with db.engine.connect() as connection:
+            diffs = _schema_diffs(connection, db.metadata)
+        if diffs:
+            issues.append(f"model/schema drift: {len(diffs)} change(s) detected")
+            issues.extend(f"  {diff}" for diff in diffs)
+        else:
+            print("No schema drift detected — no revision is needed.")
+
+        if "tenant_feature_flag_overrides" in all_tables:
+            tffo_cols = {
+                c["name"]: c
+                for c in inspector.get_columns("tenant_feature_flag_overrides")
+            }
+            print(f"\ntenant_feature_flag_overrides columns: {list(tffo_cols.keys())}")
+            for column in ("reason", "set_by"):
+                if column in tffo_cols:
+                    print(f"  OK: '{column}' column present")
+                else:
+                    print(f"  MISSING: '{column}' column")
+                    issues.append(
+                        f"tenant_feature_flag_overrides missing '{column}' column"
+                    )
 
     if issues:
-        print(f"\nISSUES FOUND ({len(issues)}):")
-        for i in issues:
-            print(f"  {i}")
-    else:
-        print("\nNo issues found! All FK references validated.")
+        print(f"\nISSUES FOUND ({len(issues)}):", file=sys.stderr)
+        for issue in issues:
+            print(f"  {issue}", file=sys.stderr)
+        return 1
 
-    # Check if our new reason/set_by columns exist in tenant_feature_flag_overrides
-    if "tenant_feature_flag_overrides" in all_tables:
-        tffo_cols = {
-            c["name"]: c for c in inspector.get_columns("tenant_feature_flag_overrides")
-        }
-        print(f"\ntenant_feature_flag_overrides columns: {list(tffo_cols.keys())}")
-        if "reason" in tffo_cols:
-            print("  ✅ 'reason' column present")
-        else:
-            print("  ❌ 'reason' column MISSING!")
-            issues.append("tenant_feature_flag_overrides missing 'reason' column")
-        if "set_by" in tffo_cols:
-            print("  ✅ 'set_by' column present")
-        else:
-            print("  ❌ 'set_by' column MISSING!")
-            issues.append("tenant_feature_flag_overrides missing 'set_by' column")
+    print("\nNo issues found! All FK references validated.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

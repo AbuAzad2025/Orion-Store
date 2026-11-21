@@ -34,6 +34,15 @@ class Role(db.Model):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_system_role: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "tenant_id": self.tenant_id,
+            "name": self.name,
+            "code": self.code,
+            "is_system_role": self.is_system_role,
+        }
+
 
 class Permission(db.Model):
     __tablename__ = "permissions"
@@ -49,6 +58,14 @@ class Permission(db.Model):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     category: Mapped[str] = mapped_column(String(50), nullable=False)
     is_system: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "code": self.code,
+            "name": self.name,
+            "category": self.category,
+        }
 
 
 class RolePermission(db.Model):
@@ -76,3 +93,10 @@ class UserRole(db.Model):
     assigned_by: Mapped[int | None] = mapped_column(
         PrimaryKeyType, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
+
+    def to_dict(self) -> dict:
+        return {
+            "user_id": self.user_id,
+            "role_id": self.role_id,
+            "assigned_by": self.assigned_by,
+        }

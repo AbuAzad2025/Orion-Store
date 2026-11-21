@@ -60,7 +60,7 @@ switch ($Action) {
         if (-not $env:ENCRYPTION_KEY) {
             $env:ENCRYPTION_KEY = python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
         }
-        python -m pytest -v -m "not external" --cov --cov-fail-under=85 --cov-report=term-missing --cov-report=json:coverage.json
+        python -m pytest -v -m "not external and not e2e" --cov --cov-fail-under=85 --cov-report=term-missing --cov-report=json:coverage.json
         if ($LASTEXITCODE -eq 0) {
             python scripts/check_coverage.py --coverage-json coverage.json
         }

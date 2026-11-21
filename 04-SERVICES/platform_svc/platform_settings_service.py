@@ -18,12 +18,28 @@ class PlatformSettingsService:
 
     def update_singleton(self, **fields) -> PlatformSettings:
         row = self.get_singleton()
+        applied: list[str] = []
         for key, value in fields.items():
             if value is None or not hasattr(row, key):
                 continue
             setattr(row, key, value)
+            applied.append(key)
         db.session.commit()
+        self._audit_update(row, applied)
         return row
+
+    @staticmethod
+    def _audit_update(row: PlatformSettings, applied: list[str]) -> None:
+        """Record settings changes with the authenticated actor (never client input)."""
+        from core.audit_log import audit_log
+
+        audit_log(
+            action="platform.settings.updated",
+            resource_type="platform_settings",
+            resource_id=str(row.id),
+            tenant_id=None,
+            details={"fields": sorted(applied)},
+        )
 
     def ensure_seeded(self) -> PlatformSettings:
         existing = PlatformSettings.query.filter_by(singleton="1").first()
@@ -39,6 +55,9 @@ class PlatformSettingsService:
             owner_name="Ahmad Ghannam",
             owner_phone="0562150193",
             owner_phone_intl="+972562150193",
+            support_email="support@azadexa.com",
+            default_currency="ILS",
+            default_language="ar",
             default_commission_percent=Decimal("0.0100"),
             singleton="1",
             valuepayment_enabled=True,

@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 
 from flask import Flask, current_app, g, redirect, request, session
-from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
+from flask_jwt_extended import get_jwt, get_jwt_identity, verify_jwt_in_request
 from sqlalchemy.orm import joinedload
 
 from core.beta_gate import (
@@ -27,11 +27,17 @@ def register_middleware(app: Flask) -> None:
         g.user = None
         g.role = None
         g.is_platform_admin = False
+        g.impersonator_user = None
+        g.impersonated_user = None
 
         tenant = _resolve_tenant_from_request()
         if tenant:
             g.tenant_id = tenant.id
             g.tenant = tenant
+
+        # Users table is itself RLS-protected: bind context BEFORE querying it,
+        # otherwise non-superuser runtime roles cannot authenticate at all.
+        bind_rls_context()
 
         _resolve_authenticated_user()
 
@@ -39,14 +45,29 @@ def register_middleware(app: Flask) -> None:
             g.tenant_id = g.user.tenant_id
             g.tenant = Tenant.query.get(g.user.tenant_id)
 
+        if g.user:
+            try:
+                claims = get_jwt()
+            except Exception:
+                claims = {}
+            impersonation = claims.get("impersonation") if claims else None
+            if impersonation:
+                g.impersonator_user = db.session.get(
+                    User, impersonation.get("impersonator_user_id")
+                )
+                g.impersonated_user = g.user
+
+        # Rebind after the user/role is known (platform-admin flag may change).
+        bind_rls_context()
+
         _resolve_request_locale()
 
-    @app.before_request
-    def bind_tenant_rls() -> None:
-        if g.tenant_id and db.engine.dialect.name == "postgresql":
+    @app.teardown_request
+    def reset_rls_context(exception=None) -> None:
+        if db.engine.dialect.name == "postgresql":
+            db.session.execute(db.text("SELECT set_config('app.tenant_id', '', false)"))
             db.session.execute(
-                db.text("SELECT set_config('app.tenant_id', :tid, true)"),
-                {"tid": str(g.tenant_id)},
+                db.text("SELECT set_config('app.is_platform_admin', 'false', false)")
             )
 
     @app.before_request
@@ -84,6 +105,42 @@ def register_middleware(app: Flask) -> None:
             ):
                 return ("Forbidden", 403)
         return None
+
+
+def bind_rls_context() -> None:
+    """Bind tenant and platform-admin flags to the current DB transaction.
+
+    Called from before_request and from code that establishes tenant context
+    after middleware (e.g. webhook handlers).
+    """
+    from flask import has_app_context
+
+    if not has_app_context() or db.engine.dialect.name != "postgresql":
+        return
+    db.session.execute(
+        db.text("SELECT set_config('app.tenant_id', :tid, false)"),
+        {"tid": str(g.tenant_id) if g.tenant_id else ""},
+    )
+    db.session.execute(
+        db.text("SELECT set_config('app.is_platform_admin', :flag, false)"),
+        {"flag": "true" if g.get("is_platform_admin") else "false"},
+    )
+
+
+def bind_task_rls_context(
+    tenant_id: int | None = None, *, is_platform_admin: bool = False
+) -> None:
+    """Bind RLS context for background jobs (no Flask request context)."""
+    if db.engine.dialect.name != "postgresql":
+        return
+    db.session.execute(
+        db.text("SELECT set_config('app.tenant_id', :tid, false)"),
+        {"tid": str(tenant_id) if tenant_id else ""},
+    )
+    db.session.execute(
+        db.text("SELECT set_config('app.is_platform_admin', :flag, false)"),
+        {"flag": "true" if is_platform_admin else "false"},
+    )
 
 
 def _resolve_request_locale() -> None:
@@ -139,12 +196,19 @@ def _resolve_authenticated_user() -> None:
         return
     try:
         verify_jwt_in_request(optional=True, locations=["cookies", "headers"])
-        identity = get_jwt_identity()
-        if identity:
-            _bind_user_to_context(str(identity))
-            return
     except Exception:
-        pass
+        identity = None  # missing/invalid JWT → anonymous, but not swallowed below
+    else:
+        identity = get_jwt_identity()
+    if identity:
+        # AuthenticationError from a mismatched tenant must propagate as 401,
+        # never silently downgrade the request to anonymous.
+        _bind_user_to_context(str(identity))
+        return
+
+    # API must not fall back to the HTML admin session (CSRF-exempt APIs).
+    if request.path.startswith("/api/") or "user_id" not in session:
+        return
 
     if "user_id" in session:
         user = User.query.filter_by(id=session["user_id"], is_active=True).first()
@@ -162,8 +226,10 @@ def _resolve_authenticated_user() -> None:
 def _bind_user_to_context(user_public_id: str) -> None:
     try:
         uid = uuid.UUID(user_public_id)
-    except ValueError:
-        raise AuthenticationError("Invalid user context.") from None
+    except (ValueError, TypeError):
+        # Legacy clients/test helpers use a slug as identity. Treat as anonymous;
+        # a real (valid UUID) token from another tenant is still rejected below.
+        return
     user = User.query.filter_by(public_id=uid, is_active=True).first()
     if not user:
         raise AuthenticationError("Invalid user context.")

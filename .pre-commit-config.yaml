@@ -3,7 +3,11 @@ repos:
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
+        # Markdown/HTML/JS may use trailing double-spaces as intentional
+        # hard line breaks — never strip them automatically.
+        exclude: '\.(md|html|js)$'
       - id: end-of-file-fixer
+        exclude: '\.(md|html|js)$'
       - id: check-yaml
       - id: check-added-large-files
         args: [--maxkb=500]
@@ -28,5 +32,25 @@ repos:
       - id: check-file-length
         name: check file length
         entry: python scripts/check_file_length.py
+        language: system
+        pass_filenames: false
+      - id: audit-rls
+        name: RLS coverage audit
+        entry: python scripts/audit_rls.py --check
+        language: system
+        pass_filenames: false
+      - id: audit-a11y
+        name: RTL/WCAG audit
+        entry: python scripts/audit_a11y.py --check
+        language: system
+        pass_filenames: false
+      - id: audit-ui-coverage
+        name: UI/API reference audit
+        entry: python scripts/audit_ui_coverage.py --check
+        language: system
+        pass_filenames: false
+      - id: audit-contrast
+        name: Design token contrast audit
+        entry: python scripts/audit_contrast.py --check
         language: system
         pass_filenames: false

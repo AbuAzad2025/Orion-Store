@@ -207,13 +207,13 @@ def test_create_job(tenant):
     assert job.status == "pending"
 
 
-def test_stock_notification(tenant):
+def test_stock_notification(tenant, product):
     svc = StockNotificationService()
     sn = svc.subscribe(
-        tenant_id=tenant.id, customer_email="notify@test.com", product_id=42
+        tenant_id=tenant.id, customer_email="notify@test.com", product_id=product.id
     )
     assert sn.customer_email == "notify@test.com"
-    assert sn.product_id == 42
+    assert sn.product_id == product.id
     assert sn.is_notified is False
 
 
@@ -237,9 +237,22 @@ def test_app_platform_lifecycle(tenant):
 
 
 def test_fraud_review(tenant):
+    from order.order import Order
+
+    order = Order(
+        tenant_id=tenant.id,
+        order_number="FRAUD-TEST-1",
+        customer_email="fraud@test.com",
+        shipping_address={},
+        subtotal="10",
+        total="10",
+    )
+    db.session.add(order)
+    db.session.commit()
+
     svc = FraudService()
-    review = svc.review_order(tenant_id=tenant.id, order_id=1, risk_score=85)
-    assert review.order_id == 1
+    review = svc.review_order(tenant_id=tenant.id, order_id=order.id, risk_score=85)
+    assert review.order_id == order.id
     assert review.risk_score == 85
 
 
@@ -368,6 +381,16 @@ def test_live_chat_session(tenant):
 
 
 def test_reconciliation_run(tenant):
+    from platform_svc.financial_events_service import FinancialEventsService
+
+    event = FinancialEventsService().record_inbound(
+        tenant_id=tenant.id,
+        amount="100.00",
+        event_type="test.reconciliation",
+        source_entity="test",
+        source_id=1,
+        apply_commission=False,
+    )
     svc = ReconciliationV2Service()
     run = svc.create_run(tenant_id=tenant.id)
     assert run.status == "pending"
@@ -375,7 +398,7 @@ def test_reconciliation_run(tenant):
     item = svc.add_item(
         tenant_id=tenant.id,
         run_id=run.id,
-        financial_event_id=1,
+        financial_event_id=event.id,
         expected_amount="100.00",
         actual_amount="100.00",
     )
@@ -387,12 +410,21 @@ def test_reconciliation_run(tenant):
 
 
 def test_audit_log_and_report():
+    from auth.auth_service import AuthService
+
+    user = AuthService().register_super_admin(
+        email="audit@test.com", password="password123"
+    )
     svc = AuditV2Service()
-    log = svc.log_action(user_id=1, action="user.login", details={"ip": "192.168.1.1"})
+    log = svc.log_action(
+        user_id=user.id, action="user.login", details={"ip": "192.168.1.1"}
+    )
     assert log.action == "user.login"
 
     report = svc.create_report(
-        report_type="security_review", generated_by=1, summary={"findings": []}
+        report_type="security_review",
+        generated_by=user.id,
+        summary={"findings": []},
     )
     assert report.report_type == "security_review"
 

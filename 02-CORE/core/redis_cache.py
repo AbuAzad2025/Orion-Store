@@ -50,6 +50,12 @@ class RedisCache:
             return
         self._client.delete(key)
 
+    def set_nx(self, key: str, value: str, ttl_seconds: int = 86400) -> bool:
+        """Atomically claim a key. Returns True only for the first caller."""
+        if not self._client:
+            return False
+        return bool(self._client.set(key, value, ex=ttl_seconds, nx=True))
+
     def incr(self, key: str) -> int | None:
         if not self._client:
             return None
