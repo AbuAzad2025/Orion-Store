@@ -21,10 +21,16 @@ def main() -> int:
         if not os.environ.get(key):
             print(f"WARN: {key} not set")
     base = os.environ.get("LAUNCH_VERIFY_URL", "http://127.0.0.1:5000")
+    from urllib.parse import urlparse
+
+    scheme = urlparse(base).scheme
+    if scheme not in ("http", "https"):
+        print(f"FAIL LAUNCH_VERIFY_URL must use http(s), got {scheme!r}")
+        return 1
     for path in ("/health", "/ready"):
         url = f"{base.rstrip('/')}{path}"
         try:
-            with urllib.request.urlopen(url, timeout=5) as resp:
+            with urllib.request.urlopen(url, timeout=5) as resp:  # nosec B310
                 if resp.status >= 400:
                     print(f"FAIL {url} status={resp.status}")
                     return 1

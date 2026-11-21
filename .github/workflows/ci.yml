@@ -200,7 +200,7 @@ jobs:
       - name: Bandit (SAST)
         run: |
           pip install "bandit==1.7.9"
-          bandit -q -r 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN scripts
+          bandit -q -c bandit.ini -r 02-CORE 03-MODELS 04-SERVICES 05-API 06-STOREFRONT 07-ADMIN scripts
 
       - name: Gitleaks (secret scanning)
         uses: gitleaks/gitleaks-action@v2

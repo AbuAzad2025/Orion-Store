@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -98,7 +99,9 @@ def main() -> int:
 
         env = os.environ.copy()
         env["DATABASE_URL"] = source_url
-        subprocess.run(args.migrate_command, shell=True, check=True, env=env)
+        # No shell: the command is provided as an operator-supplied string,
+        # split safely into an argument vector.
+        subprocess.run(shlex.split(args.migrate_command), check=True, env=env)
 
         conn = psycopg2.connect(source_url)
         with conn.cursor() as cur:

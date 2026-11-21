@@ -145,5 +145,6 @@ class FeatureFlagService:
         if flag.rollout_percent <= 0:
             return False
         hash_input = f"{flag.id}:{tenant_id}".encode()
-        digest = int(hashlib.md5(hash_input).hexdigest()[:8], 16)
+        # Deterministic bucketing, not a security hash.
+        digest = int(hashlib.md5(hash_input, usedforsecurity=False).hexdigest()[:8], 16)
         return (digest % 100) < flag.rollout_percent
