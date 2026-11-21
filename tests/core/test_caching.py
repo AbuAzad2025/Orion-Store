@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from core.caching import (
     cache_get_json,
     cache_set_json,
@@ -37,18 +39,22 @@ class _FakeRedis:
         return current
 
 
-def _enable_cache(app):
-    app.config["TESTING"] = False
-    app.config["CACHE_ENABLED"] = True
-    app.extensions["redis_cache"] = _FakeRedis()
+@pytest.fixture
+def fake_cache(app, monkeypatch):
+    """Install a fake cache only for one test — never leak it into the
+    session-scoped `app` fixture (webhook replay checks use set_nx)."""
+    fake = _FakeRedis()
+    monkeypatch.setitem(app.extensions, "redis_cache", fake)
+    monkeypatch.setitem(app.config, "TESTING", False)
+    monkeypatch.setitem(app.config, "CACHE_ENABLED", True)
+    return fake
 
 
 def test_cache_disabled_during_pytest(app):
     assert cache_get_json("missing") is None
 
 
-def test_read_through_json_hits_cache_once(app):
-    _enable_cache(app)
+def test_read_through_json_hits_cache_once(app, fake_cache):
     calls: list[int] = []
 
     with app.app_context():
@@ -62,8 +68,7 @@ def test_read_through_json_hits_cache_once(app):
         assert len(calls) == 1
 
 
-def test_invalidate_bumps_catalog_version(app):
-    _enable_cache(app)
+def test_invalidate_bumps_catalog_version(app, fake_cache):
     with app.app_context():
         key_v1 = store_product_detail_key(5, "widget", "ar")
         cache_set_json(key_v1, {"product": {"slug": "widget"}})
@@ -74,8 +79,7 @@ def test_invalidate_bumps_catalog_version(app):
         assert cache_get_json(key_v2) is None
 
 
-def test_cache_set_get_roundtrip(app):
-    _enable_cache(app)
+def test_cache_set_get_roundtrip(app, fake_cache):
     with app.app_context():
         cache_set_json("k", {"n": 1})
         raw = app.extensions["redis_cache"].get("k")

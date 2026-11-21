@@ -101,6 +101,201 @@ def test_customer_service_flows(client, store):
     assert item.status_code == 201
 
 
+def test_gdpr_self_service(client, store):
+    tenant, _product, customer, _admin = store
+    headers = auth_headers(customer, tenant_id=tenant.slug)
+    created = client.post(
+        "/api/v1/store/account/data-requests",
+        headers=headers,
+        json={"request_type": "export"},
+    )
+    assert created.status_code == 201
+    req_id = created.get_json()["request"]["id"]
+    exported = client.get(
+        f"/api/v1/store/account/data-requests/{req_id}/export", headers=headers
+    )
+    assert exported.status_code == 200
+    assert exported.get_json()["subject"]["email"] == customer.email
+
+    deletion = client.post(
+        "/api/v1/store/account/data-requests",
+        headers=headers,
+        json={"request_type": "delete"},
+    )
+    assert deletion.status_code == 201
+    delete_id = deletion.get_json()["request"]["id"]
+    executed = client.post(
+        f"/api/v1/store/account/data-requests/{delete_id}/delete",
+        headers=headers,
+        json={},
+    )
+    assert executed.status_code == 200
+    assert executed.get_json()["request"]["status"] == "completed"
+
+
+def test_admin_subscription_and_oms_flows(client, store):
+    tenant, product, customer, admin = store
+    headers = auth_headers(admin, tenant_id=tenant.slug)
+
+    plan = client.post(
+        "/api/v1/subscriptions/plans",
+        headers=headers,
+        json={"name": "Pro", "code": "pro", "billing_period_days": 30, "price": "5.00"},
+    )
+    assert plan.status_code == 201
+    assert client.get("/api/v1/subscriptions/plans", headers=headers).status_code == 200
+    sub = client.post(
+        "/api/v1/subscriptions/subscribe",
+        headers=headers,
+        json={
+            "plan_id": plan.get_json()["plan"]["id"],
+            "customer_email": customer.email,
+        },
+    )
+    assert sub.status_code == 201
+    assert (
+        client.get("/api/v1/subscriptions/subscriptions", headers=headers).status_code
+        == 200
+    )
+    assert (
+        client.post(
+            f"/api/v1/subscriptions/subscriptions/{sub.get_json()['subscription']['id']}/cancel",
+            headers=headers,
+        ).status_code
+        == 200
+    )
+
+    wh1 = client.post(
+        "/api/v1/oms/warehouses", headers=headers, json={"name": "A", "code": "a"}
+    )
+    wh2 = client.post(
+        "/api/v1/oms/warehouses", headers=headers, json={"name": "B", "code": "b"}
+    )
+    assert wh1.status_code == 201 and wh2.status_code == 201
+    assert (
+        client.put(
+            "/api/v1/oms/inventory",
+            headers=headers,
+            json={
+                "warehouse_id": wh1.get_json()["warehouse"]["id"],
+                "product_id": product.id,
+                "quantity": 5,
+            },
+        ).status_code
+        == 200
+    )
+    transfer = client.post(
+        "/api/v1/oms-ext/transfers",
+        headers=headers,
+        json={
+            "from_warehouse_id": wh1.get_json()["warehouse"]["id"],
+            "to_warehouse_id": wh2.get_json()["warehouse"]["id"],
+        },
+    )
+    assert transfer.status_code == 201
+    transfer_id = transfer.get_json()["transfer"]["id"]
+    assert client.get("/api/v1/oms-ext/transfers", headers=headers).status_code == 200
+    assert (
+        client.post(
+            f"/api/v1/oms-ext/transfers/{transfer_id}/items",
+            headers=headers,
+            json={"product_id": product.id, "quantity": 2},
+        ).status_code
+        == 201
+    )
+    assert (
+        client.post(
+            f"/api/v1/oms-ext/transfers/{transfer_id}/complete", headers=headers
+        ).status_code
+        == 200
+    )
+
+
+def test_admin_catalog_tax_bopis_and_credit(client, store):
+    tenant, product, customer, admin = store
+    headers = auth_headers(admin, tenant_id=tenant.slug)
+
+    bundle = client.post(
+        "/api/v1/bundles",
+        headers=headers,
+        json={"name": "Starter", "slug": "starter", "bundle_price": "9.00"},
+    )
+    assert bundle.status_code == 201
+    assert client.get("/api/v1/bundles", headers=headers).status_code == 200
+
+    location = client.post(
+        "/api/v1/bopis/locations",
+        headers=headers,
+        json={
+            "code": "main",
+            "name": "Main",
+            "address": {"text": "Center"},
+            "phone": "123",
+        },
+    )
+    assert location.status_code == 201
+    assert client.get("/api/v1/bopis/locations", headers=headers).status_code == 200
+    slot = client.post(
+        f"/api/v1/bopis/locations/{location.get_json()['location']['id']}/slots",
+        headers=headers,
+        json={"day_of_week": 0, "start_time": "09:00", "end_time": "17:00"},
+    )
+    assert slot.status_code == 201
+
+    jurisdiction = client.post(
+        "/api/v1/tax/jurisdictions",
+        headers=headers,
+        json={
+            "code": "PS-WB",
+            "name": "West Bank",
+            "country_code": "PS",
+            "region": "WB",
+        },
+    )
+    assert jurisdiction.status_code == 201
+    jid = jurisdiction.get_json()["jurisdiction"]["id"]
+    assert (
+        client.post(
+            f"/api/v1/tax/jurisdictions/{jid}/rates",
+            headers=headers,
+            json={"rate": "0.16"},
+        ).status_code
+        == 201
+    )
+    preview = client.post(
+        "/api/v1/tax/calculate",
+        headers=tenant_headers(tenant.slug),
+        json={
+            "subtotal": "100.00",
+            "shipping_address": {"country_code": "PS", "region": "WB"},
+        },
+    )
+    assert preview.status_code == 200
+
+    assert (
+        client.get(
+            f"/api/v1/store-credit/balance?customer_email={customer.email}",
+            headers=headers,
+        ).status_code
+        == 200
+    )
+    assert (
+        client.post(
+            "/api/v1/store-credit/add",
+            headers=headers,
+            json={"customer_email": customer.email, "amount": "10.00"},
+        ).status_code
+        == 200
+    )
+    assert (
+        client.get(
+            f"/api/v1/store-credit/transactions?customer_email={customer.email}",
+            headers=headers,
+        ).status_code
+        == 200
+    )
+
+
 def test_logout_revokes_tokens(client, store):
     tenant, _product, customer, _admin = store
     headers = auth_headers(customer, tenant_id=tenant.slug)
