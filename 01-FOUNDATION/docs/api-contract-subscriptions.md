@@ -180,7 +180,7 @@ POST /api/v1/subscriptions/licenses
 {
   "license": {
     "id": 1,
-    "key": "LIC-A1B2C3D4E5F67890",
+    "key": "LIC-EXAMPLE-NOT-A-REAL-KEY",
     "is_activated": false
   }
 }
