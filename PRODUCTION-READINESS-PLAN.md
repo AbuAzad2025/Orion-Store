@@ -26,7 +26,7 @@
 ثم ظهرت 4 فشل إضافية في `tests/services/test_v2_services.py` (نفس نمط المعرّفات
 الثابتة: `product_id=42`، `order_id=1`، `financial_event_id=1`، `user_id=1`) — كلها
 سابقة على تعديلاتنا، وتم استبدالها بكيانات حقيقية، والملف الآن 26/26 ناجح.
-**النتيجة النهائية بعد دفعة الوكلاء العشرة: `482 passed, 0 failed` (23:57 دقيقة)**
+**النتيجة النهائية بعد جولات التدقيق: `532 passed, 0 failed`**
 مع استبعاد E2E وexternal (E2E 4/4 منفردة). بوابات الجودة كلها خضراء.
 تحذير Sentry عند إنهاء العملية (pending events) غير مؤثر — `pytest` يخرج برقم 0.
 
@@ -109,7 +109,7 @@
   مراقبة، واجهات، نشر) مع توقيعات Tech Lead وOps.
 - النشر الفعلي (staging → canary → production) **لا يمكن تنفيذه محلياً**؛ التوثيق جاهز
   ويُنفَّذ من قبل Ops في البيئة المستهدفة فقط.
-- الاختبار الكامل النهائي: **388 passed / 0 failed** + E2E 3/3 + pre-commit أخضر
+- الاختبار الكامل النهائي: **532 passed / 0 failed** + E2E 4/4 + pre-commit أخضر
   + RLS 91/91 + schema 0 مشاكل + a11y 0 مشاكل + backup/restore OK.
 
 ---
@@ -283,7 +283,7 @@ client_secret/token حقيقي، object storage للفواتير + عملات م
 **الهدف:** معرفة أي عطل قبل المستخدم.
 **المهام:**
 - تفعيل Sentry بـ DSN حقيقي في staging/production (المتغير موجود لكن فارغ).
-- Prometheus + Grafana (موجودة في `docker-compose.staging.yml`) → إضافة dashboards/alert rules للـ `/health`, `/ready`, معدل الأخطاء، زمن الاستجابة، طول طابور Celery.
+- Prometheus + Grafana (موجودة في `docker-compose.staging.yml`) — اللوحة وقواعد التنبيه فُعّلت فعلاً في `01-FOUNDATION/staging/`؛ المتبقي توفير خدمة Prometheus/Grafana وAlertmanager في production.
 - تحويل `LOG_JSON=true` في production + ضمان عدم تسجيل الأسرار (راجع `core/logging_config.py`).
 - كتابة runbooks: النسخ الاحتياطي، استعادة، إعادة تشغيل Celery، التعامل مع فشل الدفع.
 - تمكين HSTS فعلياً (مرتبط بالمرحلة 1).

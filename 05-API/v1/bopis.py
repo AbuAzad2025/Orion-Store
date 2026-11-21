@@ -29,6 +29,7 @@ def create_location():
             name=data["name"],
             address=data.get("address", {}),
             warehouse_id=data.get("warehouse_id"),
+            phone=data.get("phone"),
         )
         return jsonify({"location": loc.to_dict()}), 201
     except OrionError as exc:

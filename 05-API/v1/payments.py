@@ -8,6 +8,8 @@ from flask import Blueprint, g, jsonify, request
 
 from core.exceptions import OrionError, ValidationError
 from core.middleware import require_tenant_admin
+from core.permissions import require_permission
+from core.rate_limit import limiter
 from payment_svc.payment_service import PaymentService
 
 payments_bp = Blueprint("payments", __name__)
@@ -15,9 +17,11 @@ _payments = PaymentService()
 
 
 @payments_bp.post("/orders/<order_public_id>/pay")
+@limiter.limit("10 per minute")
 def pay_order(order_public_id: str):
     try:
         require_tenant_admin()
+        require_permission("tenant.payments.write")
         data = request.get_json(silent=True) or {}
         result = _payments.pay_order(
             tenant_id=g.tenant_id,
@@ -30,9 +34,11 @@ def pay_order(order_public_id: str):
 
 
 @payments_bp.post("/<payment_public_id>/refund")
+@limiter.limit("10 per minute")
 def refund_payment(payment_public_id: str):
     try:
         require_tenant_admin()
+        require_permission("tenant.payments.write")
         data = request.get_json(silent=True) or {}
         raw_amount = data.get("amount")
         amount = None

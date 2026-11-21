@@ -1,12 +1,12 @@
 # Azadexa (Orion Engine)
 
-Multi-tenant e-commerce SaaS — **Waves 0–12 complete** ✅ + **Admin shell hardened** ✅ (login/logout/profile/footer + 10 beta stores + tenant subdomain resolution).
+Multi-tenant e-commerce SaaS — **Waves 0–15 complete** ✅ + **Full-stack consistency audits (3 rounds)** ✅.
 
-**Current phase:** 13 — Frontend Deep Dive (مخطط له؛ آخر العمل المنفّذ فعلياً كان hardening الأمان AZ-0.10/0.11).
+**Current status:** production-ready technical core; remaining work is deployment/ops (secrets, TLS, merchant accounts, load test).
 **Repository:** [github.com/AbuAzad2025/Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
 
-> **أرقام مُتحقَّق منها من الكود (2026-11-19):** 112 صنف `db.Model`، 113 `create_table()` في
-> الهجرات، 43 سياسة RLS، 100 نقطة API، 42 blueprint، 68 ملف اختبار. الأرقام الأكبر الواردة
+> **أرقام مُتحقَّق منها من الكود (2026-11-21):** 112 صنف `db.Model`، 113 جدولاً في
+> الهجرات، 91 جدولاً محمياً بـ RLS، ~100 نقطة API، 532 اختباراً ناجحاً. الأرقام الأكبر الواردة
 > في `ORION-Project-Plan-Report.md` هي أهداف تخطيطية وليست حالة الكود. انظر
 > `PRODUCTION-READINESS-PLAN.md` و `ADR/0001-source-of-truth.md`.
 
@@ -20,7 +20,7 @@ Multi-tenant e-commerce SaaS — **Waves 0–12 complete** ✅ + **Admin shell h
 | Tests | `docker-compose.test.yml` | 5433 | `azadexa_test` |
 | Staging | `docker-compose.staging.yml` | 5000 / 9090 / 3000 | `azadexa_staging` |
 | Production | `docker-compose.prod.yml` | 5000 | `azadexa_prod` |
-| CI (GitHub Actions) | Postgres 16 service | 5432 | `azadexa_test` |
+| CI (GitHub Actions) | Postgres 15 service | 5432 | `orion_test_db` |
 
 ## Quick start (Windows — native PostgreSQL)
 
@@ -55,7 +55,7 @@ Health check: `GET http://127.0.0.1:5000/health`
 | Role | URL | Credentials | Notes |
 |------|-----|-------------|-------|
 | Platform admin | `/admin/login` | **يُنشأ يدوياً** — لا توجد كلمة مرور ثابتة في الكود | شغّل `python scripts/bootstrap_cli.py` وأدخل الإيميل/كلمة المرور (المسار الوحيد لأول أدمن). `setup-local` لا ينشئ أدمن منصة. |
-| Tenant admin (e.g. beta-ramallah) | `/admin/login` | `ramallah@beta.azadexa.com` / `BetaStore2026!` | Tenant slug: `beta-ramallah` — مُنشأ فعلياً في `scripts/seed_beta.py` |
+| Tenant admin (e.g. beta-ramallah) | `/admin/login` | بيانات الدخول تُطبعها `scripts/seed_beta.py` عند البذر (عشوائية، لا ثابتة) | Tenant slug: `beta-ramallah` |
 
 Logout and profile links are available in the sidebar on every admin page.
 

@@ -84,6 +84,43 @@ def _schema_diffs(connection, metadata) -> list[str]:
     return [str(diff) for diff in compare_metadata(context, metadata)]
 
 
+def _baseline_model_diffs(metadata) -> list[str]:
+    """Compare model tables/columns with the baseline migration's CREATE TABLEs.
+
+    Reading the actual migration file is what makes this a real gate: comparing
+    a metadata-built database back to the same metadata is always a no-op.
+    """
+    import re
+
+    baseline = ROOT / "migrations/versions/20261119_0001_baseline_tables.py"
+    if not baseline.exists():
+        return [f"baseline migration not found: {baseline}"]
+    text = baseline.read_text(encoding="utf-8")
+    created: dict[str, str] = {}
+    for table_name, ddl in re.findall(
+        r"CREATE TABLE (\w+) \((.*?)\\n\)", text, re.DOTALL
+    ):
+        created[table_name] = ddl
+
+    diffs: list[str] = []
+    for table_name, table in metadata.tables.items():
+        ddl = created.get(table_name)
+        if ddl is None:
+            diffs.append(f"table {table_name}: missing from baseline migration")
+            continue
+        for column in table.columns:
+            # Migration DDL has literal \t escapes, so use the type after the
+            # column name as the anchor instead of a word boundary.
+            if not re.search(
+                rf"{re.escape(column.name)}\s+(?:BIGSERIAL|SERIAL|BIGINT|SMALLINT|VARCHAR|CHAR|TEXT|NUMERIC|DECIMAL|BOOLEAN|UUID|INTEGER|DATE|TIMESTAMP|DATETIME|JSON)",
+                ddl,
+            ):
+                diffs.append(
+                    f"table {table_name}: column {column.name} missing from baseline"
+                )
+    return diffs
+
+
 def main() -> int:
     from sqlalchemy import inspect
 
@@ -120,9 +157,10 @@ def main() -> int:
                     )
             print()
 
-        print("--- Read-only model/schema comparison (no files written) ---")
-        with db.engine.connect() as connection:
-            diffs = _schema_diffs(connection, db.metadata)
+        print(
+            "--- Read-only model vs baseline migration comparison (no files written) ---"
+        )
+        diffs = _baseline_model_diffs(db.metadata)
         if diffs:
             issues.append(f"model/schema drift: {len(diffs)} change(s) detected")
             issues.extend(f"  {diff}" for diff in diffs)

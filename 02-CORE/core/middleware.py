@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from flask import Flask, current_app, g, redirect, request, session
+from flask import Flask, current_app, g, jsonify, redirect, request, session
 from flask_jwt_extended import get_jwt, get_jwt_identity, verify_jwt_in_request
 from sqlalchemy.orm import joinedload
 
@@ -52,6 +52,7 @@ def register_middleware(app: Flask) -> None:
                 claims = {}
             impersonation = claims.get("impersonation") if claims else None
             if impersonation:
+                g.impersonation_claims = impersonation
                 g.impersonator_user = db.session.get(
                     User, impersonation.get("impersonator_user_id")
                 )
@@ -59,6 +60,39 @@ def register_middleware(app: Flask) -> None:
 
         # Rebind after the user/role is known (platform-admin flag may change).
         bind_rls_context()
+
+        # A signed JWT alone is not proof that impersonation is still allowed:
+        # the session may have been ended/revoked/expired. Validate against
+        # the database on every request so a stolen token cannot outlive it.
+        if getattr(g, "impersonation_claims", None) and request.path not in (
+            "/api/v1/auth/login",
+            "/api/v1/auth/refresh",
+            "/admin/login",
+            # Session lifecycle endpoints must stay callable even when the
+            # current impersonation token is stale/expired.
+            "/api/v1/start",
+            "/api/v1/end",
+            "/api/v1/status",
+        ):
+            claim = g.impersonation_claims
+            try:
+                from impersonation.impersonation_service import ImpersonationService
+
+                tenant_id = claim.get("tenant_id") or getattr(g, "tenant_id", None)
+                if not tenant_id and g.user:
+                    tenant_id = getattr(g.user, "tenant_id", None)
+                if not tenant_id:
+                    raise AuthorizationError("Invalid impersonation context.")
+                ImpersonationService().validate_session(
+                    impersonator_user_id=int(claim["impersonator_user_id"]),
+                    target_user_id=int(claim["target_user_id"]),
+                    tenant_id=int(tenant_id),
+                )
+            except Exception:
+                return (
+                    jsonify({"error": "Impersonation session is no longer valid."}),
+                    401,
+                )
 
         _resolve_request_locale()
 

@@ -42,13 +42,13 @@ HTTP Request
 
 | المجلد | الدور | حجم مُقاس |
 |---|---|---|
-| `02-CORE/core` | أمان، JWT، CSRF، RLS middleware، rate limit، مراقبة، تسجيل، crypto | 23 ملفًا |
-| `02-CORE/orion` | app factory، config، extensions، celery، wsgi | 5 ملفات |
+| `02-CORE/core` | أمان، JWT، CSRF، RLS middleware، rate limit، مراقبة، تسجيل، crypto | 21 ملفًا |
+| `02-CORE/orion` | app factory، config، extensions، celery، wsgi | 6 ملفات |
 | `03-MODELS` | 112 صنف `db.Model` | 99 ملفًا |
-| `04-SERVICES` | منطق الأعمال (93 ملفًا) | auth/tenant/catalog/order/payment/… |
-| `05-API` | ~100 نقطة API عبر 42 blueprint | 47 ملفًا |
-| `06-STOREFRONT` | 10 قوالب + 6 JS + ثيم | متجر العميل |
-| `07-ADMIN` | 40 قالبًا + 24 JS | لوحتا المستأجر والمنصة |
+| `04-SERVICES` | منطق الأعمال (96 ملفًا) | auth/tenant/catalog/order/payment/… |
+| `05-API` | ~100 نقطة API عبر blueprint | 50 ملفًا |
+| `06-STOREFRONT` | 13 قالبًا + JS + ثيم | متجر العميل |
+| `07-ADMIN` | 45 قالبًا + 27 JS | لوحتا المستأجر والمنصة |
 | `migrations/versions` | 3 هجرات baseline | جداول/فهارس/RLS |
 
 قاعدة البيانات: **113 جدولاً** بعد التهجير (منها `alembic_version`)، و**91 جدولاً**
@@ -211,7 +211,7 @@ HTTP Request
 
 ## 10. الجودة والاختبارات
 
-- **529 اختباراً** على PostgreSQL حقيقي (لا SQLite في CI) + 4 اختبارات E2E، تغطية ≥85% مفروضة.
+- **532 اختباراً** على PostgreSQL حقيقي (وظيفة E2E تستخدم SQLite معزولاً) + 4 اختبارات E2E، تغطية ≥85% مفروضة.
 - **pre-commit/CI**: black، isort، flake8، YAML، طول الملفات، pip-audit، Bandit،
   gitleaks، تدقيق RLS، تدقيق schema/FK، تدقيق a11y/RTL، تدقيق مراجع API/الواجهة،
   تدقيق تباين الألوان.

@@ -7,6 +7,8 @@ from flask_jwt_extended import jwt_required
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin, require_tenant_context
+from core.permissions import require_permission
+from core.rate_limit import limiter
 from order_svc.order_service import OrderService
 from returns.merchandise_return import ReturnItem
 from rma_svc.rma_service import RmaService
@@ -107,9 +109,11 @@ def list_returns():
 
 
 @returns_bp.put("/<int:return_id>/approve")
+@limiter.limit("10 per minute")
 def approve_return(return_id: int):
     try:
         require_tenant_admin()
+        require_permission("tenant.returns.write")
         row = _rma.approve_return(
             tenant_id=g.tenant_id,
             return_id=return_id,
@@ -121,9 +125,11 @@ def approve_return(return_id: int):
 
 
 @returns_bp.post("/<int:return_id>/complete")
+@limiter.limit("10 per minute")
 def complete_return(return_id: int):
     try:
         require_tenant_admin()
+        require_permission("tenant.returns.write")
         result = _rma.complete_return(tenant_id=g.tenant_id, return_id=return_id)
         return jsonify(result), 200
     except OrionError as exc:

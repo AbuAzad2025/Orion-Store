@@ -136,6 +136,12 @@ def bnpl_webhook(provider: str, tenant_id: int):
         return jsonify({"error": exc.message}), exc.status_code
 
 
+@webhooks_bp.post("/palpay/<int:tenant_id>")
+def palpay_webhook(tenant_id: int):
+    """PalPay uses the same HMAC + status contract as the BNPL gateways."""
+    return bnpl_webhook("palpay", tenant_id)
+
+
 @webhooks_bp.post("/app/<int:tenant_id>/<event_type>")
 def app_webhook(tenant_id: int, event_type: str):
     """App-platform webhook dispatcher.

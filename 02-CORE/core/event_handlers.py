@@ -42,20 +42,31 @@ def _on_payment_refunded(
     # A refund reverses the commission booked for the original payment.
     # payment_service publishes refund_id (not payment_id), so resolve the
     # payment from the refund row and delegate to the tenant-scoped API.
+    is_full_refund = False
     if refund_id:
+        from decimal import Decimal
+
+        from payment.payment import Payment
         from payment.refund import Refund
         from platform_svc.commission_service import CommissionService
 
         refund = Refund.query.filter_by(id=refund_id, tenant_id=tenant_id).first()
         if refund:
             CommissionService().reverse_for_payment(tenant_id, refund.payment_id)
+            payment = Payment.query.filter_by(
+                id=refund.payment_id, tenant_id=tenant_id
+            ).first()
+            total = Decimal(str(payment.amount)) if payment else Decimal("0")
+            is_full_refund = bool(total and Decimal(str(refund.amount)) >= total)
     if not order_id:
         return
     order = Order.query.filter_by(id=order_id, tenant_id=tenant_id).first()
     if not order:
         return
-    order.payment_status = "refunded"
-    db.session.commit()
+    # A partial refund must not move the whole order out of the paid counter.
+    if is_full_refund:
+        order.payment_status = "refunded"
+        db.session.commit()
 
 
 # ---------------------------------------------------------------------------

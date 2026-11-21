@@ -64,6 +64,7 @@ class DraftOrder(db.Model, TimestampMixin):
             "id": self.id,
             "draft_number": self.draft_number,
             "customer_email": self.customer_email,
+            "notes": self.notes,
             "status": self.status,
             "subtotal": str(self.subtotal),
             "tax_amount": str(self.tax_amount),

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import uuid
 
-from catalog.brand import Brand
 from flask import Blueprint, g, jsonify, request
 
+from catalog.brand import Brand
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
 from orion.extensions import db
@@ -18,11 +18,7 @@ brands_bp = Blueprint("brands", __name__)
 def list_brands():
     try:
         require_tenant_admin()
-        brands = (
-            Brand.query.filter_by(tenant_id=g.tenant_id)
-            .order_by(Brand.name)
-            .all()
-        )
+        brands = Brand.query.filter_by(tenant_id=g.tenant_id).order_by(Brand.name).all()
         return jsonify({"brands": [b.to_dict() for b in brands]}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

@@ -12,4 +12,12 @@ class ThemeEngine:
         # Routes pass `locale` explicitly; keep a request-scoped fallback so a
         # future template render can never lose the html lang/dir wiring.
         context.setdefault("locale", get_locale())
+        if "cookie_settings" not in context:
+            tenant = context.get("tenant")
+            if tenant is not None:
+                from compliance.compliance import CookieConsentSetting
+
+                context["cookie_settings"] = CookieConsentSetting.query.filter_by(
+                    tenant_id=tenant.id
+                ).first()
         return render_template(template_name, **context)

@@ -41,7 +41,12 @@ class TenantService:
         slug: str,
         email: str,
         domain: str | None = None,
+        status: str | None = None,
     ) -> Tenant:
+        if status is not None:
+            allowed = {s.value for s in TenantStatus}
+            if status not in allowed:
+                raise ValidationError("Invalid tenant status.")
         if Tenant.query.filter_by(slug=slug).first():
             raise ValidationError("Slug already exists.")
         tenant = Tenant(
@@ -49,7 +54,7 @@ class TenantService:
             slug=slug,
             email=email,
             domain=domain or slug,
-            status=TenantStatus.TRIAL.value,
+            status=status or TenantStatus.TRIAL.value,
         )
         tenant.config = TenantConfig(business_name=name)
         db.session.add(tenant)

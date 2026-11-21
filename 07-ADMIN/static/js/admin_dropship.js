@@ -39,7 +39,7 @@ const OrionAdminDropship = {
     if (!el) return;
     try {
       const data = await OrionAPI.get("/dropship/orders");
-      const rows = data.dropship_orders || [];
+      const rows = data.orders || data.dropship_orders || [];
       if (!rows.length) { el.textContent = "لا توجد طلبات."; return; }
       SafeDOM.clear(el);
       for (const o of rows) {

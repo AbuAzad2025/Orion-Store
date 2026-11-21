@@ -78,6 +78,7 @@ services:
     command: celery -A orion.celery_app.celery_app worker --loglevel=info
     environment:
       FLASK_ENV: production
+      RUN_MIGRATIONS: "false"
       DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD}@postgres:5432/azadexa_prod
       MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD}@postgres:5432/azadexa_prod
       REDIS_URL: redis://redis:6379/0
@@ -101,6 +102,8 @@ services:
     command: celery -A orion.celery_app.celery_app beat --loglevel=info
     environment:
       FLASK_ENV: production
+      RUN_MIGRATIONS: "false"
+      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD}@postgres:5432/azadexa_prod
       DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD}@postgres:5432/azadexa_prod
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1

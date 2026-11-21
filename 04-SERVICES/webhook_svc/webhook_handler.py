@@ -18,6 +18,7 @@ Design constraints
 from __future__ import annotations
 
 import uuid
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from core.events import publish
@@ -100,6 +101,35 @@ def _provider_ids(payload: dict[str, Any]) -> list[str]:
     return found
 
 
+def _refund_amount(payload: dict[str, Any], provider: str) -> Decimal | None:
+    """Extract the amount the provider says it already refunded."""
+    for source in _objects(payload) + _blocks(payload):
+        if provider == "stripe":
+            value = source.get("amount_refunded")
+            if value is not None:  # Stripe reports minor units (cents).
+                return Decimal(str(value)) / 100
+        nested = _as_dict(source.get("amount"))
+        if nested.get("value") is not None:  # PayPal money object.
+            return Decimal(str(nested["value"]))
+        for key in ("refund_amount", "refunded_amount", "total_refunded"):
+            value = source.get(key)
+            if value is not None:
+                return Decimal(str(value))
+    return None
+
+
+def _provider_refund_id(payload: dict[str, Any]) -> str | None:
+    for source in _objects(payload) + _blocks(payload):
+        for key in ("provider_refund_id", "refund_id"):
+            value = source.get(key)
+            if value:
+                return str(value)
+        refund = _as_dict(source.get("refund"))
+        if refund.get("id"):
+            return str(refund["id"])
+    return None
+
+
 class WebhookEffectHandler:
     """Apply the money movement described by an already-verified webhook."""
 
@@ -151,11 +181,20 @@ class WebhookEffectHandler:
         if payment is None:
             return {"processed": False, "reason": "no_completed_payment"}
 
-        # Public PaymentService API: creates the Refund row, the outbound
-        # financial event and the commission reversal (via domain event).
-        result = PaymentService().refund(
+        # The provider has ALREADY refunded. Calling PaymentService.refund()
+        # here would fire a second, real refund at the gateway. Record the
+        # external refund instead (ledger, negative event, commission reversal).
+        amount = _refund_amount(payload, provider)
+        try:
+            if amount is not None and amount <= 0:
+                amount = None
+        except (InvalidOperation, ValueError, TypeError):
+            amount = None
+        result = PaymentService().record_external_refund(
             tenant_id=tenant_id,
             payment_public_id=str(payment.public_id),
+            amount=amount,
+            provider_refund_id=_provider_refund_id(payload),
             reason=f"{provider} webhook refund",
         )
         return {
@@ -252,9 +291,22 @@ class WebhookEffectHandler:
             id=payment.order_id, tenant_id=tenant_id
         ).first()
         marked_paid = False
+        invoice = None
         if order_row is not None and order_row.payment_status != "paid":
-            self._orders.mark_paid(order_row)
+            order_row = self._orders.mark_paid(order_row)
             marked_paid = True
+            # Payments confirmed asynchronously must get the same invoice as
+            # synchronous ones (PDF + object storage), never silently skip it.
+            from platform_models.invoice import Invoice
+            from platform_svc.document_renderer import DocumentRenderer
+
+            invoice = Invoice.query.filter_by(
+                tenant_id=tenant_id, order_id=order_row.id
+            ).first()
+            if invoice is None:
+                invoice = DocumentRenderer().generate_invoice(
+                    order=order_row, payment=payment, financial_event=event
+                )
             publish("order.paid", order_id=order_row.id, tenant_id=tenant_id)
 
         db.session.commit()
@@ -264,4 +316,5 @@ class WebhookEffectHandler:
             "financial_event": event.to_dict(),
             "commission_ledger_id": ledger.id if ledger else None,
             "order_marked_paid": marked_paid,
+            "invoice": invoice.to_dict() if invoice else None,
         }

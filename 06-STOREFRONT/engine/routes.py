@@ -61,9 +61,12 @@ def store_index():
 
     locale = get_locale()
     products = _products.list_published(tenant.id)
+    # Sort the MODEL list once; the translated list is derived in the same order
+    # so index.html can safely pair them by loop index (slug/image/cart-id come
+    # from the model, display strings from the merged dict).
+    products.sort(key=lambda p: (not p.is_featured, p.name or ""))
     ts = TranslationService()
     products_i18n = [ts.merge_product(p, locale) for p in products]
-    products_i18n.sort(key=lambda p: (not p.get("is_featured"), p.get("name") or ""))
     return _engine.render(
         "index.html",
         tenant=tenant,
@@ -108,6 +111,8 @@ def store_category(slug: str):
     products = [
         p for p in _products.list_published(tenant.id) if p.category_id == category.id
     ]
+    # Keep the two lists index-aligned — see store_index.
+    products.sort(key=lambda p: (not p.is_featured, p.name or ""))
     products_i18n = [ts.merge_product(p, locale) for p in products]
     return _engine.render(
         "category.html",

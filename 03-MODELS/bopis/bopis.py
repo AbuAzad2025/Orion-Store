@@ -50,6 +50,7 @@ class PickupLocation(db.Model, TimestampMixin):
             "id": self.id,
             "code": self.code,
             "name": self.name,
+            "warehouse_id": self.warehouse_id,
             "address": self.address,
             "phone": self.phone,
             "is_active": self.is_active,

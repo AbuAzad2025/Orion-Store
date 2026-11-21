@@ -61,7 +61,9 @@ def refresh():
     claims = get_jwt()
     additional = {
         key: claims[key]
-        for key in ("is_superuser", "tenant_id", "impersonation")
+        # Never carry an impersonation grant into a refreshed token: the
+        # session is validated per request and may have been revoked.
+        for key in ("is_superuser", "tenant_id")
         if key in claims
     }
     token = create_access_token(identity=identity, additional_claims=additional)

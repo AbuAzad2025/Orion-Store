@@ -65,13 +65,16 @@ class DraftOrderService:
         return item
 
     def convert_to_order(
-        self, *, tenant_id: int, draft_id: int, customer_email: str
+        self, *, tenant_id: int, draft_id: int, customer_email: str | None = None
     ) -> Order:
         draft = DraftOrder.query.filter_by(id=draft_id, tenant_id=tenant_id).first()
         if not draft:
             raise NotFoundError("Draft order not found.")
         if draft.status == "converted":
             raise ValidationError("Draft already converted.")
+        customer_email = customer_email or draft.customer_email
+        if not customer_email:
+            raise ValidationError("Customer email is required to convert a draft.")
         items = DraftOrderItem.query.filter_by(draft_order_id=draft.id).all()
         if not items:
             raise ValidationError("Draft has no items.")

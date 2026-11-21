@@ -45,8 +45,15 @@ class TaxJurisdiction(db.Model, TimestampMixin):
             "code": self.code,
             "name": self.name,
             "country_code": self.country_code,
+            "country": self.country_code,
             "region": self.region,
             "is_active": self.is_active,
+            "rates": [
+                r.to_dict()
+                for r in TaxRate.query.filter_by(
+                    tenant_id=self.tenant_id, jurisdiction_id=self.id
+                ).all()
+            ],
         }
 
 

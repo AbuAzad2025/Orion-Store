@@ -1020,8 +1020,8 @@ GATEWAY_RESPONSE_DENYLIST = ("webhook_secret", "credentials_encrypted")
 | المكون | الملفات الرئيسية | الحالة | طريقة الوصول |
 |--------|------------------|--------|--------------|
 | **10 متاجر beta** | `seed_beta.py`, `tenant_service.py` | ✅ | `http://beta-*.local.azadexa:5000/` |
-| **Platform Admin** | `07-ADMIN/platform_admin/`, `admin_auth.py` | ✅ | `/admin/login` → `admin@azadexa.com` / `Admin2026!` |
-| **Tenant Admin** | `07-ADMIN/tenant_admin/`, `admin_auth.py` | ✅ | `/admin/login` + slug `beta-ramallah` → `ramallah@beta.azadexa.com` / `BetaStore2026!` |
+| **Platform Admin** | `07-ADMIN/platform_admin/`, `admin_auth.py` | ✅ | `/admin/login` — يُنشأ عبر `python scripts/bootstrap_cli.py` (لا كلمة مرور ثابتة) |
+| **Tenant Admin** | `07-ADMIN/tenant_admin/`, `admin_auth.py` | ✅ | `/admin/login` + slug `beta-ramallah` — بيانات الدخول تُولَّد عشوائياً في `scripts/seed_beta.py` |
 | **Admin Dashboard** | `platform_dashboard.html`, `admin_platform.js` | ✅ | إحصائيات حقيقية: tenants, users, active counts |
 | **إدارة المتاجر** | `platform_tenants.html`, `tenants.py` | ✅ | list / create / update / delete |
 | **إدارة المستخدمين** | `platform_users.html`, `users.py` | ✅ | list / create tenant admin / platform admin |

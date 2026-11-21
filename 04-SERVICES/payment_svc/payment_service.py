@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from decimal import Decimal, InvalidOperation
 from types import SimpleNamespace
 
@@ -203,6 +204,11 @@ class PaymentService:
             "uncertain": False,
         }
 
+    def record_external_refund(self, **kwargs) -> dict:
+        from payment_svc.external_refund_service import record_external_refund
+
+        return record_external_refund(**kwargs)
+
     def _validate_payment_request(self, order: Order) -> None:
         if order.payment_status == "paid":
             raise ValidationError("Order already paid.")
@@ -288,25 +294,14 @@ class PaymentService:
                 "provider_refund_id": f"cod_refund_{payment.id}",
                 "uncertain": False,
             }
-        if provider == "stripe":
+        gateway_fn = {
+            "stripe": refund_stripe,
+            "paypal": refund_paypal,
+            "palpay": refund_palpay,
+        }.get(provider)
+        if gateway_fn is not None:
             gateway = self._refund_gateway(tenant_id, provider)
-            return refund_stripe(
-                payment=payment,
-                gateway=gateway,
-                amount=amount,
-                currency=payment.currency,
-            )
-        if provider == "paypal":
-            gateway = self._refund_gateway(tenant_id, provider)
-            return refund_paypal(
-                payment=payment,
-                gateway=gateway,
-                amount=amount,
-                currency=payment.currency,
-            )
-        if provider == "palpay":
-            gateway = self._refund_gateway(tenant_id, provider)
-            return refund_palpay(
+            return gateway_fn(
                 payment=payment,
                 gateway=gateway,
                 amount=amount,

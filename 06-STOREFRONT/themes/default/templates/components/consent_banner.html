@@ -1,0 +1,33 @@
+{% set banner_settings = cookie_settings|default(None) %}
+{% if banner_settings and banner_settings.is_active %}
+<aside id="orion-consent-banner" class="fixed bottom-0 inset-x-0 z-50 bg-slate-900 text-white px-4 py-3 text-sm hidden"
+       data-tenant-id="{{ tenant.slug }}" role="region" aria-label="ملفات تعريف الارتباط">
+  <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <p class="flex-1">{{ banner_settings.banner_message or 'نستخدم ملفات تعريف الارتباط لتحسين تجربة التصفح.' }}</p>
+    <div class="flex gap-2">
+      <button type="button" id="orion-consent-accept" class="orion-btn orion-btn-gold text-xs">قبول الكل</button>
+      <button type="button" id="orion-consent-necessary" class="orion-btn text-xs">الضرورية فقط</button>
+    </div>
+  </div>
+</aside>
+<script>
+(function () {
+  var banner = document.getElementById("orion-consent-banner");
+  if (!banner) return;
+  var stored = null;
+  try { stored = localStorage.getItem("orion_cookie_consent"); } catch (e) { /* disabled */ }
+  if (!stored) { banner.classList.remove("hidden"); }
+  function save(choice) {
+    try { localStorage.setItem("orion_cookie_consent", choice); } catch (e) { /* disabled */ }
+    banner.classList.add("hidden");
+    fetch("/api/v1/compliance/consent/public", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Tenant-ID": banner.dataset.tenantId || "" },
+      body: JSON.stringify({ choice: choice })
+    }).catch(function () { /* best effort */ });
+  }
+  document.getElementById("orion-consent-accept")?.addEventListener("click", function () { save("all"); });
+  document.getElementById("orion-consent-necessary")?.addEventListener("click", function () { save("necessary"); });
+})();
+</script>
+{% endif %}

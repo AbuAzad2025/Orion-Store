@@ -186,7 +186,7 @@ const OrionTenantOps = {
         const fd = new FormData(form);
         await OrionAPI.post("/tax/jurisdictions", {
           name: fd.get("name"), code: fd.get("code"),
-          country: fd.get("country"), region: fd.get("region") || undefined,
+          country_code: fd.get("country"), region: fd.get("region") || undefined,
         });
         form.reset();
         OrionTenantOps.loadTaxJurisdictions();
@@ -221,6 +221,7 @@ const OrionTenantOps = {
         await OrionAPI.post("/bopis/locations", {
           code: fd.get("code") || String(fd.get("name") || "").trim().toLowerCase().replace(/\s+/g, "-"),
           name: fd.get("name"), address: { text: fd.get("address") },
+          phone: fd.get("phone") || undefined,
         });
         form.reset();
         OrionTenantOps.loadBopisLocations();
@@ -240,7 +241,7 @@ const OrionTenantOps = {
       for (const b of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           SafeDOM.elem("strong", null, [b.name]),
-          ` (${b.code}) — خصم ${b.discount_percent}%`
+          ` (${b.slug}) — ${b.bundle_price} ${b.currency || ""}`
         ]));
       }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
@@ -253,8 +254,8 @@ const OrionTenantOps = {
         e.preventDefault();
         const fd = new FormData(form);
         await OrionAPI.post("/bundles", {
-          name: fd.get("name"), code: fd.get("code"),
-          discount_percent: String(fd.get("discount_percent") || "0"),
+          name: fd.get("name"), slug: fd.get("slug"),
+          bundle_price: String(fd.get("bundle_price") || "0"),
         });
         form.reset();
         OrionTenantOps.loadBundles();

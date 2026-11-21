@@ -29,6 +29,9 @@ from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
 from payment_svc.payment_service import PaymentService
 from tenant_gateway_svc.gateway_service import GatewayService
+from v1.order_access import is_order_owner as _order_owner
+from v1.order_access import order_access_token as _order_access_token
+from v1.order_access import public_order_payload as _order_public_payload
 from v1.store_whatsapp import cart_items_with_names, register_store_whatsapp_routes
 
 storefront_bp = Blueprint("storefront", __name__)
@@ -210,7 +213,15 @@ def checkout():
             voucher_code=data.get("voucher_code"),
             use_store_credit=bool(data.get("use_store_credit", False)),
         )
-        return jsonify({"order": order.to_dict()}), 201
+        return (
+            jsonify(
+                {
+                    "order": order.to_dict(),
+                    "order_access_token": _order_access_token(order),
+                }
+            ),
+            201,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
     except KeyError:
@@ -232,6 +243,10 @@ def list_payment_methods():
 def pay_order(public_id: str):
     try:
         tenant = require_tenant_context()
+        order = _orders.get_by_public_id(tenant.id, public_id)
+        user = getattr(g, "user", None)
+        if user is not None and not _order_owner(order):
+            raise AuthorizationError("Permission denied.")
         data = request.get_json(silent=True) or {}
         result = _payments.pay_order(
             tenant_id=tenant.id,
@@ -248,7 +263,7 @@ def get_order(public_id: str):
     try:
         tenant = require_tenant_context()
         order = _orders.get_by_public_id(tenant.id, public_id)
-        return jsonify({"order": order.to_dict()}), 200
+        return jsonify({"order": _order_public_payload(order)}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

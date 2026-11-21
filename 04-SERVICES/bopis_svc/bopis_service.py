@@ -15,6 +15,7 @@ class BopisService:
         name: str,
         address: dict,
         warehouse_id: int | None = None,
+        phone: str | None = None,
     ) -> PickupLocation:
         loc = PickupLocation(
             tenant_id=tenant_id,
@@ -22,6 +23,7 @@ class BopisService:
             name=name,
             address=address,
             warehouse_id=warehouse_id,
+            phone=phone,
         )
         db.session.add(loc)
         db.session.commit()

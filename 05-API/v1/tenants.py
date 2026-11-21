@@ -45,6 +45,7 @@ def create_tenant():
             slug=data["slug"],
             email=data["email"],
             domain=data.get("domain"),
+            status=data.get("status"),
         )
         if data.get("admin_email") and data.get("admin_password"):
             _auth.register_tenant_user(

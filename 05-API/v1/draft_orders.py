@@ -63,7 +63,7 @@ def convert(draft_id: int):
         order = _svc.convert_to_order(
             tenant_id=g.tenant_id,
             draft_id=draft_id,
-            customer_email=data["customer_email"],
+            customer_email=data.get("customer_email"),
         )
         return jsonify({"order": order.to_dict()}), 201
     except OrionError as exc:

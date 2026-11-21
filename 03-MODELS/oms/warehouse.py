@@ -40,6 +40,7 @@ class Warehouse(db.Model, TimestampMixin):
             "is_active": self.is_active,
             "is_pickup_location": self.is_pickup_location,
             "priority": self.priority,
+            "is_default": self.priority >= 10,
         }
 
 

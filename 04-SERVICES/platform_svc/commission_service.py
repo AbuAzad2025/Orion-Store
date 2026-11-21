@@ -64,6 +64,7 @@ class CommissionService:
         """Reverse the commission booked for ``payment_id`` (tenant-scoped).
 
         Intended entry point for the ``payment.refunded`` domain event handler.
+        Partial refunds reverse only the proportional share of commission.
         """
         payment = Payment.query.filter_by(id=payment_id, tenant_id=tenant_id).first()
         if not payment:
@@ -79,7 +80,11 @@ class CommissionService:
         if not event:
             return None
         original = self._find_original(tenant_id, payment_id)
-        return self._create_reversal(original=original, event=event)
+        total = Decimal(str(payment.amount))
+        ratio = (Decimal(str(refund.amount)) / total) if total else Decimal("1")
+        if ratio > 1:
+            ratio = Decimal("1")
+        return self._create_reversal(original=original, event=event, ratio=ratio)
 
     def _original_ledger_for_event(
         self, event: FinancialEvent
@@ -117,17 +122,28 @@ class CommissionService:
         ).first()
 
     def _create_reversal(
-        self, original: PlatformCommissionLedger, event: FinancialEvent
+        self,
+        original: PlatformCommissionLedger,
+        event: FinancialEvent,
+        ratio: Decimal = Decimal("1"),
     ) -> PlatformCommissionLedger | None:
         if original is None:
             return None
-        # Idempotency: one reversal per original entry, regardless of which
-        # entry point (reverse or reverse_for_payment) was used.
-        existing = PlatformCommissionLedger.query.filter_by(
-            tenant_id=original.tenant_id,
-            reverses_ledger_id=original.id,
-            entry_type=REVERSAL_ENTRY_TYPE,
-        ).first()
+        # A full refund reverses the original entry once. Partial refunds are
+        # keyed by their own (unique) financial event, so several partial
+        # reversals can coexist without duplicating any single refund.
+        if ratio >= Decimal("1"):
+            existing = PlatformCommissionLedger.query.filter_by(
+                tenant_id=original.tenant_id,
+                reverses_ledger_id=original.id,
+                entry_type=REVERSAL_ENTRY_TYPE,
+            ).first()
+        else:
+            existing = PlatformCommissionLedger.query.filter_by(
+                tenant_id=original.tenant_id,
+                financial_event_id=event.id,
+                entry_type=REVERSAL_ENTRY_TYPE,
+            ).first()
         if existing:
             return existing
 
@@ -138,7 +154,7 @@ class CommissionService:
                 tenant_id=original.tenant_id,
                 direction="outbound",
                 event_type="commission.reversal",
-                amount=-abs(original.gross_amount),
+                amount=-(abs(original.gross_amount) * ratio).quantize(Decimal("0.01")),
                 currency=original.currency,
                 source_entity="commission_ledger",
                 source_id=original.id,
@@ -158,9 +174,13 @@ class CommissionService:
             entry_type=REVERSAL_ENTRY_TYPE,
             payment_id=original.payment_id,
             order_id=original.order_id,
-            gross_amount=-abs(original.gross_amount),
+            gross_amount=-(abs(original.gross_amount) * ratio).quantize(
+                Decimal("0.01")
+            ),
             commission_percent=original.commission_percent,
-            commission_amount=-abs(original.commission_amount),
+            commission_amount=-(abs(original.commission_amount) * ratio).quantize(
+                Decimal("0.01")
+            ),
             currency=original.currency,
             status="settled",
             notes=(

@@ -15,6 +15,7 @@
     {% block content %}{% endblock %}
   </main>
   {% include "components/footer.html" %}
+  {% include "components/consent_banner.html" %}
   <script src="{{ url_for('storefront_assets.static', filename='js/store_utils.js') }}"></script>
   <script src="{{ url_for('storefront_assets.static', filename='js/store_api.js') }}"></script>
   <script src="{{ url_for('storefront_assets.static', filename='js/lazy_load.js') }}" defer></script>
