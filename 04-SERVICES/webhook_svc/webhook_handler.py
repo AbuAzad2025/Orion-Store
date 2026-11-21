@@ -167,9 +167,7 @@ class WebhookEffectHandler:
 
     # -- internals -----------------------------------------------------------
 
-    def _resolve_order(
-        self, tenant_id: int, payload: dict[str, Any]
-    ) -> Order | None:
+    def _resolve_order(self, tenant_id: int, payload: dict[str, Any]) -> Order | None:
         for candidate in _values(payload, _ORDER_KEYS):
             try:
                 return self._orders.get_by_public_id(tenant_id, candidate)

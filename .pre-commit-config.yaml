@@ -54,3 +54,5 @@ repos:
         entry: python scripts/audit_contrast.py --check
         language: system
         pass_filenames: false
+      # audit_schema.py needs a live migrated PostgreSQL URL; see docs/RUNBOOK.md.
+      # It runs in CI (ci.yml) against the Postgres service instead.

@@ -82,7 +82,7 @@ def _post_stripe(
     payload: dict,
     *,
     secret: str = WEBHOOK_SECRET,
-) :
+):
     raw = json.dumps(payload, separators=(",", ":")).encode("utf-8")
     return client.post(
         f"/webhooks/stripe/{tenant_id}",
@@ -148,7 +148,9 @@ def test_signed_webhook_updates_order_and_creates_financial_event(
     assert before["payment_status"] == "pending"
     assert before["order_payment_status"] == "pending"
 
-    response = _post_stripe(client, pending_order["tenant_id"], _success_payload(pending_order))
+    response = _post_stripe(
+        client, pending_order["tenant_id"], _success_payload(pending_order)
+    )
 
     assert response.status_code == 200
     body = response.get_json()
@@ -161,7 +163,10 @@ def test_signed_webhook_updates_order_and_creates_financial_event(
     assert after["order_payment_status"] == "paid"
     assert after["order_status"] == "paid"
     assert len(after["events"]) == len(before["events"]) + 1
-    assert any(e[1] == "inbound" and e[2] == "stripe.payment_succeeded" for e in after["events"])
+    assert any(
+        e[1] == "inbound" and e[2] == "stripe.payment_succeeded"
+        for e in after["events"]
+    )
 
 
 def test_duplicate_webhook_does_not_repeat_effect(client, app, pending_order):
@@ -252,7 +257,9 @@ def test_bnpl_capture_webhook_updates_order(client, app, pending_order):
 
 
 def test_refund_webhook_reverses_payment(client, app, pending_order):
-    capture = _post_stripe(client, pending_order["tenant_id"], _success_payload(pending_order))
+    capture = _post_stripe(
+        client, pending_order["tenant_id"], _success_payload(pending_order)
+    )
     assert capture.get_json()["effect"]["processed"] is True
 
     refund_payload = {

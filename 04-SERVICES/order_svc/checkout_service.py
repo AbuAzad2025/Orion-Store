@@ -211,6 +211,18 @@ class CheckoutService:
                 )
             )
         db.session.commit()
+        # Publish the domain event so workflow and fraud subscribers (registered
+        # in core.event_handlers) actually run in production — the OrderEvent row
+        # above is an audit record, not an event-bus dispatch.
+        from core.events import publish
+
+        publish(
+            "order.created",
+            order_id=order.id,
+            tenant_id=cart.tenant_id,
+            customer_email=order.customer_email,
+            total=str(order.total),
+        )
         invalidate_tenant_catalog(cart.tenant_id)
         # Keep warehouse stock aligned with the saleable stock we just reduced.
         try:

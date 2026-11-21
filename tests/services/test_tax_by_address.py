@@ -6,13 +6,13 @@ from decimal import Decimal
 
 import pytest
 from support.http import tenant_headers
+from tax_svc.tax_service import TaxService
 
 from catalog_svc.product_service import ProductService
 from order.order import Order
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from platform_svc.platform_settings_service import PlatformSettingsService
-from tax_svc.tax_service import TaxService
 from tenant_svc.tenant_service import TenantService
 
 

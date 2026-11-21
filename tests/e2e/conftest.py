@@ -52,7 +52,9 @@ def browser_page(request: pytest.FixtureRequest) -> Generator[Page, None, None]:
         try:
             yield page
             SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
-            page.screenshot(path=str(SCREENSHOT_DIR / f"{request.node.name}.png"), full_page=True)
+            page.screenshot(
+                path=str(SCREENSHOT_DIR / f"{request.node.name}.png"), full_page=True
+            )
             assert not js_errors, f"Browser JS errors: {js_errors}"
         finally:
             browser.close()

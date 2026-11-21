@@ -20,10 +20,14 @@ def cart_items_with_names(carts, cart) -> list[dict]:
         names = dict(
             Product.query.filter(
                 Product.tenant_id == cart.tenant_id, Product.id.in_(ids)
-            ).with_entities(Product.id, Product.name).all()
+            )
+            .with_entities(Product.id, Product.name)
+            .all()
         )
         for item in items:
-            item["product_name"] = names.get(item["product_id"], str(item["product_id"]))
+            item["product_name"] = names.get(
+                item["product_id"], str(item["product_id"])
+            )
     return items
 
 
@@ -49,7 +53,9 @@ def register_store_whatsapp_routes(bp, carts) -> None:
                 notes=str(data.get("notes", "")),
             )
             return (
-                jsonify({"message": message, "url": whatsapp_url(tenant.phone, message)}),
+                jsonify(
+                    {"message": message, "url": whatsapp_url(tenant.phone, message)}
+                ),
                 200,
             )
         except OrionError as exc:

@@ -139,7 +139,9 @@ def test_dns_failure_does_not_leave_half_created_tenant(app, monkeypatch, caplog
     monkeypatch.setattr(
         tenant_service_module.logger,
         "warning",
-        lambda message, *args: warnings.append(str(message) % args if args else str(message)),
+        lambda message, *args: warnings.append(
+            str(message) % args if args else str(message)
+        ),
     )
 
     from platform_models.audit_log import AuditLog

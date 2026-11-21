@@ -9,9 +9,16 @@ const OrionAdminWorkflows = {
       if (!rows.length) { el.textContent = "لا توجد تعريفات."; return; }
       SafeDOM.clear(el);
       for (const d of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          SafeDOM.elem("strong", {}, [d.name]),
-          " — ", d.trigger_event
+        const runBtn = SafeDOM.actionBtn("تشغيل", "orion-btn", async () => {
+          try {
+            await OrionAPI.post(`/workflow/definitions/${d.id}/run`);
+            OrionUI.toast("تم تشغيل سير العمل", "success");
+            OrionAdminWorkflows.loadRuns();
+          } catch (err) { OrionUI.toast(err.message, "error"); }
+        });
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex items-center justify-between" }, [
+          SafeDOM.elem("span", {}, [SafeDOM.elem("strong", {}, [d.name]), " — ", d.trigger_event]),
+          runBtn
         ]));
       }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }

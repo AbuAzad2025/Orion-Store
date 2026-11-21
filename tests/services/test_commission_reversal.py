@@ -6,9 +6,9 @@ from decimal import Decimal
 
 from catalog_svc.product_service import ProductService
 from core.events import publish
-from orion.extensions import db
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
+from orion.extensions import db
 from payment.payment import Payment
 from payment.refund import Refund
 from platform_models.commission_ledger import PlatformCommissionLedger
@@ -182,6 +182,8 @@ def test_reconciliation_settles_only_one_tenant(app):
     assert PlatformCommissionLedger.query.get(ledger_b.id).status == "pending"
 
     # Per-tenant result is recorded on the ledger note and via get_status.
-    assert "matched tenant=" in (PlatformCommissionLedger.query.get(ledger_a.id).notes or "")
+    assert "matched tenant=" in (
+        PlatformCommissionLedger.query.get(ledger_a.id).notes or ""
+    )
     status = ReconciliationService().get_status(tenant_id=tenant_b.id)
     assert status["pending_commission_entries"] == 1

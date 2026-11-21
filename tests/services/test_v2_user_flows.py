@@ -9,18 +9,18 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
-
-from auth.auth_service import AuthService
-from b2b_svc.b2b_service import B2bService
-from catalog_svc.product_service import ProductService
 from gift_svc.gift_registry_service import GiftRegistryService
-from order_svc.cart_service import CartService
-from order_svc.checkout_service import CheckoutService
-from orion.extensions import db
 from stock_notification_svc.stock_notification_service import StockNotificationService
 from store_credit.store_credit import StoreCreditTransaction
 from store_credit_svc.store_credit_service import StoreCreditService
 from support.http import auth_headers
+
+from auth.auth_service import AuthService
+from b2b_svc.b2b_service import B2bService
+from catalog_svc.product_service import ProductService
+from order_svc.cart_service import CartService
+from order_svc.checkout_service import CheckoutService
+from orion.extensions import db
 from tenant_svc.tenant_service import TenantService
 
 
@@ -99,9 +99,7 @@ def test_cart_reprices_existing_item_for_group_member(app, tenant, product):
     carts = CartService()
     cart = carts.get_or_create_cart(tenant_id=tenant.id)
     carts.add_item(cart=cart, product_id=product.id, quantity=1)
-    item = carts.add_item(
-        cart=cart, product_id=product.id, quantity=1, user_id=user.id
-    )
+    item = carts.add_item(cart=cart, product_id=product.id, quantity=1, user_id=user.id)
 
     assert item.quantity == 2
     assert item.unit_price == Decimal("95.00")
@@ -199,6 +197,7 @@ def test_checkout_leaves_store_credit_untouched_by_default(app, tenant, product)
 @pytest.fixture
 def registry_api(app, tenant, product):
     from feature_flag_svc.feature_flag_service import FeatureFlagService
+
     from platform_svc.platform_settings_service import PlatformSettingsService
 
     PlatformSettingsService().ensure_seeded()
@@ -268,9 +267,14 @@ def test_gift_registry_items_deny_anonymous_and_non_owner(client, registry_api):
     body = {"product_id": registry_api["product"].id, "quantity": 1}
 
     assert client.get(url, headers=registry_api["anonymous"]).status_code == 401
-    assert client.post(url, headers=registry_api["anonymous"], json=body).status_code == 401
+    assert (
+        client.post(url, headers=registry_api["anonymous"], json=body).status_code
+        == 401
+    )
     assert client.get(url, headers=registry_api["outsider"]).status_code == 403
-    assert client.post(url, headers=registry_api["outsider"], json=body).status_code == 403
+    assert (
+        client.post(url, headers=registry_api["outsider"], json=body).status_code == 403
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from auth.auth_service import AuthService
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 from i18n_svc.page_service import PageService
 from support.http import auth_headers, tenant_headers
+
+from auth.auth_service import AuthService
 from tenant_svc.tenant_service import TenantService
 
 
@@ -108,7 +109,11 @@ def test_cms_page_footer_policy_links_follow_publication(client, app) -> None:
     privacy = client.post(
         "/api/v1/i18n/pages",
         headers=admin_headers,
-        json={"slug": "privacy-policy", "title": "سياسة الخصوصية", "is_published": True},
+        json={
+            "slug": "privacy-policy",
+            "title": "سياسة الخصوصية",
+            "is_published": True,
+        },
     )
     client.post(
         "/api/v1/i18n/pages",
@@ -142,9 +147,12 @@ def test_cms_page_mutations_require_tenant_admin(client, app) -> None:
     )
     headers = auth_headers(customer, app=app, tenant_id=tenant.slug)
 
-    assert client.post(
-        "/api/v1/i18n/pages", headers=headers, json={"slug": "x", "title": "X"}
-    ).status_code == 403
+    assert (
+        client.post(
+            "/api/v1/i18n/pages", headers=headers, json={"slug": "x", "title": "X"}
+        ).status_code
+        == 403
+    )
     assert client.get("/api/v1/i18n/pages?all=1", headers=headers).status_code == 403
 
 

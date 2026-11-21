@@ -25,8 +25,21 @@ const OrionAdminCompliance = {
       if (!rows.length) { el.textContent = "لا توجد طلبات."; return; }
       SafeDOM.clear(el);
       for (const r of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          r.customer_email, " — ", r.request_type, " — ", r.status || "pending"
+        const actions = SafeDOM.elem("span", { className: "inline-flex gap-2 ms-3" }, []);
+        if ((r.request_type === "export" || r.request_type === "delete") && r.status !== "completed") {
+          const url = r.request_type === "export" ? "export" : "execute-delete";
+          const label = r.request_type === "export" ? "تصدير" : "تنفيذ الحذف";
+          actions.appendChild(SafeDOM.actionBtn(label, "orion-btn", async () => {
+            try {
+              await OrionAPI.post(`/compliance/data-requests/${r.id}/${url}`);
+              OrionUI.toast("تم تنفيذ الطلب", "success");
+              OrionAdminCompliance.loadDSR();
+            } catch (err) { OrionUI.toast(err.message, "error"); }
+          }));
+        }
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex items-center" }, [
+          SafeDOM.elem("span", {}, [r.customer_email, " — ", r.request_type, " — ", r.status || "pending"]),
+          actions
         ]));
       }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }

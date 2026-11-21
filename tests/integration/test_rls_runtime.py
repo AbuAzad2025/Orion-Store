@@ -10,15 +10,16 @@ import re
 
 import psycopg2
 import pytest
-from catalog_svc.product_service import ProductService
-from tenant_svc.tenant_service import TenantService
 
+from catalog_svc.product_service import ProductService
 from orion.extensions import db
+from tenant_svc.tenant_service import TenantService
 
 pytestmark = pytest.mark.integration
 
 ROLE = "orion_rls_probe"
 PASSWORD = "orion_rls_probe_pwd"
+
 
 def _drop_probe_role(cur) -> None:
     cur.execute("SELECT 1 FROM pg_roles WHERE rolname = %s", (ROLE,))

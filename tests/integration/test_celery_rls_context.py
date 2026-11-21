@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from core.middleware import bind_task_rls_context
 from orion.celery_app import celery_app
 from orion.extensions import db

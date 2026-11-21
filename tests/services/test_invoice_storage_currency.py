@@ -10,11 +10,11 @@ Covers:
 from __future__ import annotations
 
 import pytest
+from currency_svc.currency_service import resolve_currency_for_tenant
 from support.http import auth_headers
 
 from auth.auth_service import AuthService
 from catalog_svc.product_service import ProductService
-from currency_svc.currency_service import resolve_currency_for_tenant
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from payment_svc.payment_service import PaymentService
@@ -202,7 +202,9 @@ def test_invoice_pdf_download_by_owner(client, app):
     assert response.mimetype == "application/pdf"
     assert response.data.startswith(b"%PDF")
     assert "attachment" in response.headers["Content-Disposition"]
-    assert result["invoice"]["invoice_number"] in response.headers["Content-Disposition"]
+    assert (
+        result["invoice"]["invoice_number"] in response.headers["Content-Disposition"]
+    )
 
 
 def test_invoice_pdf_download_by_store_admin(client, app):
@@ -218,9 +220,7 @@ def test_invoice_pdf_download_by_store_admin(client, app):
 def test_invoice_pdf_download_denies_other_customer_and_anonymous(client, app):
     tenant, _result, url, _owner, other, _admin = _paid_invoice_setup("deny-pdf-store")
 
-    other_response = client.get(
-        url, headers=auth_headers(other, tenant_id=tenant.slug)
-    )
+    other_response = client.get(url, headers=auth_headers(other, tenant_id=tenant.slug))
     assert other_response.status_code == 403
 
     anonymous = client.get(

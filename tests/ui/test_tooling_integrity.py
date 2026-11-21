@@ -37,12 +37,14 @@ def test_file_length_limits_come_from_pyproject() -> None:
     assert mod._max_for("03-MODELS/user/user.py", config) == 250
     assert mod._max_for("migrations/versions/0001.py", config) == 200
     # Legacy exceptions are explicitly declared (not hidden in the script).
-    assert mod._max_for("tests/api/test_v2_api.py", config) == limits[
-        "tests/api/test_v2_api.py"
-    ]
-    assert mod._max_for(
-        "03-MODELS/subscription/subscription.py", config
-    ) == limits["03-MODELS/subscription/subscription.py"]
+    assert (
+        mod._max_for("tests/api/test_v2_api.py", config)
+        == limits["tests/api/test_v2_api.py"]
+    )
+    assert (
+        mod._max_for("03-MODELS/subscription/subscription.py", config)
+        == limits["03-MODELS/subscription/subscription.py"]
+    )
 
 
 def test_file_length_reports_violations(tmp_path: Path, monkeypatch) -> None:

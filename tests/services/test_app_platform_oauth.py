@@ -16,10 +16,10 @@ import json
 import uuid
 
 import pytest
+from app_platform.app_platform import AppInstallation, OAuthApplication
 from flask_jwt_extended import decode_token
 from support.http import auth_headers
 
-from app_platform.app_platform import AppInstallation, OAuthApplication
 from auth.auth_service import AuthService
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant_svc.tenant_service import TenantService
@@ -72,7 +72,9 @@ def _install(client, headers, app_id):
     return resp.get_json()["installation"]
 
 
-def _token_request(client, client_id, secret, *, endpoint="oauth/token", scope="read_products"):
+def _token_request(
+    client, client_id, secret, *, endpoint="oauth/token", scope="read_products"
+):
     return client.post(
         f"{BASE}/{endpoint}",
         json={
@@ -130,9 +132,7 @@ def test_valid_raw_secret_issues_signed_token(client, app, oauth_setup, endpoint
 
 def test_wrong_secret_is_rejected(client, oauth_setup):
     data = _register(client, oauth_setup["headers"])
-    resp = _token_request(
-        client, data["app"]["client_id"], "definitely-wrong-secret"
-    )
+    resp = _token_request(client, data["app"]["client_id"], "definitely-wrong-secret")
     assert resp.status_code == 401
     assert "error" in resp.get_json()
 

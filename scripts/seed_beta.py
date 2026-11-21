@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+import secrets
 import sys
 from pathlib import Path
 
@@ -27,7 +28,8 @@ BETA_STORES: list[tuple[str, str, str]] = [
     ("متجر الزرقاء", "beta-zarqa", "zarqa@beta.azadexa.com"),
     ("متجر العقبة", "beta-aqaba", "aqaba@beta.azadexa.com"),
 ]
-DEFAULT_ADMIN_PASSWORD = "BetaStore2026!"
+# Pass a one-time password via env; generate a strong random one if omitted.
+BETA_ADMIN_PASSWORD = os.environ.get("BETA_ADMIN_PASSWORD") or secrets.token_urlsafe(18)
 
 
 def main() -> None:
@@ -52,11 +54,13 @@ def main() -> None:
             auth.register_tenant_user(
                 tenant_id=tenant.id,
                 email=email,
-                password=DEFAULT_ADMIN_PASSWORD,
+                password=BETA_ADMIN_PASSWORD,
                 is_admin=True,
             )
             slugs.append(slug)
             print(f"Seeded beta tenant: {slug} ({name})")
+    if not os.environ.get("BETA_ADMIN_PASSWORD"):
+        print(f"GENERATED_BETA_ADMIN_PASSWORD={BETA_ADMIN_PASSWORD}")
     print("BETA_TENANT_SLUGS=" + ",".join(slugs))
 
 

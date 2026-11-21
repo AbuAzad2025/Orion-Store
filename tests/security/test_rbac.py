@@ -27,9 +27,7 @@ def _seed_role(tenant_id: int, role_code: str, permission_code: str) -> Role:
     )
     db.session.add_all([role, permission])
     db.session.commit()
-    db.session.add(
-        RolePermission(role_id=role.id, permission_id=permission.id)
-    )
+    db.session.add(RolePermission(role_id=role.id, permission_id=permission.id))
     db.session.commit()
     return role
 

@@ -48,8 +48,9 @@ def _create_provider(app, tenant_id: int, *, is_active: bool = True):
 
 def _seed_subject(app, tenant_id: int, *, request_type: str):
     """Create a data request plus a user, an order and a consent record."""
-    from auth.auth_service import AuthService
     from compliance_svc.compliance_service import ComplianceService
+
+    from auth.auth_service import AuthService
     from order.order import Order
     from user.user import User
 
@@ -196,15 +197,14 @@ def test_data_export_returns_subject_data(client, app):
     assert data["subject"]["email"] == SUBJECT_EMAIL
     assert data["user"]["email"] == SUBJECT_EMAIL
     assert any(o["order_number"] == "ORD-SSO-GDPR-1" for o in data["orders"])
-    assert any(
-        c["customer_email"] == SUBJECT_EMAIL for c in data["consent_records"]
-    )
+    assert any(c["customer_email"] == SUBJECT_EMAIL for c in data["consent_records"])
 
 
 def test_execute_delete_anonymises_subject_data(client, app):
     from compliance.compliance import DataSubjectRequest
-    from order.order import Order
     from support.http import auth_headers
+
+    from order.order import Order
     from user.user import User
 
     with app.app_context():

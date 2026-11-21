@@ -18,7 +18,14 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-for part in ("02-CORE", "03-MODELS", "04-SERVICES", "05-API", "06-STOREFRONT", "07-ADMIN"):
+for part in (
+    "02-CORE",
+    "03-MODELS",
+    "04-SERVICES",
+    "05-API",
+    "06-STOREFRONT",
+    "07-ADMIN",
+):
     path = str(ROOT / part)
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -28,7 +35,9 @@ os.environ.setdefault("ENCRYPTION_KEY", "ui-coverage-audit")
 os.environ.setdefault("USE_SQLITE_TESTS", "1")
 
 _ADMIN_CALL = re.compile(r"OrionAPI\.(?:get|post|put|delete)\(\s*[\"'`]([^\"'`]+)")
-_STORE_CALL = re.compile(r"this\.request\(\s*[\"'`](?:GET|POST|PUT|DELETE)[\"'`]\s*,\s*[\"'`]([^\"'`]+)")
+_STORE_CALL = re.compile(
+    r"this\.request\(\s*[\"'`](?:GET|POST|PUT|DELETE)[\"'`]\s*,\s*[\"'`]([^\"'`]+)"
+)
 _PARAM = re.compile(r"<[^>]+>")
 
 
@@ -66,7 +75,9 @@ def audit() -> tuple[list[str], int]:
         sources.append((js, _ADMIN_CALL, "/api/v1"))
     for template in sorted((ROOT / "07-ADMIN" / "templates").rglob("*.html")):
         sources.append((template, _ADMIN_CALL, "/api/v1"))
-    store_js = ROOT / "06-STOREFRONT" / "themes" / "default" / "static" / "js" / "store_api.js"
+    store_js = (
+        ROOT / "06-STOREFRONT" / "themes" / "default" / "static" / "js" / "store_api.js"
+    )
     if not store_js.is_file():
         broken.append("missing storefront API client: store_api.js")
     else:

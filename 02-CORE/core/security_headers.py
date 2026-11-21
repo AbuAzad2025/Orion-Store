@@ -17,7 +17,7 @@ def register_security_headers(app: Flask) -> None:
             "Content-Security-Policy",
             (
                 "default-src 'self'; script-src 'self' 'unsafe-inline'; "
-                "style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+                "style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;"
             ),
         )
         if app.config.get("ENFORCE_HSTS"):

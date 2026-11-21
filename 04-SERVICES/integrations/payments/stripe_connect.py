@@ -31,7 +31,11 @@ STRIPE_REFUNDS_API = "https://api.stripe.com/v1/refunds"
 
 
 def charge_stripe(
-    *, order: Order, gateway: TenantPaymentGateway, amount: Decimal
+    *,
+    order: Order,
+    gateway: TenantPaymentGateway,
+    amount: Decimal,
+    currency: str = "ILS",
 ) -> dict:
     credentials = load_credentials(gateway)
     secret_key = credentials.get("secret_key") or credentials.get("api_key")
@@ -56,7 +60,7 @@ def charge_stripe(
         STRIPE_API,
         data={
             "amount": int((amount * 100).quantize(Decimal("1"))),
-            "currency": "ils",
+            "currency": currency,
             "metadata[order_id]": str(order.id),
             "description": f"Orion order {order.id}",
         },
@@ -77,7 +81,11 @@ def charge_stripe(
 
 
 def refund_payment(
-    *, payment: Payment, gateway: TenantPaymentGateway, amount: Decimal
+    *,
+    payment: Payment,
+    gateway: TenantPaymentGateway,
+    amount: Decimal,
+    currency: str = "ILS",
 ) -> dict:
     """Refund a Stripe charge; returns the unified refund result dictionary."""
     credentials = load_credentials(gateway)

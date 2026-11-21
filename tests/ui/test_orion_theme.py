@@ -15,7 +15,13 @@ BASE_TEMPLATES = (
     ROOT / "07-ADMIN" / "templates" / "store_financial_report.html",
 )
 THEME_FILES = (
-    ROOT / "06-STOREFRONT" / "themes" / "default" / "static" / "css" / "orion-theme.css",
+    ROOT
+    / "06-STOREFRONT"
+    / "themes"
+    / "default"
+    / "static"
+    / "css"
+    / "orion-theme.css",
     ROOT / "07-ADMIN" / "static" / "css" / "orion-theme.css",
 )
 

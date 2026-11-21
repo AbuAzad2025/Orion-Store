@@ -37,9 +37,7 @@ def test_price_change_does_not_affect_past_orders(app):
     first_order = _checkout(tenant, product, 2)
     first_total = first_order.total
     with app.app_context():
-        first_item = (
-            OrderItem.query.filter_by(order_id=first_order.id).first()
-        )
+        first_item = OrderItem.query.filter_by(order_id=first_order.id).first()
         first_unit_price = first_item.unit_price
         first_line_total = first_item.total_price
 

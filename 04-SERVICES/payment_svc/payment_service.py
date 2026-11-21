@@ -170,6 +170,7 @@ class PaymentService:
             event_type="payment.refund",
             source_entity="refund",
             source_id=refund_row.id,
+            currency=payment.currency,
             apply_commission=False,
             allow_negative=True,
             metadata={"reverses_financial_event_id": payment.financial_event_id},
@@ -229,15 +230,24 @@ class PaymentService:
             return {"success": True, "provider_payment_id": f"cod_{payment.id}"}
         if gateway.provider == "stripe":
             return charge_stripe(
-                order=order, gateway=gateway, amount=Decimal(str(payment.amount))
+                order=order,
+                gateway=gateway,
+                amount=Decimal(str(payment.amount)),
+                currency=payment.currency,
             )
         if gateway.provider == "paypal":
             return charge_paypal(
-                order=order, gateway=gateway, amount=Decimal(str(payment.amount))
+                order=order,
+                gateway=gateway,
+                amount=Decimal(str(payment.amount)),
+                currency=payment.currency,
             )
         if gateway.provider == "palpay":
             return charge_palpay(
-                order=order, gateway=gateway, amount=Decimal(str(payment.amount))
+                order=order,
+                gateway=gateway,
+                amount=Decimal(str(payment.amount)),
+                currency=payment.currency,
             )
         if gateway.provider.startswith(BNPL_GATEWAY_PREFIX):
             provider_code = gateway.provider[len(BNPL_GATEWAY_PREFIX) :]
@@ -246,6 +256,7 @@ class PaymentService:
                 order=order,
                 provider_row=bnpl_row,
                 amount=Decimal(str(payment.amount)),
+                currency=payment.currency,
             )
             if not result.get("success"):
                 return result
@@ -279,13 +290,28 @@ class PaymentService:
             }
         if provider == "stripe":
             gateway = self._refund_gateway(tenant_id, provider)
-            return refund_stripe(payment=payment, gateway=gateway, amount=amount)
+            return refund_stripe(
+                payment=payment,
+                gateway=gateway,
+                amount=amount,
+                currency=payment.currency,
+            )
         if provider == "paypal":
             gateway = self._refund_gateway(tenant_id, provider)
-            return refund_paypal(payment=payment, gateway=gateway, amount=amount)
+            return refund_paypal(
+                payment=payment,
+                gateway=gateway,
+                amount=amount,
+                currency=payment.currency,
+            )
         if provider == "palpay":
             gateway = self._refund_gateway(tenant_id, provider)
-            return refund_palpay(payment=payment, gateway=gateway, amount=amount)
+            return refund_palpay(
+                payment=payment,
+                gateway=gateway,
+                amount=amount,
+                currency=payment.currency,
+            )
         if provider.startswith(BNPL_GATEWAY_PREFIX):
             code = provider[len(BNPL_GATEWAY_PREFIX) :]
             if live_calls_enabled():
@@ -300,7 +326,10 @@ class PaymentService:
                     api_credentials_encrypted=None,
                 )
             return refund_bnpl(
-                payment=payment, provider_row=provider_row, amount=amount
+                payment=payment,
+                provider_row=provider_row,
+                amount=amount,
+                currency=payment.currency,
             )
         return {
             "success": False,

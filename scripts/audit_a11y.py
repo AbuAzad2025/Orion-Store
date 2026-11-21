@@ -60,9 +60,7 @@ def _audit_html_tag(source: str, rel: str, issues: list[str]) -> None:
 
     local_issues: list[str] = []
     for rendered in variants:
-        attrs = {
-            key.lower(): value for key, value in _HTML_ATTR_RE.findall(rendered)
-        }
+        attrs = {key.lower(): value for key, value in _HTML_ATTR_RE.findall(rendered)}
         lang = attrs.get("lang", "").strip()
         direction = attrs.get("dir", "").strip().lower()
         if not lang:
@@ -109,18 +107,28 @@ def audit() -> list[str]:
             tag = match.group(0)
             if re.search(r'\btype\s*=\s*["\'](hidden|submit|button)', tag, re.I):
                 continue
-            if not re.search(r"\b(aria-label|aria-labelledby|placeholder)\s*=", tag, re.I):
+            if not re.search(
+                r"\b(aria-label|aria-labelledby|placeholder)\s*=", tag, re.I
+            ):
                 issues.append(f"{rel}: <input> without label/aria-label/placeholder")
 
     for directory in TEMPLATE_DIRS:
         if not directory.is_dir():
-            issues.append(f"missing template directory: {directory.relative_to(ROOT).as_posix()}")
+            issues.append(
+                f"missing template directory: {directory.relative_to(ROOT).as_posix()}"
+            )
 
-    rtl_css = ROOT / "06-STOREFRONT" / "themes" / "default" / "static" / "css" / "rtl.css"
+    rtl_css = (
+        ROOT / "06-STOREFRONT" / "themes" / "default" / "static" / "css" / "rtl.css"
+    )
     if not rtl_css.is_file():
         issues.append("rtl.css is missing")
-    elif re.search(r"(?:margin|padding)-(left|right)\s*:", rtl_css.read_text(encoding="utf-8")):
-        issues.append("rtl.css: uses physical margin/padding-left/right instead of logical properties")
+    elif re.search(
+        r"(?:margin|padding)-(left|right)\s*:", rtl_css.read_text(encoding="utf-8")
+    ):
+        issues.append(
+            "rtl.css: uses physical margin/padding-left/right instead of logical properties"
+        )
 
     return issues
 

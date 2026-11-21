@@ -28,7 +28,11 @@ LIVE_URL = "https://api.palpay.ps/api/v1"
 
 
 def charge_palpay(
-    *, order: Order, gateway: TenantPaymentGateway, amount: Decimal
+    *,
+    order: Order,
+    gateway: TenantPaymentGateway,
+    amount: Decimal,
+    currency: str = "ILS",
 ) -> dict:
     credentials = load_credentials(gateway)
     api_key = credentials.get("api_key") or credentials.get("secret_key")
@@ -54,7 +58,7 @@ def charge_palpay(
         f"{base}/charges",
         payload={
             "amount": f"{amount:.2f}",
-            "currency": "ILS",
+            "currency": currency,
             "merchant_reference": str(order.id),
         },
         headers={"Authorization": f"Bearer {api_key}"},
@@ -74,7 +78,11 @@ def charge_palpay(
 
 
 def refund_payment(
-    *, payment: Payment, gateway: TenantPaymentGateway, amount: Decimal
+    *,
+    payment: Payment,
+    gateway: TenantPaymentGateway,
+    amount: Decimal,
+    currency: str = "ILS",
 ) -> dict:
     """Refund a PalPay charge; returns the unified refund result dictionary."""
     credentials = load_credentials(gateway)
@@ -98,7 +106,7 @@ def refund_payment(
 
     result = post_json(
         f"{base}/charges/{payment.provider_payment_id}/refund",
-        payload={"amount": f"{amount:.2f}", "currency": "ILS"},
+        payload={"amount": f"{amount:.2f}", "currency": currency},
         headers={"Authorization": f"Bearer {api_key}"},
         idempotency=refund_idempotency_key(payment),
     )

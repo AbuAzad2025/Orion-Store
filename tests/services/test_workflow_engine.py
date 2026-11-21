@@ -4,21 +4,21 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from core.events import publish
-from order.order import Order, OrderEvent
-from orion.extensions import db
+from support.http import auth_headers
 from workflow.workflow import WorkflowRun
+from workflow_svc.workflow_service import WorkflowService
 
 from auth.auth_service import AuthService
 from catalog_svc.product_service import ProductService
+from core.events import publish
+from order.order import Order, OrderEvent
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
+from orion.extensions import db
 from payment_svc.payment_service import PaymentService
 from platform_svc.platform_settings_service import PlatformSettingsService
-from support.http import auth_headers
 from tenant_gateway_svc.gateway_service import GatewayService
 from tenant_svc.tenant_service import TenantService
-from workflow_svc.workflow_service import WorkflowService
 
 EMAIL_TARGET = (
     "notification_svc.notification_service.NotificationService.send_action_email"
@@ -82,9 +82,7 @@ def test_order_paid_runs_workflow_to_completion(app):
         )
         send_email.assert_called_once()
 
-    runs = WorkflowRun.query.filter_by(
-        tenant_id=tenant.id, definition_id=wf.id
-    ).all()
+    runs = WorkflowRun.query.filter_by(tenant_id=tenant.id, definition_id=wf.id).all()
     assert len(runs) == 1
     run = runs[0]
     assert run.status == "completed"
@@ -190,7 +188,9 @@ def test_manual_run_endpoint_is_admin_protected_and_executes(app, client):
     customer_headers = auth_headers(customer, app=app, tenant_id=tenant.slug)
 
     assert (
-        client.post(url, json={"customer_email": "x@wf.com"}, headers=customer_headers).status_code
+        client.post(
+            url, json={"customer_email": "x@wf.com"}, headers=customer_headers
+        ).status_code
         == 403
     )
     assert client.post(url, json={}).status_code in (401, 403)

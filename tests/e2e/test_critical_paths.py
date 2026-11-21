@@ -1,4 +1,4 @@
-﻿"""Three production-critical browser paths."""
+﻿"""Production-critical browser paths (storefront, admin login, product management)."""
 
 from __future__ import annotations
 
@@ -70,7 +70,9 @@ def test_storefront_browse_cart_checkout(
     assert "checkout" in browser_page.content().lower()
 
 
-def test_tenant_admin_login(server_url: str, browser_page: Page, app, capture_shot) -> None:
+def test_tenant_admin_login(
+    server_url: str, browser_page: Page, app, capture_shot
+) -> None:
     tenant = TenantService().create_tenant(
         name="E2E Admin Store", slug="e2e-admin", email="admin-e2e@test.com"
     )
@@ -104,13 +106,17 @@ def test_tenant_admin_login(server_url: str, browser_page: Page, app, capture_sh
         ("tenant_tax", "/admin/store/tax"),
         ("tenant_returns", "/admin/store/returns"),
     ):
-        response = browser_page.goto(f"{server_url}{path}", wait_until="domcontentloaded")
+        response = browser_page.goto(
+            f"{server_url}{path}", wait_until="domcontentloaded"
+        )
         assert response.status == 200
         assert browser_page.locator(".orion-card").count() >= 1
         capture_shot(browser_page, name)
 
 
-def test_platform_admin_login(server_url: str, browser_page: Page, app, capture_shot) -> None:
+def test_platform_admin_login(
+    server_url: str, browser_page: Page, app, capture_shot
+) -> None:
     AuthService().register_super_admin(
         email="owner-e2e@azadexa.com", password="password123"
     )
@@ -128,19 +134,19 @@ def test_platform_admin_login(server_url: str, browser_page: Page, app, capture_
         ("platform_tenants", "/admin/platform/tenants"),
         ("platform_users", "/admin/platform/users"),
     ):
-        response = browser_page.goto(f"{server_url}{path}", wait_until="domcontentloaded")
+        response = browser_page.goto(
+            f"{server_url}{path}", wait_until="domcontentloaded"
+        )
         assert response.status == 200
         assert browser_page.locator(".orion-card").count() >= 1
         capture_shot(browser_page, name)
 
-    capabilities = browser_page.evaluate(
-        """() => ({
+    capabilities = browser_page.evaluate("""() => ({
             request: typeof OrionAPI.request === 'function',
             timeout: OrionAPI.timeoutMs > 0,
             toast: typeof OrionUI.toast === 'function',
             loading: typeof OrionUI.withLoading === 'function',
-        })"""
-    )
+        })""")
     assert all(capabilities.values()), capabilities
 
     browser_page.evaluate(
@@ -174,7 +180,9 @@ def test_tenant_admin_manages_products_from_dashboard(
     browser_page.click('button[type="submit"]')
     browser_page.wait_for_url("**/admin/store/dashboard", timeout=10000)
 
-    browser_page.goto(f"{server_url}/admin/store/products", wait_until="domcontentloaded")
+    browser_page.goto(
+        f"{server_url}/admin/store/products", wait_until="domcontentloaded"
+    )
     assert browser_page.locator("#product-form").is_visible()
     browser_page.fill("#p-name", "منتج من اللوحة")
     browser_page.fill("#p-slug", "dashboard-product")
@@ -185,5 +193,7 @@ def test_tenant_admin_manages_products_from_dashboard(
     browser_page.get_by_text("منتج من اللوحة").first.wait_for(timeout=10000)
     capture_shot(browser_page, "product_management")
 
-    browser_page.goto(f"{server_url}/?tenant_slug={tenant.slug}", wait_until="domcontentloaded")
+    browser_page.goto(
+        f"{server_url}/?tenant_slug={tenant.slug}", wait_until="domcontentloaded"
+    )
     assert browser_page.locator('img[alt="منتج من اللوحة"]').count() == 1

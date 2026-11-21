@@ -16,9 +16,9 @@ from integrations.payments.bnpl import refund_payment as refund_bnpl
 from integrations.payments.palpay import refund_payment as refund_palpay
 from integrations.payments.paypal import refund_payment as refund_paypal
 from integrations.payments.stripe_connect import refund_payment as refund_stripe
-from orion.extensions import db
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
+from orion.extensions import db
 from payment.payment import Payment
 from payment.refund import Refund
 from payment_svc.payment_service import PaymentService
@@ -38,7 +38,9 @@ class _FakeResponse:
         return self._payload
 
 
-def _paid_payment(app, *, provider: str = "cod", provider_payment_id: str | None = None):
+def _paid_payment(
+    app, *, provider: str = "cod", provider_payment_id: str | None = None
+):
     """Drive a real checkout + COD charge, then point the payment at a provider."""
     PlatformSettingsService().ensure_seeded()
     tenant = TenantService().create_tenant(
@@ -239,7 +241,9 @@ def test_each_adapter_refund_payment_is_unified_and_forwards_amount(
                 api_credentials_encrypted=encrypted,
                 config={"is_sandbox": False},
             )
-            result = refund_bnpl(payment=payment, provider_row=row, amount=Decimal("6.25"))
+            result = refund_bnpl(
+                payment=payment, provider_row=row, amount=Decimal("6.25")
+            )
         else:
             gateway = TenantPaymentGateway(
                 tenant_id=1,

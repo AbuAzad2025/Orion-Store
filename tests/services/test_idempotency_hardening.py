@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 import pytest
+
+from catalog_svc.product_service import ProductService
 from core.exceptions import ValidationError
+from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from payment.payment import Payment
 from payment_svc.payment_service import PaymentService
-from platform_svc.platform_settings_service import PlatformSettingsService
 from platform_models.financial_event import FinancialEvent
+from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant_gateway_svc.gateway_service import GatewayService
 from tenant_svc.tenant_service import TenantService
-from catalog_svc.product_service import ProductService
-from order_svc.cart_service import CartService
 
 
 def _order(app, tenant, product, idempotency_key=None):

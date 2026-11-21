@@ -35,7 +35,9 @@ DEFAULT_ENDPOINTS = {
 }
 
 
-def charge_bnpl(*, order: Order, provider_row: BnplProvider, amount: Decimal) -> dict:
+def charge_bnpl(
+    *, order: Order, provider_row: BnplProvider, amount: Decimal, currency: str = "ILS"
+) -> dict:
     provider = provider_row.provider
     credentials = load_credentials(provider_row)
     api_key = credentials.get("api_key") or credentials.get("secret_key")
@@ -66,7 +68,7 @@ def charge_bnpl(*, order: Order, provider_row: BnplProvider, amount: Decimal) ->
         base,
         payload={
             "amount": f"{amount:.2f}",
-            "currency": "ILS",
+            "currency": currency,
             "reference_id": str(order.id),
             "installments": 4,
         },
@@ -90,7 +92,11 @@ def charge_bnpl(*, order: Order, provider_row: BnplProvider, amount: Decimal) ->
 
 
 def refund_payment(
-    *, payment: Payment, provider_row: BnplProvider, amount: Decimal
+    *,
+    payment: Payment,
+    provider_row: BnplProvider,
+    amount: Decimal,
+    currency: str = "ILS",
 ) -> dict:
     """Refund a BNPL transaction; returns the unified refund result dictionary."""
     provider = provider_row.provider
@@ -122,7 +128,7 @@ def refund_payment(
         f"{base}/{payment.provider_payment_id}/refund",
         payload={
             "amount": f"{amount:.2f}",
-            "currency": "ILS",
+            "currency": currency,
             "transaction_id": payment.provider_payment_id,
         },
         headers={"Authorization": f"Bearer {api_key}"},

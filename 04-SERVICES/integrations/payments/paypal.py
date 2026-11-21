@@ -48,7 +48,11 @@ def _access_token(base: str, client_id: str, secret: str) -> str | None:
 
 
 def charge_paypal(
-    *, order: Order, gateway: TenantPaymentGateway, amount: Decimal
+    *,
+    order: Order,
+    gateway: TenantPaymentGateway,
+    amount: Decimal,
+    currency: str = "ILS",
 ) -> dict:
     credentials = load_credentials(gateway)
     client_id = credentials.get("client_id")
@@ -83,7 +87,7 @@ def charge_paypal(
                 {
                     "reference_id": str(order.id),
                     "amount": {
-                        "currency_code": "ILS",
+                        "currency_code": currency,
                         "value": f"{amount:.2f}",
                     },
                 }
@@ -115,7 +119,11 @@ def charge_paypal(
 
 
 def refund_payment(
-    *, payment: Payment, gateway: TenantPaymentGateway, amount: Decimal
+    *,
+    payment: Payment,
+    gateway: TenantPaymentGateway,
+    amount: Decimal,
+    currency: str = "ILS",
 ) -> dict:
     """Refund a captured PayPal payment; returns the unified refund result."""
     credentials = load_credentials(gateway)
@@ -149,7 +157,7 @@ def refund_payment(
 
     result = post_json(
         f"{base}/v2/payments/captures/{payment.provider_payment_id}/refund",
-        payload={"amount": {"currency_code": "ILS", "value": f"{amount:.2f}"}},
+        payload={"amount": {"currency_code": currency, "value": f"{amount:.2f}"}},
         headers={"Authorization": f"Bearer {token}"},
         idempotency=refund_idempotency_key(payment),
     )

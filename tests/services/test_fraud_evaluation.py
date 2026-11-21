@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 import pytest
+from fraud.fraud import FraudReview
+from fraud_svc.fraud_service import FraudService
+from support.http import auth_headers
 
 from auth.auth_service import AuthService
 from core.events import publish
 from core.exceptions import NotFoundError
-from fraud.fraud import FraudReview
-from fraud_svc.fraud_service import FraudService
 from order.order import Order
 from orion.extensions import db
-from support.http import auth_headers
 from tenant_svc.tenant_service import TenantService
 
 
@@ -86,9 +86,7 @@ def test_low_amount_does_not_create_review(app, tenant):
         assert result["risk_score"] == 0
         assert result["created"] is False
         assert (
-            FraudReview.query.filter_by(
-                tenant_id=tenant.id, order_id=order.id
-            ).count()
+            FraudReview.query.filter_by(tenant_id=tenant.id, order_id=order.id).count()
             == 0
         )
 
@@ -105,9 +103,7 @@ def test_repeated_evaluation_is_idempotent(app, tenant):
         assert second["created"] is False
         assert second["review"]["id"] == first["review"]["id"]
         assert (
-            FraudReview.query.filter_by(
-                tenant_id=tenant.id, order_id=order.id
-            ).count()
+            FraudReview.query.filter_by(tenant_id=tenant.id, order_id=order.id).count()
             == 1
         )
 
@@ -123,15 +119,11 @@ def test_other_tenant_does_not_see_review(app, tenant):
 
         assert FraudReview.query.filter_by(tenant_id=other.id).count() == 0
         assert (
-            FraudReview.query.filter_by(
-                tenant_id=other.id, order_id=order.id
-            ).count()
+            FraudReview.query.filter_by(tenant_id=other.id, order_id=order.id).count()
             == 0
         )
         with pytest.raises(NotFoundError):
-            FraudService().evaluate_order(
-                tenant_id=other.id, order_id=order.id
-            )
+            FraudService().evaluate_order(tenant_id=other.id, order_id=order.id)
 
 
 def test_order_created_event_records_review(app, tenant):
@@ -142,9 +134,7 @@ def test_order_created_event_records_review(app, tenant):
         publish("order.created", tenant_id=tenant.id, order_id=order.id)
 
         assert (
-            FraudReview.query.filter_by(
-                tenant_id=tenant.id, order_id=order.id
-            ).count()
+            FraudReview.query.filter_by(tenant_id=tenant.id, order_id=order.id).count()
             == 1
         )
 

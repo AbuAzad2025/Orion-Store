@@ -36,7 +36,9 @@ def _tokens() -> dict[str, str]:
 
 def _luminance(hex_color: str) -> float:
     channels = [int(hex_color[i : i + 2], 16) / 255 for i in (1, 3, 5)]
-    linear = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
+    linear = [
+        c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in channels
+    ]
     return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
 
 
@@ -66,7 +68,9 @@ def main() -> int:
     # Gold button label (#1b1405) on gold background.
     gold = tokens.get("--orion-gold", "#000000")
     ratio = _ratio("#1b1405", gold)
-    print(f"{'OK' if ratio >= 4.5 else 'LOW':3} gold button label on --orion-gold: {ratio:.2f}:1")
+    print(
+        f"{'OK' if ratio >= 4.5 else 'LOW':3} gold button label on --orion-gold: {ratio:.2f}:1"
+    )
     if ratio < 4.5:
         violations.append(f"gold button label: {ratio:.2f}:1")
 

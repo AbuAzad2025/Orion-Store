@@ -39,7 +39,7 @@
 
 ## 6. الواجهات
 - [ ] لا CDN خارجي (CSS محلي مبني) — `pytest tests/ui`
-- [ ] صفر `innerHTML`، 3 مسارات E2E خضراء — `pytest tests/e2e -m e2e`
+- [ ] صفر `innerHTML`، 4 مسارات E2E خضراء — `pytest tests/e2e -m e2e`
 - [ ] RTL وصفحة الوصولية تعملان
 
 ## 7. النشر والتسليم

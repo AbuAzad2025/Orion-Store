@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import re
 
+from feature_flag_svc.feature_flag_service import FeatureFlagService
+from support.http import tenant_headers
+
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
-from feature_flag_svc.feature_flag_service import FeatureFlagService
 from scripts.audit_a11y import _audit_html_tag
 from tenant_svc.tenant_service import TenantService
-
-from support.http import tenant_headers
 
 _HTML_TAG_RE = re.compile(r"<html\b[^>]*>", re.I)
 _HTML_ATTR_RE = re.compile(r"""\b(lang|dir)\s*=\s*["']([^"']*)["']""", re.I)
@@ -102,7 +102,7 @@ def test_a11y_audit_matches_direction_to_language() -> None:
         '<html lang="en" dir="ltr">',
         '<html lang="fr" dir="ltr">',
         # Dynamic form used by base.html — validated for every probe locale.
-        '<html lang="{{ locale|default(\'ar\') }}" '
+        "<html lang=\"{{ locale|default('ar') }}\" "
         "dir=\"{{ 'rtl' if locale[:2]|lower in ['ar','he'] else 'ltr' }}\">",
     )
     for tag in accepted:

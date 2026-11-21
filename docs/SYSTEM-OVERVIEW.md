@@ -191,7 +191,7 @@ HTTP Request
   لوحة منصة + صفحة معاينة مكوّنات `/admin/store/ui-kit`.
 - **JS**: `SafeDOM` (لا `innerHTML`)، `OrionAPI` (timeout/dedupe/أخطاء)،
   `OrionUI` (toast/loading/confirm)، و22 ملف JS تستخدم العميل الموحّد.
-- **اختبارات بصرية**: Playwright/Chromium، 3 مسارات + 13 لقطة شاشة،
+- **اختبارات بصرية**: Playwright/Chromium، 4 مسارات + لقطات شاشة،
   فشل عند أي خطأ JS في المتصفح.
 
 ---
@@ -211,7 +211,7 @@ HTTP Request
 
 ## 10. الجودة والاختبارات
 
-- **388+ اختبار** على PostgreSQL حقيقي (لا SQLite في CI)، تغطية ≥85% مفروضة.
+- **529 اختباراً** على PostgreSQL حقيقي (لا SQLite في CI) + 4 اختبارات E2E، تغطية ≥85% مفروضة.
 - **pre-commit/CI**: black، isort، flake8، YAML، طول الملفات، pip-audit، Bandit،
   gitleaks، تدقيق RLS، تدقيق schema/FK، تدقيق a11y/RTL، تدقيق مراجع API/الواجهة،
   تدقيق تباين الألوان.
