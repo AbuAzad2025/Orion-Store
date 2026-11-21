@@ -62,6 +62,4 @@ _STRINGS: dict[str, dict[str, str]] = {
 
 def translate(key: str, locale: str = "ar") -> str:
     base = (locale or "ar").split("_")[0].lower()
-    return _STRINGS.get(base, _STRINGS["ar"]).get(
-        key, _STRINGS["ar"].get(key, key)
-    )
+    return _STRINGS.get(base, _STRINGS["ar"]).get(key, _STRINGS["ar"].get(key, key))

@@ -169,12 +169,13 @@ def add_gift_registry_item(slug: str):
         from gift.gift_registry import GiftRegistry
         from gift_svc.gift_registry_service import GiftRegistryService
 
-        registry = GiftRegistry.query.filter_by(
-            tenant_id=tenant.id, slug=slug
-        ).first()
+        registry = GiftRegistry.query.filter_by(tenant_id=tenant.id, slug=slug).first()
         if registry is None:
             return jsonify({"error": "Registry not found."}), 404
-        if registry.user_id != user.id and registry.customer_email.lower() != user.email.lower():
+        if (
+            registry.user_id != user.id
+            and registry.customer_email.lower() != user.email.lower()
+        ):
             return jsonify({"error": "Permission denied."}), 403
         data = request.get_json(silent=True) or {}
         item = GiftRegistryService().add_item(
