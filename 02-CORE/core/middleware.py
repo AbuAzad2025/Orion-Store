@@ -221,7 +221,12 @@ def _resolve_tenant_from_request() -> Tenant | None:
         if tenant:
             return tenant
 
-    if current_app.debug and not request.path.startswith(("/api/", "/admin/")):
+    # The read-only tenants/me endpoint is also allowed in debug preview so
+    # local tooling can inspect which tenant the fallback resolved.
+    debug_api_preview = request.path == "/api/v1/tenants/me"
+    if current_app.debug and (
+        debug_api_preview or not request.path.startswith(("/api/", "/admin/"))
+    ):
         preview_slug = request.args.get("tenant_slug") or request.cookies.get(
             "orion_preview_tenant"
         )

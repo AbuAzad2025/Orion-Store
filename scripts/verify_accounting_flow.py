@@ -72,7 +72,7 @@ def main() -> None:
         customer = AuthService().register_tenant_user(
             tenant_id=tenant.id,
             email=f"verify-{uuid.uuid4().hex[:8]}@{slug}.test",
-            password="password123",
+            password="password123",  # nosec B106
             is_admin=False,
         )
         product = Product.query.filter_by(

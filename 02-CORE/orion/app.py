@@ -46,7 +46,7 @@ def _asset_version() -> str:
     """Hash the committed theme CSS so asset URLs change whenever it changes."""
     css = Path(__file__).resolve().parents[2] / "01-FOUNDATION/assets/orion-theme.css"
     try:
-        return hashlib.md5(css.read_bytes()).hexdigest()[:8]
+        return hashlib.sha256(css.read_bytes()).hexdigest()[:8]
     except OSError:  # pragma: no cover - deployed images always ship the file
         return "static"
 

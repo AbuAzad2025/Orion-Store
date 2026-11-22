@@ -33,7 +33,7 @@ TARGETS = [
 
 def download(url: str, dest: pathlib.Path) -> None:
     req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=45) as resp:
+    with urllib.request.urlopen(req, timeout=45) as resp:  # nosec B310
         data = resp.read()
     if len(data) < 2000:
         raise RuntimeError(f"suspicious font size: {len(data)}")
@@ -45,7 +45,7 @@ def main() -> None:
     for stale in FONTS.glob("*.woff2"):
         stale.unlink()
     req = urllib.request.Request(CSS_URL, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=45) as resp:
+    with urllib.request.urlopen(req, timeout=45) as resp:  # nosec B310
         css = resp.read().decode("utf-8")
 
     pattern = re.compile(

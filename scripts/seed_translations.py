@@ -12,7 +12,14 @@ import pathlib
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-for part in ("02-CORE", "03-MODELS", "04-SERVICES", "05-API", "06-STOREFRONT", "07-ADMIN"):
+for part in (
+    "02-CORE",
+    "03-MODELS",
+    "04-SERVICES",
+    "05-API",
+    "06-STOREFRONT",
+    "07-ADMIN",
+):
     sys.path.insert(0, str(ROOT / part))
 
 PRODUCTS = {
@@ -51,10 +58,11 @@ def main() -> None:
 
     app = create_app(os.environ.get("FLASK_ENV", "development"))
     with app.app_context():
-        from catalog.category import Category
-        from catalog.product import Product
         from i18n.category_translation import CategoryTranslation
         from i18n.product_translation import ProductTranslation
+
+        from catalog.category import Category
+        from catalog.product import Product
 
         created = 0
         for product in Product.query.all():

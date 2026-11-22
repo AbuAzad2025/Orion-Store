@@ -19,7 +19,7 @@
     {% if hero_product and hero_product.image_url %}
     <a href="/product/{{ hero_product.slug }}" class="orion-hero-visual" aria-label="{{ hero_product.name }}">
       <span class="orion-hero-visual-tag">{{ t('spotlight') }}</span>
-      <img src="{{ hero_product.image_url }}" alt="{{ hero_product.name }}">
+      <img src="{{ hero_product.image_url }}" alt="" aria-hidden="true">
       <span class="orion-hero-visual-meta">
         <strong>{{ hero_product.name }}</strong>
         <span>{{ money(hero_product.price) }} {{ currency }}</span>

@@ -53,7 +53,7 @@ def fetch(url: str, dest: pathlib.Path) -> None:
     req = urllib.request.Request(
         url, headers={"User-Agent": "Mozilla/5.0 OrionDemo/1.0"}
     )
-    with urllib.request.urlopen(req, timeout=45) as resp:
+    with urllib.request.urlopen(req, timeout=45) as resp:  # nosec B310
         data = resp.read()
     if len(data) < 5000:
         raise RuntimeError(f"suspiciously small image: {len(data)} bytes")

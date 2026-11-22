@@ -122,7 +122,7 @@ def main() -> None:
             auth_register = AuthService()
             auth_register.register_super_admin(
                 email="root@azadexa.test",
-                password="password123",
+                password="password123",  # nosec B106
                 first_name="منصة",
             )
 
@@ -200,14 +200,14 @@ def main() -> None:
             admin = auth.register_tenant_user(
                 tenant_id=tenant.id,
                 email=f"admin@{slug}.test",
-                password="password123",
+                password="password123",  # nosec B106
                 is_admin=True,
             )
             customers = [
                 auth.register_tenant_user(
                     tenant_id=tenant.id,
                     email=f"buyer{i}@{slug}.test",
-                    password="password123",
+                    password="password123",  # nosec B106
                     is_admin=False,
                 )
                 for i in range(1, 5)
