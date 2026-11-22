@@ -16,15 +16,24 @@
     <main class="flex-1 flex flex-col min-h-screen">
       <header class="orion-topbar">
         <div class="orion-breadcrumb">
+          <a href="{{ '/admin/store/dashboard' if tenant else '/admin/platform/dashboard' }}" class="orion-breadcrumb-home" aria-label="الرئيسية">⌂</a>
           <span class="orion-eyebrow">{{ 'متجر' if tenant else 'المنصة' }}</span>
           <span class="orion-breadcrumb-sep">/</span>
-          <span>{{ page_title }}</span>
+          <span class="orion-breadcrumb-current">{{ page_title }}</span>
         </div>
         <div class="flex items-center gap-3">
           <div class="orion-user-pill">
-            <span class="orion-badge">{{ 'أدمن متجر' if tenant else 'أدمن منصة' }}</span>
-            {% if tenant %}<span class="orion-muted text-xs">{{ tenant.name }}</span>{% endif %}
+            <span class="orion-avatar" aria-hidden="true">{{ (g.user.email or 'A')[:1]|upper if g.user else 'A' }}</span>
+            <span class="orion-user-meta">
+              <span class="orion-badge">{{ 'أدمن متجر' if tenant else 'أدمن منصة' }}</span>
+              {% if tenant %}<span class="orion-muted text-xs">{{ tenant.name }}</span>{% endif %}
+            </span>
           </div>
+          {% if tenant %}
+          <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="orion-topbar-link" rel="noopener">المتجر ↗</a>
+          {% endif %}
+          <a href="/admin/profile" class="orion-topbar-link">الملف</a>
+          <a href="/admin/logout" class="orion-topbar-link orion-topbar-logout">خروج</a>
           {% block page_actions %}{% endblock %}
         </div>
       </header>

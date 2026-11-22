@@ -7,16 +7,51 @@
     {% set policy.terms = p %}
   {% endif %}
 {% endfor %}
-<footer class="orion-muted mt-12 border-t py-6 text-center text-sm">
-  {% if policy.privacy or policy.terms %}
-  <nav class="flex flex-wrap justify-center gap-4 mb-3" aria-label="روابط السياسات">
-    {% if policy.privacy %}
-    <a class="underline hover:no-underline" href="/pages/{{ policy.privacy.slug }}">{{ policy.privacy.title|default('سياسة الخصوصية') }}</a>
-    {% endif %}
-    {% if policy.terms %}
-    <a class="underline hover:no-underline" href="/pages/{{ policy.terms.slug }}">{{ policy.terms.title|default('الشروط والأحكام') }}</a>
-    {% endif %}
-  </nav>
-  {% endif %}
-  <p>مدعوم من <strong>Azadexa</strong></p>
+{% set wa_footer = whatsapp_url(tenant.phone, t('order_request') ~ tenant.name) %}
+
+<footer class="orion-footer orion-muted mt-16 border-t">
+  <div class="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <section class="orion-footer-brand">
+      <div class="orion-brand mb-3">
+        <span class="orion-brand-mark" aria-hidden="true">A</span>
+        <span class="orion-brand-name">{{ tenant.name }}</span>
+      </div>
+      <p class="text-sm leading-relaxed">{{ t('footer_about') }}</p>
+    </section>
+
+    <nav aria-label="{{ t('quick_links') }}">
+      <h2 class="orion-footer-title">{{ t('quick_links') }}</h2>
+      <a class="orion-footer-link" href="/?tenant_slug={{ tenant.slug }}">{{ t('home') }}</a>
+      <a class="orion-footer-link" href="/cart?tenant_slug={{ tenant.slug }}">{{ t('cart') }}</a>
+      <a class="orion-footer-link" href="/account?tenant_slug={{ tenant.slug }}">{{ t('account') }}</a>
+    </nav>
+
+    <section aria-label="{{ t('contact_us') }}">
+      <h2 class="orion-footer-title">{{ t('contact_us') }}</h2>
+      {% if tenant.phone %}<p class="orion-footer-line" dir="ltr">{{ tenant.phone }}</p>{% endif %}
+      {% if tenant.email %}<p class="orion-footer-line" dir="ltr">{{ tenant.email }}</p>{% endif %}
+      {% if wa_footer %}
+      <a class="orion-footer-link" href="{{ wa_footer }}" target="_blank" rel="noopener">{{ t('whatsapp') }} ↗</a>
+      {% endif %}
+      <a class="orion-footer-link" href="/consent?tenant_slug={{ tenant.slug }}">{{ t('legal') }}</a>
+    </section>
+
+    <nav aria-label="{{ t('legal') }}">
+      <h2 class="orion-footer-title">{{ t('legal') }}</h2>
+      {% if policy.privacy %}
+      <a class="orion-footer-link" href="/pages/{{ policy.privacy.slug }}">{{ policy.privacy.title|default(t('privacy_policy')) }}</a>
+      {% else %}
+      <a class="orion-footer-link" href="/consent?tenant_slug={{ tenant.slug }}">{{ t('privacy_policy') }}</a>
+      {% endif %}
+      {% if policy.terms %}
+      <a class="orion-footer-link" href="/pages/{{ policy.terms.slug }}">{{ policy.terms.title|default(t('terms_conditions')) }}</a>
+      {% endif %}
+    </nav>
+  </div>
+  <div class="orion-footer-bottom">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <p>© {{ tenant.name }} — {{ t('all_rights') }}</p>
+      <p>{{ t('powered_by') }} <strong>Azadexa</strong></p>
+    </div>
+  </div>
 </footer>

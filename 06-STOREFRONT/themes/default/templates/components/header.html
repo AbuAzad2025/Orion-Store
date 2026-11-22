@@ -1,23 +1,40 @@
 <header class="orion-store-header">
-  <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-    <a href="/" class="orion-title orion-eyebrow text-xl">{{ tenant.name }}</a>
-    <nav class="space-x-4 space-x-reverse text-sm flex items-center">
-      <a href="/" class="orion-muted orion-header-link">{{ t('home') }}</a>
-      <a href="/account" class="orion-muted orion-header-link">{{ t('account') }}</a>
-      <a href="/cart" class="orion-muted orion-header-link">{{ t('cart') }}</a>
-      <a href="{{ request.path }}?locale=ar&currency={{ currency }}" class="orion-muted orion-header-link" hreflang="ar" aria-label="العربية">ع</a>
-      <a href="{{ request.path }}?locale=en&currency={{ currency }}" class="orion-muted orion-header-link" hreflang="en" aria-label="English">EN</a>
-      <select id="currency-switch" class="orion-input text-xs w-auto" aria-label="Currency"
-              onchange="if(this.value) location.href='{{ request.path }}?locale={{ locale }}&currency='+this.value">
-        {% for code in currencies %}
-        <option value="{{ code }}"{% if code == currency %} selected{% endif %}>{{ code }}</option>
-        {% endfor %}
-      </select>
+  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+    <a href="/?tenant_slug={{ tenant.slug }}" class="orion-brand" aria-label="{{ tenant.name }} — {{ t('home') }}">
+      <span class="orion-brand-mark" aria-hidden="true">A</span>
+      <span class="orion-brand-name">{{ tenant.name }}</span>
+    </a>
+
+    <nav class="orion-store-nav" aria-label="{{ t('main_navigation') }}">
+      <a href="/?tenant_slug={{ tenant.slug }}" class="orion-header-link{% if request.path == '/' %} is-active{% endif %}"
+         {% if request.path == '/' %}aria-current="page"{% endif %}>{{ t('home') }}</a>
+      <a href="/cart?tenant_slug={{ tenant.slug }}" class="orion-header-link{% if request.path.startswith('/cart') %} is-active{% endif %}"
+         {% if request.path.startswith('/cart') %}aria-current="page"{% endif %}>{{ t('cart') }}</a>
+      <a href="/account?tenant_slug={{ tenant.slug }}" class="orion-header-link{% if request.path.startswith('/account') %} is-active{% endif %}"
+         {% if request.path.startswith('/account') %}aria-current="page"{% endif %}>{{ t('account') }}</a>
+    </nav>
+
+    <div class="orion-store-controls">
+      <div class="orion-locale-switch" role="group" aria-label="{{ t('language') }}">
+        <a href="{{ request.path }}?locale=ar&currency={{ currency }}" class="orion-locale-link{% if locale[:2]|lower == 'ar' %} is-active{% endif %}"
+           hreflang="ar" aria-label="العربية" {% if locale[:2]|lower == 'ar' %}aria-current="true"{% endif %}>ع</a>
+        <a href="{{ request.path }}?locale=en&currency={{ currency }}" class="orion-locale-link{% if locale[:2]|lower == 'en' %} is-active{% endif %}"
+           hreflang="en" aria-label="English" {% if locale[:2]|lower == 'en' %}aria-current="true"{% endif %}>EN</a>
+      </div>
+      <label class="orion-currency-control">
+        <span class="orion-stat-label">{{ t('currency') }}</span>
+        <select id="currency-switch" aria-label="{{ t('currency') }}"
+                onchange="if(this.value) location.href='{{ request.path }}?locale={{ locale }}&currency='+this.value">
+          {% for code in currencies %}
+          <option value="{{ code }}"{% if code == currency %} selected{% endif %}>{{ code }}</option>
+          {% endfor %}
+        </select>
+      </label>
       {% set wa_link = whatsapp_url(tenant.phone, t('order_request') ~ tenant.name) %}
       {% if wa_link %}
-      <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn orion-btn-gold text-xs"
+      <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn orion-btn-gold orion-wa-cta"
          aria-label="{{ t('whatsapp') }}">{{ t('whatsapp') }}</a>
       {% endif %}
-    </nav>
+    </div>
   </div>
 </header>
