@@ -12,6 +12,13 @@
 </head>
 <body class="bg-gray-50 min-h-screen orion-surface flex flex-col" data-tenant-id="{{ tenant.slug }}" data-currency="{{ currency }}">
   <a class="orion-skip-link" href="#main-content">{{ t('skip_to_content') }}</a>
+  <div class="orion-trustbar" aria-label="{{ t('support') }}">
+    <div class="orion-trustbar-inner">
+      <span class="orion-trust-item"><span class="orion-trust-tick" aria-hidden="true">&#10003;</span>{{ t('trust_secure') }}</span>
+      <span class="orion-trust-item"><span class="orion-trust-tick" aria-hidden="true">&#10003;</span>{{ t('trust_shipping') }}</span>
+      <span class="orion-trust-item"><span class="orion-trust-tick" aria-hidden="true">&#10003;</span>{{ t('trust_support') }}</span>
+    </div>
+  </div>
   {% include "components/header.html" %}
   <main id="main-content" class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
     {% block content %}{% endblock %}

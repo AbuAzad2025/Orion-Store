@@ -4,6 +4,7 @@
 {% set p_price = (product_i18n.price or product.price) if product_i18n else product.price %}
 {% set desc = (product_i18n.description or product_i18n.short_description) if product_i18n else product.short_description %}
 
+<div class="orion-pdp">
 <section class="orion-product-detail">
   <div class="orion-detail-media">
     {% if product.image_url %}
@@ -29,6 +30,11 @@
       <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold" aria-label="{{ t('add_to_cart') }} {{ p_name }}">{{ t('add_to_cart') }}</button>
       <a href="/cart" class="orion-btn orion-btn-ghost">{{ t('view_cart') }}</a>
     </div>
+    <div class="orion-pdp-trust" aria-label="{{ t('support') }}">
+      <span><span aria-hidden="true">&#10003;</span> {{ t('trust_secure') }}</span>
+      <span><span aria-hidden="true">&#10003;</span> {{ t('trust_shipping') }}</span>
+      <span><span aria-hidden="true">&#10003;</span> {{ t('trust_returns') }}</span>
+    </div>
     {% set wa_order = whatsapp_url(tenant.phone, t('order_request') ~ p_name ~ ' - ' ~ money(p_price) ~ ' ' ~ currency) %}
     {% if wa_order %}
     <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-block"
@@ -48,6 +54,18 @@
     </div>
   </div>
 </section>
+
+<div class="orion-sticky-buy">
+  <div class="orion-sticky-buy-inner">
+    {% if product.image_url %}<img src="{{ product.image_url }}" alt="" aria-hidden="true">{% endif %}
+    <div class="orion-sticky-buy-info">
+      <strong>{{ p_name }}</strong>
+      <span>{{ money(p_price) }} {{ currency }}</span>
+    </div>
+    <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold orion-sticky-add" aria-label="{{ t('add_to_cart') }} {{ p_name }}">{{ t('add_to_cart') }}</button>
+  </div>
+</div>
+</div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>

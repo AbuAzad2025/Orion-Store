@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import uuid
 
+from sqlalchemy import func
+
 from catalog.product import Product
 from core.exceptions import NotFoundError, ValidationError
 from core.utils import utc_now
@@ -191,9 +193,22 @@ class OmsService:
         if not product:
             raise NotFoundError("Product not found.")
         wh_id = warehouse_id or self.ensure_default_warehouse(tenant_id).id
+        # products.quantity is the tenant-wide sellable total. Only write the
+        # remainder to this warehouse so per-warehouse levels never double count.
+        elsewhere = (
+            db.session.query(func.coalesce(func.sum(InventoryLevel.quantity), 0))
+            .filter(
+                InventoryLevel.tenant_id == tenant_id,
+                InventoryLevel.product_id == product_id,
+                InventoryLevel.warehouse_id != wh_id,
+            )
+            .scalar()
+            or 0
+        )
+        target = max(0, int(product.quantity) - int(elsewhere))
         return self.upsert_inventory(
             tenant_id=tenant_id,
             warehouse_id=wh_id,
             product_id=product_id,
-            quantity=product.quantity,
+            quantity=target,
         )
