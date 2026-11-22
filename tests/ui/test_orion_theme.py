@@ -38,6 +38,10 @@ def test_theme_build_exists() -> None:
 def test_base_templates_use_local_theme() -> None:
     for template in BASE_TEMPLATES:
         text = template.read_text(encoding="utf-8")
+        # Child templates inherit the theme from their base template.
+        if "{% extends" in text:
+            assert "admin_base.html" in text or "base.html" in text
+            continue
         assert "orion-theme.css" in text, f"{template} does not load the theme"
         assert "orion-surface" in text, f"{template} has no luxury surface"
 

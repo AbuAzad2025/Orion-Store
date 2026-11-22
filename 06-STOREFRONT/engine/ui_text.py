@@ -41,6 +41,9 @@ _STRINGS: dict[str, dict[str, str]] = {
         "terms_conditions": "الشروط والأحكام",
         "all_rights": "جميع الحقوق محفوظة",
         "powered_by": "مدعوم من",
+        "fx_rate": "سعر الصرف",
+        "live_rate": "مباشر",
+        "rate_date": "آخر تحديث",
         "order_request": "مرحباً، أريد طلب: ",
     },
     "en": {
@@ -81,6 +84,9 @@ _STRINGS: dict[str, dict[str, str]] = {
         "terms_conditions": "Terms and conditions",
         "all_rights": "All rights reserved",
         "powered_by": "Powered by",
+        "fx_rate": "Exchange rate",
+        "live_rate": "live",
+        "rate_date": "Updated",
         "order_request": "Hello, I would like to order: ",
     },
 }

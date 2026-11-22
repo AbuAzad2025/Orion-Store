@@ -66,6 +66,16 @@ class Config:
         "yes",
     )
     CACHE_TTL_SECONDS = int(os.environ.get("CACHE_TTL_SECONDS", "300"))
+    # Live FX rates from exchangerate-api; testing stays deterministic.
+    CURRENCY_LIVE_RATES = os.environ.get("CURRENCY_LIVE_RATES", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    CURRENCY_RATE_TTL_SECONDS = int(os.environ.get("CURRENCY_RATE_TTL_SECONDS", "3600"))
+    CURRENCY_RATE_PROVIDER_URL = os.environ.get(
+        "CURRENCY_RATE_PROVIDER_URL", "https://open.er-api.com/v6/latest/{base}"
+    )
     BETA_MODE = os.environ.get("BETA_MODE", "false").lower() in ("1", "true", "yes")
     BETA_TENANT_SLUGS = os.environ.get("BETA_TENANT_SLUGS", "")
     CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", REDIS_URL)
@@ -112,6 +122,7 @@ class TestingConfig(Config):
     RATELIMIT_ENABLED = False
     PROMETHEUS_ENABLED = False
     CACHE_ENABLED = False
+    CURRENCY_LIVE_RATES = False
     CELERY_TASK_ALWAYS_EAGER = True
 
 

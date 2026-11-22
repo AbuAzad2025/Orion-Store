@@ -104,6 +104,12 @@ HTTP Request
 | **الامتثال والجودة** | فرaud rules/reviews، consent records،طلبات بيانات، SSO، إمكانية وصول، البحث/merchandising، سير عمل |
 | **المراقبة** | /health و/ready و/metrics، Sentry، Grafana، تنبيهات، LOG_JSON |
 
+> **أسعار الصرف**: مبدّل العملة في المتجر يستخدم أسعاراً حقيقية من
+> `exchangerate-api` (`CURRENCY_RATE_PROVIDER_URL`)، تُخزَّن في `currency_rates`
+> لمدة `CURRENCY_RATE_TTL_SECONDS` كـ fallback دون اتصال. الفوتر يعرض السعر
+> ومصدره وعلامة "مباشر". في الاختبارات `CURRENCY_LIVE_RATES=false` لضمان
+> determinism.
+
 ---
 
 ## 6.0 المستودع لكل مستأجر (مصدر واحد للحساب والمراقبة)

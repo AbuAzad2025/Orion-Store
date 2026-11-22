@@ -537,6 +537,18 @@ body.orion-surface {
   border-block-start: 1px solid var(--orion-border);
 }
 
+.orion-fx-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.orion-fx-note .orion-badge {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.45rem;
+}
+
 @media (max-width: 768px) {
   .orion-store-header > div {
     justify-content: center;

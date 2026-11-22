@@ -51,7 +51,13 @@
   <div class="orion-footer-bottom">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3 text-xs">
       <p>© {{ tenant.name }} — {{ t('all_rights') }}</p>
-      <p>{{ t('powered_by') }} <strong>Azadexa</strong></p>
+      <p class="orion-fx-note">
+        {% if fx_rate_info %}
+          {{ t('fx_rate') }} {{ fx_rate_info.pair }}: {{ fx_rate_info.rate }}
+          <span class="orion-badge">{{ t('live_rate') if fx_rate_info.live else t('rate_date') ~ ' ' ~ fx_rate_info.date }}</span>
+        {% endif %}
+        {{ t('powered_by') }} <strong>Azadexa</strong>
+      </p>
     </div>
   </div>
 </footer>

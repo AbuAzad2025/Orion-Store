@@ -47,6 +47,11 @@ class ThemeEngine:
         context["currency"] = (
             selected if selected in SUPPORTED_CURRENCIES else source_currency
         )
+        from currency_svc.currency_service import CurrencyService
+
+        context["fx_rate_info"] = CurrencyService().rate_info(
+            source_currency, context["currency"]
+        )
         context["t"] = lambda key: translate(key, locale)
         context["money"] = lambda value: _format_money(
             value, source_currency, context["currency"]
