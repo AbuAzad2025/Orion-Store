@@ -112,6 +112,23 @@ python scripts/verify_deployment_rls.py --check
 
 ---
 
+## 5.1 النشر الأول (Deployment runbook)
+
+1. انسخ `.env.production.example` إلى `.env.production` واملأ الأسرار الحقيقية.
+2. ضع شهادة wildcard في `01-FOUNDATION/infrastructure/certs/`
+   (`fullchain.pem` + `privkey.pem`) — راجع §0.1.
+3. شغّل الفحص المحلي: `powershell -File scripts/preflight_deploy.ps1`.
+   يجب أن ينتهي بـ `GO`؛ أي `NO-GO` يعني إيقاف النشر.
+4. انشر: `docker compose --env-file .env.production -f 01-FOUNDATION/infrastructure/docker-compose.prod.yml up -d --build`.
+5. تحقق بعد النشر:
+   - `curl -I https://<tenant>.azadexa.com/health` → 200 + HSTS
+   - `curl -I http://<tenant>.azadexa.com/` → 301 إلى HTTPS
+   - `python scripts/verify_deployment_rls.py --check` → 0 مشاكل
+   - طلب sandbox واحد كامل (طلب → دفع → فاتورة)
+6. سجّل رقم الإصدار/الـ commit ووقت النشر في سجل العمليات.
+
+---
+
 ## 6. التراجع عن نشر (Rollback)
 
 1. `docker compose --env-file .env.production -f ...docker-compose.prod.yml down`
