@@ -40,17 +40,22 @@ def init_prometheus(app: Flask) -> None:
     if app.config.get("TESTING") or not app.config.get("PROMETHEUS_ENABLED", True):
         return
 
-    from prometheus_client import Counter, Histogram, generate_latest
+    from prometheus_client import CollectorRegistry, Counter, Histogram, generate_latest
 
+    # Private registry per app: re-initialising monitoring (e.g. in tests or
+    # multiple app factories) must not re-register global timeseries.
+    registry = CollectorRegistry()
     _REQUEST_COUNT = Counter(
         "orion_http_requests_total",
         "HTTP requests",
         ["method", "endpoint", "status"],
+        registry=registry,
     )
     _REQUEST_LATENCY = Histogram(
         "orion_http_request_duration_seconds",
         "HTTP request latency",
         ["method", "endpoint"],
+        registry=registry,
     )
 
     @app.before_request
@@ -71,7 +76,7 @@ def init_prometheus(app: Flask) -> None:
     @app.get("/metrics")
     def metrics() -> Response:
         return Response(
-            generate_latest(),
+            generate_latest(registry),
             mimetype="text/plain; version=0.0.4; charset=utf-8",
         )
 
