@@ -9,47 +9,54 @@
 {% endfor %}
 {% set wa_footer = whatsapp_url(tenant.phone, t('order_request') ~ tenant.name) %}
 
-<footer class="orion-footer orion-muted mt-16 border-t">
-  <div class="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+<footer class="orion-footer">
+  <div class="orion-footer-grid">
     <section class="orion-footer-brand">
-      <div class="orion-brand mb-3">
+      <div class="orion-brand mb-4">
         <span class="orion-brand-mark" aria-hidden="true">A</span>
         <span class="orion-brand-name">{{ tenant.name }}</span>
       </div>
-      <p class="text-sm leading-relaxed">{{ t('footer_about') }}</p>
+      <p class="orion-footer-about">{{ t('footer_about') }}</p>
+      {% if wa_footer %}
+      <a class="orion-footer-cta" href="{{ wa_footer }}" target="_blank" rel="noopener">{{ t('whatsapp') }} ↗</a>
+      {% endif %}
     </section>
 
     <nav aria-label="{{ t('quick_links') }}">
-      <h2 class="orion-footer-title">{{ t('quick_links') }}</h2>
-      <a class="orion-footer-link" href="/?tenant_slug={{ tenant.slug }}">{{ t('home') }}</a>
-      <a class="orion-footer-link" href="/cart?tenant_slug={{ tenant.slug }}">{{ t('cart') }}</a>
-      <a class="orion-footer-link" href="/account?tenant_slug={{ tenant.slug }}">{{ t('account') }}</a>
+      <h2 class="orion-footer-col-title">{{ t('quick_links') }}</h2>
+      <div class="orion-footer-links">
+        <a href="/?tenant_slug={{ tenant.slug }}">{{ t('home') }}</a>
+        <a href="/cart?tenant_slug={{ tenant.slug }}">{{ t('cart') }}</a>
+        <a href="/account?tenant_slug={{ tenant.slug }}">{{ t('account') }}</a>
+      </div>
     </nav>
 
     <section aria-label="{{ t('contact_us') }}">
-      <h2 class="orion-footer-title">{{ t('contact_us') }}</h2>
-      {% if tenant.phone %}<p class="orion-footer-line" dir="ltr">{{ tenant.phone }}</p>{% endif %}
-      {% if tenant.email %}<p class="orion-footer-line" dir="ltr">{{ tenant.email }}</p>{% endif %}
-      {% if wa_footer %}
-      <a class="orion-footer-link" href="{{ wa_footer }}" target="_blank" rel="noopener">{{ t('whatsapp') }} ↗</a>
-      {% endif %}
-      <a class="orion-footer-link" href="/consent?tenant_slug={{ tenant.slug }}">{{ t('legal') }}</a>
+      <h2 class="orion-footer-col-title">{{ t('contact_us') }}</h2>
+      <div class="orion-footer-links">
+        {% if tenant.phone %}<a href="tel:{{ tenant.phone }}" dir="ltr">{{ tenant.phone }}</a>{% endif %}
+        {% if tenant.email %}<a href="mailto:{{ tenant.email }}" dir="ltr">{{ tenant.email }}</a>{% endif %}
+        <a href="/consent?tenant_slug={{ tenant.slug }}">{{ t('legal') }}</a>
+      </div>
     </section>
 
     <nav aria-label="{{ t('legal') }}">
-      <h2 class="orion-footer-title">{{ t('legal') }}</h2>
-      {% if policy.privacy %}
-      <a class="orion-footer-link" href="/pages/{{ policy.privacy.slug }}">{{ policy.privacy.title|default(t('privacy_policy')) }}</a>
-      {% else %}
-      <a class="orion-footer-link" href="/consent?tenant_slug={{ tenant.slug }}">{{ t('privacy_policy') }}</a>
-      {% endif %}
-      {% if policy.terms %}
-      <a class="orion-footer-link" href="/pages/{{ policy.terms.slug }}">{{ policy.terms.title|default(t('terms_conditions')) }}</a>
-      {% endif %}
+      <h2 class="orion-footer-col-title">{{ t('legal') }}</h2>
+      <div class="orion-footer-links">
+        {% if policy.privacy %}
+        <a href="/pages/{{ policy.privacy.slug }}">{{ policy.privacy.title|default(t('privacy_policy')) }}</a>
+        {% else %}
+        <a href="/consent?tenant_slug={{ tenant.slug }}">{{ t('privacy_policy') }}</a>
+        {% endif %}
+        {% if policy.terms %}
+        <a href="/pages/{{ policy.terms.slug }}">{{ policy.terms.title|default(t('terms_conditions')) }}</a>
+        {% endif %}
+      </div>
     </nav>
   </div>
+
   <div class="orion-footer-bottom">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+    <div class="orion-footer-bottom-inner">
       <p>© {{ tenant.name }} — {{ t('all_rights') }}</p>
       <p class="orion-fx-note">
         {% if fx_rate_info %}
@@ -59,7 +66,7 @@
           <span class="orion-badge">{{ t('fx_markup') }} +{{ fx_markup_percent }}% → {{ fx_rate_info.customer_rate }}</span>
           {% endif %}
         {% endif %}
-        {{ t('powered_by') }} <strong>Azadexa</strong>
+        <span>{{ t('powered_by') }} <strong>Azadexa</strong></span>
       </p>
     </div>
   </div>
