@@ -47,11 +47,17 @@ def send_smtp_email(*, recipient: str, subject: str, body: str) -> None:
         )
 
 
-def render_order_confirmation(context: dict) -> tuple[str, str]:
-    subject = f"تأكيد الطلب {context.get('order_number', '')}"
+def render_order_confirmation(
+    context: dict, locale: str | None = None
+) -> tuple[str, str]:
+    from core.i18n_messages import localize
+
+    number = context.get("order_number", "")
+    total = context.get("total", "")
+    subject = f"{localize('تأكيد الطلب', 'Order confirmation', locale)} {number}"
     body = (
-        f"شكراً لطلبك من Azadexa.\n"
-        f"رقم الطلب: {context.get('order_number')}\n"
-        f"الإجمالي: {context.get('total')}\n"
+        f"{localize('شكراً لطلبك من Azadexa.', 'Thank you for your order from Azadexa.', locale)}\n"
+        f"{localize('رقم الطلب', 'Order number', locale)}: {number}\n"
+        f"{localize('الإجمالي', 'Total', locale)}: {total}\n"
     )
     return subject, body

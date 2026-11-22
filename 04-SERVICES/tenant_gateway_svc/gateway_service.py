@@ -46,12 +46,14 @@ class GatewayService:
         gateways = TenantPaymentGateway.query.filter_by(
             tenant_id=tenant_id, is_enabled=True
         ).all()
+        from core.i18n_messages import localize
+
         labels = {
-            "cod": "الدفع عند الاستلام",
+            "cod": localize("الدفع عند الاستلام", "Cash on delivery"),
             "stripe": "Stripe",
             "paypal": "PayPal",
-            "bnpl_tabby": "Tabby — ادفع لاحقاً",
-            "bnpl_tamara": "Tamara — ادفع لاحقاً",
+            "bnpl_tabby": localize("Tabby — ادفع لاحقاً", "Tabby — Pay later"),
+            "bnpl_tamara": localize("Tamara — ادفع لاحقاً", "Tamara — Pay later"),
         }
         return [
             {

@@ -17,9 +17,9 @@
     <div class="orion-nav-controls">
       <div class="orion-locale-switch" role="group" aria-label="{{ t('language') }}">
         <a href="{{ request.path }}?locale=ar&currency={{ currency }}" class="orion-locale-link{% if locale[:2]|lower == 'ar' %} is-active{% endif %}"
-           hreflang="ar" aria-label="العربية" {% if locale[:2]|lower == 'ar' %}aria-current="true"{% endif %}>ع</a>
+           hreflang="ar" aria-label="{{ t('language_ar') }}" {% if locale[:2]|lower == 'ar' %}aria-current="true"{% endif %}>{{ t('language_ar_short') }}</a>
         <a href="{{ request.path }}?locale=en&currency={{ currency }}" class="orion-locale-link{% if locale[:2]|lower == 'en' %} is-active{% endif %}"
-           hreflang="en" aria-label="English" {% if locale[:2]|lower == 'en' %}aria-current="true"{% endif %}>EN</a>
+           hreflang="en" aria-label="{{ t('language_en') }}" {% if locale[:2]|lower == 'en' %}aria-current="true"{% endif %}>{{ t('language_en_short') }}</a>
       </div>
       <label class="orion-currency-control" aria-label="{{ t('currency') }}">
         <select id="currency-switch" aria-label="{{ t('currency') }}"

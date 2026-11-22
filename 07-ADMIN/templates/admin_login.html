@@ -10,21 +10,21 @@
 </head>
 <body class="bg-slate-100 min-h-screen flex items-center justify-center orion-surface">
   <form id="login-form" action="/admin/login" method="post" class="bg-white p-8 rounded-lg shadow w-full max-w-md space-y-4">
-    <h1 class="text-xl font-bold text-center">Azadexa Admin</h1>
+    <h1 class="text-xl font-bold text-center">Azadexa — لوحة الإدارة</h1>
     {% if error %}
     <p class="text-red-600 text-sm text-center">{{ error }}</p>
     {% endif %}
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div>
       <label class="block text-sm mb-1" for="email">البريد</label>
-      <input id="email" name="email" type="email" required class="w-full border rounded px-3 py-2" aria-label="Email">
+      <input id="email" name="email" type="email" required class="w-full border rounded px-3 py-2" aria-label="البريد الإلكتروني">
     </div>
     <div>
       <label class="block text-sm mb-1" for="password">كلمة المرور</label>
-      <input id="password" name="password" type="password" required class="w-full border rounded px-3 py-2" aria-label="Password">
+      <input id="password" name="password" type="password" required class="w-full border rounded px-3 py-2" aria-label="كلمة المرور">
     </div>
     <div>
-      <label class="block text-sm mb-1" for="tenant-slug">Slug المتجر (اختياري)</label>
+      <label class="block text-sm mb-1" for="tenant-slug">معرّف المتجر في الرابط (اختياري)</label>
       <input id="tenant-slug" name="tenant_slug" type="text" class="w-full border rounded px-3 py-2" placeholder="my-store">
     </div>
     <button type="submit" class="orion-btn orion-btn-gold w-full">تسجيل الدخول</button>
@@ -35,14 +35,14 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div>
         <label class="block text-sm mb-1" for="sso-provider-code">رمز مزوّد SSO</label>
-        <input id="sso-provider-code" name="provider_code" type="text" required class="w-full border rounded px-3 py-2" aria-label="SSO provider code">
+        <input id="sso-provider-code" name="provider_code" type="text" required class="w-full border rounded px-3 py-2" aria-label="رمز مزوّد SSO">
       </div>
       <div>
         <label class="block text-sm mb-1" for="sso-email">البريد الخارجي</label>
-        <input id="sso-email" name="external_email" type="email" required class="w-full border rounded px-3 py-2" aria-label="SSO external email">
+        <input id="sso-email" name="external_email" type="email" required class="w-full border rounded px-3 py-2" aria-label="البريد الإلكتروني الخارجي لـ SSO">
       </div>
       <div>
-        <label class="block text-sm mb-1" for="sso-tenant">Slug المتجر</label>
+        <label class="block text-sm mb-1" for="sso-tenant">معرّف المتجر في الرابط</label>
         <input id="sso-tenant" name="tenant_slug" type="text" required class="w-full border rounded px-3 py-2" placeholder="my-store">
       </div>
       <button type="submit" class="orion-btn w-full">دخول عبر SSO</button>

@@ -6,6 +6,7 @@ const StoreAPI = {
     return {
       "Content-Type": "application/json",
       "X-Tenant-ID": this.tenantId,
+      "X-Locale": document.documentElement.lang || "ar",
     };
   },
   async request(method, path, body) {

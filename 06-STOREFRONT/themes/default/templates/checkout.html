@@ -1,52 +1,52 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="orion-title text-2xl mb-6">إتمام الطلب</h1>
+<h1 class="orion-title text-2xl mb-6">{{ t('checkout') }}</h1>
 <form id="checkout-form" class="orion-card max-w-md space-y-4">
   <div>
-    <label class="orion-stat-label block" for="customer-email">البريد الإلكتروني</label>
-    <input id="customer-email" type="email" required class="orion-input w-full" aria-label="Customer Email">
+    <label class="orion-stat-label block" for="customer-email">{{ t('your_email') }}</label>
+    <input id="customer-email" type="email" required class="orion-input w-full" aria-label="{{ t('your_email') }}">
   </div>
   <div>
-    <label class="orion-stat-label block" for="shipping-city">المدينة</label>
-    <input id="shipping-city" type="text" required class="orion-input w-full" aria-label="Shipping City">
+    <label class="orion-stat-label block" for="shipping-city">{{ t('city') }}</label>
+    <input id="shipping-city" type="text" required class="orion-input w-full" aria-label="{{ t('city') }}">
   </div>
   <div class="grid grid-cols-2 gap-2">
     <div>
-      <label class="orion-stat-label block" for="shipping-country">الدولة (رمز من حرفين)</label>
-      <input id="shipping-country" type="text" maxlength="2" class="orion-input w-full" placeholder="PS" dir="ltr" aria-label="Shipping country code">
+      <label class="orion-stat-label block" for="shipping-country">{{ t('country_code') }}</label>
+      <input id="shipping-country" type="text" maxlength="2" class="orion-input w-full" placeholder="PS" dir="ltr" aria-label="{{ t('country_code') }}">
     </div>
     <div>
-      <label class="orion-stat-label block" for="shipping-region">المنطقة</label>
-      <input id="shipping-region" type="text" class="orion-input w-full" aria-label="Shipping region">
+      <label class="orion-stat-label block" for="shipping-region">{{ t('region') }}</label>
+      <input id="shipping-region" type="text" class="orion-input w-full" aria-label="{{ t('region') }}">
     </div>
   </div>
   <div>
-    <label class="orion-stat-label block" for="shipping-method">طريقة الشحن</label>
+    <label class="orion-stat-label block" for="shipping-method">{{ t('shipping_method') }}</label>
     <select id="shipping-method" class="orion-input w-full">
-      <option value="">جارٍ التحميل…</option>
+      <option value="">{{ t('loading') }}</option>
     </select>
   </div>
   <div id="pickup-row" class="hidden">
-    <label class="orion-stat-label block" for="pickup-location">الاستلام من المتجر</label>
-    <select id="pickup-location" class="orion-input w-full" aria-label="موقع الاستلام">
-      <option value="">توصيل إلى العنوان</option>
+    <label class="orion-stat-label block" for="pickup-location">{{ t('store_pickup') }}</label>
+    <select id="pickup-location" class="orion-input w-full" aria-label="{{ t('pickup_location') }}">
+      <option value="">{{ t('deliver_to_address') }}</option>
     </select>
   </div>
   <div>
-    <label class="orion-stat-label block" for="voucher-code">رمز الخصم</label>
-    <input id="voucher-code" type="text" class="orion-input w-full" placeholder="SAVE10">
+    <label class="orion-stat-label block" for="voucher-code">{{ t('voucher_code') }}</label>
+    <input id="voucher-code" type="text" class="orion-input w-full" placeholder="SAVE10" aria-label="{{ t('voucher_code') }}">
   </div>
   <div>
-    <label class="orion-stat-label block" for="payment-method">طريقة الدفع</label>
+    <label class="orion-stat-label block" for="payment-method">{{ t('payment_method') }}</label>
     <select id="payment-method" class="orion-input w-full">
-      <option value="">جارٍ التحميل…</option>
+      <option value="">{{ t('loading') }}</option>
     </select>
   </div>
   <label class="flex items-center gap-2 text-sm" id="use-credit-row">
-    <input id="use-store-credit" type="checkbox" aria-label="استخدام رصيد المتجر"> استخدم رصيدك
+    <input id="use-store-credit" type="checkbox" aria-label="{{ t('use_store_credit') }}"> {{ t('use_your_credit') }}
   </label>
   <p id="checkout-summary" class="text-sm text-gray-600"></p>
-  <button type="submit" class="orion-btn orion-btn-gold w-full">تأكيد الطلب والدفع</button>
+  <button type="submit" class="orion-btn orion-btn-gold w-full">{{ t('confirm_pay') }}</button>
 </form>
 <div id="checkout-result" class="mt-4 text-sm"></div>
 {% endblock %}

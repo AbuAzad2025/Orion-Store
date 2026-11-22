@@ -9,7 +9,11 @@ const OrionAPI = {
   },
 
   headers() {
-    const h = { "Content-Type": "application/json", Accept: "application/json" };
+    const h = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-Locale": document.documentElement.lang || "ar",
+    };
     const csrf = this.getCookie("csrf_access_token");
     if (csrf) h["X-CSRF-TOKEN"] = csrf;
     const tenantId = document.body.dataset.tenantId;

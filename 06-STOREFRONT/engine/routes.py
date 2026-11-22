@@ -13,6 +13,7 @@ from catalog_svc.product_service import ProductService
 from core.context import get_locale
 from core.exceptions import NotFoundError
 from engine.theme_engine import ThemeEngine
+from engine.ui_text import translate
 
 _STOREFRONT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -134,7 +135,7 @@ def store_account():
     return _engine.render(
         "account.html",
         tenant=tenant,
-        page_title="حسابي",
+        page_title=translate("account", get_locale()),
         locale=get_locale(),
     )
 
@@ -147,7 +148,7 @@ def store_cart():
     return _engine.render(
         "cart.html",
         tenant=tenant,
-        page_title="السلة",
+        page_title=translate("cart", get_locale()),
         locale=get_locale(),
     )
 
@@ -160,7 +161,7 @@ def store_checkout():
     return _engine.render(
         "checkout.html",
         tenant=tenant,
-        page_title="الدفع",
+        page_title=translate("checkout", get_locale()),
         locale=get_locale(),
     )
 
@@ -176,7 +177,7 @@ def store_consent():
         "consent.html",
         tenant=tenant,
         cookie_settings=setting,
-        page_title="الخصوصية وملفات تعريف الارتباط",
+        page_title=translate("privacy_cookies", get_locale()),
         locale=get_locale(),
     )
 
@@ -195,7 +196,7 @@ def store_page(slug: str):
                 "page.html",
                 tenant=tenant,
                 page=None,
-                message="ربما تم حذف الصفحة أو أنها غير منشورة.",
+                message=translate("page_not_found_desc", locale),
                 page_title="404",
                 locale=locale,
             ),

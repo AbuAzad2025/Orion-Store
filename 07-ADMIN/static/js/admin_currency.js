@@ -13,7 +13,9 @@ const OrionAdminCurrency = {
           r.from_currency, " → ", r.to_currency, " = ", r.rate, " (", r.source || "manual", ")"
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) {
+      el.textContent = "تعذّر تحميل الأسعار. قد يقتصر التعديل على مسؤولي المنصة.";
+    }
   },
 
   init() {
@@ -35,8 +37,12 @@ const OrionAdminCurrency = {
         const amount = document.getElementById("conv-amount").value;
         const from = document.getElementById("conv-from").value;
         const to = document.getElementById("conv-to").value;
-        const data = await OrionAPI.get(`/currency/convert?amount=${amount}&from=${from}&to=${to}`);
-        document.getElementById("conv-result").textContent = `${data.result} ${to}`;
+        try {
+          const data = await OrionAPI.get(`/currency/convert?amount=${amount}&from=${from}&to=${to}`);
+          document.getElementById("conv-result").textContent = `${data.result} ${to}`;
+        } catch (err) {
+          document.getElementById("conv-result").textContent = "تعذّر التحويل. تحقّق من المبلغ والعملات.";
+        }
       });
     }
     OrionAdminCurrency.loadRates();

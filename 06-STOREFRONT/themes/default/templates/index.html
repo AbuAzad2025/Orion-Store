@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-{% set hero_product = (products|selectattr('is_featured')|first) or (products[0] if products else none) %}
+{% set hero_products = products_i18n or products %}
+{% set hero_product = (hero_products|selectattr('is_featured')|first) or (hero_products[0] if hero_products else none) %}
 <section class="orion-hero">
   <div class="orion-hero-glow" aria-hidden="true"></div>
   <div class="orion-hero-inner">

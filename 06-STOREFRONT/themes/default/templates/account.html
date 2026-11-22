@@ -1,70 +1,70 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">حسابي</h1>
+<h1 class="text-2xl font-bold mb-4">{{ t('account') }}</h1>
 <section id="account-guest" class="orion-card max-w-md space-y-3">
-  <h2 class="font-semibold">تسجيل الدخول</h2>
+  <h2 class="font-semibold">{{ t('sign_in') }}</h2>
   <form id="login-form" class="grid gap-2 text-sm">
-    <input name="email" type="email" placeholder="البريد" class="orion-input w-full" required>
-    <input name="password" type="password" placeholder="كلمة المرور" class="orion-input w-full" required>
-    <button type="submit" class="orion-btn orion-btn-gold w-full">تسجيل الدخول</button>
+    <input name="email" type="email" placeholder="{{ t('your_email') }}" class="orion-input w-full" required>
+    <input name="password" type="password" placeholder="{{ t('password') }}" class="orion-input w-full" required>
+    <button type="submit" class="orion-btn orion-btn-gold w-full">{{ t('sign_in') }}</button>
   </form>
-  <h2 class="font-semibold pt-4">إنشاء حساب جديد</h2>
+  <h2 class="font-semibold pt-4">{{ t('create_account') }}</h2>
   <form id="register-form" class="grid gap-2 text-sm">
-    <input name="first_name" type="text" placeholder="الاسم" class="orion-input w-full">
-    <input name="email" type="email" placeholder="البريد" class="orion-input w-full" required>
-    <input name="password" type="password" placeholder="كلمة المرور" class="orion-input w-full" required>
-    <button type="submit" class="orion-btn w-full">إنشاء حساب</button>
+    <input name="first_name" type="text" placeholder="{{ t('your_name') }}" class="orion-input w-full">
+    <input name="email" type="email" placeholder="{{ t('your_email') }}" class="orion-input w-full" required>
+    <input name="password" type="password" placeholder="{{ t('password') }}" class="orion-input w-full" required>
+    <button type="submit" class="orion-btn w-full">{{ t('create_account_short') }}</button>
   </form>
   <p id="account-error" class="text-red-600 text-sm hidden"></p>
 </section>
 <section id="account-user" class="hidden">
   <p class="mb-4 text-gray-600" id="account-email"></p>
-  <h2 class="font-semibold mb-2">طلباتك</h2>
-  <div id="account-orders" class="text-sm text-gray-600">جارٍ التحميل…</div>
+  <h2 class="font-semibold mb-2">{{ t('your_orders') }}</h2>
+  <div id="account-orders" class="text-sm text-gray-600">{{ t('loading') }}</div>
   <section class="orion-card mt-6 space-y-4">
-    <h2 class="font-semibold text-lg">خدماتك</h2>
-    <p id="account-credit" class="orion-muted text-sm">رصيدك: …</p>
+    <h2 class="font-semibold text-lg">{{ t('your_services') }}</h2>
+    <p id="account-credit" class="orion-muted text-sm">{{ t('your_balance') }}</p>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
       <div>
-        <h3 class="font-semibold mb-2">الاشتراكات</h3>
-        <div id="account-plans" class="space-y-2 orion-muted">جارٍ التحميل…</div>
+        <h3 class="font-semibold mb-2">{{ t('subscriptions') }}</h3>
+        <div id="account-plans" class="space-y-2 orion-muted">{{ t('loading') }}</div>
       </div>
       <div>
-        <h3 class="font-semibold mb-2">اطلب عرض سعر</h3>
+        <h3 class="font-semibold mb-2">{{ t('request_quote') }}</h3>
         <form id="quote-request-form" class="space-y-2">
-          <input name="notes" class="orion-input w-full" placeholder="ملاحظات الطلب" aria-label="ملاحظات الطلب">
-          <input name="product_id" type="number" min="1" placeholder="رقم المنتج" class="orion-input w-full" aria-label="رقم المنتج">
-          <input name="quantity" type="number" min="1" value="1" class="orion-input w-full" aria-label="الكمية">
-          <button type="submit" class="orion-btn w-full">إرسال الطلب</button>
+          <input name="notes" class="orion-input w-full" placeholder="{{ t('order_notes') }}" aria-label="{{ t('order_notes') }}">
+          <input name="product_id" type="number" min="1" placeholder="{{ t('product_id') }}" class="orion-input w-full" aria-label="{{ t('product_id') }}">
+          <input name="quantity" type="number" min="1" value="1" class="orion-input w-full" aria-label="{{ t('quantity') }}">
+          <button type="submit" class="orion-btn w-full">{{ t('send_request') }}</button>
         </form>
         <div id="account-quotes" class="mt-2 space-y-1 orion-muted"></div>
       </div>
       <div>
-        <h3 class="font-semibold mb-2">قوائم الهدايا</h3>
+        <h3 class="font-semibold mb-2">{{ t('gift_lists') }}</h3>
         <form id="gift-registry-form" class="space-y-2">
-          <input name="registry_name" required class="orion-input w-full" placeholder="اسم القائمة" aria-label="اسم القائمة">
-          <input name="event_type" class="orion-input w-full" placeholder="المناسبة" aria-label="المناسبة">
-          <input name="event_date" type="date" class="orion-input w-full" aria-label="تاريخ المناسبة">
-          <button type="submit" class="orion-btn w-full">إنشاء قائمة جديدة</button>
+          <input name="registry_name" required class="orion-input w-full" placeholder="{{ t('list_name') }}" aria-label="{{ t('list_name') }}">
+          <input name="event_type" class="orion-input w-full" placeholder="{{ t('occasion') }}" aria-label="{{ t('occasion') }}">
+          <input name="event_date" type="date" class="orion-input w-full" aria-label="{{ t('event_date') }}">
+          <button type="submit" class="orion-btn w-full">{{ t('create_list') }}</button>
         </form>
         <form id="gift-item-form" class="space-y-2 mt-2">
-          <input name="slug" class="orion-input w-full" placeholder="رمز القائمة" aria-label="رمز القائمة">
-          <input name="product_id" type="number" min="1" class="orion-input w-full" placeholder="رقم المنتج" aria-label="رقم المنتج">
-          <button type="submit" class="orion-btn w-full">أضف منتجاً للقائمة</button>
+          <input name="slug" class="orion-input w-full" placeholder="{{ t('list_code') }}" aria-label="{{ t('list_code') }}">
+          <input name="product_id" type="number" min="1" class="orion-input w-full" placeholder="{{ t('product_id') }}" aria-label="{{ t('product_id') }}">
+          <button type="submit" class="orion-btn w-full">{{ t('add_product_to_list') }}</button>
         </form>
         <div id="account-registries" class="mt-2 space-y-1 orion-muted"></div>
       </div>
     </div>
   </section>
   <section class="orion-card mt-6 max-w-md space-y-2">
-    <h2 class="font-semibold">خصوصيتك وبياناتك</h2>
+    <h2 class="font-semibold">{{ t('privacy_data') }}</h2>
     <div class="flex gap-2">
-      <button id="gdpr-export-btn" class="orion-btn text-sm">تنزيل نسخة من بياناتي</button>
-      <button id="gdpr-delete-btn" class="orion-btn text-sm">حذف بياناتي</button>
+      <button id="gdpr-export-btn" class="orion-btn text-sm">{{ t('download_my_data') }}</button>
+      <button id="gdpr-delete-btn" class="orion-btn text-sm">{{ t('delete_my_data') }}</button>
     </div>
     <p id="gdpr-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
   </section>
-  <button id="logout-btn" class="mt-4 text-sm text-red-700 underline">تسجيل الخروج</button>
+  <button id="logout-btn" class="mt-4 text-sm text-red-700 underline">{{ t('logout') }}</button>
 </section>
 {% endblock %}
 {% block scripts %}

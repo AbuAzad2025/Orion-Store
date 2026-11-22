@@ -1,7 +1,7 @@
 {# Impersonation banner — shows when platform admin is impersonating a tenant admin (AZ-0.18) #}
 {% if g.impersonator_user and g.impersonated_user %}
 <div id="impersonation-banner"
-     class="fixed top-0 left-0 right-0 z-50 bg-amber-600 text-white shadow-lg"
+     class="fixed top-0 start-0 end-0 z-50 bg-amber-600 text-white shadow-lg"
      role="alert"
      aria-live="assertive">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">

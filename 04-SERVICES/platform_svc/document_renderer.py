@@ -15,12 +15,20 @@ from platform_models.platform_settings import PlatformSettings
 from platform_svc.pdf_service import get_invoice_storage, html_to_pdf
 from platform_svc.platform_settings_service import PlatformSettingsService
 
-DEFAULT_INVOICE_BODY = (
-    '<div class="invoice-header"><h1>فاتورة</h1></div>'
-    '<div class="invoice-body">{{order_number}}</div>'
-    '<footer id="azadexa-platform-footer" class="azadexa-platform-footer" '
-    'data-immutable="true"></footer>'
-)
+
+def default_invoice_body(locale: str | None = None) -> str:
+    from core.i18n_messages import localize
+
+    heading = localize("فاتورة", "Invoice", locale)
+    return (
+        f'<div class="invoice-header"><h1>{heading}</h1></div>'
+        '<div class="invoice-body">{{order_number}}</div>'
+        '<footer id="azadexa-platform-footer" class="azadexa-platform-footer" '
+        'data-immutable="true"></footer>'
+    )
+
+
+DEFAULT_INVOICE_BODY = default_invoice_body()
 
 
 class DocumentRenderer:
@@ -57,9 +65,11 @@ class DocumentRenderer:
         template_row: TenantDocumentTemplate | None,
         footer_html: str,
     ) -> str:
+        from core.i18n_messages import request_locale
+
         body = (
             template_row.body_html if template_row else None
-        ) or DEFAULT_INVOICE_BODY
+        ) or default_invoice_body(request_locale())
         self.validate_template(body)
         body = body.replace("{{order_number}}", order.order_number)
         body = body.replace("{{total}}", str(order.total))

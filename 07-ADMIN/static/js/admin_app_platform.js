@@ -65,14 +65,14 @@ const OrionAdminAppPlatform = {
     try {
       const data = await OrionAPI.get("/app-platform/sandboxes");
       const rows = data.sandboxes || [];
-      if (!rows.length) { el.textContent = "لا توجد sandbox."; return; }
+      if (!rows.length) { el.textContent = "لا توجد متاجر تجريبية."; return; }
       SafeDOM.clear(el);
       for (const s of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           s.slug, " — ", s.name
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = "تعذّر تحميل المتاجر التجريبية."; }
   },
 
   // One-time reveal: the button is shown once after registration and removes

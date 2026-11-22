@@ -4,6 +4,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const waBtn = document.getElementById("whatsapp-order-btn");
   const waMsg = document.getElementById("wa-msg");
 
+  const isArabic = document.documentElement.lang === "ar";
+  const tr = (ar, en) => (isArabic ? ar : en);
+  const currency = document.body.dataset.currency || "ILS";
+  const sourceCurrency = document.body.dataset.sourceCurrency || currency;
+  const fxRate = parseFloat(document.body.dataset.fxRate || "0") || 0;
+  const convert = (value) =>
+    currency !== sourceCurrency && fxRate ? value * fxRate : value;
+  const money = (value) => convert(parseFloat(value || 0) || 0).toFixed(2);
+  const emptyText = listEl?.dataset.empty || tr("السلة فارغة.", "The cart is empty.");
+  const totalLabel = document.getElementById("cart-total")?.dataset.total || tr("المجموع:", "Total:");
+
   async function ensureCart() {
     let token = StoreAPI.getCartToken();
     if (!token) {
@@ -14,45 +25,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     return token;
   }
 
+  function showEmpty() {
+    if (listEl) {
+      SafeDOM.clear(listEl);
+      listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, [emptyText]));
+    }
+    if (waBtn) waBtn.disabled = true;
+    const totalEl = document.getElementById("cart-total");
+    if (totalEl) totalEl.textContent = "";
+  }
+
   async function refresh() {
     const token = StoreAPI.getCartToken();
-    if (!token) {
-      if (listEl) { SafeDOM.clear(listEl); listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["السلة فارغة."])); }
-      if (waBtn) waBtn.disabled = true;
-      const totalEl = document.getElementById("cart-total");
-      if (totalEl) totalEl.textContent = "";
-      return;
-    }
+    if (!token) { showEmpty(); return; }
     const data = await StoreAPI.getCart(token);
-    if (!data.items.length) {
-      if (listEl) { SafeDOM.clear(listEl); listEl.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["السلة فارغة."])); }
-      if (waBtn) waBtn.disabled = true;
-      const totalEl = document.getElementById("cart-total");
-      if (totalEl) totalEl.textContent = "";
-      return;
-    }
+    if (!data.items.length) { showEmpty(); return; }
     if (waBtn) waBtn.disabled = false;
     if (listEl) {
       SafeDOM.clear(listEl);
-      const currency = document.body.dataset.currency || "ILS";
       let total = 0;
       data.items.forEach((i) => {
         const line = parseFloat(i.total_price || 0) || 0;
         total += line;
         listEl.appendChild(SafeDOM.elem("div", { className: "flex justify-between border-b py-2" }, [
           SafeDOM.elem("span", {}, [i.product_name || i.product_id]),
-          SafeDOM.elem("span", {}, [`${i.quantity} × ${i.unit_price} ${currency}`]),
+          SafeDOM.elem("span", {}, [`${i.quantity} × ${money(i.unit_price)} ${currency}`]),
         ]));
       });
       const totalEl = document.getElementById("cart-total");
-      if (totalEl) totalEl.textContent = `المجموع: ${total.toFixed(2)} ${currency}`;
+      if (totalEl) totalEl.textContent = `${totalLabel} ${money(total)} ${currency}`;
     }
   }
 
   waBtn?.addEventListener("click", async () => {
     const token = StoreAPI.getCartToken();
     if (!token) {
-      if (waMsg) waMsg.textContent = "السلة فارغة.";
+      if (waMsg) waMsg.textContent = emptyText;
       return;
     }
     waBtn.disabled = true;
@@ -61,9 +69,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         customer_name: document.getElementById("wa-customer-name")?.value || "",
         notes: document.getElementById("wa-notes")?.value || "",
       });
-      if (!result.url) throw new Error("رقم واتساب غير مُضبط لهذا المتجر.");
+      if (!result.url) throw new Error(tr("رقم واتساب غير مُضبط لهذا المتجر.", "No WhatsApp number is configured for this store."));
       window.open(result.url, "_blank", "noopener,noreferrer");
-      if (waMsg) waMsg.textContent = "تم تجهيز الطلب — أكمل الإرسال في واتساب.";
+      if (waMsg) waMsg.textContent = tr("تم تجهيز الطلب — أكمل الإرسال في واتساب.", "Order prepared — finish sending it in WhatsApp.");
     } catch (err) {
       if (waMsg) waMsg.textContent = err.message;
     } finally {
@@ -71,20 +79,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // On cart page: load existing cart or show empty
   if (listEl) {
     refresh().catch((err) => {
       listEl.textContent = err.message;
     });
   }
 
-  // Add-to-cart buttons — create cart lazily on first click
   document.querySelectorAll("[data-add-cart]").forEach((btn) => {
     const originalText = btn.textContent;
     btn.addEventListener("click", async () => {
       if (btn.disabled) return;
       btn.disabled = true;
-      btn.textContent = "...جاري";
+      btn.textContent = tr("جارٍ الإضافة…", "Adding…");
       btn.classList.add("opacity-60", "cursor-wait");
       try {
         const productId = parseInt(btn.dataset.addCart, 10);

@@ -97,6 +97,7 @@ def main() -> None:
         from bopis_svc.bopis_service import BopisService
         from currency_svc.currency_service import CurrencyService
         from discount_svc.voucher_service import VoucherService
+        from feature_flag.feature_flag import FeatureFlag
         from gift_svc.gift_registry_service import GiftRegistryService
         from store_credit_svc.store_credit_service import StoreCreditService
 
@@ -109,6 +110,21 @@ def main() -> None:
         from payment_svc.payment_service import PaymentService
         from tenant.tenant import Tenant
         from tenant_svc.tenant_service import TenantService
+        from user.user import User
+
+        # Make the language switcher work in the demo dataset.
+        multi_language = FeatureFlag.query.filter_by(code="multi_language").first()
+        if multi_language:
+            multi_language.default_value = True
+            db.session.commit()
+
+        if not User.query.filter_by(email="root@azadexa.test", tenant_id=None).first():
+            auth_register = AuthService()
+            auth_register.register_super_admin(
+                email="root@azadexa.test",
+                password="password123",
+                first_name="منصة",
+            )
 
         auth = AuthService()
         categories = CategoryService()

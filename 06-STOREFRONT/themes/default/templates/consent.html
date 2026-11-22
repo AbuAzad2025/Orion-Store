@@ -3,18 +3,18 @@
 <section class="orion-consent max-w-3xl mx-auto" id="cookie-consent"
          data-active="{{ 'true' if (cookie_settings and cookie_settings.is_active) else 'false' }}"
          data-tenant-id="{{ tenant.slug }}">
-  <h1 class="orion-title orion-eyebrow text-2xl mb-4">خصوصيتك وملفات تعريف الارتباط</h1>
+  <h1 class="orion-title orion-eyebrow text-2xl mb-4">{{ t('privacy_cookies') }}</h1>
   <p class="orion-muted mb-6">
-    {{ (cookie_settings.banner_message if cookie_settings and cookie_settings.banner_message else 'نستخدم ملفات تعريف الارتباط لتحسين تجربة التصفح وتحليل الاستخدام.') }}
+    {{ (cookie_settings.banner_message if cookie_settings and cookie_settings.banner_message else t('cookies_banner_long')) }}
   </p>
   <ul class="orion-muted text-sm mb-6 space-y-2">
-    <li>الملفات الضرورية: تشغّل المتجر ولا يمكن إيقافها.</li>
-    <li>ملفات التحليل: تساعدنا على تحسين تجربتك.</li>
-    <li>ملفات التسويق: تعرض لك محتوى يناسبك.</li>
+    <li>{{ t('cookies_essential') }}</li>
+    <li>{{ t('cookies_analytics') }}</li>
+    <li>{{ t('cookies_marketing') }}</li>
   </ul>
   <div class="flex gap-3">
-    <button type="button" id="consent-accept-all" class="orion-btn orion-btn-gold">قبول الجميع</button>
-    <button type="button" id="consent-necessary-only" class="orion-btn">الضرورية فقط</button>
+    <button type="button" id="consent-accept-all" class="orion-btn orion-btn-gold">{{ t('accept_all') }}</button>
+    <button type="button" id="consent-necessary-only" class="orion-btn">{{ t('necessary_only') }}</button>
   </div>
   <p class="orion-muted text-xs mt-4" id="consent-status" role="status"></p>
 </section>
@@ -25,9 +25,10 @@
   var section = document.getElementById("cookie-consent");
   var status = document.getElementById("consent-status");
   if (!section || section.dataset.active !== "true") { return; }
+  var savedPrefix = {{ t('consent_saved')|tojson }};
   function save(choice) {
     try { localStorage.setItem("orion_cookie_consent", choice); } catch (e) { /* storage disabled */ }
-    if (status) { status.textContent = "تم حفظ اختيارك: " + choice; }
+    if (status) { status.textContent = savedPrefix + choice; }
     fetch("/api/v1/compliance/consent/public", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-Tenant-ID": (document.body.dataset.tenantId || section.dataset.tenantId || "") },

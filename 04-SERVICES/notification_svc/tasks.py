@@ -7,15 +7,19 @@ from orion.celery_app import celery_app
 
 @celery_app.task(name="orion.send_email")
 def send_email_task(payload: dict) -> dict:
+    from core.i18n_messages import localize
     from notification_svc.email_sender import render_order_confirmation, send_smtp_email
 
     template = payload.get("template")
     context = payload.get("context") or {}
+    locale = payload.get("locale")
     if template == "order_confirmation":
-        subject, body = render_order_confirmation(context)
+        subject, body = render_order_confirmation(context, locale=locale)
     else:
         subject = f"Azadexa — {template}"
-        body = str(context)
+        body = f"{localize('تفاصيل', 'Details', locale)}\n" + "\n".join(
+            f"{k}: {v}" for k, v in context.items()
+        )
     send_smtp_email(recipient=payload["recipient"], subject=subject, body=body)
     return {"status": "sent", "recipient": payload["recipient"]}
 

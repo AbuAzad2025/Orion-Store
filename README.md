@@ -85,6 +85,7 @@ Production: `https://{tenant.slug}.azadexa.com/` or custom domain.
 # fresh DB + migrations, then:
 DATABASE_URL=postgresql://... FLASK_ENV=development python scripts/seed_demo_data.py
 DATABASE_URL=postgresql://... FLASK_ENV=development python scripts/fetch_product_images.py
+DATABASE_URL=postgresql://... FLASK_ENV=development python scripts/seed_translations.py
 ```
 Seeds 5 tenants (`outlet`, `gulf`, `euro`, `atlantic`, `sterling`) with 12 products,
 6 categories, 2 warehouses, 4 customers, 8 paid orders, 1 partial refund,
@@ -96,6 +97,11 @@ Re-running skips existing tenants.
 Verify the full purchase/refund/ledger cycle (see `docs/ACCOUNTING_AUDIT.md`):
 ```powershell
 DATABASE_URL=postgresql://... FLASK_ENV=development python scripts/verify_accounting_flow.py outlet
+```
+
+Audit Arabic/English consistency across all pages (see `docs/TRANSLATION_AUDIT.md`):
+```powershell
+DATABASE_URL=postgresql://... FLASK_ENV=development python scripts/audit_translation.py
 ```
 
 ## Wave 0–1 deliverables

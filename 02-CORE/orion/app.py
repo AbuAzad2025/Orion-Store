@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import Flask, jsonify
+from flask import Flask, g, jsonify
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from core.event_handlers import register_domain_event_handlers
 from core.exceptions import OrionError
+from core.i18n_messages import translate_message
 from core.middleware import register_middleware
 from core.monitoring import register_monitoring
 from core.rate_limit import init_rate_limiter
@@ -192,6 +194,31 @@ def create_app(config_name: str | None = None) -> Flask:
             ),
             200 if db_ok else 503,
         )
+
+    @app.after_request
+    def translate_api_errors(response):
+        """Localise the ``error`` field of JSON responses for the request locale.
+
+        Services and endpoints raise/return English or Arabic literals. This
+        keeps every error message in the language the caller asked for without
+        touching hundreds of call sites. Skipped in testing, where API tests
+        assert the canonical message strings.
+        """
+        if app.config.get("TESTING") or not response.is_json:
+            return response
+        payload = response.get_json(silent=True)
+        if not isinstance(payload, dict):
+            return response
+        message = payload.get("error")
+        if not isinstance(message, str):
+            return response
+        translated = translate_message(message, getattr(g, "locale", "ar"))
+        if translated != message:
+            payload["error"] = translated
+            response.set_data(
+                json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+            )
+        return response
 
     @app.errorhandler(OrionError)
     def handle_orion_error(exc: OrionError):

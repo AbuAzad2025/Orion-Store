@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
             SafeDOM.elem("input", { type: "password", className: "bnpl-key border rounded px-2 py-1 text-sm w-full mb-2", placeholder: "API Key (اتركه فارغاً للإبقاء)" }),
             SafeDOM.elem("label", { className: "inline-flex items-center gap-2 text-sm mb-2" }, [
               SafeDOM.elem("input", sandboxAttrs),
-              " Sandbox"
+              " وضع الاختبار"
             ]),
             SafeDOM.elem("button", { type: "button", className: "bnpl-save rounded bg-indigo-600 px-3 py-1 text-white text-sm", "data-provider": p.provider }, ["حفظ"])
           ]);
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
               SafeDOM.elem("div", null, [
                 SafeDOM.elem("strong", null, [f.name]),
                 SafeDOM.elem("p", { className: "text-xs text-gray-500" }, [`${f.code} — ${f.description || ""}`]),
-                SafeDOM.elem("p", { className: "text-xs text-gray-400 mt-1" }, [`Rollout: ${f.rollout_percent}%`])
+                SafeDOM.elem("p", { className: "text-xs text-gray-400 mt-1" }, [`نسبة النشر: ${f.rollout_percent}%`])
               ]),
               SafeDOM.elem("div", { className: "flex items-center gap-3" }, [
                 f.has_override ? SafeDOM.elem("span", { className: "text-xs text-amber-600" }, ["مخصّص"]) : SafeDOM.elem("span", { className: "text-xs text-gray-400" }, ["تلقائي"]),

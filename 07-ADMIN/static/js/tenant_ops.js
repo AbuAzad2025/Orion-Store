@@ -276,9 +276,13 @@ const OrionTenantOps = {
       if (!rows.length) { el.textContent = "لا توجد مواقع استلام."; return; }
       SafeDOM.clear(el);
       for (const l of rows) {
+        const a = l.address;
+        const address = typeof a === "string"
+          ? a
+          : (a && (a.text || a.city || a.line1 || Object.values(a).join("، "))) || "";
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           SafeDOM.elem("strong", null, [l.name]),
-          ` — ${l.address}${l.phone ? ` (${l.phone})` : ""}`
+          ` — ${address}${l.phone ? ` (${l.phone})` : ""}`
         ]));
       }
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }

@@ -5,9 +5,9 @@
     <h2 class="text-lg font-semibold mb-3">سجلات الموافقة</h2>
     <form id="consent-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
-      <input name="consent_type" type="text" placeholder="نوع الموافقة (مثال: marketing)" required>
+      <input name="consent_type" type="text" placeholder="نوع الموافقة (مثال: تسويق)" required>
       <label class="inline-flex items-center gap-2">
-        <input name="granted" type="checkbox" checked aria-label="Granted"> ممنوحة
+        <input name="granted" type="checkbox" checked aria-label="ممنوحة"> ممنوحة
       </label>
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة موافقة</button>
     </form>
@@ -31,7 +31,7 @@
     <form id="cookie-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <textarea name="banner_message" rows="2" placeholder="نص البانر" class="border rounded px-2 py-1"></textarea>
       <label class="inline-flex items-center gap-2">
-        <input name="is_active" type="checkbox" checked aria-label="Is Active"> مفعّل
+        <input name="is_active" type="checkbox" checked aria-label="مفعّل"> مفعّل
       </label>
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">حفظ الإعدادات</button>
     </form>
@@ -44,9 +44,9 @@
         <option value="saml">SAML</option>
         <option value="oidc">OpenID Connect</option>
       </select>
-      <input name="client_id" type="text" placeholder="Client ID" required>
-      <input name="client_secret" type="password" placeholder="Client Secret" required>
-      <input name="issuer_url" type="url" placeholder="Issuer URL">
+      <input name="client_id" type="text" placeholder="معرّف العميل" required>
+      <input name="client_secret" type="password" placeholder="المفتاح السري للعميل" required>
+      <input name="issuer_url" type="url" placeholder="رابط جهة الإصدار">
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة مزود</button>
     </form>
     <div id="sso-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
@@ -54,7 +54,7 @@
     <form id="sso-exchange-form" class="grid gap-2 max-w-md text-sm">
       <input name="provider_code" type="text" placeholder="رمز المزود" required aria-label="رمز مزود SSO">
       <input name="external_email" type="email" placeholder="البريد الخارجي" required aria-label="البريد الخارجي">
-      <input name="tenant_id" type="text" placeholder="Tenant ID (اختياري)" aria-label="معرّف المتجر">
+      <input name="tenant_id" type="text" placeholder="معرّف المتجر (اختياري)" aria-label="معرّف المتجر">
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">تبادل</button>
     </form>
     <p id="sso-exchange-result" class="orion-muted text-sm" role="status" aria-live="polite"></p>

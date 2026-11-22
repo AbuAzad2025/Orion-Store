@@ -414,7 +414,7 @@ def tenant_schema_markup():
     return render_template(
         "schema_markup_management.html",
         tenant=tenant,
-        page_title="Schema Markup",
+        page_title="ترميز البيانات المنظّمة",
         active_nav="schema_markup",
     )
 

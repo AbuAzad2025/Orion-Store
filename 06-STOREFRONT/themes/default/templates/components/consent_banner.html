@@ -1,12 +1,12 @@
 {% set banner_settings = cookie_settings|default(None) %}
 {% if banner_settings and banner_settings.is_active %}
 <aside id="orion-consent-banner" class="fixed bottom-0 inset-x-0 z-50 bg-slate-900 text-white px-4 py-3 text-sm hidden"
-       data-tenant-id="{{ tenant.slug }}" role="region" aria-label="ملفات تعريف الارتباط">
+       data-tenant-id="{{ tenant.slug }}" role="region" aria-label="{{ t('cookies') }}">
   <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
-    <p class="flex-1">{{ banner_settings.banner_message or 'نستخدم ملفات تعريف الارتباط لتحسين تجربة التصفح.' }}</p>
+    <p class="flex-1">{{ banner_settings.banner_message or t('cookies_banner_short') }}</p>
     <div class="flex gap-2">
-      <button type="button" id="orion-consent-accept" class="orion-btn orion-btn-gold text-xs">قبول الجميع</button>
-      <button type="button" id="orion-consent-necessary" class="orion-btn text-xs">الضرورية فقط</button>
+      <button type="button" id="orion-consent-accept" class="orion-btn orion-btn-gold text-xs">{{ t('accept_all') }}</button>
+      <button type="button" id="orion-consent-necessary" class="orion-btn text-xs">{{ t('necessary_only') }}</button>
     </div>
   </div>
 </aside>
