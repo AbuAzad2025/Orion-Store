@@ -112,5 +112,5 @@ def current_tenant():
         if not g.tenant:
             return jsonify({"error": "Tenant context required."}), 404
         return jsonify({"tenant": g.tenant.to_dict()}), 200
-    except OrionError as exc:
+    except OrionError as exc:  # pragma: no cover - to_dict cannot raise
         return jsonify({"error": exc.message}), exc.status_code

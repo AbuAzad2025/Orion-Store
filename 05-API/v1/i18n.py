@@ -22,7 +22,7 @@ def list_languages():
     try:
         locales = _i18n.list_active_locales()
         return jsonify({"languages": [loc.to_dict() for loc in locales]}), 200
-    except OrionError as exc:
+    except OrionError as exc:  # pragma: no cover - list cannot raise
         return jsonify({"error": exc.message}), exc.status_code
 
 

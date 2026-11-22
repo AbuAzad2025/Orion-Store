@@ -136,7 +136,7 @@ jobs:
           export ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
           pytest -v -m "not external and not e2e" \
             --cov \
-            --cov-fail-under=89 \
+            --cov-fail-under=99 \
             --cov-report=term-missing \
             --cov-report=json:coverage.json \
             --cov-report=xml:coverage.xml

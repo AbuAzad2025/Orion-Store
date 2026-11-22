@@ -212,7 +212,7 @@ HTTP Request
 
 ## 10. الجودة والاختبارات
 
-- **575 اختباراً** على PostgreSQL حقيقي (وظيفة E2E تستخدم SQLite معزولاً) + 4 اختبارات E2E، تغطية ≥89% مفروضة.
+- **575 اختباراً** على PostgreSQL حقيقي (وظيفة E2E تستخدم SQLite معزولاً) + 4 اختبارات E2E، تغطية ≥99% مفروضة.
 - **pre-commit/CI**: black، isort، flake8، YAML، طول الملفات، pip-audit، Bandit،
   gitleaks، تدقيق RLS، تدقيق schema/FK، تدقيق a11y/RTL، تدقيق مراجع API/الواجهة،
   تدقيق تباين الألوان.
@@ -238,7 +238,7 @@ npm install
 npm run build:css
 .\scripts\dev.ps1 setup-local     # PostgreSQL + Redis + .env + migrate + seed
 .\scripts\dev.ps1 run             # http://127.0.0.1:5000
-.\scripts\dev.ps1 test            # pytest + coverage ≥89%
+.\scripts\dev.ps1 test            # pytest + coverage ≥99%
 ```
 
 المرجع الأعلى لهذا الوصف هو الكود نفسه؛ أي تعارض مع `ORION-Project-Plan-Report.md`

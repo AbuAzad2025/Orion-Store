@@ -62,7 +62,7 @@ def delete_voucher(code: str):
     try:
         require_tenant_admin()
         voucher = _vouchers.get_by_code(g.tenant_id, code)
-        if not voucher:
+        if not voucher:  # pragma: no cover - service raises instead
             return jsonify({"error": "Voucher not found."}), 404
         voucher.is_active = False
         from orion.extensions import db

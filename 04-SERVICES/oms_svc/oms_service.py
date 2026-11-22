@@ -166,7 +166,7 @@ class OmsService:
         items = FulfillmentItem.query.filter_by(fulfillment_id=row.id).all()
         for fi in items:
             oi = OrderItem.query.get(fi.order_item_id)
-            if not oi:
+            if not oi:  # pragma: no cover - FK RESTRICT makes this unreachable
                 continue
             level = InventoryLevel.query.filter_by(
                 warehouse_id=row.warehouse_id, product_id=oi.product_id

@@ -14,7 +14,7 @@ from base.pk import PrimaryKeyType
 from base.types import PlanType, TenantStatus
 from orion.extensions import db
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover - type-only import
     from tenant.tenant_config import TenantConfig
 
 

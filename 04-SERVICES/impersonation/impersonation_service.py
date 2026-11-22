@@ -73,11 +73,14 @@ class ImpersonationService:
         audit = AuditLog(
             tenant_id=tenant_id,
             actor_user_id=impersonator_user_id,
-            impersonator_user_id=impersonator_user_id,
             action="impersonation_start",
             resource_type="user",
             resource_id=str(target_user_id),
-            details={"target_email": target.email, "expires_at": expires.isoformat()},
+            details={
+                "target_email": target.email,
+                "expires_at": expires.isoformat(),
+                "impersonator_user_id": impersonator_user_id,
+            },
         )
         db.session.add(audit)
         db.session.commit()
@@ -100,11 +103,13 @@ class ImpersonationService:
         audit = AuditLog(
             tenant_id=session.tenant_id,
             actor_user_id=session.target_user_id,
-            impersonator_user_id=impersonator_user_id,
             action="impersonation_end",
             resource_type="user",
             resource_id=str(session.target_user_id),
-            details={"session_id": session.id},
+            details={
+                "session_id": session.id,
+                "impersonator_user_id": impersonator_user_id,
+            },
         )
         db.session.add(audit)
         db.session.commit()
@@ -125,11 +130,13 @@ class ImpersonationService:
             audit = AuditLog(
                 tenant_id=s.tenant_id,
                 actor_user_id=s.target_user_id,
-                impersonator_user_id=impersonator_user_id,
                 action="impersonation_revoked",
                 resource_type="user",
                 resource_id=str(s.target_user_id),
-                details={"session_id": s.id},
+                details={
+                    "session_id": s.id,
+                    "impersonator_user_id": impersonator_user_id,
+                },
             )
             db.session.add(audit)
             count += 1

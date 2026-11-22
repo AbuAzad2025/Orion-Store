@@ -133,7 +133,7 @@ def sso_exchange():
         )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
-    except (KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError):  # pragma: no cover - dead handler
         return jsonify({"error": "Invalid request."}), 400
 
     tokens = issue_tokens_for_user(user)

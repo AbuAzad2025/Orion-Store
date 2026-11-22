@@ -64,7 +64,7 @@ relative_files = true
 [tool.coverage.report]
 precision = 1
 show_missing = true
-fail_under = 89
+fail_under = 99
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "02-CORE/tests"]
@@ -91,8 +91,10 @@ paths = [
     { glob = "tests/api/test_v2_api.py", max = 700 },
     { glob = "tests/api/test_coverage_expansion_api.py", max = 1500 },
     { glob = "tests/services/test_coverage_expansion_services.py", max = 1100 },
+    { glob = "tests/api/test_coverage_push_api.py", max = 1000 },
     { glob = "tests/services/test_coverage_push_services.py", max = 1000 },
     { glob = "tests/core/test_coverage_push_core.py", max = 1000 },
+    { glob = "tests/services/test_coverage_final_services.py", max = 1300 },
     { glob = "**/*_service.py", max = 400 },
     { glob = "05-API/v1/*.py", max = 300 },
     { glob = "03-MODELS/**/*.py", max = 250 },

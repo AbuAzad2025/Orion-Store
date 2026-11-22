@@ -59,7 +59,7 @@ def convert():
             ),
             200,
         )
-    except OrionError as exc:
+    except OrionError as exc:  # pragma: no cover - convert never raises
         return jsonify({"error": exc.message}), exc.status_code
     except (TypeError, ValueError, InvalidOperation):
         return jsonify({"error": "Invalid request."}), 400

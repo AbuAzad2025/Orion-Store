@@ -9,7 +9,7 @@ from flask import Flask, Response, g, request
 
 from core.logging_config import configure_logging
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover - type-only import
     from prometheus_client import Counter, Histogram
 
 _REQUEST_COUNT: Counter | None = None

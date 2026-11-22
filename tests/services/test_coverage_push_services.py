@@ -77,6 +77,7 @@ def _fixed(item):
 
 
 def _raises(exc):
+
     def raise_it(*a, **k):
         raise exc
 
@@ -263,7 +264,10 @@ def test_adapter_live_charge_branches(app, live, tenant, monkeypatch, mod, facto
         if factory == "gw"
         else _bnpl(t, sandbox=False)
     )
-    charge = lambda: _charge(mod, order, row)
+
+    def charge():
+        return _charge(mod, order, row)
+
     assert "credentials_missing" in charge()["error"]
     _creds(app, row, other="x")
     assert "credentials_missing" in charge()["error"]
@@ -322,7 +326,10 @@ def test_adapter_live_refund_branches(app, live, tenant, monkeypatch, mod, facto
         else _bnpl(t, sandbox=False)
     )
     payment = _pay(t, _order(t), provider="x", pid="txn")
-    refund = lambda: _refund(mod, payment, row)
+
+    def refund():
+        return _refund(mod, payment, row)
+
     assert "credentials_missing" in refund()["error"]
     _creds(app, row, client_id="cid", client_secret="sec", api_key="key")
     if mod is paypal:
@@ -368,7 +375,10 @@ def test_stripe_live_error_branches(app, live, tenant, monkeypatch):
     t = tenant.id
     row = _gw(t, "stripe", sandbox=False)
     order = _order(t)
-    charge = lambda: stripe_connect.charge_stripe(order=order, gateway=row, amount=A)
+
+    def charge():
+        return stripe_connect.charge_stripe(order=order, gateway=row, amount=A)
+
     assert charge()["error"] == "stripe_credentials_missing"
     _creds(app, row, other="x")
     assert charge()["error"] == "stripe_credentials_missing"
@@ -377,9 +387,10 @@ def test_stripe_live_error_branches(app, live, tenant, monkeypatch):
     assert charge()["error"] == "stripe_missing_payment_id"
     payment = _pay(t, order, provider="stripe", pid="pi-1")
     _creds(app, row, other="x")
-    refund = lambda: stripe_connect.refund_payment(
-        payment=payment, gateway=row, amount=A
-    )
+
+    def refund():
+        return stripe_connect.refund_payment(payment=payment, gateway=row, amount=A)
+
     assert refund()["error"] == "stripe_credentials_missing"
     _creds(app, row, secret_key="sk")
     monkeypatch.setattr(
@@ -491,7 +502,10 @@ def test_refund_gateway_dispatch(app, live, tenant, monkeypatch):
     t = tenant.id
     svc = PaymentService()
     payment = _pay(t, _order(t), provider="bnpl_tabby", pid="txn")
-    refund = lambda: svc._refund_external_gateway(t, payment, Decimal("5"))
+
+    def refund():
+        return svc._refund_external_gateway(t, payment, Decimal("5"))
+
     monkeypatch.setitem(app.config, "PAYMENT_LIVE_CALLS_ENABLED", False)
     assert refund()["success"] is True
     _creds(app, _bnpl(t), api_key="key")

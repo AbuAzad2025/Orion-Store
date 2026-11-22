@@ -33,7 +33,7 @@ def create_draft():
         return jsonify({"draft_order": draft.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
-    except (KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError):  # pragma: no cover - dead handler
         return jsonify({"error": "Invalid request."}), 400
 
 
@@ -68,5 +68,5 @@ def convert(draft_id: int):
         return jsonify({"order": order.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
-    except (KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError):  # pragma: no cover - dead handler
         return jsonify({"error": "Invalid request."}), 400

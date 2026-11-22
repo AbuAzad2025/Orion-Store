@@ -100,7 +100,7 @@ def install_app(app_id: int):
         return jsonify({"installation": inst.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
-    except (TypeError, ValueError):
+    except (TypeError, ValueError):  # pragma: no cover - dead handler
         return jsonify({"error": "Invalid request."}), 400
 
 
