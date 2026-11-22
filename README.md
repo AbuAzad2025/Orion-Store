@@ -80,6 +80,16 @@ Production: `https://{tenant.slug}.azadexa.com/` or custom domain.
 - Checkout supports address-based tax, store credit, coupons and optional BOPIS pickup.
 - Admin login supports SSO exchange for enabled tenant identity providers.
 
+## Demo data (local testing)
+```powershell
+# fresh DB + migrations, then:
+DATABASE_URL=postgresql://... FLASK_ENV=development python scripts/seed_demo_data.py
+```
+Seeds 5 tenants (`outlet`, `gulf`, `euro`, `atlantic`, `sterling`) with 12 products,
+6 categories, 2 warehouses, 4 customers, 8 paid orders, 1 partial refund,
+invoices, commissions, store credit, vouchers, gift registries and real FX rates.
+Admin logins: `admin@<slug>.test` / `password123`. Re-running skips existing tenants.
+
 ## Wave 0–1 deliverables
 
 - Flask app factory + `/health`
