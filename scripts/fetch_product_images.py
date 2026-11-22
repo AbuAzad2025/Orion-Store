@@ -19,7 +19,14 @@ import tempfile
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-for part in ("02-CORE", "03-MODELS", "04-SERVICES", "05-API", "06-STOREFRONT", "07-ADMIN"):
+for part in (
+    "02-CORE",
+    "03-MODELS",
+    "04-SERVICES",
+    "05-API",
+    "06-STOREFRONT",
+    "07-ADMIN",
+):
     sys.path.insert(0, str(ROOT / part))
 
 ASSETS = ROOT / "06-STOREFRONT/themes/default/static/images/products"
@@ -43,7 +50,9 @@ PRODUCT_IMAGES = {
 
 
 def fetch(url: str, dest: pathlib.Path) -> None:
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 OrionDemo/1.0"})
+    req = urllib.request.Request(
+        url, headers={"User-Agent": "Mozilla/5.0 OrionDemo/1.0"}
+    )
     with urllib.request.urlopen(req, timeout=45) as resp:
         data = resp.read()
     if len(data) < 5000:
@@ -86,9 +95,7 @@ def main() -> None:
                 continue
             for product in Product.query.filter_by(tenant_id=tenant_id).all():
                 if product.slug in PRODUCT_IMAGES:
-                    product.image_url = (
-                        f"/store/static/images/products/{tenant_slug}/{product.slug}.jpg"
-                    )
+                    product.image_url = f"/store/static/images/products/{tenant_slug}/{product.slug}.jpg"
                     updated += 1
         db.session.commit()
         print(f"Attached images to {updated} products across {len(TENANTS)} tenants.")

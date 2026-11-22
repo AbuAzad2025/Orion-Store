@@ -16,7 +16,14 @@ import sys
 from decimal import Decimal
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-for part in ("02-CORE", "03-MODELS", "04-SERVICES", "05-API", "06-STOREFRONT", "07-ADMIN"):
+for part in (
+    "02-CORE",
+    "03-MODELS",
+    "04-SERVICES",
+    "05-API",
+    "06-STOREFRONT",
+    "07-ADMIN",
+):
     sys.path.insert(0, str(ROOT / part))
 
 RESULTS: list[tuple[str, bool, str]] = []
@@ -36,8 +43,14 @@ def main() -> None:
 
     app = create_app(os.environ["FLASK_ENV"])
     with app.app_context():
-        from catalog.product import Product
+        import uuid
+
         from currency_svc.currency_service import CurrencyService
+        from store_credit.store_credit import StoreCreditTransaction
+        from store_credit_svc.store_credit_service import StoreCreditService
+
+        from auth.auth_service import AuthService
+        from catalog.product import Product
         from oms.warehouse import InventoryLevel
         from order.order import Order
         from order_svc.cart_service import CartService
@@ -49,14 +62,8 @@ def main() -> None:
         from platform_models.financial_event import FinancialEvent
         from platform_models.invoice import Invoice
         from platform_svc.pdf_service import get_invoice_storage
-        from store_credit.store_credit import StoreCreditTransaction
-        from store_credit_svc.store_credit_service import StoreCreditService
         from tenant.tenant import Tenant
         from user.user import User
-
-        import uuid
-
-        from auth.auth_service import AuthService
 
         tenant = Tenant.query.filter_by(slug=slug).first()
         if tenant is None:
@@ -68,7 +75,9 @@ def main() -> None:
             password="password123",
             is_admin=False,
         )
-        product = Product.query.filter_by(tenant_id=tenant.id, is_published=True).first()
+        product = Product.query.filter_by(
+            tenant_id=tenant.id, is_published=True
+        ).first()
 
         # --- store credit top-up -------------------------------------------
         credit_svc = StoreCreditService()
@@ -79,7 +88,9 @@ def main() -> None:
             reason="accounting verification",
         )
         before_balance = Decimal(str(credit.balance))
-        check("store credit top-up", before_balance >= Decimal("100"), str(before_balance))
+        check(
+            "store credit top-up", before_balance >= Decimal("100"), str(before_balance)
+        )
 
         # --- checkout + payment --------------------------------------------
         qty = 2
@@ -99,24 +110,48 @@ def main() -> None:
             order_public_id=str(order.public_id),
             payment_method="cod",
         )
-        payment = Payment.query.filter_by(tenant_id=tenant.id, order_id=order.id).first()
+        payment = Payment.query.filter_by(
+            tenant_id=tenant.id, order_id=order.id
+        ).first()
         check("order created", order.total is not None, order.order_number)
-        check("payment completed", payment is not None and payment.status == "completed", str(payment.amount if payment else None))
-        check("payment matches order total", Decimal(str(payment.amount)) == Decimal(str(order.total)), f"{payment.amount} vs {order.total}")
+        check(
+            "payment completed",
+            payment is not None and payment.status == "completed",
+            str(payment.amount if payment else None),
+        )
+        check(
+            "payment matches order total",
+            Decimal(str(payment.amount)) == Decimal(str(order.total)),
+            f"{payment.amount} vs {order.total}",
+        )
 
         # store credit was used at checkout
         after_credit = StoreCreditService().get_balance(
             tenant_id=tenant.id, customer_email=customer.email
         )
-        check("store credit debited at checkout", after_credit < before_balance, f"{before_balance} -> {after_credit}")
+        check(
+            "store credit debited at checkout",
+            after_credit < before_balance,
+            f"{before_balance} -> {after_credit}",
+        )
         txn = StoreCreditTransaction.query.filter_by(
             tenant_id=tenant.id, credit_id=credit.id, transaction_type="debit"
         ).first()
-        check("store credit transaction recorded", txn is not None, str(txn.amount if txn else None))
+        check(
+            "store credit transaction recorded",
+            txn is not None,
+            str(txn.amount if txn else None),
+        )
 
         # --- invoice + PDF ---------------------------------------------------
-        invoice = Invoice.query.filter_by(tenant_id=tenant.id, order_id=order.id).first()
-        check("invoice created", invoice is not None, str(invoice.invoice_number if invoice else None))
+        invoice = Invoice.query.filter_by(
+            tenant_id=tenant.id, order_id=order.id
+        ).first()
+        check(
+            "invoice created",
+            invoice is not None,
+            str(invoice.invoice_number if invoice else None),
+        )
         if invoice:
             db.session.refresh(invoice)
             key = invoice.storage_key or invoice.pdf_artifact_path
@@ -132,22 +167,48 @@ def main() -> None:
         inbound = FinancialEvent.query.filter_by(
             tenant_id=tenant.id, source_entity="payment", source_id=payment.id
         ).first()
-        check("inbound financial event", inbound is not None and inbound.status == "completed", str(inbound.amount if inbound else None))
+        check(
+            "inbound financial event",
+            inbound is not None and inbound.status == "completed",
+            str(inbound.amount if inbound else None),
+        )
         ledger = PlatformCommissionLedger.query.filter_by(
             tenant_id=tenant.id, payment_id=payment.id, entry_type="commission"
         ).first()
-        expected_commission = (Decimal(str(payment.amount)) * ledger.commission_percent).quantize(Decimal("0.01")) if ledger else Decimal("0")
-        check("commission ledger booked", ledger is not None and Decimal(str(ledger.commission_amount)) == expected_commission, f"{ledger.commission_amount if ledger else None} expected {expected_commission}")
+        expected_commission = (
+            (Decimal(str(payment.amount)) * ledger.commission_percent).quantize(
+                Decimal("0.01")
+            )
+            if ledger
+            else Decimal("0")
+        )
+        check(
+            "commission ledger booked",
+            ledger is not None
+            and Decimal(str(ledger.commission_amount)) == expected_commission,
+            f"{ledger.commission_amount if ledger else None} expected {expected_commission}",
+        )
 
         # --- inventory --------------------------------------------------------
         db.session.refresh(product)
-        check("product stock decremented", product.quantity == stock_before - qty, f"{stock_before} -> {product.quantity}")
+        check(
+            "product stock decremented",
+            product.quantity == stock_before - qty,
+            f"{stock_before} -> {product.quantity}",
+        )
         total_levels = (
             db.session.query(db.func.coalesce(db.func.sum(InventoryLevel.quantity), 0))
-            .filter(InventoryLevel.tenant_id == tenant.id, InventoryLevel.product_id == product.id)
+            .filter(
+                InventoryLevel.tenant_id == tenant.id,
+                InventoryLevel.product_id == product.id,
+            )
             .scalar()
         )
-        check("warehouse stock sums to product total", int(total_levels) == product.quantity, f"levels={total_levels} product={product.quantity}")
+        check(
+            "warehouse stock sums to product total",
+            int(total_levels) == product.quantity,
+            f"levels={total_levels} product={product.quantity}",
+        )
 
         # --- partial refund + reversal ---------------------------------------
         refund_amount = Decimal("10.00")
@@ -157,23 +218,48 @@ def main() -> None:
             amount=refund_amount,
             reason="accounting verification partial",
         )
-        refund = Refund.query.filter_by(tenant_id=tenant.id, payment_id=payment.id).first()
-        check("refund row created", refund is not None and Decimal(str(refund.amount)) == refund_amount, str(refund.amount if refund else None))
-        check("provider refund id set", bool(refund and refund.provider_refund_id), str(refund.provider_refund_id if refund else None))
+        refund = Refund.query.filter_by(
+            tenant_id=tenant.id, payment_id=payment.id
+        ).first()
+        check(
+            "refund row created",
+            refund is not None and Decimal(str(refund.amount)) == refund_amount,
+            str(refund.amount if refund else None),
+        )
+        check(
+            "provider refund id set",
+            bool(refund and refund.provider_refund_id),
+            str(refund.provider_refund_id if refund else None),
+        )
         outbound = FinancialEvent.query.filter_by(
             tenant_id=tenant.id, source_entity="refund", source_id=refund.id
         ).first()
-        check("negative refund event", outbound is not None and Decimal(str(outbound.amount)) == -refund_amount, str(outbound.amount if outbound else None))
+        check(
+            "negative refund event",
+            outbound is not None and Decimal(str(outbound.amount)) == -refund_amount,
+            str(outbound.amount if outbound else None),
+        )
         reversal = PlatformCommissionLedger.query.filter_by(
             tenant_id=tenant.id,
             reverses_ledger_id=ledger.id,
             entry_type="commission_reversal",
         ).first()
         ratio = refund_amount / Decimal(str(payment.amount))
-        expected_reversal = -(Decimal(str(ledger.commission_amount)) * ratio).quantize(Decimal("0.01"))
-        check("commission reversal posted", reversal is not None and Decimal(str(reversal.commission_amount)) == expected_reversal, f"{reversal.commission_amount if reversal else None} expected {expected_reversal}")
+        expected_reversal = -(Decimal(str(ledger.commission_amount)) * ratio).quantize(
+            Decimal("0.01")
+        )
+        check(
+            "commission reversal posted",
+            reversal is not None
+            and Decimal(str(reversal.commission_amount)) == expected_reversal,
+            f"{reversal.commission_amount if reversal else None} expected {expected_reversal}",
+        )
         db.session.refresh(order)
-        check("partial refund keeps order paid", order.payment_status == "paid", order.payment_status)
+        check(
+            "partial refund keeps order paid",
+            order.payment_status == "paid",
+            order.payment_status,
+        )
 
         # --- FX with 3% customer markup -------------------------------------
         fx = CurrencyService()
@@ -186,9 +272,25 @@ def main() -> None:
                 to_currency=tenant.default_currency,
                 markup_percent=app.config.get("CURRENCY_FX_MARKUP_PERCENT", 0),
             )
-            expected = (Decimal("100") * rate * (Decimal(1) + Decimal(str(app.config.get("CURRENCY_FX_MARKUP_PERCENT", 0))) / 100)).quantize(Decimal("0.01"))
-            check("FX conversion + markup", converted == expected, f"{converted} expected {expected}")
-            check("FX info exposes markup", bool(info and info.get("customer_rate")), str(info))
+            expected = (
+                Decimal("100")
+                * rate
+                * (
+                    Decimal(1)
+                    + Decimal(str(app.config.get("CURRENCY_FX_MARKUP_PERCENT", 0)))
+                    / 100
+                )
+            ).quantize(Decimal("0.01"))
+            check(
+                "FX conversion + markup",
+                converted == expected,
+                f"{converted} expected {expected}",
+            )
+            check(
+                "FX info exposes markup",
+                bool(info and info.get("customer_rate")),
+                str(info),
+            )
         else:
             check("FX rate available", rate is not None, tenant.default_currency)
 

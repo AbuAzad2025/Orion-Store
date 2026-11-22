@@ -24,18 +24,23 @@
   min-height: 100vh;
 }
 
-/* Typography — readable Arabic/Latin stack without external font downloads. */
+/* Typography — modern Arabic web fonts with a native system fallback. */
 body.orion-surface {
-  font-family: "Segoe UI", Tahoma, Arial, "Noto Sans", sans-serif;
+  font-family: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
 .orion-surface h1,
 .orion-surface h2,
-.orion-surface h3 {
-  letter-spacing: -0.015em;
-  line-height: 1.25;
+.orion-surface h3,
+.orion-hero-title,
+.orion-section-title,
+.orion-detail-title,
+.orion-detail-info .orion-product-price {
+  font-family: "Readex Pro", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 /* Coherent dark-luxury surface over the existing Tailwind utility classes.
