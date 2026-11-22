@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify
@@ -38,10 +40,20 @@ def _validate_production_secrets(app: Flask) -> None:
         )
 
 
+def _asset_version() -> str:
+    """Hash the committed theme CSS so asset URLs change whenever it changes."""
+    css = Path(__file__).resolve().parents[2] / "01-FOUNDATION/assets/orion-theme.css"
+    try:
+        return hashlib.md5(css.read_bytes()).hexdigest()[:8]
+    except OSError:  # pragma: no cover - deployed images always ship the file
+        return "static"
+
+
 def create_app(config_name: str | None = None) -> Flask:
     load_dotenv()
 
     app = Flask(__name__)
+    app.jinja_env.globals["asset_version"] = _asset_version()
     env = config_name or os.environ.get("FLASK_ENV", "development")
     app.config.from_object(config_by_name.get(env, config_by_name["default"]))
 

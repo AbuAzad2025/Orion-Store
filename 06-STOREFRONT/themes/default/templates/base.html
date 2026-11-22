@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page_title }}</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('storefront_assets.static', filename='favicon.svg') }}">
-  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/tailwind.css') }}">
-  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/orion-theme.css') }}">
-  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/main.css') }}">
-  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/rtl.css') }}">
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/tailwind.css') }}?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/orion-theme.css') }}?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/main.css') }}?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/rtl.css') }}?v={{ asset_version }}">
 </head>
 <body class="bg-gray-50 min-h-screen orion-surface flex flex-col" data-tenant-id="{{ tenant.slug }}" data-currency="{{ currency }}">
   <a class="orion-skip-link" href="#main-content">{{ t('skip_to_content') }}</a>
@@ -18,8 +18,8 @@
   </main>
   {% include "components/footer.html" %}
   {% include "components/consent_banner.html" %}
-  <script src="{{ url_for('storefront_assets.static', filename='js/store_utils.js') }}"></script>
-  <script src="{{ url_for('storefront_assets.static', filename='js/store_api.js') }}"></script>
+  <script src="{{ url_for('storefront_assets.static', filename='js/store_utils.js') }}?v={{ asset_version }}"></script>
+  <script src="{{ url_for('storefront_assets.static', filename='js/store_api.js') }}?v={{ asset_version }}"></script>
   <script src="{{ url_for('storefront_assets.static', filename='js/lazy_load.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>
