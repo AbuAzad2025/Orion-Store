@@ -24,6 +24,20 @@
   min-height: 100vh;
 }
 
+/* Typography — readable Arabic/Latin stack without external font downloads. */
+body.orion-surface {
+  font-family: "Segoe UI", Tahoma, Arial, "Noto Sans", sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.orion-surface h1,
+.orion-surface h2,
+.orion-surface h3 {
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
 /* Coherent dark-luxury surface over the existing Tailwind utility classes.
    Scoped so third-party/static pages outside .orion-surface stay untouched. */
 .orion-surface .bg-white,
@@ -200,30 +214,41 @@
   justify-content: center;
   gap: 0.5rem;
   min-height: 2.75rem;
-  padding-inline: 1.25rem;
+  padding-inline: 1.35rem;
   border-radius: 999px;
   border: 1px solid var(--orion-border);
   background: var(--orion-panel-2);
   color: var(--orion-text);
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   cursor: pointer;
-  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease,
+    box-shadow 140ms ease;
 }
 
 .orion-btn:hover {
   background: #1d2f4b;
   border-color: var(--orion-gold);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
   transform: translateY(-1px);
 }
 
+.orion-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
 .orion-btn-gold {
-  background: var(--orion-gold);
+  background: linear-gradient(135deg, var(--orion-gold), var(--orion-gold-strong));
   color: #1b1405;
   border-color: var(--orion-gold);
+  box-shadow: 0 6px 18px rgba(230, 196, 121, 0.22);
 }
 
 .orion-btn-gold:hover {
   background: var(--orion-gold-strong);
+  box-shadow: 0 8px 22px rgba(230, 196, 121, 0.3);
 }
 
 .orion-input,

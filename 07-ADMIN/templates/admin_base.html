@@ -7,9 +7,9 @@
   <link rel="icon" type="image/svg+xml" href="{{ url_for('admin_assets.static', filename='favicon.svg') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
-
+  {% block head_extra %}{% endblock %}
 </head>
-<body class="bg-gray-100 min-h-screen orion-surface" {% if tenant %}data-tenant-id="{{ tenant.slug }}"{% endif %}>
+<body class="bg-gray-100 min-h-screen orion-surface" {% if tenant %}data-tenant-id="{{ tenant.slug }}"{% endif %} {% block body_attrs %}{% endblock %}>
   {% include "components/impersonation_banner.html" %}
   <a class="orion-skip-link" href="#main-content">تخطَّ إلى المحتوى</a>
   <div class="flex min-h-screen">

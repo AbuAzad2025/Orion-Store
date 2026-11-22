@@ -15,7 +15,7 @@ from sqlalchemy import and_, or_
 
 from auth.auth_service import AuthService
 from core.audit_log import audit_log
-from core.exceptions import NotFoundError, OrionError
+from core.exceptions import AuthenticationError, NotFoundError, OrionError
 from core.jwt_auth import issue_tokens_for_user
 from core.middleware import require_tenant_context
 from core.rate_limit import limiter
@@ -30,12 +30,12 @@ def _current_customer() -> User:
     try:
         public_id = uuid.UUID(get_jwt_identity())
     except (ValueError, TypeError) as exc:
-        raise NotFoundError("Customer not found.") from exc
+        raise AuthenticationError("Customer not found.") from exc
     user = User.query.filter_by(
         public_id=public_id, tenant_id=g.tenant_id, is_customer=True, is_active=True
     ).first()
     if not user:
-        raise NotFoundError("Customer not found.")
+        raise AuthenticationError("Customer not found.")
     return user
 
 
