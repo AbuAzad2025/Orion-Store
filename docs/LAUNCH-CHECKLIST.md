@@ -6,6 +6,7 @@
 ## 1. الأمان (P0)
 - [ ] `ProductionConfig` يرفض `SECRET_KEY` الافتراضي والمفاتيح الفارغة — `pytest tests/security/test_production_config.py`
 - [ ] كوكيز `Secure` + `HttpOnly` + `SameSite` وHSTS مُفعّل — نفس الاختبار
+- [ ] شهادة TLSwildcard في `infrastructure/certs/` وخدمة `nginx` تنهي TLS على 443 — `docs/RUNBOOK.md §0.1`
 - [ ] RLS على **كل** الجداول التي تحمل `tenant_id` — `python scripts/audit_rls.py --check`
 - [ ] دور التطبيق **ليس superuser** بعد النشر — `python scripts/verify_deployment_rls.py --check` (0 مشاكل)
 - [ ] FK سليمة وفهارس `tenant_id` موجودة — `python scripts/audit_schema.py --check`
@@ -27,7 +28,7 @@
 
 ## 4. الجودة
 - [ ] `python -m pre_commit run --all-files` أخضر
-- [ ] `pytest -m "not external and not e2e"` بالكامل أخضر + تغطية ≥85%
+- [ ] `pytest -m "not external and not e2e"` بالكامل أخضر + تغطية ≥99%
 - [ ] `pip-audit --strict` وBandit وgitleaks في CI
 
 ## 5. المراقبة

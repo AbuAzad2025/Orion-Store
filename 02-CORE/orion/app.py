@@ -6,6 +6,7 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from core.event_handlers import register_domain_event_handlers
 from core.exceptions import OrionError
@@ -43,6 +44,14 @@ def create_app(config_name: str | None = None) -> Flask:
     app = Flask(__name__)
     env = config_name or os.environ.get("FLASK_ENV", "development")
     app.config.from_object(config_by_name.get(env, config_by_name["default"]))
+
+    # Behind the production TLS reverse proxy the app sees HTTP on :5000.
+    # Trust the proxy headers so request.is_secure, host-based tenant resolution
+    # and Secure cookie redirects behave as they do on the public HTTPS origin.
+    if env == "production":
+        app.wsgi_app = ProxyFix(
+            app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1
+        )
 
     # Config class attributes are evaluated at import time, before load_dotenv()
     # runs. Re-apply critical environment values so .env and late-set vars win.

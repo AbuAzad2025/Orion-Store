@@ -17,6 +17,21 @@ curl http://127.0.0.1:5000/metrics              # Prometheus (غير مُفعّ�
 - `/ready` يُعيد 503 إذا تعذّر الوصول لـ PostgreSQL.
 - `/health` يُظهر حالة Redis (`ping_redis`).
 
+### 0.1 TLS / reverse proxy (production)
+ compose الإنتاج لا يكشف المنفذ 5000 مباشرة؛ خدمة `nginx` تنهي TLS على
+ المنفذين 80/443 وتُعيد التوجيه إلى `orion-api:5000` على الشبكة الداخلية.
+ قبل التشغيل ضع الشهادة في `01-FOUNDATION/infrastructure/certs/`
+ (`fullchain.pem` + `privkey.pem`، راجع `certs/README.md`)، ثم:
+
+```powershell
+docker compose --env-file .env.production -f 01-FOUNDATION/infrastructure/docker-compose.prod.yml up -d --build
+curl -I https://<tenant>.azadexa.com/health        # يجب 200 + HSTS
+curl -I http://<tenant>.azadexa.com/               # 301 إلى HTTPS
+```
+
+ التطبيق يثق بـ `X-Forwarded-*` عبر ProxyFix في بيئة production فقط، لذا
+ كوكيز `Secure` وإعادة التوجيه تعمل بشكل صحيح خلف البروكسي.
+
 ---
 
 ## 1. النسخ الاحتياطي (Backup)

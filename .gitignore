@@ -22,6 +22,9 @@ env/
 *.swp
 *.swo
 
+# TLS private keys / certificates
+*.pem
+
 # Testing
 .pytest_cache/
 .coverage
