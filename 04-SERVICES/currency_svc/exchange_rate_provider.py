@@ -16,7 +16,9 @@ _CACHE: dict[str, tuple[float, Decimal]] = {}
 _CACHE_TTL = 1800  # seconds
 
 
-def fetch_live_rate(base: str, quote: str, url_template: str = DEFAULT_URL) -> Decimal | None:
+def fetch_live_rate(
+    base: str, quote: str, url_template: str = DEFAULT_URL
+) -> Decimal | None:
     base = (base or "").strip().upper()
     quote = (quote or "").strip().upper()
     if len(base) != 3 or len(quote) != 3:
@@ -41,5 +43,11 @@ def fetch_live_rate(base: str, quote: str, url_template: str = DEFAULT_URL) -> D
             return None
         _CACHE[key] = (time.time(), rate)
         return rate
-    except (requests.RequestException, ValueError, KeyError, InvalidOperation, TypeError):
+    except (
+        requests.RequestException,
+        ValueError,
+        KeyError,
+        InvalidOperation,
+        TypeError,
+    ):
         return None

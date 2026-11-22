@@ -55,6 +55,9 @@
         {% if fx_rate_info %}
           {{ t('fx_rate') }} {{ fx_rate_info.pair }}: {{ fx_rate_info.rate }}
           <span class="orion-badge">{{ t('live_rate') if fx_rate_info.live else t('rate_date') ~ ' ' ~ fx_rate_info.date }}</span>
+          {% if fx_markup_percent %}
+          <span class="orion-badge">{{ t('fx_markup') }} +{{ fx_markup_percent }}% → {{ fx_rate_info.customer_rate }}</span>
+          {% endif %}
         {% endif %}
         {{ t('powered_by') }} <strong>Azadexa</strong>
       </p>

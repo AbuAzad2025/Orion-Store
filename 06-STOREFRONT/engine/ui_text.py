@@ -44,6 +44,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "fx_rate": "سعر الصرف",
         "live_rate": "مباشر",
         "rate_date": "آخر تحديث",
+        "fx_markup": "شامل فرق العملة",
         "order_request": "مرحباً، أريد طلب: ",
     },
     "en": {
@@ -87,6 +88,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "fx_rate": "Exchange rate",
         "live_rate": "live",
         "rate_date": "Updated",
+        "fx_markup": "incl. FX margin",
         "order_request": "Hello, I would like to order: ",
     },
 }

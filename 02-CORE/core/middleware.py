@@ -104,6 +104,19 @@ def register_middleware(app: Flask) -> None:
                 db.text("SELECT set_config('app.is_platform_admin', 'false', false)")
             )
 
+    @app.after_request
+    def remember_debug_tenant(response):
+        """In dev preview, remember the chosen tenant for subsequent bare URLs."""
+        if current_app.debug and request.args.get("tenant_slug"):
+            response.set_cookie(
+                "orion_preview_tenant",
+                request.args["tenant_slug"],
+                max_age=7 * 24 * 3600,
+                httponly=False,
+                samesite="Lax",
+            )
+        return response
+
     @app.before_request
     def guard_beta_program() -> None:
         if not beta_mode_enabled() or not is_beta_gated_path(request.path):
@@ -208,13 +221,21 @@ def _resolve_tenant_from_request() -> Tenant | None:
         if tenant:
             return tenant
 
-    if current_app.debug:
-        preview_slug = request.args.get("tenant_slug")
+    if current_app.debug and not request.path.startswith(("/api/", "/admin/")):
+        preview_slug = request.args.get("tenant_slug") or request.cookies.get(
+            "orion_preview_tenant"
+        )
         if preview_slug:
             tenant = _tenant_query().filter_by(slug=preview_slug).first()
             if tenant:
                 return tenant
-        tenant = _tenant_query().filter_by(slug="beta-ramallah").first()
+        # Last resort for local development only: first active tenant.
+        tenant = (
+            _tenant_query()
+            .filter_by(is_active=True, deleted_at=None)
+            .order_by(Tenant.id)
+            .first()
+        )
         if tenant:
             return tenant
     return None

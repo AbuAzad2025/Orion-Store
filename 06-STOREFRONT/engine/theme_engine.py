@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
 
-from flask import has_request_context, render_template, request
+from flask import current_app, has_request_context, render_template, request
 
 from core.context import get_locale
 from engine.ui_text import translate
@@ -12,7 +12,7 @@ from engine.ui_text import translate
 SUPPORTED_CURRENCIES = frozenset({"ILS", "USD", "EUR", "GBP", "SAR", "AED", "JOD"})
 
 
-def _format_money(value, source: str, target: str) -> str:
+def _format_money(value, source: str, target: str, markup_percent: float = 0) -> str:
     try:
         amount = Decimal(str(value))
     except (InvalidOperation, ValueError, TypeError):
@@ -23,7 +23,10 @@ def _format_money(value, source: str, target: str) -> str:
 
     try:
         converted = CurrencyService().convert(
-            amount=amount, from_currency=source, to_currency=target
+            amount=amount,
+            from_currency=source,
+            to_currency=target,
+            markup_percent=markup_percent,
         )
     except Exception:
         return f"{amount:.2f}"
@@ -49,12 +52,14 @@ class ThemeEngine:
         )
         from currency_svc.currency_service import CurrencyService
 
+        markup = float(current_app.config.get("CURRENCY_FX_MARKUP_PERCENT", 0))
+        context["fx_markup_percent"] = markup
         context["fx_rate_info"] = CurrencyService().rate_info(
             source_currency, context["currency"]
         )
         context["t"] = lambda key: translate(key, locale)
         context["money"] = lambda value: _format_money(
-            value, source_currency, context["currency"]
+            value, source_currency, context["currency"], markup
         )
         context["currencies"] = sorted(SUPPORTED_CURRENCIES)
         if "cookie_settings" not in context and tenant is not None:

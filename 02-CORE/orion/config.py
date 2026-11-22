@@ -73,6 +73,10 @@ class Config:
         "yes",
     )
     CURRENCY_RATE_TTL_SECONDS = int(os.environ.get("CURRENCY_RATE_TTL_SECONDS", "3600"))
+    # Customer-facing FX markup applied when switching display currency.
+    CURRENCY_FX_MARKUP_PERCENT = float(
+        os.environ.get("CURRENCY_FX_MARKUP_PERCENT", "3")
+    )
     CURRENCY_RATE_PROVIDER_URL = os.environ.get(
         "CURRENCY_RATE_PROVIDER_URL", "https://open.er-api.com/v6/latest/{base}"
     )
@@ -123,6 +127,7 @@ class TestingConfig(Config):
     PROMETHEUS_ENABLED = False
     CACHE_ENABLED = False
     CURRENCY_LIVE_RATES = False
+    CURRENCY_FX_MARKUP_PERCENT = 0
     CELERY_TASK_ALWAYS_EAGER = True
 
 

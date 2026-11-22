@@ -106,9 +106,10 @@ HTTP Request
 
 > **أسعار الصرف**: مبدّل العملة في المتجر يستخدم أسعاراً حقيقية من
 > `exchangerate-api` (`CURRENCY_RATE_PROVIDER_URL`)، تُخزَّن في `currency_rates`
-> لمدة `CURRENCY_RATE_TTL_SECONDS` كـ fallback دون اتصال. الفوتر يعرض السعر
-> ومصدره وعلامة "مباشر". في الاختبارات `CURRENCY_LIVE_RATES=false` لضمان
-> determinism.
+> لمدة `CURRENCY_RATE_TTL_SECONDS` كـ fallback دون اتصال. عند تغيير عملة العرض
+> يُضاف `CURRENCY_FX_MARKUP_PERCENT` (افتراضي 3%) فوق سعر الصرف؛ الفوتر يعرض
+> السعر الأساسي والسعر بعد الفرق ومصدره وعلامة "مباشر". في الاختبارات
+> `CURRENCY_LIVE_RATES=false` و`CURRENCY_FX_MARKUP_PERCENT=0` لضمان determinism.
 
 ---
 

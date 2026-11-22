@@ -135,7 +135,12 @@ class CurrencyService:
         return row.rate, inverse
 
     def convert(
-        self, *, amount: Decimal, from_currency: str, to_currency: str
+        self,
+        *,
+        amount: Decimal,
+        from_currency: str,
+        to_currency: str,
+        markup_percent: float | Decimal = 0,
     ) -> Decimal:
         if from_currency.upper() == to_currency.upper():
             return amount
@@ -143,6 +148,9 @@ class CurrencyService:
         if rate is None:
             return amount
         result = amount / rate if inverse else amount * rate
+        markup = Decimal(str(markup_percent))
+        if markup:
+            result = result * (Decimal(1) + markup / Decimal(100))
         return result.quantize(Decimal("0.01"))
 
     def latest_rate(self, from_currency: str, to_currency: str) -> Decimal | None:
@@ -166,8 +174,12 @@ class CurrencyService:
             return None
         value = Decimal(1) / row.rate if inverse else row.rate
         rate_text = format(value, "f").rstrip("0").rstrip(".")
+        markup = Decimal(str(_setting("CURRENCY_FX_MARKUP_PERCENT", 0)))
+        customer_rate = value * (Decimal(1) + markup / Decimal(100))
         return {
             "rate": rate_text or "0",
+            "markup_percent": str(markup),
+            "customer_rate": format(customer_rate, "f").rstrip("0").rstrip(".") or "0",
             "source": row.source,
             "date": str(row.rate_date),
             "live": row.source.startswith("live:"),
