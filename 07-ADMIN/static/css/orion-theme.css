@@ -3,19 +3,19 @@
    Uses logical properties so the same file works for LTR and RTL. */
 
 :root {
-  --orion-bg: #0b1220;
-  --orion-panel: #111c2e;
-  --orion-panel-2: #16243a;
-  --orion-text: #e8eef7;
-  --orion-muted: #a9b8cc;
-  --orion-gold: #e6c479;
-  --orion-gold-strong: #f2d99b;
-  --orion-border: #2a3b55;
-  --orion-accent: #7cb0f8;
+  --orion-bg: #0a0f18;
+  --orion-panel: #121a28;
+  --orion-panel-2: #1a2638;
+  --orion-text: #f4f7fc;
+  --orion-muted: #b6c3d6;
+  --orion-gold: #e9c579;
+  --orion-gold-strong: #ffd891;
+  --orion-border: #2c3b50;
+  --orion-accent: #7fb4ff;
   --orion-danger: #ff9b9b;
   --orion-success: #8fe0b0;
-  --orion-radius: 14px;
-  --orion-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --orion-radius: 18px;
+  --orion-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
 }
 
 .orion-surface {
@@ -691,5 +691,322 @@ body.orion-surface {
 
   .orion-user-meta {
     display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Modern urban storefront
+   --------------------------------------------------------------------------- */
+.orion-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--orion-border);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(233, 197, 121, 0.18), transparent 45%),
+    linear-gradient(135deg, #111a28 0%, #162437 55%, #0d1521 100%);
+  padding: clamp(2rem, 6vw, 4.5rem);
+  min-block-size: 18rem;
+  display: grid;
+  align-items: center;
+  box-shadow: var(--orion-shadow);
+}
+
+.orion-hero::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -6rem;
+  inset-block-end: -8rem;
+  inline-size: 22rem;
+  block-size: 22rem;
+  border: 1px solid rgba(233, 197, 121, 0.16);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orion-hero-glow {
+  position: absolute;
+  inset-inline-start: 45%;
+  inset-block-start: -60%;
+  inline-size: 30rem;
+  block-size: 30rem;
+  background: radial-gradient(circle, rgba(127, 180, 255, 0.16), transparent 65%);
+  pointer-events: none;
+}
+
+.orion-hero-content {
+  position: relative;
+  z-index: 1;
+  max-inline-size: 44rem;
+}
+
+.orion-hero-badge {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(233, 197, 121, 0.45);
+  border-radius: 999px;
+  background: rgba(233, 197, 121, 0.1);
+  color: var(--orion-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.orion-hero-title {
+  margin-block: 1rem 0.75rem;
+  font-size: clamp(2.1rem, 5.5vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  color: var(--orion-text);
+}
+
+.orion-hero-subtitle {
+  color: var(--orion-muted);
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  max-inline-size: 34rem;
+}
+
+.orion-hero-actions,
+.orion-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-block-start: 1.5rem;
+}
+
+.orion-btn-ghost {
+  background: transparent;
+  border-color: var(--orion-border);
+  color: var(--orion-text);
+}
+
+.orion-btn-ghost:hover {
+  background: var(--orion-panel-2);
+}
+
+.orion-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-end: 1.5rem;
+}
+
+.orion-section-title {
+  margin-block-start: 0.25rem;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+
+.orion-section-line {
+  flex: 1;
+  block-size: 1px;
+  background: linear-gradient(90deg, var(--orion-border), transparent);
+}
+
+.orion-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.25rem;
+}
+
+.orion-product-card {
+  overflow: hidden;
+  border: 1px solid var(--orion-border);
+  border-radius: var(--orion-radius);
+  background: linear-gradient(160deg, var(--orion-panel), var(--orion-panel-2));
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.24);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.orion-product-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(233, 197, 121, 0.55);
+  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.4);
+}
+
+.orion-product-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.orion-product-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(127, 180, 255, 0.1), transparent 60%),
+    #0e1624;
+}
+
+.orion-product-media img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: transform 260ms ease;
+}
+
+.orion-product-card:hover .orion-product-media img {
+  transform: scale(1.04);
+}
+
+.orion-product-placeholder {
+  color: var(--orion-muted);
+  font-size: 0.8rem;
+}
+
+.orion-product-badge {
+  position: absolute;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--orion-gold);
+  color: #1b1405;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.orion-product-body {
+  padding: 1.15rem 1.25rem 0.25rem;
+}
+
+.orion-product-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.orion-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-block-start: 0.35rem;
+}
+
+.orion-product-price {
+  color: var(--orion-gold);
+  font-size: 1.3rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.orion-product-price small {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.orion-product-old {
+  color: var(--orion-muted);
+  font-size: 0.8rem;
+  text-decoration: line-through;
+}
+
+.orion-product-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.9rem 1.25rem 1.25rem;
+}
+
+.orion-add-btn,
+.orion-wa-btn {
+  flex: 1;
+  min-height: 2.5rem;
+  font-size: 0.82rem;
+}
+
+.orion-empty-modern {
+  padding: 3rem;
+  border: 1px dashed var(--orion-border);
+  border-radius: var(--orion-radius);
+  color: var(--orion-muted);
+  text-align: center;
+}
+
+.orion-product-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.orion-detail-media {
+  position: relative;
+  aspect-ratio: 4 / 4;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--orion-border);
+  border-radius: 24px;
+  background: radial-gradient(circle at 50% 30%, rgba(127, 180, 255, 0.12), transparent 60%), #0e1624;
+}
+
+.orion-detail-media img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.orion-detail-info {
+  padding-block-start: 0.5rem;
+}
+
+.orion-detail-title {
+  margin-block: 0.4rem;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.orion-detail-desc {
+  margin-block: 1.25rem;
+  color: var(--orion-muted);
+  line-height: 1.9;
+}
+
+.orion-wa-block {
+  inline-size: 100%;
+  margin-block-start: 0.75rem;
+}
+
+.orion-stock-box {
+  margin-block-start: 2rem;
+  padding-block-start: 1.5rem;
+  border-block-start: 1px solid var(--orion-border);
+}
+
+.orion-notify-form {
+  display: flex;
+  gap: 0.6rem;
+  margin-block-start: 0.75rem;
+}
+
+.orion-form-msg {
+  margin-block-start: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.orion-form-msg.is-success { color: var(--orion-success); }
+.orion-form-msg.is-error { color: var(--orion-danger); }
+
+@media (max-width: 860px) {
+  .orion-product-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .orion-detail-media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .orion-hero-actions,
+  .orion-product-actions {
+    inline-size: 100%;
   }
 }

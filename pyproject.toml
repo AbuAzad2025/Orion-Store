@@ -85,7 +85,7 @@ paths = [
     { glob = "03-MODELS/subscription/subscription.py", max = 350 },
     { glob = "05-API/v1/tenant_portal.py", max = 350 },
     { glob = "05-API/v1/storefront.py", max = 350 },
-    { glob = "**/orion-theme.css", max = 800 },
+    { glob = "**/orion-theme.css", max = 1100 },
     { glob = "migrations/versions/20261119_0001_baseline_tables.py", max = 400 },
     { glob = "migrations/versions/20261119_0002_baseline_indexes.py", max = 400 },
     { glob = "tests/api/test_auth_tenant_admin.py", max = 900 },

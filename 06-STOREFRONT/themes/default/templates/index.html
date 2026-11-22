@@ -1,18 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<span class="orion-eyebrow">{{ tenant.name }}</span>
-<h1 class="orion-title text-2xl mb-6">{{ t('products') }}</h1>
-{% if products %}
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-  {% for product in products_i18n or products %}
-    {% set product_i18n = product %}
-    {% set product = products[loop.index0] if products_i18n else product %}
-    {% include "components/product_card.html" %}
-  {% endfor %}
-</div>
-{% else %}
-<div class="orion-card orion-empty">{{ t('no_products') }}</div>
-{% endif %}
+<section class="orion-hero">
+  <div class="orion-hero-glow" aria-hidden="true"></div>
+  <div class="orion-hero-content">
+    <span class="orion-hero-badge">{{ t('hero_eyebrow') }}</span>
+    <h1 class="orion-hero-title">{{ t('hero_title') }}</h1>
+    <p class="orion-hero-subtitle">{{ t('hero_subtitle') }}</p>
+    <div class="orion-hero-actions">
+      <a href="#catalog" class="orion-btn orion-btn-gold">{{ t('hero_cta') }}</a>
+      {% if tenant.phone %}
+      <a href="{{ whatsapp_url(tenant.phone, t('order_request') ~ tenant.name) }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost">{{ t('whatsapp') }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section id="catalog" class="mt-12">
+  <div class="orion-section-head">
+    <div>
+      <span class="orion-eyebrow">{{ t('featured') }}</span>
+      <h2 class="orion-section-title">{{ t('products') }}</h2>
+    </div>
+    <span class="orion-section-line" aria-hidden="true"></span>
+  </div>
+  {% if products %}
+  <div class="orion-product-grid">
+    {% for product in products_i18n or products %}
+      {% set product_i18n = product %}
+      {% set product = products[loop.index0] if products_i18n else product %}
+      {% include "components/product_card.html" %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="orion-empty-modern">{{ t('no_products') }}</div>
+  {% endif %}
+</section>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>

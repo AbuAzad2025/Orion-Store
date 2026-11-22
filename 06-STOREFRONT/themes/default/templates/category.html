@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<span class="orion-eyebrow">{{ t('category') }}</span>
-<h1 class="orion-title text-2xl mb-6">{{ category.name }}</h1>
+<section class="orion-section-head">
+  <div>
+    <span class="orion-eyebrow">{{ t('category') }}</span>
+    <h1 class="orion-section-title">{{ category.name }}</h1>
+  </div>
+  <span class="orion-section-line" aria-hidden="true"></span>
+</section>
 {% if products %}
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+<div class="orion-product-grid mt-8">
   {% for product in products_i18n or products %}
     {% set product_i18n = product %}
     {% set product = products[loop.index0] if products_i18n else product %}
@@ -11,7 +16,7 @@
   {% endfor %}
 </div>
 {% else %}
-<div class="orion-card orion-empty">{{ t('no_category_products') }}</div>
+<div class="orion-empty-modern">{{ t('no_category_products') }}</div>
 {% endif %}
 {% endblock %}
 {% block scripts %}

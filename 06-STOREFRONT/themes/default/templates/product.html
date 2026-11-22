@@ -1,39 +1,53 @@
 {% extends "base.html" %}
 {% block content %}
-<article class="orion-card max-w-lg mx-auto">
-  {% if product.image_url %}
-  <img src="{{ product.image_url }}" alt="{{ product.name }}"
-       class="w-full h-72 object-cover rounded mb-5 border border-slate-800">
-  {% endif %}
-  {% set p_name = (product_i18n.name or product.name) if product_i18n else product.name %}
-  {% set p_price = (product_i18n.price or product.price) if product_i18n else product.price %}
-  <h1 class="orion-title text-2xl mb-2">{{ p_name }}</h1>
-  <p class="orion-eyebrow text-2xl mb-4">{{ money(p_price) }} {{ currency }}</p>
-  {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}
-  <p class="orion-muted text-sm line-through">{{ money(product_i18n.compare_at_price) }} {{ currency }}</p>
-  {% endif %}
-  {% set desc = (product_i18n.description or product_i18n.short_description) if product_i18n else product.short_description %}
-  {% if desc %}<p class="orion-muted mb-6">{{ desc }}</p>{% endif %}
-  <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold">{{ t('add_to_cart') }}</button>
-  <a href="/cart" class="mr-4 text-sm text-gray-600 underline">{{ t('view_cart') }}</a>
-  {% set wa_order = whatsapp_url(tenant.phone, t('order_request') ~ p_name ~ ' - ' ~ money(p_price) ~ ' ' ~ currency) %}
-  {% if wa_order %}
-  <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn mt-3 block"
-     aria-label="{{ t('order_whatsapp') }} {{ p_name }}">{{ t('order_whatsapp') }}</a>
-  {% endif %}
+{% set p_name = (product_i18n.name or product.name) if product_i18n else product.name %}
+{% set p_price = (product_i18n.price or product.price) if product_i18n else product.price %}
+{% set desc = (product_i18n.description or product_i18n.short_description) if product_i18n else product.short_description %}
 
-  <hr class="my-6">
-  <div class="text-center">
-    <p class="text-sm text-gray-500 mb-2">{{ t('out_of_stock') }}</p>
-    <form id="stock-notify-form" class="flex gap-2 max-w-sm mx-auto">
-      <input type="hidden" name="product_id" value="{{ product.id }}">
-      <input type="email" name="customer_email" placeholder="{{ t('your_email') }}" required
-        class="orion-input flex-1 text-sm">
-      <button type="submit" class="orion-btn text-sm whitespace-nowrap">{{ t('notify_me') }}</button>
-    </form>
-    <p id="stock-notify-msg" class="text-sm mt-2 hidden"></p>
+<section class="orion-product-detail">
+  <div class="orion-detail-media">
+    {% if product.image_url %}
+    <img src="{{ product.image_url }}" alt="{{ p_name }}">
+    {% else %}
+    <span class="orion-product-placeholder">{{ t('no_image') }}</span>
+    {% endif %}
+    {% if product.is_featured %}<span class="orion-product-badge">{{ t('featured') }}</span>{% endif %}
   </div>
-</article>
+
+  <div class="orion-detail-info">
+    <span class="orion-eyebrow">{{ tenant.name }}</span>
+    <h1 class="orion-detail-title">{{ p_name }}</h1>
+    <div class="orion-price-row">
+      <span class="orion-product-price">{{ money(p_price) }} <small>{{ currency }}</small></span>
+      {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}
+      <span class="orion-product-old">{{ money(product_i18n.compare_at_price) }}</span>
+      {% endif %}
+    </div>
+    {% if desc %}<p class="orion-detail-desc">{{ desc }}</p>{% endif %}
+
+    <div class="orion-cta-row">
+      <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold" aria-label="{{ t('add_to_cart') }} {{ p_name }}">{{ t('add_to_cart') }}</button>
+      <a href="/cart" class="orion-btn orion-btn-ghost">{{ t('view_cart') }}</a>
+    </div>
+    {% set wa_order = whatsapp_url(tenant.phone, t('order_request') ~ p_name ~ ' - ' ~ money(p_price) ~ ' ' ~ currency) %}
+    {% if wa_order %}
+    <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-block"
+       aria-label="{{ t('order_whatsapp') }} {{ p_name }}">{{ t('order_whatsapp') }}</a>
+    {% endif %}
+
+    <div class="orion-stock-box">
+      <p class="orion-muted text-sm">{{ t('out_of_stock') }}</p>
+      <form id="stock-notify-form" class="orion-notify-form"
+            data-success="{{ t('stock_success') }}" data-fail="{{ t('stock_fail') }}">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="email" name="customer_email" placeholder="{{ t('your_email') }}" required
+               class="orion-input" aria-label="{{ t('your_email') }}">
+        <button type="submit" class="orion-btn">{{ t('notify_me') }}</button>
+      </form>
+      <p id="stock-notify-msg" class="orion-form-msg hidden" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>
@@ -51,12 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
         parseInt(fd.get("product_id")),
         fd.get("customer_email").trim()
       );
-      msg.textContent = "تم التسجيل! سنخبرك عند توفر المنتج.";
-      msg.className = "text-sm mt-2 text-emerald-700";
+      msg.textContent = form.dataset.success;
+      msg.className = "orion-form-msg is-success";
       form.reset();
     } catch (err) {
-      msg.textContent = err.message || "تعذّر التسجيل. حاول مرة أخرى.";
-      msg.className = "text-sm mt-2 text-red-600";
+      msg.textContent = err.message || form.dataset.fail;
+      msg.className = "orion-form-msg is-error";
     }
   });
 });
