@@ -1,8 +1,8 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="flex justify-between items-center mb-4">
-  <h2 class="text-lg font-semibold">المستخدمين</h2>
-  <button onclick="OrionAdminPlatform.openUserModal()" class="orion-btn orion-btn-gold text-sm">+ إضافة مستخدم</button>
+  <h2 class="text-lg font-semibold">المستخدمون</h2>
+  <button onclick="OrionAdminPlatform.openUserModal()" class="orion-btn orion-btn-gold text-sm">+ مستخدم جديد</button>
 </div>
 
 <div class="orion-card">
@@ -15,7 +15,7 @@
       <th class="p-3">الحالة</th>
       <th class="p-3">إجراء</th>
     </tr></thead>
-    <tbody id="users-list"><tr><td colspan="6" class="p-3">جاري التحميل...</td></tr></tbody>
+    <tbody id="users-list"><tr><td colspan="6" class="p-3">جارٍ التحميل…</td></tr></tbody>
   </table>
 </div>
 
@@ -32,7 +32,7 @@
         <input name="password" id="user-password" type="password" required class="orion-input w-full" aria-label="Password">
       </div>
       <div>
-        <label class="block text-sm mb-1">نوع المستخدم</label>
+        <label class="block text-sm mb-1">نوع الحساب</label>
         <select name="user_type" id="user-type" class="orion-input w-full">
           <option value="tenant_admin">مدير متجر</option>
           <option value="platform_admin">مدير منصة</option>
@@ -44,7 +44,7 @@
       </div>
       <div class="flex justify-end gap-2 pt-3">
         <button type="button" onclick="OrionAdminPlatform.closeUserModal()" class="px-4 py-2 border rounded text-sm">إلغاء</button>
-        <button type="submit" class="orion-btn orion-btn-gold text-sm">حفظ</button>
+        <button type="submit" class="orion-btn orion-btn-gold text-sm">حفظ التغييرات</button>
       </div>
     </form>
   </div>

@@ -3,17 +3,17 @@
 <section class="orion-consent max-w-3xl mx-auto" id="cookie-consent"
          data-active="{{ 'true' if (cookie_settings and cookie_settings.is_active) else 'false' }}"
          data-tenant-id="{{ tenant.slug }}">
-  <h1 class="orion-title orion-eyebrow text-2xl mb-4">الخصوصية وملفات تعريف الارتباط</h1>
+  <h1 class="orion-title orion-eyebrow text-2xl mb-4">خصوصيتك وملفات تعريف الارتباط</h1>
   <p class="orion-muted mb-6">
     {{ (cookie_settings.banner_message if cookie_settings and cookie_settings.banner_message else 'نستخدم ملفات تعريف الارتباط لتحسين تجربة التصفح وتحليل الاستخدام.') }}
   </p>
   <ul class="orion-muted text-sm mb-6 space-y-2">
-    <li>ملفات ضرورية: مطلوبة لعمل المتجر ولا يمكن تعطيلها.</li>
-    <li>ملفات تحليلية: تساعدنا على فهم استخدام المتجر.</li>
-    <li>ملفات تسويقية: تُستخدم لعرض محتوى مناسب لك.</li>
+    <li>الملفات الضرورية: تشغّل المتجر ولا يمكن إيقافها.</li>
+    <li>ملفات التحليل: تساعدنا على تحسين تجربتك.</li>
+    <li>ملفات التسويق: تعرض لك محتوى يناسبك.</li>
   </ul>
   <div class="flex gap-3">
-    <button type="button" id="consent-accept-all" class="orion-btn orion-btn-gold">قبول الكل</button>
+    <button type="button" id="consent-accept-all" class="orion-btn orion-btn-gold">قبول الجميع</button>
     <button type="button" id="consent-necessary-only" class="orion-btn">الضرورية فقط</button>
   </div>
   <p class="orion-muted text-xs mt-4" id="consent-status" role="status"></p>

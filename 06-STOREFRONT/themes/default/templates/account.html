@@ -6,36 +6,36 @@
   <form id="login-form" class="grid gap-2 text-sm">
     <input name="email" type="email" placeholder="البريد" class="orion-input w-full" required>
     <input name="password" type="password" placeholder="كلمة المرور" class="orion-input w-full" required>
-    <button type="submit" class="orion-btn orion-btn-gold w-full">دخول</button>
+    <button type="submit" class="orion-btn orion-btn-gold w-full">تسجيل الدخول</button>
   </form>
-  <h2 class="font-semibold pt-4">حساب جديد</h2>
+  <h2 class="font-semibold pt-4">إنشاء حساب جديد</h2>
   <form id="register-form" class="grid gap-2 text-sm">
     <input name="first_name" type="text" placeholder="الاسم" class="orion-input w-full">
     <input name="email" type="email" placeholder="البريد" class="orion-input w-full" required>
     <input name="password" type="password" placeholder="كلمة المرور" class="orion-input w-full" required>
-    <button type="submit" class="orion-btn w-full">تسجيل</button>
+    <button type="submit" class="orion-btn w-full">إنشاء حساب</button>
   </form>
   <p id="account-error" class="text-red-600 text-sm hidden"></p>
 </section>
 <section id="account-user" class="hidden">
   <p class="mb-4 text-gray-600" id="account-email"></p>
-  <h2 class="font-semibold mb-2">طلباتي</h2>
-  <div id="account-orders" class="text-sm text-gray-600">جاري التحميل...</div>
+  <h2 class="font-semibold mb-2">طلباتك</h2>
+  <div id="account-orders" class="text-sm text-gray-600">جارٍ التحميل…</div>
   <section class="orion-card mt-6 space-y-4">
-    <h2 class="font-semibold text-lg">خدماتي</h2>
-    <p id="account-credit" class="orion-muted text-sm">رصيد المتجر: ...</p>
+    <h2 class="font-semibold text-lg">خدماتك</h2>
+    <p id="account-credit" class="orion-muted text-sm">رصيدك: …</p>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
       <div>
         <h3 class="font-semibold mb-2">الاشتراكات</h3>
-        <div id="account-plans" class="space-y-2 orion-muted">جاري التحميل...</div>
+        <div id="account-plans" class="space-y-2 orion-muted">جارٍ التحميل…</div>
       </div>
       <div>
-        <h3 class="font-semibold mb-2">طلب عرض سعر (B2B)</h3>
+        <h3 class="font-semibold mb-2">اطلب عرض سعر</h3>
         <form id="quote-request-form" class="space-y-2">
           <input name="notes" class="orion-input w-full" placeholder="ملاحظات الطلب" aria-label="ملاحظات الطلب">
           <input name="product_id" type="number" min="1" placeholder="رقم المنتج" class="orion-input w-full" aria-label="رقم المنتج">
           <input name="quantity" type="number" min="1" value="1" class="orion-input w-full" aria-label="الكمية">
-          <button type="submit" class="orion-btn w-full">إرسال طلب العرض</button>
+          <button type="submit" class="orion-btn w-full">إرسال الطلب</button>
         </form>
         <div id="account-quotes" class="mt-2 space-y-1 orion-muted"></div>
       </div>
@@ -45,26 +45,26 @@
           <input name="registry_name" required class="orion-input w-full" placeholder="اسم القائمة" aria-label="اسم القائمة">
           <input name="event_type" class="orion-input w-full" placeholder="المناسبة" aria-label="المناسبة">
           <input name="event_date" type="date" class="orion-input w-full" aria-label="تاريخ المناسبة">
-          <button type="submit" class="orion-btn w-full">إنشاء القائمة</button>
+          <button type="submit" class="orion-btn w-full">إنشاء قائمة جديدة</button>
         </form>
         <form id="gift-item-form" class="space-y-2 mt-2">
           <input name="slug" class="orion-input w-full" placeholder="رمز القائمة" aria-label="رمز القائمة">
           <input name="product_id" type="number" min="1" class="orion-input w-full" placeholder="رقم المنتج" aria-label="رقم المنتج">
-          <button type="submit" class="orion-btn w-full">إضافة منتج للقائمة</button>
+          <button type="submit" class="orion-btn w-full">أضف منتجاً للقائمة</button>
         </form>
         <div id="account-registries" class="mt-2 space-y-1 orion-muted"></div>
       </div>
     </div>
   </section>
   <section class="orion-card mt-6 max-w-md space-y-2">
-    <h2 class="font-semibold">الخصوصية والبيانات</h2>
+    <h2 class="font-semibold">خصوصيتك وبياناتك</h2>
     <div class="flex gap-2">
-      <button id="gdpr-export-btn" class="orion-btn text-sm">طلب نسخة من بياناتي</button>
-      <button id="gdpr-delete-btn" class="orion-btn text-sm">طلب حذف بياناتي</button>
+      <button id="gdpr-export-btn" class="orion-btn text-sm">تنزيل نسخة من بياناتي</button>
+      <button id="gdpr-delete-btn" class="orion-btn text-sm">حذف بياناتي</button>
     </div>
     <p id="gdpr-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
   </section>
-  <button id="logout-btn" class="mt-4 text-sm text-red-700 underline">خروج</button>
+  <button id="logout-btn" class="mt-4 text-sm text-red-700 underline">تسجيل الخروج</button>
 </section>
 {% endblock %}
 {% block scripts %}

@@ -13,7 +13,7 @@
       <div class="text-base font-medium">{{ user.email }}</div>
     </div>
     <div>
-      <label class="block text-sm text-gray-500 mb-1">الصلاحية</label>
+      <label class="block text-sm text-gray-500 mb-1">الصلاحيات</label>
       <div class="text-base font-medium">
         {% if is_platform_admin %}مدير المنصة{% elif tenant %}مدير المتجر: {{ tenant.name }}{% else %}مستخدم{% endif %}
       </div>
@@ -31,7 +31,7 @@
   </div>
 
   <div class="mt-6 pt-6 border-t flex gap-3">
-    <a href="{{ url_for('platform_admin.platform_dashboard') if is_platform_admin else url_for('tenant_admin.tenant_dashboard') }}" class="orion-btn">عودة</a>
+    <a href="{{ url_for('platform_admin.platform_dashboard') if is_platform_admin else url_for('tenant_admin.tenant_dashboard') }}" class="orion-btn">العودة للوحة</a>
     <a href="/admin/logout" class="bg-red-600 text-white px-4 py-2 rounded text-sm">تسجيل الخروج</a>
   </div>
 </div>

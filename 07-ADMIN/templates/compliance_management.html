@@ -2,29 +2,29 @@
 {% block content %}
 <div class="space-y-6">
   <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">سجلات الموافقة (Consent)</h2>
+    <h2 class="text-lg font-semibold mb-3">سجلات الموافقة</h2>
     <form id="consent-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
       <input name="consent_type" type="text" placeholder="نوع الموافقة (مثال: marketing)" required>
       <label class="inline-flex items-center gap-2">
         <input name="granted" type="checkbox" checked aria-label="Granted"> ممنوحة
       </label>
-      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">تسجيل موافقة</button>
+      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة موافقة</button>
     </form>
-    <div id="consent-records-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+    <div id="consent-records-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
   </section>
   <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">طلبات بيانات العملاء (GDPR/CCPA)</h2>
+    <h2 class="text-lg font-semibold mb-3">طلبات بيانات العملاء</h2>
     <form id="dsr-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
       <select name="request_type" class="border rounded px-2 py-1">
         <option value="export">تصدير البيانات</option>
         <option value="delete">حذف البيانات</option>
-        <option value="rectify">تصحيح البيانات</option>
+        <option value="rectify">تصحيح بيانات عميل</option>
       </select>
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إنشاء طلب</button>
     </form>
-    <div id="dsr-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+    <div id="dsr-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
   </section>
   <section class="rounded border bg-white p-4">
     <h2 class="text-lg font-semibold mb-3">إعدادات ملفات تعريف الارتباط</h2>
@@ -35,7 +35,7 @@
       </label>
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">حفظ الإعدادات</button>
     </form>
-    <div id="cookie-settings-display" class="text-gray-500 text-sm">جاري التحميل...</div>
+    <div id="cookie-settings-display" class="text-gray-500 text-sm">جارٍ التحميل…</div>
   </section>
   <section class="rounded border bg-white p-4">
     <h2 class="text-lg font-semibold mb-3">مزودو SSO</h2>
@@ -49,8 +49,8 @@
       <input name="issuer_url" type="url" placeholder="Issuer URL">
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة مزود</button>
     </form>
-    <div id="sso-list" class="text-gray-500 text-sm">جاري التحميل...</div>
-    <h3 class="orion-title mt-4">تبادل SSO (اختبار)</h3>
+    <div id="sso-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <h3 class="orion-title mt-4">تجربة الدخول الموحّد</h3>
     <form id="sso-exchange-form" class="grid gap-2 max-w-md text-sm">
       <input name="provider_code" type="text" placeholder="رمز المزود" required aria-label="رمز مزود SSO">
       <input name="external_email" type="email" placeholder="البريد الخارجي" required aria-label="البريد الخارجي">

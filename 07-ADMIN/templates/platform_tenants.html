@@ -2,7 +2,7 @@
 {% block content %}
 <div class="flex justify-between items-center mb-4">
   <h2 class="text-lg font-semibold">المتاجر</h2>
-  <button onclick="OrionAdminPlatform.openTenantModal()" class="orion-btn orion-btn-gold text-sm">+ إضافة متجر</button>
+  <button onclick="OrionAdminPlatform.openTenantModal()" class="orion-btn orion-btn-gold text-sm">+ متجر جديد</button>
 </div>
 
 <div class="orion-card">
@@ -12,9 +12,9 @@
       <th class="p-3">Slug</th>
       <th class="p-3">Email</th>
       <th class="p-3">الحالة</th>
-      <th class="p-3">إجراء</th>
+      <th class="p-3">الإجراءات</th>
     </tr></thead>
-    <tbody id="tenants-list"><tr><td colspan="5" class="p-3">جاري التحميل...</td></tr></tbody>
+    <tbody id="tenants-list"><tr><td colspan="5" class="p-3">جارٍ التحميل…</td></tr></tbody>
   </table>
 </div>
 
@@ -42,14 +42,14 @@
       <div>
         <label class="block text-sm mb-1">الحالة</label>
         <select name="status" id="tenant-status" class="orion-input w-full">
-          <option value="trial">تجربي</option>
+          <option value="trial">تجريبي</option>
           <option value="active">نشط</option>
           <option value="suspended">معلق</option>
         </select>
       </div>
       <div class="flex justify-end gap-2 pt-3">
         <button type="button" onclick="OrionAdminPlatform.closeTenantModal()" class="px-4 py-2 border rounded text-sm">إلغاء</button>
-        <button type="submit" class="orion-btn orion-btn-gold text-sm">حفظ</button>
+        <button type="submit" class="orion-btn orion-btn-gold text-sm">حفظ التغييرات</button>
       </div>
     </form>
   </div>

@@ -31,10 +31,10 @@
             </span>
           </div>
           {% if tenant %}
-          <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="orion-topbar-link" rel="noopener">المتجر ↗</a>
+          <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="orion-topbar-link" rel="noopener">عرض المتجر ↗</a>
           {% endif %}
-          <a href="/admin/profile" class="orion-topbar-link">الملف</a>
-          <a href="/admin/logout" class="orion-topbar-link orion-topbar-logout">خروج</a>
+          <a href="/admin/profile" class="orion-topbar-link">الملف الشخصي</a>
+          <a href="/admin/logout" class="orion-topbar-link orion-topbar-logout">تسجيل الخروج</a>
           {% block page_actions %}{% endblock %}
         </div>
       </header>

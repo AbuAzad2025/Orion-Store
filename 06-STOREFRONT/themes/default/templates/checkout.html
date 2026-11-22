@@ -16,37 +16,37 @@
       <input id="shipping-country" type="text" maxlength="2" class="orion-input w-full" placeholder="PS" dir="ltr" aria-label="Shipping country code">
     </div>
     <div>
-      <label class="orion-stat-label block" for="shipping-region">المنطقة (اختياري)</label>
+      <label class="orion-stat-label block" for="shipping-region">المنطقة</label>
       <input id="shipping-region" type="text" class="orion-input w-full" aria-label="Shipping region">
     </div>
   </div>
   <div>
     <label class="orion-stat-label block" for="shipping-method">طريقة الشحن</label>
     <select id="shipping-method" class="orion-input w-full">
-      <option value="">جاري التحميل...</option>
+      <option value="">جارٍ التحميل…</option>
     </select>
   </div>
   <div id="pickup-row" class="hidden">
-    <label class="orion-stat-label block" for="pickup-location">استلام من المتجر (اختياري)</label>
+    <label class="orion-stat-label block" for="pickup-location">الاستلام من المتجر</label>
     <select id="pickup-location" class="orion-input w-full" aria-label="موقع الاستلام">
-      <option value="">توصيل عادي</option>
+      <option value="">توصيل إلى العنوان</option>
     </select>
   </div>
   <div>
-    <label class="orion-stat-label block" for="voucher-code">كود الخصم (اختياري)</label>
+    <label class="orion-stat-label block" for="voucher-code">رمز الخصم</label>
     <input id="voucher-code" type="text" class="orion-input w-full" placeholder="SAVE10">
   </div>
   <div>
     <label class="orion-stat-label block" for="payment-method">طريقة الدفع</label>
     <select id="payment-method" class="orion-input w-full">
-      <option value="">جاري التحميل...</option>
+      <option value="">جارٍ التحميل…</option>
     </select>
   </div>
   <label class="flex items-center gap-2 text-sm" id="use-credit-row">
-    <input id="use-store-credit" type="checkbox" aria-label="استخدام رصيد المتجر"> استخدام رصيد المتجر
+    <input id="use-store-credit" type="checkbox" aria-label="استخدام رصيد المتجر"> استخدم رصيدك
   </label>
   <p id="checkout-summary" class="text-sm text-gray-600"></p>
-  <button type="submit" class="orion-btn orion-btn-gold w-full">ادفع الآن</button>
+  <button type="submit" class="orion-btn orion-btn-gold w-full">تأكيد الطلب والدفع</button>
 </form>
 <div id="checkout-result" class="mt-4 text-sm"></div>
 {% endblock %}

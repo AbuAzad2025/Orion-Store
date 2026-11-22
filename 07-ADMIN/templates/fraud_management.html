@@ -6,8 +6,8 @@
     <form id="fraud-rule-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="name" type="text" placeholder="اسم القاعدة" required>
       <select name="rule_type" class="border rounded px-2 py-1">
-        <option value="amount">مبلغ الطلب</option>
-        <option value="velocity">تكرار</option>
+        <option value="amount">قيمة الطلب</option>
+        <option value="velocity">عدد المرات</option>
         <option value="ip">عنوان IP</option>
       </select>
       <select name="operator" class="border rounded px-2 py-1">
@@ -23,10 +23,10 @@
       </select>
       <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة قاعدة</button>
     </form>
-    <div id="fraud-rules-list" class="text-gray-500 text-sm">جاري التحميل...</div>
+    <div id="fraud-rules-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
   </section>
   <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">مراجعة طلب (Fraud Review)</h2>
+    <h2 class="text-lg font-semibold mb-3">مراجعة طلب مشبوه</h2>
     <form id="fraud-review-form" class="grid gap-2 max-w-md text-sm">
       <input name="order_id" type="number" placeholder="معرف الطلب" required>
       <input name="risk_score" type="number" placeholder="درجة الخطورة (0-100)">

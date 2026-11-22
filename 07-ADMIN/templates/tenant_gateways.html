@@ -4,23 +4,23 @@
   <section>
     <h2 class="text-lg font-semibold mb-2">بوابات الدفع</h2>
     <button id="enable-cod" class="mb-4 rounded bg-emerald-600 px-4 py-2 text-white text-sm">تفعيل الدفع عند الاستلام</button>
-    <div id="gateways-list" class="text-gray-500">جاري التحميل...</div>
+    <div id="gateways-list" class="text-gray-500">جارٍ التحميل…</div>
   </section>
   <section class="orion-card">
-    <h2 class="text-lg font-semibold mb-3">ربط PayPal</h2>
+    <h2 class="text-lg font-semibold mb-3">ربط باي بال</h2>
     <div class="grid gap-3 max-w-md">
       <input id="paypal-client-id" type="text" placeholder="Client ID" class="border rounded px-3 py-2 text-sm">
       <input id="paypal-client-secret" type="password" placeholder="Client Secret" class="border rounded px-3 py-2 text-sm">
       <label class="inline-flex items-center gap-2 text-sm">
         <input id="paypal-sandbox" type="checkbox" checked aria-label="Paypal Sandbox">
-        وضع تجريبي (Sandbox)
+        وضع الاختبار
       </label>
       <button id="connect-paypal" class="rounded bg-blue-600 px-4 py-2 text-white text-sm w-fit">حفظ PayPal</button>
     </div>
   </section>
   <section class="orion-card">
-    <h2 class="text-lg font-semibold mb-3">مزودو BNPL</h2>
-    <div id="bnpl-providers-list" class="text-gray-500">جاري التحميل...</div>
+    <h2 class="text-lg font-semibold mb-3">مزوّدو الدفع بالتقسيط</h2>
+    <div id="bnpl-providers-list" class="text-gray-500">جارٍ التحميل…</div>
   </section>
 </div>
 {% endblock %}
