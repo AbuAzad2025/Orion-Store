@@ -26,7 +26,7 @@
 
 /* Typography — modern Arabic web fonts with a native system fallback. */
 body.orion-surface {
-  font-family: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: "Tajawal", "Segoe UI", Tahoma, Arial, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
@@ -38,7 +38,7 @@ body.orion-surface {
 .orion-section-title,
 .orion-detail-title,
 .orion-detail-info .orion-product-price {
-  font-family: "Readex Pro", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  font-family: "Tajawal", "Segoe UI", Tahoma, sans-serif;
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
@@ -179,7 +179,7 @@ body.orion-surface {
   align-items: center;
   gap: 0.6rem;
   color: var(--orion-text);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .orion-breadcrumb-sep {
@@ -225,7 +225,7 @@ body.orion-surface {
   background: var(--orion-panel-2);
   color: var(--orion-text);
   font-size: 0.9rem;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: 0.01em;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   cursor: pointer;
@@ -805,7 +805,7 @@ body.orion-surface {
 
 .orion-hero-visual-meta span {
   color: var(--orion-gold);
-  font-weight: 750;
+  font-weight: 800;
 }
 
 .orion-hero-badge {
@@ -865,7 +865,7 @@ body.orion-surface {
 .orion-section-title {
   margin-block-start: 0.25rem;
   font-size: clamp(1.5rem, 3vw, 2.1rem);
-  font-weight: 750;
+  font-weight: 800;
   letter-spacing: -0.035em;
 }
 
@@ -968,7 +968,7 @@ body.orion-surface {
 
 .orion-product-price small {
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .orion-product-old {
@@ -1136,7 +1136,7 @@ body.orion-surface {
   background: var(--orion-gold);
   color: #1b1405;
   font-size: 0.8rem;
-  font-weight: 750;
+  font-weight: 800;
   text-decoration: none;
 }
 
@@ -1175,7 +1175,7 @@ body.orion-surface {
 .orion-footer-col-title {
   color: var(--orion-text);
   font-size: 0.78rem;
-  font-weight: 750;
+  font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-block-end: 1rem;
@@ -1240,7 +1240,7 @@ body.orion-surface {
   gap: 0.4rem;
   color: var(--orion-muted);
   font-size: 0.74rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.02em;
 }
 
@@ -1333,4 +1333,35 @@ body.orion-surface {
   .orion-hero-visual { max-inline-size: 22rem; }
   .orion-trustbar-inner { justify-content: flex-start; }
   .orion-pdp { padding-block-end: 5rem; }
+}
+
+/* One font family everywhere (Tajawal). Only use the weights that actually
+   ship in the self-hosted files: 400, 500, 700, 800, 900. Intermediate
+   values (600/650/750) are avoided so the browser never fakes the bold. */
+.orion-brand-name,
+.orion-hero-title,
+.orion-product-name,
+.orion-product-price,
+.orion-section-title,
+.orion-detail-title,
+.orion-footer-col-title,
+.orion-sticky-buy-info strong,
+.orion-sticky-buy-info span {
+  font-family: "Tajawal", "Segoe UI", sans-serif;
+  font-weight: 900;
+}
+
+.orion-nav-link,
+.orion-nav-link.is-active,
+.orion-footer-links a,
+.orion-trust-item,
+.orion-btn,
+.orion-nav-wa,
+.orion-hero-badge,
+.orion-product-badge,
+.orion-footer-cta,
+.orion-trust-tick,
+.orion-pdp-trust span span {
+  font-family: "Tajawal", "Segoe UI", sans-serif;
+  font-weight: 800;
 }

@@ -18,8 +18,7 @@ import urllib.request
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CSS_URL = (
     "https://fonts.googleapis.com/css2?"
-    "family=IBM+Plex+Sans+Arabic:wght@400;500;600;700"
-    "&family=Readex+Pro:wght@400;600;700;800&display=swap"
+    "family=Tajawal:wght@400;500;700;800;900&display=swap"
 )
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -43,6 +42,8 @@ def download(url: str, dest: pathlib.Path) -> None:
 
 def main() -> None:
     FONTS.mkdir(parents=True, exist_ok=True)
+    for stale in FONTS.glob("*.woff2"):
+        stale.unlink()
     req = urllib.request.Request(CSS_URL, headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=45) as resp:
         css = resp.read().decode("utf-8")
@@ -77,7 +78,7 @@ def main() -> None:
         )
         count += 1
 
-    generated = "\n".join(out) + "\n"
+    generated = "\n".join(out).rstrip() + "\n"
     # The admin app serves its assets under /admin/static/, so emit two CSS
     # variants with the correct URL prefix.
     for target in TARGETS:

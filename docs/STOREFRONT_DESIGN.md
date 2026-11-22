@@ -15,7 +15,7 @@ Charle Agency "12 Best Ecommerce Web Designs".
 | Social proof next to the price | Nike, Gymshark, Represent | `orion-pdp-trust` badges on the product detail page |
 | Product photography as infrastructure | every benchmark site | 12 keyword-matched free-stock photos per tenant, consistent 4:3 crop |
 | Hover feedback on product media | Nike, Gymshark | card lift + image zoom on hover |
-| Typography as a brand asset | Bottega, Aesop, Geist-based sites | self-hosted **IBM Plex Sans Arabic** for UI text + **Readex Pro** for display headings |
+| Typography as a brand asset | Bottega, Aesop, Geist-based sites | one self-hosted family — **Tajawal** — across body, headings, navbar, footer and bars |
 | Single, consistent brand conviction | all benchmark sites | charcoal / panel / gold palette across header, hero, cards, footer |
 
 ## Arabic typography
@@ -24,16 +24,19 @@ The previous build used a generic system stack (`Segoe UI` / `Tahoma`), which
 is not comparable to benchmark stores and falls back to Tahoma for Arabic on
 Windows. It is now replaced with two modern Arabic web fonts:
 
-- **IBM Plex Sans Arabic** (400/500/600/700) — workhorse for body and UI.
-- **Readex Pro** (400/600/700/800) — display voice for headings and prices.
+- **Tajawal** (400/500/700/800/900) — the single family used for every piece
+  of text: body, headings, prices, navbar, footer, buttons and trust bars.
+
+Using one family keeps the page visually coherent. Only weights that exist in
+the font files are used, so bold text is real rather than browser-synthesised.
 
 `scripts/fetch_fonts.py` downloads the licensed woff2 files from Google Fonts
 at build time and commits them under both `static/fonts/` folders, generating
 a `fonts.css` per app with the correct URL prefix. This keeps the strict CSP
 (`default-src 'self'`) intact — no third-party requests and no CSP relaxation.
 
-Verified in the browser: 14 `@font-face` rules registered, no external font
-requests, 8 font faces loaded on the storefront and 5 on the admin login.
+Verified in the browser: 10 `@font-face` rules, no external font requests,
+Tajawal 400/700/800/900 loaded, and every text element resolves to Tajawal.
 
 ## Implementation notes
 
