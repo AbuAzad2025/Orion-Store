@@ -17,6 +17,8 @@ reflected script payloads. Mutation endpoints are only exercised with
 unauthorized identities (expected 401/403) to avoid changing live data.
 """
 
+# isort: skip_file  (import order is load-bearing: the app must initialize first)
+
 from __future__ import annotations
 
 import os
@@ -64,12 +66,13 @@ def main() -> None:
 
     from flask_jwt_extended import create_access_token
 
+    # Import order is load-bearing: initialize the app before ORM models,
+    # otherwise orion.extensions -> orion.app -> event_handlers -> order.order
+    # loops back into a partially initialized base.base_model.
+    from orion.app import create_app
+
     from catalog.product import Product
     from order.order import Order
-
-    # Import the app first: importing ORM models directly can trigger a
-    # circular import through orion.extensions -> orion.app -> event handlers.
-    from orion.app import create_app
     from platform_models.invoice import Invoice
     from tenant.tenant import Tenant
     from user.user import User
