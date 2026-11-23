@@ -58,7 +58,7 @@ def test_storefront_browse_cart_checkout(
         product_id,
     )
     browser_page.reload(wait_until="domcontentloaded")
-    assert browser_page.locator('a[href="/checkout"]').is_visible()
+    assert browser_page.locator('a[href^="/checkout"]').is_visible()
     assert browser_page.locator("#whatsapp-order-btn").is_visible()
     assert "E2E Product" in browser_page.locator("#cart-items").inner_text()
     capture_shot(browser_page, "storefront_cart")

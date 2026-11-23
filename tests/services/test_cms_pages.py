@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 from i18n_svc.page_service import PageService
 from support.http import auth_headers, tenant_headers
@@ -101,6 +103,11 @@ def test_cms_page_create_localized_view_update_soft_delete(client, app) -> None:
     assert listed.get_json()["pages"] == []
 
 
+def _has_page_link(html: str, slug: str) -> bool:
+    """Footer links carry a signed store token in production URLs."""
+    return re.search(rf'href="/pages/{re.escape(slug)}(?:"|\?)', html) is not None
+
+
 def test_cms_page_footer_policy_links_follow_publication(client, app) -> None:
     tenant, admin = _make_tenant(app, "cms-footer")
     admin_headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
@@ -123,8 +130,8 @@ def test_cms_page_footer_policy_links_follow_publication(client, app) -> None:
     assert privacy.status_code == 201
 
     home = _html(client.get("/", headers=public_headers))
-    assert 'href="/pages/privacy-policy"' in home
-    assert 'href="/pages/terms"' in home
+    assert _has_page_link(home, "privacy-policy")
+    assert _has_page_link(home, "terms")
 
     privacy_id = privacy.get_json()["page"]["id"]
     client.put(
@@ -133,8 +140,8 @@ def test_cms_page_footer_policy_links_follow_publication(client, app) -> None:
         json={"is_published": False},
     )
     home = _html(client.get("/", headers=public_headers))
-    assert 'href="/pages/privacy-policy"' not in home
-    assert 'href="/pages/terms"' in home
+    assert not _has_page_link(home, "privacy-policy")
+    assert _has_page_link(home, "terms")
 
 
 def test_cms_page_mutations_require_tenant_admin(client, app) -> None:
