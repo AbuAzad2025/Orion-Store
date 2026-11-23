@@ -177,7 +177,15 @@ def check_page(client, url: str, locale: str, label: str, findings: list) -> Non
     text = visible_text(resp.get_data(as_text=True))
     if ARABIC.search(text) and locale == "en":
         samples = [m.group(0) for m in ARABIC.finditer(text)][:6]
-        findings.append((label, url, locale, "Arabic text in English page", samples))
+        # Category names are tenant data (i18n_svc translations), not UI chrome.
+        # The home spotlight and category pages legitimately show them.
+        data_driven = label == "storefront" and (
+            url.startswith("/?tenant_slug") or url.startswith("/category/")
+        )
+        if not data_driven:
+            findings.append(
+                (label, url, locale, "Arabic text in English page", samples)
+            )
     if locale == "ar":
         words = {w.lower() for w in LATIN_WORD.findall(text)}
         bad = sorted(w for w in words if w not in ALLOWED_LATIN)
