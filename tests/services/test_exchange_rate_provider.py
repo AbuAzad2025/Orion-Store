@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-import pytest
-
 import currency_svc.exchange_rate_provider as provider
+import pytest
 
 
 @pytest.fixture(autouse=True)
