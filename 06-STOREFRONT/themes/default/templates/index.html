@@ -38,6 +38,7 @@
     <span class="orion-section-line" aria-hidden="true"></span>
   </div>
   {% if products %}
+  {% include "components/filters.html" %}
   <div class="orion-product-grid">
     {% for product in products_i18n or products %}
       {% set product_i18n = product %}

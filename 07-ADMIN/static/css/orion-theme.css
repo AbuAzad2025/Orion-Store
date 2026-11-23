@@ -7,7 +7,8 @@
   --orion-panel: #121a28;
   --orion-panel-2: #1a2638;
   --orion-text: #f4f7fc;
-  --orion-muted: #d4ddee;
+  --orion-muted: #d8dfe9;
+  --orion-text-soft: #ecefff;
   --orion-gold: #e9c579;
   --orion-gold-strong: #ffd891;
   --orion-border: #2c3b50;
@@ -316,7 +317,7 @@ body.orion-surface {
   display: block;
   padding: 0.55rem 0.85rem;
   border-radius: 10px;
-  color: var(--orion-muted);
+  color: var(--orion-text-soft);
   text-decoration: none;
   border-inline-start: 3px solid transparent;
 }
@@ -1094,7 +1095,7 @@ body.orion-surface {
   grid-template-columns: 1.7fr repeat(3,1fr); gap: 2.75rem;
 }
 .orion-footer-brand { border-inline-start: 3px solid var(--orion-gold); border-radius: 0 14px 14px 0; padding-inline-start: .85rem; }
-.orion-footer-about { color: var(--orion-muted); font-size: .9rem; line-height: 1.95; max-inline-size: 24rem; letter-spacing: -.008em; }
+.orion-footer-about { color: var(--orion-text-soft); font-size: .9rem; line-height: 1.95; max-inline-size: 24rem; letter-spacing: -.008em; }
 .orion-footer-cta {
   display: inline-flex; align-items: center; gap: .5rem; margin-block-start: 1.1rem; padding: .55rem 1.15rem;
   border: 1px solid var(--orion-gold); border-radius: 999px;
@@ -1108,7 +1109,7 @@ body.orion-surface {
 }
 .orion-footer-links { display: flex; flex-direction: column; gap: .45rem; }
 .orion-footer-links a {
-  color: var(--orion-muted); font-size: .88rem; text-decoration: none;
+  color: var(--orion-text-soft); font-size: .88rem; text-decoration: none;
   transition: color 150ms ease,letter-spacing 150ms ease,padding-inline-start 150ms ease;
 }
 .orion-footer-links a:hover { color: var(--orion-gold); letter-spacing: .02em; padding-inline-start: .4rem; }
@@ -1270,3 +1271,54 @@ body.orion-surface {
   .orion-trust-item { padding: 0.35rem 0.7rem; font-size: 0.7rem; }
   .orion-footer-grid { padding: 2.75rem 1rem 2.25rem; gap: 1.75rem; }
 }
+
+/* Navbar search box + filters bar + pagination — organized fast-access tools. */
+.orion-nav-search {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.42rem 0.8rem 0.42rem 0.75rem;
+  border: 1px solid var(--orion-border); border-radius: 999px;
+  background: var(--orion-panel);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
+}
+.orion-nav-search:focus-within { border-color: var(--orion-gold); }
+.orion-search-input {
+  width: min(13rem, 42vw); border: 0; outline: 0; background: transparent;
+  color: var(--orion-text-soft); font-size: 0.86rem;
+}
+.orion-search-input::placeholder { color: var(--orion-muted); }
+.orion-search-btn {
+  display: inline-grid; place-items: center; inline-size: 2.1rem; block-size: 2.1rem;
+  border: 0; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(135deg, var(--orion-gold), var(--orion-gold-strong));
+  color: #1b1405; font-size: 1rem;
+}
+.orion-search-btn:hover { box-shadow: 0 6px 16px rgba(230, 196, 121, 0.32); }
+.orion-search-btn:focus-visible { outline: 3px solid var(--orion-gold); outline-offset: 2px; }
+
+.orion-filters {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.7rem; align-items: end; margin-block: 0.9rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed var(--orion-gold); border-radius: 14px;
+  background: linear-gradient(180deg, var(--orion-panel), var(--orion-panel-2));
+}
+.orion-filters .orion-filter-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.orion-filter-label { font-size: 0.66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--orion-gold); }
+.orion-filter-check { display: flex; align-items: center; gap: .55rem; margin-block-start: .45rem; font-size: .8rem; color: var(--orion-text-soft); }
+.orion-filter-select, .orion-filter-input {
+  padding: .48rem .7rem; font-size: .8rem; border: 1px solid var(--orion-border); border-radius: 10px;
+  background: var(--orion-panel-2); color: var(--orion-text-soft);
+  transition: border-color 140ms ease;
+}
+.orion-filter-select:focus-visible, .orion-filter-input:focus-visible { outline: 2px solid var(--orion-gold); outline-offset: 1px; }
+.orion-filter-apply {
+  padding: .6rem 1.1rem; border: 0; border-radius: 999px;
+  background: linear-gradient(135deg, var(--orion-gold), var(--orion-gold-strong));
+  color: #1b1405; font-size: .8rem; font-weight: 800; cursor: pointer;
+}
+.orion-filter-apply:hover { background: var(--orion-gold-strong); }
+.orion-filter-clear { font-size: .8rem; color: var(--orion-gold); text-decoration: none; }
+.orion-pagination { display: flex; gap: .5rem; justify-content: center; margin-block-start: 1.25rem; flex-wrap: wrap; }
+.orion-page-link { padding: .45rem 1rem; border: 1px solid var(--orion-border); border-radius: 999px; color: var(--orion-text-soft); font-size: .82rem; text-decoration: none; }
+.orion-page-link:hover { border-color: var(--orion-gold); color: var(--orion-text); }
+.orion-page-current { color: var(--orion-gold); font-weight: 800; }

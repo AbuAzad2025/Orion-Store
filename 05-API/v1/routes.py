@@ -43,6 +43,7 @@ from v1.store_account import store_account_bp
 from v1.store_credit import store_credit_bp
 from v1.storefront import storefront_bp
 from v1.storefront_pickup import storefront_pickup_bp
+from v1.storefront_search import storefront_search_bp
 from v1.subscriptions import subscriptions_bp
 from v1.tax_api import tax_bp
 from v1.tenant_portal import tenant_portal_bp
@@ -120,6 +121,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(payments_bp, url_prefix="/api/v1/payments")
     app.register_blueprint(platform_settings_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(storefront_bp, url_prefix="/api/v1/store")
+    app.register_blueprint(storefront_search_bp, url_prefix="/api/v1/store")
     app.register_blueprint(storefront_pickup_bp, url_prefix="/api/v1/store")
     app.register_blueprint(store_account_bp, url_prefix="/api/v1/store/account")
     app.register_blueprint(customer_flows_bp, url_prefix="/api/v1/store/account")

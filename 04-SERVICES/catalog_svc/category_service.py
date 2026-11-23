@@ -17,6 +17,21 @@ class CategoryService:
             Category.sort_order, Category.name
         )
 
+    def category_product_counts(self, tenant_id: int) -> dict[int, int]:
+        """Published product counts per category (unpublished/hidden not counted)."""
+        from catalog.product import Product
+        from orion.extensions import db
+
+        rows = (
+            Product.query.filter_by(
+                tenant_id=tenant_id, deleted_at=None, is_published=True
+            )
+            .with_entities(Product.category_id, db.func.count())
+            .group_by(Product.category_id)
+            .all()
+        )
+        return {cid: count for cid, count in rows if cid is not None}
+
     def get_by_slug(self, tenant_id: int, slug: str) -> Category:
         category = Category.query.filter_by(
             tenant_id=tenant_id, slug=slug, deleted_at=None

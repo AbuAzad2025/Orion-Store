@@ -6,13 +6,14 @@ import re
 from pathlib import Path
 
 from compliance.compliance import CookieConsentSetting
-from flask import Blueprint, g, request
+from flask import Blueprint, g, request, url_for
 from i18n_svc.page_service import PageService
 
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
 from core.context import get_locale
 from core.exceptions import NotFoundError
+from core.pagination import paginate_query, pagination_params
 from engine.theme_engine import ThemeEngine
 from engine.ui_text import translate
 
@@ -99,13 +100,23 @@ def store_index():
     from i18n_svc.translation_service import TranslationService
 
     locale = get_locale()
-    products = _products.list_published(tenant.id)
-    # Sort the MODEL list once; the translated list is derived in the same order
-    # so index.html can safely pair them by loop index (slug/image/cart-id come
-    # from the model, display strings from the merged dict).
-    products.sort(key=lambda p: (not p.is_featured, p.name or ""))
     ts = TranslationService()
+    category_id = _parse_category_id(tenant.id, request.args.get("category"))
+    featured = _parse_featured(request.args.get("featured"))
+    sort = _parse_sort(request.args.get("sort"))
+    price_min = _parse_decimal(request.args.get("price_min"))
+    price_max = _parse_decimal(request.args.get("price_max"))
+    products = _products.query_published(
+        tenant.id,
+        category_id=category_id,
+        featured=featured,
+        price_min=price_min,
+        price_max=price_max,
+        sort="featured" if sort == "default" else sort,
+    ).all()
     products_i18n = [ts.merge_product(p, locale) for p in products]
+    categories = _categories.list_for_tenant(tenant.id)
+    counts = _categories.category_product_counts(tenant.id)
     return _engine.render(
         "index.html",
         tenant=tenant,
@@ -113,6 +124,13 @@ def store_index():
         products_i18n=products_i18n,
         page_title=tenant.name,
         locale=locale,
+        categories=categories,
+        category_counts=counts,
+        selected_category_id=category_id,
+        featured=bool(featured),
+        sort=sort,
+        price_min=price_min,
+        price_max=price_max,
     )
 
 
@@ -148,12 +166,21 @@ def store_category(slug: str):
     ts = TranslationService()
     category = ts.get_category_by_localized_slug(tenant.id, slug, locale)
     category_i18n = ts.merge_category(category, locale)
-    products = [
-        p for p in _products.list_published(tenant.id) if p.category_id == category.id
-    ]
-    # Keep the two lists index-aligned — see store_index.
-    products.sort(key=lambda p: (not p.is_featured, p.name or ""))
+    products = _products.query_published(
+        tenant.id,
+        category_id=category.id,
+        featured=_parse_featured(request.args.get("featured")),
+        price_min=_parse_decimal(request.args.get("price_min")),
+        price_max=_parse_decimal(request.args.get("price_max")),
+        sort=(
+            "featured"
+            if _parse_sort(request.args.get("sort")) == "default"
+            else _parse_sort(request.args.get("sort"))
+        ),
+    ).all()
     products_i18n = [ts.merge_product(p, locale) for p in products]
+    categories = _categories.list_for_tenant(tenant.id)
+    counts = _categories.category_product_counts(tenant.id)
     return _engine.render(
         "category.html",
         tenant=tenant,
@@ -162,6 +189,13 @@ def store_category(slug: str):
         products_i18n=products_i18n,
         page_title=category_i18n.get("name") or category.name,
         locale=locale,
+        categories=categories,
+        category_counts=counts,
+        selected_category_id=category.id,
+        featured=bool(_parse_featured(request.args.get("featured"))),
+        sort=_parse_sort(request.args.get("sort")),
+        price_min=_parse_decimal(request.args.get("price_min")),
+        price_max=_parse_decimal(request.args.get("price_max")),
     )
 
 
@@ -179,6 +213,99 @@ def store_login():
         store_admin_login_url=_store_admin_login_url(tenant),
         platform_admin_login_url=_platform_admin_login_url(),
         locale=locale,
+    )
+
+
+def _parse_category_id(tenant_id: int, slug: str):
+    from catalog.category import Category
+
+    slug = (slug or "").strip()
+    if not slug:
+        return None
+    category = Category.query.filter_by(
+        tenant_id=tenant_id, slug=slug, deleted_at=None
+    ).first()
+    return category.id if category else None
+
+
+def _parse_decimal(value: str | None):
+    if value is None or not value.strip():
+        return None
+    try:
+        from decimal import Decimal
+
+        return Decimal(value.strip())
+    except Exception:
+        return None
+
+
+def _parse_featured(value: str | None) -> bool | None:
+    if value is None:
+        return None
+    return str(value).strip().lower() in ("1", "true", "on", "yes")
+
+
+def _parse_sort(value: str | None) -> str:
+    from catalog_svc.product_service import ProductService
+
+    value = (value or "").strip()
+    return value if value in ProductService.SORT_OPTIONS else "default"
+
+
+@storefront_ui_bp.get("/search")
+def store_search():
+    """Product search page: text search + category/featured/price/sort filters."""
+    tenant = _tenant_or_404()
+    if not tenant:
+        return "Store not found.", 404
+    from i18n_svc.translation_service import TranslationService
+
+    locale = get_locale()
+    ts = TranslationService()
+    query = request.args.get("q", "").strip()
+    category_id = _parse_category_id(tenant.id, request.args.get("category"))
+    featured = _parse_featured(request.args.get("featured"))
+    sort = _parse_sort(request.args.get("sort"))
+    price_min = _parse_decimal(request.args.get("price_min"))
+    price_max = _parse_decimal(request.args.get("price_max"))
+    products_q = _products.query_search_published(
+        tenant.id,
+        query,
+        category_id=category_id,
+        featured=featured,
+        price_min=price_min,
+        price_max=price_max,
+        sort=sort,
+    )
+    page, per_page = pagination_params()
+    products, meta = paginate_query(products_q, page, per_page)
+    products_i18n = [ts.merge_product(p, locale) for p in products]
+    categories = _categories.list_for_tenant(tenant.id)
+    counts = _categories.category_product_counts(tenant.id)
+
+    def _page_url(n: int) -> str:
+        params = {k: v for k, v in request.args.items()}
+        params["page"] = str(n)
+        return url_for("storefront_ui.store_search", **params)
+
+    return _engine.render(
+        "search.html",
+        tenant=tenant,
+        page_title=translate("search_results_title", locale),
+        locale=locale,
+        search_q=query,
+        products=products,
+        products_i18n=products_i18n,
+        categories=categories,
+        category_counts=counts,
+        selected_category_id=category_id,
+        featured=bool(featured),
+        sort=sort,
+        price_min=price_min,
+        price_max=price_max,
+        pagination_meta=meta,
+        prev_url=_page_url(page - 1) if page > 1 else None,
+        next_url=_page_url(page + 1) if page < meta["pages"] else None,
     )
 
 

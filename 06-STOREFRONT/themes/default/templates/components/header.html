@@ -42,6 +42,12 @@
       <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-nav-wa"
          aria-label="{{ t('whatsapp') }}">{{ t('whatsapp') }}</a>
       {% endif %}
+      <form class="orion-nav-search" role="search" action="/search" method="get" aria-label="{{ t('search_placeholder') }}">
+        <input type="search" name="q" value="{{ search_q or '' }}" class="orion-search-input"
+               placeholder="{{ t('search_placeholder') }}" required>
+        <button type="submit" class="orion-search-btn" aria-label="{{ t('search_placeholder') }}"><span aria-hidden="true">🔍</span></button>
+        <input type="hidden" name="store" value="{{ store_token }}">
+      </form>
     </div>
   </div>
 </header>

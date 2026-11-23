@@ -1,0 +1,45 @@
+{#- Shared product filters bar — used on the catalog page and the search page. -#}
+<form class="orion-filters" role="group" aria-label="{{ t('filters_title') }}">
+  <input type="hidden" name="store" value="{{ store_token }}">
+  {% if search_q %}
+  <input type="hidden" name="q" value="{{ search_q }}">
+  {% endif %}
+  <label class="orion-filter-field">
+    <span class="orion-filter-label">{{ t('filter_category') }}</span>
+    <select name="category" class="orion-filter-select" aria-label="{{ t('filter_category') }}">
+      <option value=""{% if not selected_category_id %} selected{% endif %}>{{ t('filter_all') }}</option>
+      {% for c in categories %}
+      {% set count = category_counts.get(c.id, 0) %}
+      <option value="{{ c.slug }}"{% if selected_category_id == c.id %} selected{% endif %}>
+        {{ c.name }}{% if count > 0 %} ({{ count }}){% endif %}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label class="orion-filter-check">
+    <input type="checkbox" name="featured" value="1" aria-label="{{ t('filter_featured') }}"{% if featured %} checked{% endif %}>
+    {{ t('filter_featured') }}
+  </label>
+  <label class="orion-filter-field">
+    <span class="orion-filter-label">{{ t('price_min') }}</span>
+    <input type="number" name="price_min" class="orion-filter-input" step="0.01" min="0" value="{{ price_min or '' }}"
+           aria-label="{{ t('price_min') }}">
+  </label>
+  <label class="orion-filter-field">
+    <span class="orion-filter-label">{{ t('price_max') }}</span>
+    <input type="number" name="price_max" class="orion-filter-input" step="0.01" min="0" value="{{ price_max or '' }}"
+           aria-label="{{ t('price_max') }}">
+  </label>
+  <label class="orion-filter-field">
+    <span class="orion-filter-label">{{ t('sort_label') }}</span>
+    <select name="sort" class="orion-filter-select" aria-label="{{ t('sort_default') }}">
+      <option value="default"{% if sort in (None, '', 'default') %} selected{% endif %}>{{ t('sort_default') }}</option>
+      <option value="price_asc"{% if sort == 'price_asc' %} selected{% endif %}>{{ t('sort_price_asc') }}</option>
+      <option value="price_desc"{% if sort == 'price_desc' %} selected{% endif %}>{{ t('sort_price_desc') }}</option>
+    </select>
+  </label>
+  <button type="submit" class="orion-filter-apply">{{ t('filter_apply') }}</button>
+  <a href="{{ request.path }}?store={{ store_token }}" class="orion-filter-clear" aria-label="{{ t('filter_clear') }}">
+    {{ t('filter_clear') }}
+  </a>
+</form>

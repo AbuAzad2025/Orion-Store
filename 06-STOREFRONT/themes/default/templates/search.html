@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="orion-search-page" aria-label="{{ t('filters_title') }}">
+  <h1 class="orion-title text-2xl mb-1">{{ t('search_results_title') }}</h1>
+  {% if search_q %}
+  <p class="orion-muted text-sm mb-6">
+    {{ t('search_results_count').format(n=pagination_meta.total) }}
+  </p>
+  {% else %}
+  <p class="orion-muted text-sm mb-6">{{ t('search_placeholder') }}</p>
+  {% endif %}
+
+  {% include "components/filters.html" %}
+
+  {% if products %}
+  <div class="orion-product-grid mt-8">
+    {% for product in products %}
+    {% set product_i18n = products_i18n[loop.index0] %}
+    {% set product = products[loop.index0] %}
+    {% include "components/product_card.html" %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="orion-empty-modern">{{ t('search_empty') }}</div>
+  {% endif %}
+
+  {% if pagination_meta.pages > 1 %}
+  <nav class="orion-pagination" aria-label="{{ t('search_results_title') }}">
+    {% if pagination_meta.page > 1 %}
+    <a class="orion-page-link" href="{{ prev_url }}">{{ t('pagination_prev') }}</a>
+    {% endif %}
+    <span class="orion-page-link orion-page-current">{{ pagination_meta.page }} / {{ pagination_meta.pages }}</span>
+    {% if pagination_meta.page < pagination_meta.pages %}
+    <a class="orion-page-link" href="{{ next_url }}">{{ t('pagination_next') }}</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>
+{% endblock %}

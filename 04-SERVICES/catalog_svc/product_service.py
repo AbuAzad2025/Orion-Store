@@ -6,12 +6,19 @@ import logging
 import uuid
 from decimal import Decimal
 
+from sqlalchemy import or_
 from sqlalchemy.orm import load_only
 
 from catalog.product import Product
 from core.caching import invalidate_tenant_catalog
 from core.exceptions import NotFoundError, ValidationError
 from orion.extensions import db
+
+
+def _escape_like_wildcard(term: str) -> str:
+    """Escape LIKE wildcards so a search term can never match more than itself."""
+    return term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
 
 _PUBLISHED_COLUMNS = load_only(
     Product.id,
@@ -78,14 +85,99 @@ class ProductService:
     def list_published(self, tenant_id: int) -> list[Product]:
         return self.query_published(tenant_id).all()
 
-    def query_published(self, tenant_id: int):
-        return (
-            Product.query.filter_by(
-                tenant_id=tenant_id, deleted_at=None, is_published=True
-            )
-            .options(_PUBLISHED_COLUMNS)
-            .order_by(Product.created_at.desc())
+    def query_published(
+        self,
+        tenant_id: int,
+        *,
+        category_id: int | None = None,
+        featured: bool | None = None,
+        price_min: Decimal | str | None = None,
+        price_max: Decimal | str | None = None,
+        sort: str | None = None,
+    ):
+        """Published products with optional catalog filters (tenant-scoped).
+
+        Default order stays newest-first (legacy behavior); ``sort`` accepts
+        ``"featured"``, ``"price_asc"`` or ``"price_desc"``.
+        """
+        q = Product.query.filter_by(
+            tenant_id=tenant_id, deleted_at=None, is_published=True
+        ).options(_PUBLISHED_COLUMNS)
+        if category_id is not None:
+            q = q.filter_by(category_id=category_id)
+        if featured is not None:
+            q = q.filter_by(is_featured=featured)
+        if price_min is not None:
+            q = q.filter(Product.price >= Decimal(str(price_min)))
+        if price_max is not None:
+            q = q.filter(Product.price <= Decimal(str(price_max)))
+        if sort == "price_asc":
+            q = q.order_by(Product.price.asc(), Product.created_at.desc())
+        elif sort == "price_desc":
+            q = q.order_by(Product.price.desc(), Product.created_at.desc())
+        elif sort == "featured":
+            q = q.order_by(Product.is_featured.desc(), Product.created_at.desc())
+        else:
+            q = q.order_by(Product.created_at.desc())
+        return q
+
+    SORT_OPTIONS = ("default", "price_asc", "price_desc")
+
+    def query_search_published(
+        self,
+        tenant_id: int,
+        query: str | None = None,
+        *,
+        category_id: int | None = None,
+        featured: bool | None = None,
+        price_min: Decimal | str | None = None,
+        price_max: Decimal | str | None = None,
+        sort: str = "default",
+    ):
+        """Published products matching a text search + filters, deterministically sorted.
+
+        Search default surfaces featured products first, then newest.
+        """
+        q = self.query_published(
+            tenant_id,
+            category_id=category_id,
+            featured=featured,
+            price_min=price_min,
+            price_max=price_max,
+            sort="featured" if sort in ("default", "featured") else sort,
         )
+        term = (query or "").strip()
+        if term:
+            needle = _escape_like_wildcard(term)
+            q = q.filter(
+                or_(
+                    Product.name.ilike(f"%{needle}%", escape="\\"),
+                    Product.short_description.ilike(f"%{needle}%", escape="\\"),
+                    Product.description.ilike(f"%{needle}%", escape="\\"),
+                )
+            )
+        return q
+
+    def search_published(
+        self,
+        tenant_id: int,
+        query: str | None = None,
+        *,
+        category_id: int | None = None,
+        featured: bool | None = None,
+        price_min: Decimal | str | None = None,
+        price_max: Decimal | str | None = None,
+        sort: str = "default",
+    ) -> list[Product]:
+        return self.query_search_published(
+            tenant_id,
+            query,
+            category_id=category_id,
+            featured=featured,
+            price_min=price_min,
+            price_max=price_max,
+            sort=sort,
+        ).all()
 
     def get_by_slug(self, tenant_id: int, slug: str) -> Product:
         product = Product.query.filter_by(
