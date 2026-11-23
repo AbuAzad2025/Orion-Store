@@ -221,6 +221,20 @@ def _resolve_request_locale() -> None:
 
 
 def _resolve_tenant_from_request() -> Tenant | None:
+    # Public storefront pages may select a tenant by its public slug. This is a
+    # read-only storefront selection (not an admin capability) and must work in
+    # production, where the development-only fallback is disabled.
+    if not request.path.startswith(("/api/", "/admin/")):
+        preview_slug = request.args.get("tenant_slug")
+        if preview_slug:
+            tenant = (
+                _tenant_query()
+                .filter_by(slug=preview_slug, is_active=True, deleted_at=None)
+                .first()
+            )
+            if tenant:
+                return tenant
+
     header_id = request.headers.get("X-Tenant-ID")
     if header_id:
         tenant = None
