@@ -24,7 +24,11 @@ def test_roundtrip(app, store):
 def test_tampered_token_resolves_nothing(app, store):
     with app.app_context():
         token = issue(store)
-        for bad in (token[:-1] + ("A" if token[-1] != "A" else "B"), token + "x", "garbage"):
+        for bad in (
+            token[:-1] + ("A" if token[-1] != "A" else "B"),
+            token + "x",
+            "garbage",
+        ):
             assert resolve(bad) is None
 
 
