@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from support.http import tenant_headers
 
 from core.store_token import issue
-from support.http import tenant_headers
 from tenant_svc.tenant_service import TenantService
 
 
