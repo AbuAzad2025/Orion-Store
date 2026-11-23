@@ -141,6 +141,24 @@ def register_middleware(app: Flask) -> None:
             )
         return response
 
+    @app.after_request
+    def remember_locale_choice(response):
+        """Stick to the language the user explicitly picked via ?locale=...
+
+        The language control passes ?locale=xx, so the next requests read the
+        persisted choice from this cookie and every storefront template keeps
+        that language until the user chooses another one.
+        """
+        locale = request.args.get("locale")
+        if locale and getattr(g, "locale", None):
+            response.set_cookie(
+                "orion_locale",
+                g.locale,
+                max_age=90 * 24 * 3600,
+                samesite="Lax",
+            )
+        return response
+
     @app.before_request
     def guard_beta_program() -> None:
         if not beta_mode_enabled() or not is_beta_gated_path(request.path):

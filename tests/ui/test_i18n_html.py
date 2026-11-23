@@ -62,7 +62,7 @@ def test_storefront_defaults_to_arabic_rtl(client, app) -> None:
     assert attrs["dir"] == "rtl"
 
 
-def test_locale_query_switches_to_english_ltr(client, app) -> None:
+def test_locale_query_switches_to_english_ltr_and_sticks(client, app) -> None:
     headers = _make_storefront()
     english = client.get("/?locale=en", headers=headers)
     assert english.status_code == 200
@@ -70,9 +70,18 @@ def test_locale_query_switches_to_english_ltr(client, app) -> None:
     assert attrs["lang"] == "en"
     assert attrs["dir"] == "ltr"
 
-    # Same page without the query string stays Arabic — no static leakage.
+    # The chosen language sticks on every template until the user changes it.
     default = client.get("/", headers=headers)
-    assert _html_attrs(default)["lang"] == "ar"
+    assert _html_attrs(default)["lang"] == "en"
+
+
+def test_storefront_default_is_arabic_despite_english_browser(client, app) -> None:
+    headers = _make_storefront()
+    response = client.get(
+        "/", headers={**headers, "Accept-Language": "en-US,en;q=0.9"}
+    )
+    assert response.status_code == 200
+    assert _html_attrs(response)["lang"] == "ar"
 
 
 def test_every_storefront_route_passes_locale(client, app) -> None:

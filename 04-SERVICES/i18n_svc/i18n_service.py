@@ -53,6 +53,12 @@ class I18nService:
         self.ensure_locales_seeded()
         default = (tenant.default_language if tenant else None) or "ar"
         candidate = (requested or "").strip().lower()[:5] or None
+        # The tenant default wins over the browser Accept-Language, unless the
+        # user explicitly chose one (query, cookie or X-Locale). This keeps the
+        # storefront language sticky on every template; users switch with the
+        # language control, which records their choice in the orion_locale cookie.
+        if not candidate and tenant is not None and (tenant.default_language or "").strip():
+            candidate = tenant.default_language.strip().lower()[:5]
         if not candidate:
             candidate = self._from_accept_language() or default
         if not multi_language_enabled and candidate != default:
@@ -75,7 +81,11 @@ class I18nService:
 
     def bind_request_locale(self) -> None:
         tenant = getattr(g, "tenant", None)
-        requested = request.args.get("locale") or request.headers.get("X-Locale")
+        requested = (
+            request.args.get("locale")
+            or request.headers.get("X-Locale")
+            or request.cookies.get("orion_locale")
+        )
         multi = True
         if tenant:
             from feature_flag_svc.feature_flag_evaluator import FeatureFlagEvaluator
