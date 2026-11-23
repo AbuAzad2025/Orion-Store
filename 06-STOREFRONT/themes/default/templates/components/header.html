@@ -1,29 +1,29 @@
 <header class="orion-navbar">
   <div class="orion-navbar-inner">
-    <a href="/?tenant_slug={{ tenant.slug }}" class="orion-brand" aria-label="{{ tenant.name }} — {{ t('home') }}">
+    <a href="/?store={{ store_token }}" class="orion-brand" aria-label="{{ tenant.name }} — {{ t('home') }}">
       <span class="orion-brand-mark" aria-hidden="true">A</span>
       <span class="orion-brand-name">{{ tenant.name }}</span>
     </a>
 
     <nav class="orion-nav-links" aria-label="{{ t('main_navigation') }}">
-      <a href="/?tenant_slug={{ tenant.slug }}" class="orion-nav-link{% if request.path == '/' %} is-active{% endif %}"
+      <a href="/?store={{ store_token }}" class="orion-nav-link{% if request.path == '/' %} is-active{% endif %}"
          {% if request.path == '/' %}aria-current="page"{% endif %}>{{ t('home') }}</a>
-      <a href="/cart?tenant_slug={{ tenant.slug }}" class="orion-nav-link{% if request.path.startswith('/cart') %} is-active{% endif %}"
+      <a href="/cart?store={{ store_token }}" class="orion-nav-link{% if request.path.startswith('/cart') %} is-active{% endif %}"
          {% if request.path.startswith('/cart') %}aria-current="page"{% endif %}>{{ t('cart') }}</a>
-      <a href="/account?tenant_slug={{ tenant.slug }}" class="orion-nav-link{% if request.path.startswith('/account') %} is-active{% endif %}"
+      <a href="/account?store={{ store_token }}" class="orion-nav-link{% if request.path.startswith('/account') %} is-active{% endif %}"
          {% if request.path.startswith('/account') %}aria-current="page"{% endif %}>{{ t('account') }}</a>
     </nav>
 
     <div class="orion-nav-controls">
       <div class="orion-locale-switch" role="group" aria-label="{{ t('language') }}">
-        <a href="{{ request.path }}?locale=ar&currency={{ currency }}" class="orion-locale-link{% if locale[:2]|lower == 'ar' %} is-active{% endif %}"
+        <a href="{{ request.path }}?locale=ar&currency={{ currency }}&store={{ store_token }}" class="orion-locale-link{% if locale[:2]|lower == 'ar' %} is-active{% endif %}"
            hreflang="ar" aria-label="{{ t('language_ar') }}" {% if locale[:2]|lower == 'ar' %}aria-current="true"{% endif %}>{{ t('language_ar_short') }}</a>
-        <a href="{{ request.path }}?locale=en&currency={{ currency }}" class="orion-locale-link{% if locale[:2]|lower == 'en' %} is-active{% endif %}"
+        <a href="{{ request.path }}?locale=en&currency={{ currency }}&store={{ store_token }}" class="orion-locale-link{% if locale[:2]|lower == 'en' %} is-active{% endif %}"
            hreflang="en" aria-label="{{ t('language_en') }}" {% if locale[:2]|lower == 'en' %}aria-current="true"{% endif %}>{{ t('language_en_short') }}</a>
       </div>
       <label class="orion-currency-control" aria-label="{{ t('currency') }}">
         <select id="currency-switch" aria-label="{{ t('currency') }}"
-                onchange="if(this.value) location.href='{{ request.path }}?locale={{ locale }}&currency='+this.value">
+                onchange="if(this.value) location.href='{{ request.path }}?locale={{ locale }}&currency='+this.value+'&store={{ store_token }}'">
           {% for code in currencies %}
           <option value="{{ code }}"{% if code == currency %} selected{% endif %}>{{ code }}</option>
           {% endfor %}

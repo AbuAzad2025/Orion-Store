@@ -61,6 +61,9 @@ class ThemeEngine:
         context["money"] = lambda value: _format_money(
             value, source_currency, context["currency"], markup
         )
+        from core.store_token import issue as issue_store_token
+
+        context["store_token"] = issue_store_token(tenant) if tenant else ""
         context["currencies"] = sorted(SUPPORTED_CURRENCIES)
         if "cookie_settings" not in context and tenant is not None:
             from compliance.compliance import CookieConsentSetting

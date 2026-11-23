@@ -13,7 +13,7 @@
         {{ t('checkout_desc') }}
       </p>
     </div>
-    <a href="/checkout" class="orion-btn orion-btn-gold mt-4 w-full">{{ t('checkout') }}</a>
+    <a href="/checkout?store={{ store_token }}" class="orion-btn orion-btn-gold mt-4 w-full">{{ t('checkout') }}</a>
   </section>
 
   {% if tenant.phone %}

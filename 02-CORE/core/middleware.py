@@ -221,15 +221,23 @@ def _resolve_request_locale() -> None:
 
 
 def _resolve_tenant_from_request() -> Tenant | None:
-    # Public storefront pages may select a tenant by its public slug. This is a
-    # read-only storefront selection (not an admin capability) and must work in
-    # production, where the development-only fallback is disabled.
+    # Signed store tokens are the production-safe way to pick a storefront.
+    # A tampered token resolves to no tenant at all — never a fallback.
     if not request.path.startswith(("/api/", "/admin/")):
-        preview_slug = request.args.get("tenant_slug")
-        if preview_slug:
+        from core.store_token import resolve as resolve_store_token
+
+        token = request.args.get("store")
+        if token:
+            return resolve_store_token(token)
+        # Plain slugs stay a development convenience only: too guessable for
+        # production, where tenant selection must be via the signed token or
+        # an exact Host match.
+        if current_app.debug and request.args.get("tenant_slug"):
             tenant = (
                 _tenant_query()
-                .filter_by(slug=preview_slug, is_active=True, deleted_at=None)
+                .filter_by(
+                    slug=request.args["tenant_slug"], is_active=True, deleted_at=None
+                )
                 .first()
             )
             if tenant:

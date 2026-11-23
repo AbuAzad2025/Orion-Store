@@ -25,9 +25,9 @@
     <nav aria-label="{{ t('quick_links') }}">
       <h2 class="orion-footer-col-title">{{ t('quick_links') }}</h2>
       <div class="orion-footer-links">
-        <a href="/?tenant_slug={{ tenant.slug }}">{{ t('home') }}</a>
-        <a href="/cart?tenant_slug={{ tenant.slug }}">{{ t('cart') }}</a>
-        <a href="/account?tenant_slug={{ tenant.slug }}">{{ t('account') }}</a>
+        <a href="/?store={{ store_token }}">{{ t('home') }}</a>
+        <a href="/cart?store={{ store_token }}">{{ t('cart') }}</a>
+        <a href="/account?store={{ store_token }}">{{ t('account') }}</a>
       </div>
     </nav>
 
@@ -36,7 +36,7 @@
       <div class="orion-footer-links">
         {% if tenant.phone %}<a href="tel:{{ tenant.phone }}" dir="ltr">{{ tenant.phone }}</a>{% endif %}
         {% if tenant.email %}<a href="mailto:{{ tenant.email }}" dir="ltr">{{ tenant.email }}</a>{% endif %}
-        <a href="/consent?tenant_slug={{ tenant.slug }}">{{ t('legal') }}</a>
+        <a href="/consent?store={{ store_token }}">{{ t('legal') }}</a>
       </div>
     </section>
 
@@ -44,12 +44,12 @@
       <h2 class="orion-footer-col-title">{{ t('legal') }}</h2>
       <div class="orion-footer-links">
         {% if policy.privacy %}
-        <a href="/pages/{{ policy.privacy.slug }}">{{ policy.privacy.title|default(t('privacy_policy')) }}</a>
+        <a href="/pages/{{ policy.privacy.slug }}?store={{ store_token }}">{{ policy.privacy.title|default(t('privacy_policy')) }}</a>
         {% else %}
-        <a href="/consent?tenant_slug={{ tenant.slug }}">{{ t('privacy_policy') }}</a>
+        <a href="/consent?store={{ store_token }}">{{ t('privacy_policy') }}</a>
         {% endif %}
         {% if policy.terms %}
-        <a href="/pages/{{ policy.terms.slug }}">{{ policy.terms.title|default(t('terms_conditions')) }}</a>
+        <a href="/pages/{{ policy.terms.slug }}?store={{ store_token }}">{{ policy.terms.title|default(t('terms_conditions')) }}</a>
         {% endif %}
       </div>
     </nav>
