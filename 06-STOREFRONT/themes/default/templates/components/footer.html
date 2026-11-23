@@ -23,25 +23,25 @@
     </section>
 
     <nav aria-label="{{ t('quick_links') }}">
-      <h2 class="orion-footer-col-title">{{ t('quick_links') }}</h2>
+      <h2 class="orion-footer-col-title"><span aria-hidden="true" class="orion-footer-icon">🔗</span>{{ t('quick_links') }}</h2>
       <div class="orion-footer-links">
-        <a href="/?store={{ store_token }}">{{ t('home') }}</a>
-        <a href="/cart?store={{ store_token }}">{{ t('cart') }}</a>
-        <a href="/account?store={{ store_token }}">{{ t('account') }}</a>
+        <a href="/?store={{ store_token }}"><span aria-hidden="true" class="orion-footer-icon">🏠</span>{{ t('home') }}</a>
+        <a href="/cart?store={{ store_token }}"><span aria-hidden="true" class="orion-footer-icon">🛒</span>{{ t('cart') }}</a>
+        <a href="/account?store={{ store_token }}"><span aria-hidden="true" class="orion-footer-icon">👤</span>{{ t('account') }}</a>
       </div>
     </nav>
 
     <section aria-label="{{ t('contact_us') }}">
-      <h2 class="orion-footer-col-title">{{ t('contact_us') }}</h2>
+      <h2 class="orion-footer-col-title"><span aria-hidden="true" class="orion-footer-icon">📞</span>{{ t('contact_us') }}</h2>
       <div class="orion-footer-links">
-        {% if tenant.phone %}<a href="tel:{{ tenant.phone }}" dir="ltr">{{ tenant.phone }}</a>{% endif %}
-        {% if tenant.email %}<a href="mailto:{{ tenant.email }}" dir="ltr">{{ tenant.email }}</a>{% endif %}
-        <a href="/consent?store={{ store_token }}">{{ t('legal') }}</a>
+        {% if tenant.phone %}<a href="tel:{{ tenant.phone }}" dir="ltr"><span aria-hidden="true" class="orion-footer-icon">📞</span>{{ tenant.phone }}</a>{% endif %}
+        {% if tenant.email %}<a href="mailto:{{ tenant.email }}" dir="ltr"><span aria-hidden="true" class="orion-footer-icon">✉️</span>{{ tenant.email }}</a>{% endif %}
+        <a href="/consent?store={{ store_token }}"><span aria-hidden="true" class="orion-footer-icon">📜</span>{{ t('legal') }}</a>
       </div>
     </section>
 
     <nav aria-label="{{ t('legal') }}">
-      <h2 class="orion-footer-col-title">{{ t('legal') }}</h2>
+      <h2 class="orion-footer-col-title"><span aria-hidden="true" class="orion-footer-icon">📑</span>{{ t('legal') }}</h2>
       <div class="orion-footer-links">
         {% if policy.privacy %}
         <a href="/pages/{{ policy.privacy.slug }}?store={{ store_token }}">{{ policy.privacy.title|default(t('privacy_policy')) }}</a>

@@ -7,11 +7,17 @@
 
     <nav class="orion-nav-links" aria-label="{{ t('main_navigation') }}">
       <a href="/?store={{ store_token }}" class="orion-nav-link{% if request.path == '/' %} is-active{% endif %}"
-         {% if request.path == '/' %}aria-current="page"{% endif %}>{{ t('home') }}</a>
+         {% if request.path == '/' %}aria-current="page"{% endif %}>
+        <span aria-hidden="true" class="orion-nav-icon">🏠</span>{{ t('home') }}
+      </a>
       <a href="/cart?store={{ store_token }}" class="orion-nav-link{% if request.path.startswith('/cart') %} is-active{% endif %}"
-         {% if request.path.startswith('/cart') %}aria-current="page"{% endif %}>{{ t('cart') }}</a>
+         {% if request.path.startswith('/cart') %}aria-current="page"{% endif %}>
+        <span aria-hidden="true" class="orion-nav-icon">🛒</span>{{ t('cart') }}
+      </a>
       <a href="/account?store={{ store_token }}" class="orion-nav-link{% if request.path.startswith('/account') %} is-active{% endif %}"
-         {% if request.path.startswith('/account') %}aria-current="page"{% endif %}>{{ t('account') }}</a>
+         {% if request.path.startswith('/account') %}aria-current="page"{% endif %}>
+        <span aria-hidden="true" class="orion-nav-icon">👤</span>{{ t('account') }}
+      </a>
     </nav>
 
     <div class="orion-nav-controls">
