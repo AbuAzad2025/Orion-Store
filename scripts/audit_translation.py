@@ -104,6 +104,8 @@ ALLOWED_LATIN = {
     "usd",
     "en",
     "info",
+    # deployed demo store name (brand/tenant name, not UI chrome)
+    "demo",
 }
 ALLOWED_ARABIC = set()
 
