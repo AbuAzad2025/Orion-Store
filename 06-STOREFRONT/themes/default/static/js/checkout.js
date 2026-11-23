@@ -1,4 +1,6 @@
 /** Checkout + pay flow (wave 5 #56, wave 6 shipping/voucher). */
+const isArabic = document.documentElement.lang === "ar";
+const tr = (ar, en) => (isArabic ? ar : en);
 document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("checkout-form");
   const resultEl = document.getElementById("checkout-result");
@@ -41,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     if (!methodsRes.methods || !methodsRes.methods.length) {
       SafeDOM.clear(methodSelect);
-      methodSelect.appendChild(SafeDOM.elem("option", { value: "" }, ["لا توجد طرق شحن"]));
+      methodSelect.appendChild(SafeDOM.elem("option", { value: "" }, [tr("لا توجد طرق شحن", "No shipping methods available.")]));
     }
     if (paymentSelect) {
       SafeDOM.clear(paymentSelect);
@@ -56,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       if (!payRes.payment_methods || !payRes.payment_methods.length) {
         SafeDOM.clear(paymentSelect);
-        paymentSelect.appendChild(SafeDOM.elem("option", { value: "cod" }, ["الدفع عند الاستلام"]));
+        paymentSelect.appendChild(SafeDOM.elem("option", { value: "cod" }, [tr("الدفع عند الاستلام", "Cash on delivery")]));
       }
       if (notes) {
         const showNotes = () => {
@@ -70,10 +72,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   } catch (err) {
     SafeDOM.clear(methodSelect);
-    methodSelect.appendChild(SafeDOM.elem("option", { value: "" }, ["تعذر تحميل الشحن"]));
+    methodSelect.appendChild(SafeDOM.elem("option", { value: "" }, [tr("تعذر تحميل الشحن", "Could not load shipping options.")]));
     if (paymentSelect) {
       SafeDOM.clear(paymentSelect);
-      paymentSelect.appendChild(SafeDOM.elem("option", { value: "cod" }, ["الدفع عند الاستلام"]));
+      paymentSelect.appendChild(SafeDOM.elem("option", { value: "cod" }, [tr("الدفع عند الاستلام", "Cash on delivery")]));
     }
   }
 
@@ -81,10 +83,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     ev.preventDefault();
     if (form.dataset.busy) return;
     form.dataset.busy = "1";
-    resultEl.textContent = "جاري المعالجة...";
+    resultEl.textContent = tr("جاري المعالجة...", "Processing...");
     try {
       const token = StoreAPI.getCartToken();
-      if (!token) throw new Error("لا توجد سلة.");
+      if (!token) throw new Error(tr("لا توجد سلة.", "No cart is available."));
       const email = document.getElementById("customer-email").value;
       const city = document.getElementById("shipping-city").value;
       const countryCode = document.getElementById("shipping-country")?.value.trim() || "";
@@ -108,19 +110,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         pickup_location_id: document.getElementById("pickup-location")?.value || undefined,
       });
       const order = orderRes.order;
-      summaryEl.textContent = `المجموع: ${order.total} (شحن: ${order.shipping_cost})`;
+      summaryEl.textContent = `${tr("المجموع:", "Total:")} ${order.total} ${tr("(شحن:", "(Shipping:")} ${order.shipping_cost})`;
       const payRes = await StoreAPI.payOrder(order.public_id, method);
       SafeDOM.clear(resultEl);
-      resultEl.appendChild(SafeDOM.elem("p", { className: "text-green-700" }, [`تم الدفع — رقم الطلب ${order.order_number}`]));
+      resultEl.appendChild(SafeDOM.elem("p", { className: "text-green-700" }, [`${tr("تم الدفع", "Payment successful")} — ${tr("رقم الطلب", "Order #")}${order.order_number}`]));
       if (payRes.invoice) {
         resultEl.appendChild(SafeDOM.elem("p", { className: "text-sm" }, [
-          `فاتورة: ${payRes.invoice.invoice_number} `,
+          `${tr("فاتورة:", "Invoice:")} ${payRes.invoice.invoice_number} `,
           SafeDOM.elem("a", {
             href: `/api/v1/store/orders/${order.public_id}/invoice.pdf`,
             className: "orion-header-link underline",
             target: "_blank",
             rel: "noopener",
-          }, ["تحميل PDF"])
+          }, [tr("تحميل PDF", "Download PDF")])
         ]));
       }
       localStorage.removeItem(StoreAPI.cartTokenKey);

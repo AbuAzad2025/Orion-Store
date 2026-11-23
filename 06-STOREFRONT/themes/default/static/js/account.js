@@ -1,4 +1,6 @@
 /** Storefront customer account — JWT cookie (wave 15). */
+const isArabic = document.documentElement.lang === "ar";
+const tr = (ar, en) => (isArabic ? ar : en);
 const AccountUI = {
   getCookie(name) {
     const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
@@ -49,7 +51,7 @@ const AccountUI = {
           list.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${o.order_number} — ${o.total}`]));
         });
       } else {
-        list.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, ["لا توجد طلبات."]));
+        list.appendChild(SafeDOM.elem("p", { className: "text-gray-500" }, [tr("لا توجد طلبات.", "No orders yet.")]));
       }
     }
     await this.loadServices();
@@ -76,19 +78,19 @@ const AccountUI = {
         this.api("GET", "/quote-requests"),
         this.api("GET", "/gift-registries"),
       ]);
-      creditEl.textContent = `رصيد المتجر: ${credit.data.credit?.balance || "0.00"}`;
+      creditEl.textContent = `${tr("رصيد المتجر: ", "Store credit: ")}${credit.data.credit?.balance || "0.00"}`;
       const plansEl = document.getElementById("account-plans");
       if (plansEl) {
         SafeDOM.clear(plansEl);
         const rows = plans.data.plans || [];
-        if (!rows.length) plansEl.textContent = "لا توجد خطط متاحة.";
+        if (!rows.length) plansEl.textContent = tr("لا توجد خطط متاحة.", "No plans available.");
         for (const p of rows) {
           plansEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 flex items-center justify-between" }, [
             SafeDOM.elem("span", {}, [`${p.name} — ${p.price} ${p.currency || ""}`]),
-            SafeDOM.actionBtn("اشترك", "text-blue-700 text-xs", async () => {
+            SafeDOM.actionBtn(tr("اشترك", "Subscribe"), "text-blue-700 text-xs", async () => {
               try {
                 await this.api("POST", "/subscribe", { plan_id: p.id });
-                this.notify("تم الاشتراك", "success");
+                this.notify(tr("تم الاشتراك", "Subscribed"), "success");
               } catch (err) { this.notify(err.message, "error"); }
             }),
           ]));
@@ -146,7 +148,7 @@ const AccountUI = {
         }
         await this.api("POST", "/quote-requests", body);
         e.target.reset();
-        this.notify("تم إرسال طلب العرض", "success");
+        this.notify(tr("تم إرسال طلب العرض", "Quote request sent"), "success");
         this.loadServices();
       } catch (err) { this.notify(err.message, "error"); }
     });
@@ -160,7 +162,7 @@ const AccountUI = {
           event_date: fd.get("event_date") || undefined,
         });
         e.target.reset();
-        this.notify("تم إنشاء القائمة", "success");
+        this.notify(tr("تم إنشاء القائمة", "List created"), "success");
         this.loadServices();
       } catch (err) { this.notify(err.message, "error"); }
     });
@@ -172,7 +174,7 @@ const AccountUI = {
           product_id: Number(fd.get("product_id")),
         });
         e.target.reset();
-        this.notify("تمت إضافة المنتج", "success");
+        this.notify(tr("تمت إضافة المنتج", "Product added"), "success");
         this.loadServices();
       } catch (err) { this.notify(err.message, "error"); }
     });
@@ -188,11 +190,11 @@ const AccountUI = {
           const a = document.createElement("a");
           a.href = url; a.download = "orion-my-data.json"; a.click();
           URL.revokeObjectURL(url);
-          msg.textContent = "تم تنزيل نسخة بياناتك.";
+          msg.textContent = tr("تم تنزيل نسخة بياناتك.", "Downloaded a copy of your data.");
         } else {
-          if (!window.confirm("سيتم إخفاء بياناتك الشخصية نهائياً. متابعة؟")) return;
+          if (!window.confirm(tr("سيتم إخفاء بياناتك الشخصية نهائياً. متابعة؟", "Your personal data will be hidden permanently. Continue?"))) return;
           await this.api("POST", `/data-requests/${req.id}/delete`, {});
-          msg.textContent = "تم تنفيذ طلب الحذف.";
+          msg.textContent = tr("تم تنفيذ طلب الحذف.", "Your deletion request has been completed.");
           this.loadProfile();
         }
       } catch (err) { msg.textContent = err.message; }
