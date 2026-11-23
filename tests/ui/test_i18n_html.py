@@ -77,9 +77,7 @@ def test_locale_query_switches_to_english_ltr_and_sticks(client, app) -> None:
 
 def test_storefront_default_is_arabic_despite_english_browser(client, app) -> None:
     headers = _make_storefront()
-    response = client.get(
-        "/", headers={**headers, "Accept-Language": "en-US,en;q=0.9"}
-    )
+    response = client.get("/", headers={**headers, "Accept-Language": "en-US,en;q=0.9"})
     assert response.status_code == 200
     assert _html_attrs(response)["lang"] == "ar"
 

@@ -57,7 +57,11 @@ class I18nService:
         # user explicitly chose one (query, cookie or X-Locale). This keeps the
         # storefront language sticky on every template; users switch with the
         # language control, which records their choice in the orion_locale cookie.
-        if not candidate and tenant is not None and (tenant.default_language or "").strip():
+        if (
+            not candidate
+            and tenant is not None
+            and (tenant.default_language or "").strip()
+        ):
             candidate = tenant.default_language.strip().lower()[:5]
         if not candidate:
             candidate = self._from_accept_language() or default
