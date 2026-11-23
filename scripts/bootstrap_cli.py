@@ -29,23 +29,32 @@ from pathlib import Path
 # Bootstrap PATH — resolve project root dynamically
 # ---------------------------------------------------------------------------
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
-for _sub in ("02-CORE", "03-MODELS", "04-SERVICES", "05-API"):
+for _sub in (
+    "02-CORE",
+    "03-MODELS",
+    "04-SERVICES",
+    "05-API",
+    "06-STOREFRONT",
+    "07-ADMIN",
+):
     _p = str(_PROJECT_ROOT / _sub)
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-# ---------------------------------------------------------------------------
-# Imports (after PATH setup)
-# ---------------------------------------------------------------------------
-from auth.auth_service import AuthService  # noqa: E402
-from orion.app import create_app  # noqa: E402
-from platform_svc.platform_settings_service import PlatformSettingsService  # noqa: E402
-from user.user import User  # noqa: E402
-
 
 def main() -> None:
     os.environ.setdefault("FLASK_ENV", "development")
+
+    # The app factory must be imported and run before any model/service import.
+    # Otherwise `tenant.tenant` is partially initialised while the app factory
+    # loads `core.middleware`, causing a circular import.
+    from orion.app import create_app
+
     app = create_app()
+
+    from auth.auth_service import AuthService
+    from platform_svc.platform_settings_service import PlatformSettingsService
+    from user.user import User
 
     with app.app_context():
         # ── check for ANY existing platform admin ──────────────────────
