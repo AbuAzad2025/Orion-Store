@@ -60,9 +60,45 @@ def main() -> None:
     with app.app_context():
         from i18n.category_translation import CategoryTranslation
         from i18n.product_translation import ProductTranslation
+        from i18n_svc.page_service import PageService
 
         from catalog.category import Category
         from catalog.product import Product
+        from tenant.tenant import Tenant
+
+        pages = PageService()
+        for tenant in Tenant.query.all():
+            try:
+                page = pages.get_by_slug(tenant.id, "privacy")
+            except Exception:
+                page = pages.create_page(
+                    tenant_id=tenant.id,
+                    slug="privacy",
+                    title="سياسة الخصوصية",
+                    is_published=True,
+                )
+            pages.upsert_translation(
+                page,
+                locale="ar",
+                title="سياسة الخصوصية",
+                body=(
+                    "نحترم خصوصيتك. نستخدم بياناتك فقط لتشغيل المتجر وتنفيذ طلباتك "
+                    "وتحسين تجربتك. لا نشارك معلوماتك مع أطراف ثالثة إلا بموافقتك "
+                    "أو بموجب القانون. يمكنك طلب تصدير بياناتك أو حذفها من صفحة حسابك."
+                ),
+            )
+            pages.upsert_translation(
+                page,
+                locale="en",
+                title="Privacy Policy",
+                body=(
+                    "We respect your privacy. We use your data only to run the store, "
+                    "fulfil your orders and improve your experience. We do not share "
+                    "your information with third parties except with your consent or "
+                    "as required by law. You can export or delete your data from your "
+                    "account page."
+                ),
+            )
 
         created = 0
         for product in Product.query.all():

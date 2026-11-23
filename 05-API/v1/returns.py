@@ -18,12 +18,29 @@ _rma = RmaService()
 _orders = OrderService()
 
 
+_REASON_LABELS = {
+    "defective": ("منتج معيب", "Defective product"),
+    "wrong_item": ("منتج خاطئ", "Wrong item"),
+    "changed_mind": ("تغيير رأي", "Changed mind"),
+}
+
+
 @returns_bp.get("/reasons")
 def list_reasons():
     try:
+        from core.context import get_locale
+
         tenant = require_tenant_context()
         reasons = _rma.list_reasons(tenant.id)
-        return jsonify({"reasons": [r.to_dict() for r in reasons]}), 200
+        english = get_locale().split("_")[0].lower().startswith("en")
+        payload = []
+        for reason in reasons:
+            data = reason.to_dict()
+            labels = _REASON_LABELS.get(data.get("code"))
+            if labels:
+                data["label"] = labels[1] if english else labels[0]
+            payload.append(data)
+        return jsonify({"reasons": payload}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

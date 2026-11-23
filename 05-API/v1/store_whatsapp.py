@@ -11,23 +11,30 @@ from engine.whatsapp import format_cart_order, whatsapp_url
 
 
 def cart_items_with_names(carts, cart) -> list[dict]:
-    """Cart items + real product names (CartItem.to_dict has ids only)."""
+    """Cart items + product names in the language of the current request."""
+    from i18n_svc.translation_service import TranslationService
+
     from catalog.product import Product
+    from core.context import get_locale
 
     items = [item.to_dict() for item in carts.list_items(cart)]
     ids = [item["product_id"] for item in items]
     if ids:
-        names = dict(
-            Product.query.filter(
+        products = {
+            p.id: p
+            for p in Product.query.filter(
                 Product.tenant_id == cart.tenant_id, Product.id.in_(ids)
-            )
-            .with_entities(Product.id, Product.name)
-            .all()
-        )
+            ).all()
+        }
+        locale = get_locale()
+        translate = TranslationService()
         for item in items:
-            item["product_name"] = names.get(
-                item["product_id"], str(item["product_id"])
-            )
+            product = products.get(item["product_id"])
+            if product is None:
+                item["product_name"] = str(item["product_id"])
+                continue
+            merged = translate.merge_product(product, locale)
+            item["product_name"] = merged.get("name") or product.name
     return items
 
 

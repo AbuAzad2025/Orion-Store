@@ -160,6 +160,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const flagsEl = document.getElementById("feature-flags-list");
+  const flagNamesAr = {
+    ai_enabled: "المساعد الذكي",
+    booking_enabled: "الحجوزات",
+    multi_language: "تعدد اللغات",
+    subscriptions_enabled: "الاشتراكات",
+    bopis_enabled: "الاستلام من المتجر",
+    store_credit_enabled: "رصيد المتجر",
+    draft_orders_enabled: "الطلبات المسودة",
+    affiliates_enabled: "المسوقون",
+    gift_registries_enabled: "قوائم الهدايا",
+    dropship_enabled: "الدروبشيبنج",
+    live_chat_enabled: "الدردشة المباشرة"
+  };
   if (flagsEl) {
     OrionAPI.get("/tenant/feature-flags")
       .then((data) => {
@@ -178,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const flagWrap = SafeDOM.elem("div", { className: "rounded border p-3 bg-white", "data-flag": f.code }, [
             SafeDOM.elem("div", { className: "flex items-center justify-between" }, [
               SafeDOM.elem("div", null, [
-                SafeDOM.elem("strong", null, [f.name]),
+                SafeDOM.elem("strong", null, [flagNamesAr[f.code] || f.name]),
                 SafeDOM.elem("p", { className: "text-xs text-gray-500" }, [`${f.code} — ${f.description || ""}`]),
                 SafeDOM.elem("p", { className: "text-xs text-gray-400 mt-1" }, [`نسبة النشر: ${f.rollout_percent}%`])
               ]),
