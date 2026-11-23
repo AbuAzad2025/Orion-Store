@@ -1017,3 +1017,91 @@ def test_external_refund_validates_all_bad_inputs(app, db_session, tenant):
             provider_refund_id="provider-refund-1",
         )
     assert Refund.query.filter_by(payment_id=payment.id).count() == 1
+
+
+def test_external_refund_requires_provider_id(app, db_session, tenant):
+    order = _order(tenant.id)
+    payment, _event = _payment(tenant.id, order.id)
+    with pytest.raises(ValidationError):
+        record_external_refund(
+            tenant_id=tenant.id, payment_public_id=str(payment.public_id)
+        )
+
+
+def test_external_refund_cumulative_cap(app, db_session, tenant):
+    order = _order(tenant.id, total="100.00")
+    payment, _event = _payment(tenant.id, order.id, amount="100.00")
+    record_external_refund(
+        tenant_id=tenant.id,
+        payment_public_id=str(payment.public_id),
+        amount="60.00",
+        provider_refund_id="cumulative-1",
+    )
+    with pytest.raises(ValidationError):
+        record_external_refund(
+            tenant_id=tenant.id,
+            payment_public_id=str(payment.public_id),
+            amount="50.00",
+            provider_refund_id="cumulative-2",
+        )
+
+
+def test_external_refund_rejects_refunded_payment(app, db_session, tenant):
+    order = _order(tenant.id, total="100.00")
+    payment, _event = _payment(tenant.id, order.id, amount="100.00")
+    record_external_refund(
+        tenant_id=tenant.id,
+        payment_public_id=str(payment.public_id),
+        amount="100.00",
+        provider_refund_id="full-1",
+    )
+    with pytest.raises(ValidationError):
+        record_external_refund(
+            tenant_id=tenant.id,
+            payment_public_id=str(payment.public_id),
+            amount="1.00",
+            provider_refund_id="after-full",
+        )
+
+
+def test_external_refund_rejects_non_finite_amount(app, db_session, tenant):
+    order = _order(tenant.id)
+    payment, _event = _payment(tenant.id, order.id)
+    with pytest.raises(ValidationError):
+        record_external_refund(
+            tenant_id=tenant.id,
+            payment_public_id=str(payment.public_id),
+            amount="NaN",
+            provider_refund_id="nan-1",
+        )
+
+
+def test_external_refund_duplicate_provider_id(app, db_session, tenant):
+    order = _order(tenant.id)
+    payment, _event = _payment(tenant.id, order.id)
+    record_external_refund(
+        tenant_id=tenant.id,
+        payment_public_id=str(payment.public_id),
+        amount="10.00",
+        provider_refund_id="duplicate-1",
+    )
+    with pytest.raises(ConflictError):
+        record_external_refund(
+            tenant_id=tenant.id,
+            payment_public_id=str(payment.public_id),
+            amount="10.00",
+            provider_refund_id="duplicate-1",
+        )
+
+
+def test_external_refund_invalid_amount_strings(app, db_session, tenant):
+    order = _order(tenant.id)
+    payment, _event = _payment(tenant.id, order.id)
+    for bad in ("not-a-number", "0", "-5.00"):
+        with pytest.raises(ValidationError):
+            record_external_refund(
+                tenant_id=tenant.id,
+                payment_public_id=str(payment.public_id),
+                amount=bad,
+                provider_refund_id=f"bad-{bad}",
+            )

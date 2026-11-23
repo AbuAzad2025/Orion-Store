@@ -92,3 +92,64 @@ def test_payment_methods_api(client, app, store):
         json={"code": "usdt", "is_enabled": True},
     )
     assert rejected.status_code == 400
+
+
+def test_method_input_validation(app, store):
+    tenant, _ = store
+    with app.app_context():
+        svc = GatewayService()
+        bad_inputs = [
+            {"display_name": 123},
+            {"instructions": {"nested": "object"}},
+            {"display_name": "x" * 101},
+            {"instructions": "y" * 2001},
+            {"is_enabled": "false"},
+            {"is_enabled": 1},
+        ]
+        for extra in bad_inputs:
+            with pytest.raises(ValidationError):
+                svc.upsert_method(tenant_id=tenant.id, code="manual", **extra)
+
+
+def test_available_methods_include_tenant_config(app, store):
+    tenant, _ = store
+    with app.app_context():
+        svc = GatewayService()
+        svc.upsert_method(
+            tenant_id=tenant.id,
+            code="bank_transfer",
+            display_name="Bank",
+            instructions="Pay to IBAN",
+            is_enabled=True,
+        )
+        english = {m["code"]: m for m in svc.available_methods(tenant.id, "en")}
+        assert english["bank_transfer"]["label"] == "Bank transfer"
+        assert english["bank_transfer"]["instructions"] == "Pay to IBAN"
+        checkout = {c["code"]: c for c in svc.list_enabled_for_checkout(tenant.id)}
+        assert checkout["bank_transfer"]["instructions"] == "Pay to IBAN"
+
+
+def test_gateway_service_helpers(app, store):
+    from core.exceptions import NotFoundError
+    from platform_models.tenant_gateway import TenantPaymentGateway
+
+    tenant, _ = store
+    with app.app_context():
+        svc = GatewayService()
+        with pytest.raises(NotFoundError):
+            svc.get_enabled(tenant.id, "paypal")
+        cod = svc.ensure_cod_gateway(tenant.id)
+        assert cod.is_enabled is True
+        assert svc.ensure_cod_gateway(tenant.id).id == cod.id
+        assert svc.get_enabled(tenant.id, "cod").id == cod.id
+        with pytest.raises(ValidationError):
+            svc.upsert_paypal(tenant_id=tenant.id, client_id="", client_secret="")
+        paypal = svc.upsert_paypal(
+            tenant_id=tenant.id,
+            client_id="client",
+            client_secret="secret",
+            webhook_secret="whsec",
+            is_sandbox=False,
+        )
+        assert paypal.provider == "paypal"
+        assert TenantPaymentGateway.query.filter_by(tenant_id=tenant.id).count() == 2

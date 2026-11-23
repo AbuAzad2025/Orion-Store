@@ -91,7 +91,7 @@ paths = [
     { glob = "tests/api/test_auth_tenant_admin.py", max = 900 },
     { glob = "tests/api/test_v2_api.py", max = 700 },
     { glob = "tests/api/test_coverage_expansion_api.py", max = 1500 },
-    { glob = "tests/services/test_coverage_expansion_services.py", max = 1100 },
+    { glob = "tests/services/test_coverage_expansion_services.py", max = 1150 },
     { glob = "tests/api/test_coverage_push_api.py", max = 1000 },
     { glob = "tests/services/test_coverage_push_services.py", max = 1000 },
     { glob = "tests/core/test_coverage_push_core.py", max = 1000 },
