@@ -45,6 +45,31 @@ def register_middleware(app: Flask) -> None:
             g.tenant_id = g.user.tenant_id
             g.tenant = Tenant.query.get(g.user.tenant_id)
 
+        # Debug-only tenant preview. Runs after auth so platform admins keep
+        # their no-tenant context; only the read-only tenants/me API endpoint
+        # is included for local tooling.
+        if g.tenant is None and current_app.debug:
+            debug_api_preview = (
+                request.path == "/api/v1/tenants/me" and not g.is_platform_admin
+            )
+            if debug_api_preview or not request.path.startswith(("/api/", "/admin/")):
+                preview_slug = request.args.get("tenant_slug") or request.cookies.get(
+                    "orion_preview_tenant"
+                )
+                if preview_slug:
+                    preview = _tenant_query().filter_by(slug=preview_slug).first()
+                    if preview:
+                        g.tenant, g.tenant_id = preview, preview.id
+                if g.tenant is None:
+                    preview = (
+                        _tenant_query()
+                        .filter_by(is_active=True, deleted_at=None)
+                        .order_by(Tenant.id)
+                        .first()
+                    )
+                    if preview:
+                        g.tenant, g.tenant_id = preview, preview.id
+
         if g.user:
             try:
                 claims = get_jwt()
@@ -221,28 +246,6 @@ def _resolve_tenant_from_request() -> Tenant | None:
         if tenant:
             return tenant
 
-    # The read-only tenants/me endpoint is also allowed in debug preview so
-    # local tooling can inspect which tenant the fallback resolved.
-    debug_api_preview = request.path == "/api/v1/tenants/me"
-    if current_app.debug and (
-        debug_api_preview or not request.path.startswith(("/api/", "/admin/"))
-    ):
-        preview_slug = request.args.get("tenant_slug") or request.cookies.get(
-            "orion_preview_tenant"
-        )
-        if preview_slug:
-            tenant = _tenant_query().filter_by(slug=preview_slug).first()
-            if tenant:
-                return tenant
-        # Last resort for local development only: first active tenant.
-        tenant = (
-            _tenant_query()
-            .filter_by(is_active=True, deleted_at=None)
-            .order_by(Tenant.id)
-            .first()
-        )
-        if tenant:
-            return tenant
     return None
 
 

@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import Flask, g, jsonify
+from flask import Flask, jsonify, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from core.event_handlers import register_domain_event_handlers
@@ -197,14 +197,14 @@ def create_app(config_name: str | None = None) -> Flask:
 
     @app.after_request
     def translate_api_errors(response):
-        """Localise the ``error`` field of JSON responses for the request locale.
+        """Localise the ``error`` field when the caller explicitly asks a locale.
 
-        Services and endpoints raise/return English or Arabic literals. This
-        keeps every error message in the language the caller asked for without
-        touching hundreds of call sites. Skipped in testing, where API tests
-        assert the canonical message strings.
+        Only requests carrying ``X-Locale`` (sent by our UI clients) or an
+        explicit ``?locale=`` are translated. Plain API clients and tests keep
+        receiving the canonical service message, preserving the API contract.
         """
-        if app.config.get("TESTING") or not response.is_json:
+        explicit_locale = request.headers.get("X-Locale") or request.args.get("locale")
+        if not explicit_locale or not response.is_json:
             return response
         payload = response.get_json(silent=True)
         if not isinstance(payload, dict):
@@ -212,7 +212,7 @@ def create_app(config_name: str | None = None) -> Flask:
         message = payload.get("error")
         if not isinstance(message, str):
             return response
-        translated = translate_message(message, getattr(g, "locale", "ar"))
+        translated = translate_message(message, explicit_locale)
         if translated != message:
             payload["error"] = translated
             response.set_data(
