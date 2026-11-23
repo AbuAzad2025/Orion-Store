@@ -202,24 +202,40 @@ def main() -> None:
 
     app = create_app(os.environ.get("FLASK_ENV", "development"))
     findings: list = []
+    from tenant.tenant import Tenant
+    from user.user import User
+
+    with app.app_context():
+        store = (
+            Tenant.query.filter_by(slug="demo").first()
+            or Tenant.query.filter(Tenant.deleted_at.is_(None)).first()
+        )
+        store_slug = store.slug if store else "demo"
+        store_admin = User.query.filter_by(tenant_id=store.id, is_admin=True).first()
+        platform_admin = User.query.filter(
+            User.is_superuser.is_(True), User.deleted_at.is_(None)
+        ).first()
+    admin_email = store_admin.email if store_admin else None
+    platform_email = platform_admin.email if platform_admin else None
+
     with app.test_client() as client:
         for url in STORE_PAGES:
             for locale in ("ar", "en"):
                 check_page(
                     client,
-                    f"{url}?tenant_slug=gulf&locale={locale}",
+                    f"{url}?tenant_slug={store_slug}&locale={locale}",
                     locale,
                     "storefront",
                     findings,
                 )
     with app.test_client() as client:
-        if not login(client, "admin@gulf.test", "gulf"):
+        if admin_email and not login(client, admin_email, store_slug):
             print("WARNING: store admin login failed")
         # The admin UI is Arabic-only (admin_base declares lang="ar" dir="rtl").
         for url in [u for u in ADMIN_PAGES if "/platform/" not in u]:
             check_page(client, f"{url}?locale=ar", "ar", "admin", findings)
     with app.test_client() as client:
-        if not login(client, "root@azadexa.test"):
+        if platform_email and not login(client, platform_email):
             print("WARNING: platform admin login failed")
         for url in [u for u in ADMIN_PAGES if "/platform/" in u]:
             check_page(client, f"{url}?locale=ar", "ar", "platform", findings)
