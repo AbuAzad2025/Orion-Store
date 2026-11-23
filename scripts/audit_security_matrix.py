@@ -23,6 +23,7 @@ import os
 import pathlib
 import re
 import sys
+import uuid
 from collections import defaultdict
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -65,6 +66,9 @@ def main() -> None:
 
     from catalog.product import Product
     from order.order import Order
+
+    # Import the app first: importing ORM models directly can trigger a
+    # circular import through orion.extensions -> orion.app -> event handlers.
     from orion.app import create_app
     from platform_models.invoice import Invoice
     from tenant.tenant import Tenant
@@ -72,44 +76,59 @@ def main() -> None:
 
     app = create_app(os.environ.get("FLASK_ENV", "development"))
     with app.app_context():
-        gulf = Tenant.query.filter_by(slug="gulf").first()
-        outlet = Tenant.query.filter_by(slug="outlet").first()
-        gulf_id, outlet_id = str(gulf.public_id), str(outlet.public_id)
-        customer = User.query.filter_by(email="buyer1@gulf.test").first()
-        admin = User.query.filter_by(email="admin@gulf.test").first()
-        root_user = User.query.filter_by(email="root@azadexa.test").first()
-        product = Product.query.filter_by(tenant_id=gulf.id).first()
-        order = Order.query.filter_by(tenant_id=gulf.id).first()
-        invoice = Invoice.query.filter_by(tenant_id=gulf.id).first()
+        store = (
+            Tenant.query.filter_by(slug="demo").first()
+            or Tenant.query.filter(Tenant.deleted_at.is_(None)).first()
+        )
+        if not store:
+            raise SystemExit("Security audit requires at least one tenant.")
+        store_id = str(store.public_id)
+        # A foreign (nonexistent) tenant exercises the same cross-tenant denial
+        # that a second seeded tenant used to cover.
+        foreign_id = str(uuid.uuid4())
+        customer = User.query.filter_by(
+            email="buyer1@gulf.test", tenant_id=store.id
+        ).first()
+        admin = User.query.filter_by(
+            email="admin@gulf.test", tenant_id=store.id
+        ).first()
+        root_user = User.query.filter(
+            User.is_superuser.is_(True), User.deleted_at.is_(None)
+        ).first()
+        if not (customer and admin and root_user):
+            raise SystemExit("Security audit identities are missing.")
+        product = Product.query.filter_by(tenant_id=store.id, deleted_at=None).first()
+        order = Order.query.filter_by(tenant_id=store.id).first()
+        invoice = Invoice.query.filter_by(tenant_id=store.id).first()
 
         identities = {
             "anon": {},
             "customer": {
                 "Authorization": f"Bearer {create_access_token(identity=str(customer.public_id))}",
-                "X-Tenant-ID": gulf_id,
+                "X-Tenant-ID": store_id,
             },
             "admin": {
                 "Authorization": f"Bearer {create_access_token(identity=str(admin.public_id))}",
-                "X-Tenant-ID": gulf_id,
+                "X-Tenant-ID": store_id,
             },
             "platform": {
                 "Authorization": f"Bearer {create_access_token(identity=str(root_user.public_id))}"
             },
             "foreign": {
                 "Authorization": f"Bearer {create_access_token(identity=str(admin.public_id))}",
-                "X-Tenant-ID": outlet_id,
+                "X-Tenant-ID": foreign_id,
             },
         }
 
         samples = {
-            "tenant_id": [str(gulf.id), str(outlet.id)],
-            "product_id": [str(product.id)],
+            "tenant_id": [str(store.id), foreign_id],
+            "product_id": [str(product.id) if product else "1"],
             "public_id": [
-                str(order.public_id),
-                str(product.public_id),
-                str(gulf.public_id),
+                str(order.public_id) if order else "1",
+                str(product.public_id) if product else "1",
+                store_id,
             ],
-            "slug": ["smart-phone-pro", "electronics", "privacy", "gulf"],
+            "slug": ["smart-phone-pro", "electronics", "privacy", store.slug],
             "cart_token": ["not-a-real-token"],
             "code": ["WELCOME-GUL"],
             "id": ["1"],
@@ -198,7 +217,7 @@ def main() -> None:
     # and injecting a script payload into every query-string field found.
     seen_pages: set[tuple[str, str]] = set()
     for who, headers in identities.items():
-        queue = ["/?tenant_slug=gulf", "/admin/login"]
+        queue = [f"/?tenant_slug={store.slug}", "/admin/login"]
         while queue and len([p for p, w in seen_pages if w == who]) < 120:
             start = queue.pop(0)
             if (start, who) in seen_pages:
