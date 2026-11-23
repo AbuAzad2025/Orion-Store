@@ -5,6 +5,13 @@ from __future__ import annotations
 import os
 from datetime import timedelta
 
+from dotenv import load_dotenv
+
+# Load .env before the module-level config values are evaluated. Flask CLI and
+# systemd happen to do this for us, but a plain `python -c 'import wsgi'`
+# (or any other WSGI launcher) must resolve the same database and secrets.
+load_dotenv()
+
 # Production + testing target — PostgreSQL only (§0.8, §4.0).
 DEFAULT_DEV_DATABASE_URL = "postgresql://azadexa:azadexa_dev@localhost:5432/azadexa_dev"
 DEFAULT_TEST_DATABASE_URL = (
