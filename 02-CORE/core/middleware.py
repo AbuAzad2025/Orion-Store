@@ -254,6 +254,10 @@ def _tenant_query():
 
 def _resolve_authenticated_user() -> None:
     """JWT (API) or session (HTML admin)."""
+    # CORS preflight is handled by Flask and carries no credentials. Trying to
+    # read JWT claims on OPTIONS raises inside flask_jwt_extended.
+    if request.method == "OPTIONS":
+        return
     if request.path in ("/api/v1/auth/refresh", "/admin/login"):
         return
     try:

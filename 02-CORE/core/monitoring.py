@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING
 
-from flask import Flask, Response, g, request
+from flask import Flask, Response, current_app, g, request
 
 from core.logging_config import configure_logging
 
@@ -75,6 +75,12 @@ def init_prometheus(app: Flask) -> None:
 
     @app.get("/metrics")
     def metrics() -> Response:
+        # Prometheus endpoint names and traffic volumes are operational data;
+        # never expose them publicly in production.
+        if str(current_app.config.get("ENV") or "").lower() in ("production", "prod"):
+            from core.middleware import require_platform_admin
+
+            require_platform_admin()
         return Response(
             generate_latest(registry),
             mimetype="text/plain; version=0.0.4; charset=utf-8",
