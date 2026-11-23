@@ -1,5 +1,5 @@
 <header class="orion-navbar">
-  {% set keep_q = ('&q=' ~ (search_q|urlencode)) if search_q else '' %}
+  {% set keep_q = keep_params|default('') %}
   <div class="orion-navbar-inner">
     <a href="/?store={{ store_token }}" class="orion-brand" aria-label="{{ tenant.name }} — {{ t('home') }}">
       <span class="orion-brand-mark" aria-hidden="true">A</span>

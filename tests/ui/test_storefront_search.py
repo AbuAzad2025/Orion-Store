@@ -130,6 +130,20 @@ def test_language_switch_preserves_search_query(client, app) -> None:
     assert en_link and "q=coffee" in en_link.group(1)
 
 
+def test_language_switch_preserves_all_filters(client, app) -> None:
+    tenant, _, _ = _seed()
+    resp = client.get(
+        "/search?q=coffee&sort=price_desc&price_min=10&category=kitchen",
+        headers=tenant_headers(tenant.slug),
+    )
+    text = resp.get_data(as_text=True)
+    en_link = re.search(r'href="([^"]*locale=en[^"]*)"', text)
+    assert en_link
+    href = en_link.group(1)
+    for value in ("q=coffee", "sort=price_desc", "price_min=10", "category=kitchen"):
+        assert value in href
+
+
 def test_search_sort_price_desc(client, app) -> None:
     tenant, _, _ = _seed()
     _product(tenant, "Small thing", "small-thing", "30.00")

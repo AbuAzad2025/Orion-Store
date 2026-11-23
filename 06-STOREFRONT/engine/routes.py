@@ -282,6 +282,13 @@ def store_search():
     products_i18n = [ts.merge_product(p, locale) for p in products]
     categories = _categories.list_for_tenant(tenant.id)
     counts = _categories.category_product_counts(tenant.id)
+    from urllib.parse import quote as _quote
+
+    keep_params = "".join(
+        f"&{key}={_quote(request.args[key], safe='')}"
+        for key in ("q", "category", "featured", "price_min", "price_max", "sort")
+        if request.args.get(key)
+    )
 
     def _page_url(n: int) -> str:
         params = {k: v for k, v in request.args.items()}
@@ -306,6 +313,7 @@ def store_search():
         pagination_meta=meta,
         prev_url=_page_url(page - 1) if page > 1 else None,
         next_url=_page_url(page + 1) if page < meta["pages"] else None,
+        keep_params=keep_params,
     )
 
 
