@@ -21,6 +21,7 @@ unauthorized identities (expected 401/403) to avoid changing live data.
 
 from __future__ import annotations
 
+import atexit
 import os
 import pathlib
 import re
@@ -70,6 +71,7 @@ def main() -> None:
     # otherwise orion.extensions -> orion.app -> event_handlers -> order.order
     # loops back into a partially initialized base.base_model.
     from orion.app import create_app
+    from orion.extensions import db
 
     from catalog.product import Product
     from order.order import Order
@@ -86,9 +88,29 @@ def main() -> None:
         if not store:
             raise SystemExit("Security audit requires at least one tenant.")
         store_id = str(store.public_id)
-        # A foreign (nonexistent) tenant exercises the same cross-tenant denial
-        # that a second seeded tenant used to cover.
-        foreign_id = str(uuid.uuid4())
+        # A real temporary second tenant exercises the cross-tenant denial
+        # properly: a nonexistent UUID would fall back to "no tenant context"
+        # and mask the very check this audit is for. Cleaned up on exit.
+        foreign = Tenant(
+            name="Security Audit Foreign",
+            slug=f"audit-foreign-{uuid.uuid4().hex[:8]}",
+            email="audit-foreign@test.local",
+        )
+        db.session.add(foreign)
+        db.session.commit()
+        foreign_id = str(foreign.public_id)
+
+        def _cleanup_foreign() -> None:
+            try:
+                with app.app_context():
+                    row = db.session.get(Tenant, foreign.id)
+                    if row is not None:
+                        db.session.delete(row)
+                        db.session.commit()
+            except Exception:  # noqa: BLE001 - best-effort cleanup only
+                pass
+
+        atexit.register(_cleanup_foreign)
         customer = User.query.filter_by(
             email="buyer1@gulf.test", tenant_id=store.id
         ).first()
