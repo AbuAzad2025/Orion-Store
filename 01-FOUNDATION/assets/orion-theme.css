@@ -1142,56 +1142,16 @@ body.orion-surface {
 
 .orion-nav-wa:hover { background: var(--orion-gold-strong); }
 
-.orion-nav-login {
-  padding: 0.45rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid var(--orion-gold);
-  color: var(--orion-gold);
-  font-size: 0.8rem;
-  font-weight: 800;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.orion-nav-login:hover,
-.orion-nav-login[aria-current="page"] {
-  background: var(--orion-gold);
-  color: #1b1405;
-}
-
-.orion-login-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 1rem;
-}
-.orion-login-option {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.25rem;
-  border: 1px solid var(--orion-border);
-  border-radius: 14px;
-  background: var(--orion-panel-2, #121d2d);
-  color: var(--orion-text);
-  text-decoration: none;
-  transition: border-color 140ms ease, transform 140ms ease;
-}
+.orion-nav-login { padding: .45rem .9rem; border: 1px solid var(--orion-gold); border-radius: 999px; color: var(--orion-gold); font-size: .8rem; font-weight: 800; text-decoration: none; white-space: nowrap; }
+.orion-nav-login:hover,.orion-nav-login[aria-current="page"] { background: var(--orion-gold); color: #1b1405; }
+.orion-login-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(15rem,1fr)); gap: 1rem; }
+.orion-login-option { position: relative; display: flex; flex-direction: column; gap: .5rem; padding: 1.25rem; border: 1px solid var(--orion-border); border-radius: 14px; background: var(--orion-panel-2,#121d2d); color: var(--orion-text); text-decoration: none; transition: border-color 140ms ease,transform 140ms ease; }
 .orion-login-option:hover { border-color: var(--orion-gold); transform: translateY(-2px); }
 .orion-login-option-admin { border-color: var(--orion-gold); }
 .orion-login-option-title { font-size: 1.05rem; font-weight: 800; }
-.orion-login-option-desc { font-size: 0.82rem; color: var(--orion-muted); line-height: 1.6; }
-.orion-login-option-arrow {
-  position: absolute;
-  inset-inline-end: 1.1rem;
-  top: 1.15rem;
-  color: var(--orion-gold);
-  font-size: 1.1rem;
-}
-.orion-login-note {
-  margin-block-start: 1.5rem;
-  font-size: 0.82rem;
-  color: var(--orion-muted);
-}
+.orion-login-option-desc { font-size: .82rem; color: var(--orion-muted); line-height: 1.6; }
+.orion-login-option-arrow { position: absolute; inset-inline-end: 1.1rem; top: 1.15rem; color: var(--orion-gold); font-size: 1.1rem; }
+.orion-login-note { margin-block-start: 1.5rem; font-size: .82rem; color: var(--orion-muted); }
 .orion-login-inline { color: var(--orion-gold); font-weight: 700; text-decoration: none; }
 .orion-login-inline:hover { text-decoration: underline; }
 
