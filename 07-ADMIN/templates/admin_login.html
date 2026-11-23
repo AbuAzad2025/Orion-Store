@@ -4,50 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page_title }} — Azadexa</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('admin_assets.static', filename='favicon.svg') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/fonts.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center orion-surface">
-  <form id="login-form" action="/admin/login" method="post" class="bg-white p-8 rounded-lg shadow w-full max-w-md space-y-4">
-    <h1 class="text-xl font-bold text-center">Azadexa — لوحة الإدارة</h1>
-    {% if error %}
-    <p class="text-red-600 text-sm text-center">{{ error }}</p>
-    {% endif %}
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div>
-      <label class="block text-sm mb-1" for="email">البريد</label>
-      <input id="email" name="email" type="email" required class="w-full border rounded px-3 py-2" aria-label="البريد الإلكتروني">
-    </div>
-    <div>
-      <label class="block text-sm mb-1" for="password">كلمة المرور</label>
-      <input id="password" name="password" type="password" required class="w-full border rounded px-3 py-2" aria-label="كلمة المرور">
-    </div>
-    <div>
-      <label class="block text-sm mb-1" for="tenant-slug">معرّف المتجر في الرابط (اختياري)</label>
-      <input id="tenant-slug" name="tenant_slug" type="text" class="w-full border rounded px-3 py-2" placeholder="my-store">
-    </div>
-    <button type="submit" class="orion-btn orion-btn-gold w-full">تسجيل الدخول</button>
-  </form>
-  <details class="bg-white p-6 rounded-lg shadow w-full max-w-md">
-    <summary class="cursor-pointer text-sm text-blue-700">تسجيل الدخول عبر SSO</summary>
-    <form action="/admin/sso/exchange" method="post" class="mt-4 space-y-3 text-sm">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <div>
-        <label class="block text-sm mb-1" for="sso-provider-code">رمز مزوّد SSO</label>
-        <input id="sso-provider-code" name="provider_code" type="text" required class="w-full border rounded px-3 py-2" aria-label="رمز مزوّد SSO">
-      </div>
-      <div>
-        <label class="block text-sm mb-1" for="sso-email">البريد الخارجي</label>
-        <input id="sso-email" name="external_email" type="email" required class="w-full border rounded px-3 py-2" aria-label="البريد الإلكتروني الخارجي لـ SSO">
-      </div>
-      <div>
-        <label class="block text-sm mb-1" for="sso-tenant">معرّف المتجر في الرابط</label>
-        <input id="sso-tenant" name="tenant_slug" type="text" required class="w-full border rounded px-3 py-2" placeholder="my-store">
-      </div>
-      <button type="submit" class="orion-btn w-full">دخول عبر SSO</button>
-    </form>
-  </details>
+<body class="orion-surface orion-auth-wrap">
+  <main class="orion-auth-card">
+    <header class="orion-auth-brand">
+      <span class="orion-brand-mark orion-brand-mark-sm" aria-hidden="true">A</span>
+      <span>
+        <strong class="orion-auth-title">{{ platform_settings.platform_name | default('Azadexa') }}</strong>
+        <span class="orion-auth-subtitle">لوحة الإدارة — تسجيل الدخول</span>
+      </span>
+    </header>
+
+    <section class="orion-card orion-auth-panel">
+      {% if error %}
+      <p class="orion-auth-error" role="alert">{{ error }}</p>
+      {% endif %}
+      <form id="login-form" action="/admin/login" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="orion-auth-field">
+          <label class="orion-auth-label" for="email">البريد الإلكتروني</label>
+          <input id="email" name="email" type="email" required class="orion-input w-full"
+                 placeholder="name@example.com" aria-label="البريد الإلكتروني" autocomplete="username">
+        </div>
+        <div class="orion-auth-field">
+          <label class="orion-auth-label" for="password">كلمة المرور</label>
+          <input id="password" name="password" type="password" required class="orion-input w-full"
+                 placeholder="••••••••" aria-label="كلمة المرور" autocomplete="current-password">
+        </div>
+        <div class="orion-auth-field">
+          <label class="orion-auth-label" for="tenant-slug">معرّف المتجر <span class="orion-auth-hint">(اختياري)</span></label>
+          <input id="tenant-slug" name="tenant_slug" type="text" class="orion-input w-full"
+                 placeholder="my-store" aria-label="معرّف المتجر" autocomplete="off">
+          <span class="orion-auth-hint">يُحدَّد المتجر تلقائياً من الرابط عند تركه فارغاً.</span>
+        </div>
+        <button type="submit" class="orion-btn orion-btn-gold orion-auth-btn">تسجيل الدخول</button>
+      </form>
+    </section>
+
+    <details class="orion-card orion-auth-sso">
+      <summary>الدخول عبر SSO</summary>
+      <form action="/admin/sso/exchange" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="orion-auth-field">
+          <label class="orion-auth-label" for="sso-provider-code">رمز مزوّد SSO</label>
+          <input id="sso-provider-code" name="provider_code" type="text" required class="orion-input w-full"
+                 placeholder="provider-code" aria-label="رمز مزوّد SSO">
+        </div>
+        <div class="orion-auth-field">
+          <label class="orion-auth-label" for="sso-email">البريد الخارجي</label>
+          <input id="sso-email" name="external_email" type="email" required class="orion-input w-full"
+                 placeholder="name@example.com" aria-label="البريد الإلكتروني الخارجي لـ SSO">
+        </div>
+        <div class="orion-auth-field">
+          <label class="orion-auth-label" for="sso-tenant">معرّف المتجر</label>
+          <input id="sso-tenant" name="tenant_slug" type="text" required class="orion-input w-full"
+                 placeholder="my-store" aria-label="معرّف المتجر لـ SSO">
+        </div>
+        <button type="submit" class="orion-btn w-full">دخول عبر SSO</button>
+      </form>
+    </details>
+  </main>
   <script src="{{ url_for('admin_assets.static', filename='js/admin_utils.js') }}"></script>
   <script src="{{ url_for('admin_assets.static', filename='js/api_client.js') }}"></script>
   <script src="{{ url_for('admin_assets.static', filename='js/admin_login.js') }}"></script>

@@ -1322,3 +1322,27 @@ body.orion-surface {
 .orion-page-link { padding: .45rem 1rem; border: 1px solid var(--orion-border); border-radius: 999px; color: var(--orion-text-soft); font-size: .82rem; text-decoration: none; }
 .orion-page-link:hover { border-color: var(--orion-gold); color: var(--orion-text); }
 .orion-page-current { color: var(--orion-gold); font-weight: 800; }
+
+/* Auth pages — branded, organized login. */
+.orion-auth-wrap { min-block-size: 100vh; display: grid; place-items: center; padding: 1.5rem; }
+.orion-auth-card { inline-size: min(100%, 27rem); display: grid; gap: 1rem; }
+.orion-auth-brand {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .9rem 1.1rem; border: 1px solid var(--orion-border); border-radius: 16px;
+  background: linear-gradient(135deg, var(--orion-panel-2), var(--orion-panel));
+}
+.orion-auth-title { display: block; color: var(--orion-text); font-size: 1.2rem; font-weight: 800; }
+.orion-auth-subtitle { display: block; color: var(--orion-muted); font-size: .78rem; }
+.orion-auth-panel { display: grid; gap: 1rem; }
+.orion-auth-panel form { display: grid; gap: 1rem; }
+.orion-auth-field { display: grid; gap: .35rem; }
+.orion-auth-label { color: var(--orion-text-soft); font-size: .82rem; font-weight: 700; }
+.orion-auth-hint { color: var(--orion-muted); font-size: .72rem; }
+.orion-auth-error {
+  padding: .6rem .85rem; border: 1px solid var(--orion-danger); border-radius: 10px;
+  background: rgba(255,155,155,.08); color: var(--orion-danger); font-size: .85rem;
+}
+.orion-auth-btn { inline-size: 100%; margin-block-start: .25rem; }
+.orion-auth-sso { padding: 1.15rem 1.5rem; }
+.orion-auth-sso summary { cursor: pointer; color: var(--orion-gold); font-size: .84rem; font-weight: 800; }
+.orion-auth-sso form { margin-block-start: 1rem; display: grid; gap: .9rem; }
