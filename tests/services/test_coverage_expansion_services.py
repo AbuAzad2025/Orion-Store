@@ -971,10 +971,10 @@ def test_external_refund_full_amount_closes_payment(app, db_session, tenant):
     result = record_external_refund(
         tenant_id=tenant.id,
         payment_public_id=str(payment.public_id),
-        provider_refund_id=None,
+        provider_refund_id="provider-refund-full-1",
     )
     assert result["refund"]["amount"] == str(payment.amount)
-    assert result["provider_refund_id"] is None
+    assert result["provider_refund_id"] == "provider-refund-full-1"
     assert Payment.query.filter_by(id=payment.id).one().status == "refunded"
 
 

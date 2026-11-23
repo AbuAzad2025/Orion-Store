@@ -120,6 +120,8 @@ class PaymentService:
             )
         except (InvalidOperation, ValueError, TypeError) as exc:
             raise ValidationError("Invalid refund amount.") from exc
+        if not refund_amount.is_finite():
+            raise ValidationError("Invalid refund amount.")
         if refund_amount <= 0:
             raise ValidationError("Refund amount must be positive.")
         if refund_amount > Decimal(str(payment.amount)):

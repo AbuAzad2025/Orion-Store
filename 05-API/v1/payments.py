@@ -47,6 +47,8 @@ def refund_payment(payment_public_id: str):
                 amount = Decimal(str(raw_amount))
             except (InvalidOperation, ValueError, TypeError) as exc:
                 raise ValidationError("Invalid refund amount.") from exc
+            if not amount.is_finite():
+                raise ValidationError("Invalid refund amount.")
         result = _payments.refund(
             tenant_id=g.tenant_id,
             payment_public_id=payment_public_id,

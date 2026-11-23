@@ -34,8 +34,10 @@ def record_external_refund(
     payment = Payment.query.filter_by(tenant_id=tenant_id, public_id=pid).first()
     if not payment:
         raise NotFoundError("Payment not found.")
-    if payment.status not in ("completed", "refunded"):
+    if payment.status != "completed":
         raise ValidationError("Only completed payments can be refunded.")
+    if not provider_refund_id:
+        raise ValidationError("Provider refund id is required.")
 
     try:
         refund_amount = (
@@ -43,18 +45,28 @@ def record_external_refund(
         )
     except (InvalidOperation, ValueError, TypeError) as exc:
         raise ValidationError("Invalid refund amount.") from exc
+    if not refund_amount.is_finite():
+        raise ValidationError("Invalid refund amount.")
     if refund_amount <= 0:
         raise ValidationError("Refund amount must be positive.")
-    if refund_amount > Decimal(str(payment.amount)):
+
+    paid = Decimal(str(payment.amount))
+    already_refunded = sum(
+        (
+            Decimal(str(row.amount))
+            for row in Refund.query.filter_by(
+                tenant_id=tenant_id, payment_id=payment.id
+            ).all()
+        ),
+        Decimal("0"),
+    )
+    if already_refunded + refund_amount > paid:
         raise ValidationError("Refund amount exceeds payment amount.")
 
     # One row per provider refund id: duplicate webhooks cannot double-post.
-    if (
-        provider_refund_id
-        and Refund.query.filter_by(
-            tenant_id=tenant_id, provider_refund_id=provider_refund_id
-        ).first()
-    ):
+    if Refund.query.filter_by(
+        tenant_id=tenant_id, provider_refund_id=provider_refund_id
+    ).first():
         raise ConflictError("Refund already recorded.")
 
     refund_row = Refund(
@@ -80,7 +92,7 @@ def record_external_refund(
         metadata={"reverses_financial_event_id": payment.financial_event_id},
     )
     refund_row.financial_event_id = outbound.id
-    if refund_amount >= Decimal(str(payment.amount)):
+    if already_refunded + refund_amount >= paid:
         payment.status = "refunded"
     db.session.commit()
     publish(

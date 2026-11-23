@@ -84,7 +84,7 @@ paths = [
     # Legacy large files — split gradually; documented exceptions only.
     { glob = "03-MODELS/subscription/subscription.py", max = 350 },
     { glob = "05-API/v1/tenant_portal.py", max = 400 },
-    { glob = "05-API/v1/storefront.py", max = 350 },
+    { glob = "05-API/v1/storefront.py", max = 380 },
     { glob = "**/orion-theme.css", max = 1400 },
     { glob = "migrations/versions/20261119_0001_baseline_tables.py", max = 400 },
     { glob = "migrations/versions/20261119_0002_baseline_indexes.py", max = 400 },

@@ -10,6 +10,7 @@ from integrations.payments._http import (
     credentials_present,
     endpoint_for,
     idempotency_key,
+    is_production,
     is_sandbox,
     live_calls_enabled,
     load_credentials,
@@ -43,7 +44,9 @@ def charge_palpay(
     if not configured and not sandbox:
         return {"success": False, "error": "palpay_credentials_missing"}
     if not live_calls_enabled():
-        if not stub_allowed() and not sandbox:
+        if is_production():
+            return {"success": False, "error": "payment_provider_not_configured"}
+        if not stub_allowed():
             return {"success": False, "error": "palpay_credentials_missing"}
         prefix = "palpay_test" if sandbox else "palpay_live"
         return {
@@ -90,6 +93,8 @@ def refund_payment(
     base = endpoint_for(gateway, "PALPAY_API_BASE_URL", SANDBOX_URL, LIVE_URL)
 
     if not live_calls_enabled():
+        if is_production():
+            return {"success": False, "error": "payment_provider_not_configured"}
         prefix = "palpay_re_test" if is_sandbox(gateway) else "palpay_re_live"
         return {
             "success": True,

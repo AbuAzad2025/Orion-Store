@@ -13,6 +13,7 @@ from flask import current_app
 from integrations.payments._http import (
     credentials_present,
     idempotency_key,
+    is_production,
     is_sandbox,
     live_calls_enabled,
     load_credentials,
@@ -45,7 +46,9 @@ def charge_stripe(
     if not configured and not sandbox:
         return {"success": False, "error": "stripe_credentials_missing"}
     if not live_calls_enabled():
-        if not stub_allowed() and not sandbox:
+        if is_production():
+            return {"success": False, "error": "payment_provider_not_configured"}
+        if not stub_allowed():
             return {"success": False, "error": "stripe_credentials_missing"}
         prefix = "pi_test" if sandbox else "pi_live"
         return {
@@ -93,6 +96,8 @@ def refund_payment(
     sandbox = is_sandbox(gateway)
 
     if not live_calls_enabled():
+        if is_production():
+            return {"success": False, "error": "payment_provider_not_configured"}
         prefix = "re_test" if sandbox else "re_live"
         return {
             "success": True,

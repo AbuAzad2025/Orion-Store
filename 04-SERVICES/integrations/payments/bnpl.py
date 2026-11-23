@@ -15,6 +15,7 @@ from integrations.payments._http import (
     credentials_present,
     endpoint_for,
     idempotency_key,
+    is_production,
     live_calls_enabled,
     load_credentials,
     post_json,
@@ -52,7 +53,9 @@ def charge_bnpl(
     if not configured and not sandbox:
         return {"success": False, "error": "bnpl_credentials_missing"}
     if not live_calls_enabled():
-        if not stub_allowed() and not sandbox:
+        if is_production():
+            return {"success": False, "error": "payment_provider_not_configured"}
+        if not stub_allowed():
             return {"success": False, "error": "bnpl_credentials_missing"}
         label = "test" if sandbox else "live"
         return {
@@ -110,6 +113,8 @@ def refund_payment(
     base = endpoint_for(provider_row, "BNPL_API_BASE_URL", sandbox_url, live_url)
 
     if not live_calls_enabled():
+        if is_production():
+            return {"success": False, "error": "payment_provider_not_configured"}
         label = "test" if sandbox else "live"
         return {
             "success": True,

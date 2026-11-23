@@ -61,11 +61,12 @@ def refresh():
     claims = get_jwt()
     additional = {
         key: claims[key]
-        # Never carry an impersonation grant into a refreshed token: the
-        # session is validated per request and may have been revoked.
-        for key in ("is_superuser", "tenant_id")
+        for key in ("is_superuser", "tenant_id", "impersonation")
         if key in claims
     }
+    # The impersonation grant is deliberately preserved: middleware validates
+    # the underlying session on every request (including refresh), so a stale
+    # refresh token cannot mint a clean tenant-admin token after revocation.
     token = create_access_token(identity=identity, additional_claims=additional)
     response = jsonify({"access_token": token})
     set_access_cookies(response, token)

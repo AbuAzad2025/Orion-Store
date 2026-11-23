@@ -9,8 +9,10 @@ All provider adapters in this package use this module so that:
 
 from __future__ import annotations
 
+import ipaddress
 import json
 from typing import Any
+from urllib.parse import urlparse
 
 import requests
 from flask import current_app
@@ -48,8 +50,16 @@ def is_sandbox(row: Any) -> bool:
     return bool(getattr(row, "is_sandbox", True))
 
 
+def is_production() -> bool:
+    """True only for a production deployment (never for testing/development)."""
+    env = str(current_app.config.get("ENV") or "").lower()
+    return env in ("production", "prod")
+
+
 def stub_allowed() -> bool:
-    """Sandbox stubs are only acceptable outside production."""
+    """Sandbox stubs are never acceptable in production, even if flag is set."""
+    if is_production():
+        return False
     return bool(current_app.config.get("PAYMENT_STUB_ALLOWED", False))
 
 
@@ -76,18 +86,45 @@ def refund_idempotency_key(payment: Any) -> str:
     return f"orion-refund-{payment.id}"
 
 
+def _safe_endpoint(url: str, default_url: str) -> str:
+    """Only allow HTTPS on the provider's own host — no redirects elsewhere."""
+    parsed = urlparse(url)
+    expected = urlparse(default_url)
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or parsed.username
+        or parsed.password
+        or parsed.hostname.lower() != (expected.hostname or "").lower()
+    ):
+        raise PaymentGatewayError("invalid_payment_endpoint")
+    try:
+        address = ipaddress.ip_address(parsed.hostname)
+    except ValueError:
+        pass  # a DNS name, not a literal private address
+    else:
+        if address.is_private or address.is_loopback or address.is_link_local:
+            raise PaymentGatewayError("invalid_payment_endpoint")
+    return url.rstrip("/")
+
+
 def endpoint_for(
     row: Any, env_name: str, sandbox_url: str, live_url: str
 ) -> str | None:
-    configured = gateway_config(row).get("api_base_url")
-    if configured:
-        return str(configured).rstrip("/")
-    from os import environ
+    """Resolve a provider base URL. Tenants may never override it.
 
-    configured = environ.get(env_name)
+    ``config.api_base_url`` used to be caller-writable, which allowed an SSRF
+    and credential exfiltration from any tenant that could edit gateway
+    config. Only the operator-controlled environment variable is honoured,
+    and it must still point at the provider's own HTTPS host.
+    """
+    default = sandbox_url if is_sandbox(row) else live_url
+    import os
+
+    configured = os.environ.get(env_name)
     if configured:
-        return configured.rstrip("/")
-    return sandbox_url if is_sandbox(row) else live_url
+        return _safe_endpoint(configured.rstrip("/"), default)
+    return default
 
 
 def post_json(
@@ -106,7 +143,11 @@ def post_json(
     }
     try:
         response = requests.post(
-            url, json=payload, headers=request_headers, timeout=DEFAULT_TIMEOUT
+            url,
+            json=payload,
+            headers=request_headers,
+            timeout=DEFAULT_TIMEOUT,
+            allow_redirects=False,
         )
     except requests.RequestException as exc:
         return {
@@ -141,7 +182,11 @@ def post_form(
     }
     try:
         response = requests.post(
-            url, data=data, headers=request_headers, timeout=DEFAULT_TIMEOUT
+            url,
+            data=data,
+            headers=request_headers,
+            timeout=DEFAULT_TIMEOUT,
+            allow_redirects=False,
         )
     except requests.RequestException as exc:
         return {

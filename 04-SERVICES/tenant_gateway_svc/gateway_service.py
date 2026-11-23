@@ -157,6 +157,17 @@ class GatewayService:
         ):
             raise ValidationError("Unsupported payment method.")
 
+        if display_name is not None and not isinstance(display_name, str):
+            raise ValidationError("Display name must be text.")
+        if instructions is not None and not isinstance(instructions, str):
+            raise ValidationError("Instructions must be text.")
+        if len(display_name or "") > 100:
+            raise ValidationError("Display name is too long.")
+        if len(instructions or "") > 2000:
+            raise ValidationError("Instructions are too long.")
+        if not isinstance(is_enabled, bool):
+            raise ValidationError("Invalid enabled state.")
+
         default = next(m for m in PAYMENT_METHODS if m["code"] == normalized)
         gateway = TenantPaymentGateway.query.filter_by(
             tenant_id=tenant_id, provider=normalized

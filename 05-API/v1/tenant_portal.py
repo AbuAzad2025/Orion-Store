@@ -9,9 +9,16 @@ from i18n_svc.translation_service import TranslationService
 from bnpl_svc.bnpl_service import BnplService
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
-from core.exceptions import NotFoundError, OrionError
+from core.exceptions import (
+    AuthorizationError,
+    NotFoundError,
+    OrionError,
+    ValidationError,
+)
 from core.middleware import require_tenant_admin
 from core.pagination import paginate_query, paginated_payload, pagination_params
+from core.permissions import require_permission
+from core.rate_limit import limiter
 from engine.whatsapp import normalize_phone
 from order_svc.order_service import OrderService
 from orion.extensions import db
@@ -144,13 +151,22 @@ def save_payment_method():
     """Enable/disable or configure one non-crypto payment method."""
     try:
         require_tenant_admin()
+        if getattr(g, "is_platform_admin", False) and not getattr(
+            g, "impersonation_claims", None
+        ):
+            raise AuthorizationError(
+                "Impersonation required to modify tenant payment settings."
+            )
         data = request.get_json(silent=True) or {}
+        enabled = data.get("is_enabled", True)
+        if not isinstance(enabled, bool):
+            raise ValidationError("Invalid enabled state.")
         gateway = _gateways.upsert_method(
             tenant_id=g.tenant_id,
             code=data.get("code", ""),
             display_name=data.get("display_name", ""),
             instructions=data.get("instructions", ""),
-            is_enabled=bool(data.get("is_enabled", True)),
+            is_enabled=enabled,
         )
         return jsonify({"gateway": gateway.to_dict()}), 200
     except OrionError as exc:
@@ -257,9 +273,11 @@ def upsert_document_template(document_type: str):
 
 
 @tenant_portal_bp.post("/payments/<payment_public_id>/refund")
+@limiter.limit("10 per minute")
 def refund_payment(payment_public_id: str):
     try:
         require_tenant_admin()
+        require_permission("tenant.payments.write")
         data = request.get_json(silent=True) or {}
         result = _payments.refund(
             tenant_id=g.tenant_id,

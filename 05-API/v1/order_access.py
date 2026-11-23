@@ -38,11 +38,25 @@ def public_order_payload(order) -> dict:
     return data
 
 
-def order_access_token(order) -> str:
-    """Signed capability for guest order lookups (7 days)."""
+def _serializer():
     from itsdangerous import URLSafeTimedSerializer
 
-    serializer = URLSafeTimedSerializer(
+    return URLSafeTimedSerializer(
         current_app.config["SECRET_KEY"], salt="orion-order-access"
     )
-    return serializer.dumps({"oid": str(order.public_id)})
+
+
+def order_access_token(order) -> str:
+    """Signed capability for guest order lookups (7 days)."""
+    return _serializer().dumps({"oid": str(order.public_id)})
+
+
+def verify_order_access_token(token, order, max_age: int = 7 * 24 * 3600) -> bool:
+    """Verify a signed guest capability for this specific order."""
+    if not token:
+        return False
+    try:
+        data = _serializer().loads(token, max_age=max_age)
+    except Exception:
+        return False
+    return isinstance(data, dict) and str(data.get("oid")) == str(order.public_id)

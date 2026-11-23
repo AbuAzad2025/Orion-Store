@@ -91,7 +91,6 @@ def register_middleware(app: Flask) -> None:
         # the database on every request so a stolen token cannot outlive it.
         if getattr(g, "impersonation_claims", None) and request.path not in (
             "/api/v1/auth/login",
-            "/api/v1/auth/refresh",
             "/admin/login",
             # Session lifecycle endpoints must stay callable even when the
             # current impersonation token is stale/expired.

@@ -15,6 +15,7 @@ from integrations.payments._http import (
     credentials_present,
     endpoint_for,
     idempotency_key,
+    is_production,
     is_sandbox,
     live_calls_enabled,
     load_credentials,
@@ -64,7 +65,9 @@ def charge_paypal(
     if not configured and not sandbox:
         return {"success": False, "error": "paypal_credentials_missing"}
     if not live_calls_enabled():
-        if not stub_allowed() and not sandbox:
+        if is_production():
+            return {"success": False, "error": "payment_provider_not_configured"}
+        if not stub_allowed():
             return {"success": False, "error": "paypal_credentials_missing"}
         prefix = "pp_test" if sandbox else "pp_live"
         return {
@@ -132,6 +135,8 @@ def refund_payment(
     base = endpoint_for(gateway, "PAYPAL_API_BASE_URL", SANDBOX, LIVE)
 
     if not live_calls_enabled():
+        if is_production():
+            return {"success": False, "error": "payment_provider_not_configured"}
         prefix = "pp_re_test" if is_sandbox(gateway) else "pp_re_live"
         return {
             "success": True,

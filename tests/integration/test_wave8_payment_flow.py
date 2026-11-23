@@ -11,6 +11,16 @@ from order_svc.checkout_service import CheckoutService
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant_gateway_svc.gateway_service import GatewayService
 from tenant_svc.tenant_service import TenantService
+from v1.order_access import order_access_token
+
+
+def _pay_headers(app, tenant, order):
+    """Guest checkout orders need a signed capability to be paid."""
+    with app.app_context():
+        return {
+            **tenant_headers(tenant.slug),
+            "X-Order-Access-Token": order_access_token(order),
+        }
 
 
 def _checkout_order(tenant, client=None):
@@ -43,7 +53,7 @@ def test_paypal_payment_full_flow(client, app):
         is_sandbox=True,
     )
     order = _checkout_order(tenant)
-    headers = tenant_headers(tenant.slug)
+    headers = _pay_headers(app, tenant, order)
     pay = client.post(
         f"/api/v1/store/orders/{order.public_id}/pay",
         headers=headers,
@@ -69,7 +79,7 @@ def test_bnpl_tabby_payment_full_flow(client, app):
         is_enabled=True,
     )
     order = _checkout_order(tenant)
-    headers = tenant_headers(tenant.slug)
+    headers = _pay_headers(app, tenant, order)
     pay = client.post(
         f"/api/v1/store/orders/{order.public_id}/pay",
         headers=headers,

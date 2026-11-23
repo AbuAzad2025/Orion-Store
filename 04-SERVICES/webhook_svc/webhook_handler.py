@@ -190,11 +190,19 @@ class WebhookEffectHandler:
                 amount = None
         except (InvalidOperation, ValueError, TypeError):
             amount = None
+        event = payload.get("event") if isinstance(payload.get("event"), dict) else {}
+        provider_refund_id = (
+            _provider_refund_id(payload)
+            or payload.get("id")
+            or payload.get("event_id")
+            or event.get("id")
+            or f"webhook-{payment.public_id}-{amount or 'full'}"
+        )
         result = PaymentService().record_external_refund(
             tenant_id=tenant_id,
             payment_public_id=str(payment.public_id),
             amount=amount,
-            provider_refund_id=_provider_refund_id(payload),
+            provider_refund_id=str(provider_refund_id),
             reason=f"{provider} webhook refund",
         )
         return {
