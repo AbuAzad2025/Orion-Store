@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from catalog_svc.category_service import CategoryService
 from catalog_svc.product_service import ProductService
+from orion.extensions import db
 from tenant_svc.tenant_service import TenantService
 
 
@@ -57,6 +58,29 @@ def test_search_by_description(app) -> None:
     )
     assert [p.name for p in products.search_published(tenant.id, "summer")] == [
         "Portable Fan"
+    ]
+
+
+def test_search_matches_translated_name(app) -> None:
+    from i18n.product_translation import ProductTranslation
+
+    tenant, products, _, _ = _seed()
+    product = _product(products, tenant, "هاتف ذكي", "399.00")
+    db.session.add(
+        ProductTranslation(
+            tenant_id=tenant.id,
+            product_id=product.id,
+            locale="en",
+            name="Smart Phone",
+            description="A fast mobile phone",
+        )
+    )
+    db.session.commit()
+    assert [p.name for p in products.search_published(tenant.id, "phone")] == [
+        "هاتف ذكي"
+    ]
+    assert [p.name for p in products.search_published(tenant.id, "mobile")] == [
+        "هاتف ذكي"
     ]
 
 

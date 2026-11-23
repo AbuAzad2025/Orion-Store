@@ -148,12 +148,23 @@ class ProductService:
         )
         term = (query or "").strip()
         if term:
+            from i18n.product_translation import ProductTranslation
+
             needle = _escape_like_wildcard(term)
+            pattern = f"%{needle}%"
+            translated_ids = db.session.query(ProductTranslation.product_id).filter(
+                ProductTranslation.tenant_id == tenant_id,
+                or_(
+                    ProductTranslation.name.ilike(pattern, escape="\\"),
+                    ProductTranslation.description.ilike(pattern, escape="\\"),
+                ),
+            )
             q = q.filter(
                 or_(
-                    Product.name.ilike(f"%{needle}%", escape="\\"),
-                    Product.short_description.ilike(f"%{needle}%", escape="\\"),
-                    Product.description.ilike(f"%{needle}%", escape="\\"),
+                    Product.name.ilike(pattern, escape="\\"),
+                    Product.short_description.ilike(pattern, escape="\\"),
+                    Product.description.ilike(pattern, escape="\\"),
+                    Product.id.in_(translated_ids),
                 )
             )
         return q
