@@ -68,6 +68,7 @@ files:
   "04-SERVICES/order_svc/checkout_service.py": { wave: 3, min: 83 }
   "04-SERVICES/order_svc/order_service.py": { wave: 3, min: 93 }
   "05-API/v1/storefront.py": { wave: 3, min: 73 }
+  "05-API/v1/storefront_search.py": { wave: 16, min: 85 }
   # wave 4 — financial events
   "03-MODELS/platform_models/financial_event.py": { wave: 4, min: 98 }
   "04-SERVICES/platform_svc/financial_events_service.py": { wave: 4, min: 92 }
