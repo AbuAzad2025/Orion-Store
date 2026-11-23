@@ -26,7 +26,14 @@ import sys
 from collections import defaultdict
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-for part in ("02-CORE", "03-MODELS", "04-SERVICES", "05-API", "06-STOREFRONT", "07-ADMIN"):
+for part in (
+    "02-CORE",
+    "03-MODELS",
+    "04-SERVICES",
+    "05-API",
+    "06-STOREFRONT",
+    "07-ADMIN",
+):
     sys.path.insert(0, str(ROOT / part))
 
 SENSITIVE_RE = re.compile(
@@ -34,7 +41,13 @@ SENSITIVE_RE = re.compile(
     r"\"(?:api_)?credentials_encrypted\"\s*:\s*\"[^\"]+\")",
     re.IGNORECASE,
 )
-PUBLIC_STATUS_PATHS = {"/api/v1/platform/status", "/api/v1/status", "/health", "/ready", "/metrics"}
+PUBLIC_STATUS_PATHS = {
+    "/api/v1/platform/status",
+    "/api/v1/status",
+    "/health",
+    "/ready",
+    "/metrics",
+}
 XSS = "%3Cscript%3Ealert(1)%3C/script%3E"
 
 FINDINGS: list[tuple[str, str, str]] = []
@@ -71,16 +84,31 @@ def main() -> None:
 
         identities = {
             "anon": {},
-            "customer": {"Authorization": f"Bearer {create_access_token(identity=str(customer.public_id))}", "X-Tenant-ID": gulf_id},
-            "admin": {"Authorization": f"Bearer {create_access_token(identity=str(admin.public_id))}", "X-Tenant-ID": gulf_id},
-            "platform": {"Authorization": f"Bearer {create_access_token(identity=str(root_user.public_id))}"},
-            "foreign": {"Authorization": f"Bearer {create_access_token(identity=str(admin.public_id))}", "X-Tenant-ID": outlet_id},
+            "customer": {
+                "Authorization": f"Bearer {create_access_token(identity=str(customer.public_id))}",
+                "X-Tenant-ID": gulf_id,
+            },
+            "admin": {
+                "Authorization": f"Bearer {create_access_token(identity=str(admin.public_id))}",
+                "X-Tenant-ID": gulf_id,
+            },
+            "platform": {
+                "Authorization": f"Bearer {create_access_token(identity=str(root_user.public_id))}"
+            },
+            "foreign": {
+                "Authorization": f"Bearer {create_access_token(identity=str(admin.public_id))}",
+                "X-Tenant-ID": outlet_id,
+            },
         }
 
         samples = {
             "tenant_id": [str(gulf.id), str(outlet.id)],
             "product_id": [str(product.id)],
-            "public_id": [str(order.public_id), str(product.public_id), str(gulf.public_id)],
+            "public_id": [
+                str(order.public_id),
+                str(product.public_id),
+                str(gulf.public_id),
+            ],
             "slug": ["smart-phone-pro", "electronics", "privacy", "gulf"],
             "cart_token": ["not-a-real-token"],
             "code": ["WELCOME-GUL"],
@@ -106,7 +134,8 @@ def main() -> None:
             return path
 
         rules = [
-            r for r in app.url_map.iter_rules()
+            r
+            for r in app.url_map.iter_rules()
             if not r.rule.startswith(("/static", "/admin/static", "/store/static"))
         ]
 
@@ -135,16 +164,35 @@ def main() -> None:
                     flag("5XX", f"{method} {path} [{who}]", str(resp.status_code))
                 low = body.lower()
                 if SENSITIVE_RE.search(body):
-                    flag("SENSITIVE", f"{method} {path} [{who}]", "sensitive value in response")
+                    flag(
+                        "SENSITIVE",
+                        f"{method} {path} [{who}]",
+                        "sensitive value in response",
+                    )
                 if (
                     who == "customer"
                     and path not in PUBLIC_STATUS_PATHS
-                    and (path.startswith("/admin/platform") or path.startswith("/api/v1/platform"))
+                    and (
+                        path.startswith("/admin/platform")
+                        or path.startswith("/api/v1/platform")
+                    )
                     and 200 <= resp.status_code < 300
                 ):
-                    flag("AUTHZ", f"{method} {path} [customer]", "reached platform surface")
-                if who == "foreign" and resp.status_code < 400 and path.startswith("/api/v1/tenant"):
-                    flag("CROSS-TENANT", f"{method} {path} [foreign]", "writable with foreign header")
+                    flag(
+                        "AUTHZ",
+                        f"{method} {path} [customer]",
+                        "reached platform surface",
+                    )
+                if (
+                    who == "foreign"
+                    and resp.status_code < 400
+                    and path.startswith("/api/v1/tenant")
+                ):
+                    flag(
+                        "CROSS-TENANT",
+                        f"{method} {path} [foreign]",
+                        "writable with foreign header",
+                    )
 
     # BFS crawl every reachable page for each identity, checking every link
     # and injecting a script payload into every query-string field found.
@@ -169,16 +217,18 @@ def main() -> None:
                     if href not in [q for q in queue]:
                         queue.append(href)
             # Every query field on this page gets the script payload.
-            for name in re.findall(r'[?&]([A-Za-z_][\w-]*)=', start):
-                injected = re.sub(
-                    rf"([?&]{re.escape(name)}=)[^&]*", rf"\1{XSS}", start
-                )
+            for name in re.findall(r"[?&]([A-Za-z_][\w-]*)=", start):
+                injected = re.sub(rf"([?&]{re.escape(name)}=)[^&]*", rf"\1{XSS}", start)
                 r2 = client.get(injected, headers=headers)
                 CALLS += 1
-                if "<script>alert(1)</script>" in r2.get_data().decode("utf-8", "replace"):
+                if "<script>alert(1)</script>" in r2.get_data().decode(
+                    "utf-8", "replace"
+                ):
                     flag("REFLECTED-XSS", f"{who} {injected[:90]}")
 
-    print(f"ROUTES: {len(rules)}  CALLS: {CALLS}  PAGES: {len(seen_pages)}  FINDINGS: {len(FINDINGS)}")
+    print(
+        f"ROUTES: {len(rules)}  CALLS: {CALLS}  PAGES: {len(seen_pages)}  FINDINGS: {len(FINDINGS)}"
+    )
     for kind, target, detail in FINDINGS[:60]:
         print(f"  {kind:14s} {target} {detail}")
     if FINDINGS:
