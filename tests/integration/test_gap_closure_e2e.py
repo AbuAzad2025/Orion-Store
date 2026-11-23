@@ -13,6 +13,7 @@ from payment_svc.payment_service import PaymentService
 from platform_svc.document_renderer import DocumentRenderer
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant_svc.tenant_service import TenantService
+from v1.order_access import order_access_token
 
 
 def test_storefront_e2e_browse_cart_checkout_pay_invoice(client, app):
@@ -41,9 +42,14 @@ def test_storefront_e2e_browse_cart_checkout_pay_invoice(client, app):
         customer_email="e2e@buyer.com",
         shipping_address={"city": "Haifa"},
     )
+    with app.app_context():
+        pay_headers = {
+            **headers,
+            "X-Order-Access-Token": order_access_token(order),
+        }
     pay = client.post(
         f"/api/v1/store/orders/{order.public_id}/pay",
-        headers=headers,
+        headers=pay_headers,
         json={"payment_method": "cod"},
     )
     assert pay.status_code == 200
@@ -51,9 +57,11 @@ def test_storefront_e2e_browse_cart_checkout_pay_invoice(client, app):
     assert body["invoice"]["pdf_artifact_path"]
     assert body["invoice"]["has_rendered_html"] is True
 
-    inv = client.get(f"/api/v1/store/orders/{order.public_id}/invoice", headers=headers)
+    inv = client.get(
+        f"/api/v1/store/orders/{order.public_id}/invoice", headers=pay_headers
+    )
     assert inv.status_code == 200
-    assert "azadexa-platform-footer" in inv.get_json()["rendered_html"]
+    assert "rendered_html" not in inv.get_json()  # guest capability never gets PII HTML
 
     order_row = Order.query.filter_by(id=order.id).first()
     assert order_row.fulfillment_status == "paid_unfulfilled"

@@ -9,6 +9,7 @@ from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant_svc.tenant_service import TenantService
+from v1.order_access import order_access_token
 
 
 def test_cod_payment_full_flow(client, app):
@@ -33,9 +34,14 @@ def test_cod_payment_full_flow(client, app):
         shipping_address={"city": "Hebron"},
     )
 
+    with app.app_context():
+        pay_headers = {
+            **headers,
+            "X-Order-Access-Token": order_access_token(order),
+        }
     pay = client.post(
         f"/api/v1/store/orders/{order.public_id}/pay",
-        headers=headers,
+        headers=pay_headers,
         json={"payment_method": "cod"},
     )
     assert pay.status_code == 200

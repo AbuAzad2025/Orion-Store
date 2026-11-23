@@ -231,13 +231,23 @@ ADAPTERS = [(paypal, "gw"), (palpay, "gw"), (bnpl_adapter, "bnpl")]
 
 
 def test_http_boundary_outcomes(monkeypatch):
+    # Tenant-writable config may never override the provider endpoint (SSRF).
     cfg = SimpleNamespace(
         config={"api_base_url": "https://cfg.test/v1/"}, is_sandbox=True
     )
-    assert _http.endpoint_for(cfg, "PUSH_URL", "s", "l") == "https://cfg.test/v1"
-    monkeypatch.setenv("PUSH_URL", "https://env.test/")
-    plain = SimpleNamespace(config={}, is_sandbox=False)
-    assert _http.endpoint_for(plain, "PUSH_URL", "s", "l") == "https://env.test"
+    assert _http.endpoint_for(cfg, "PUSH_URL", "https://s.test", "https://l.test") == (
+        "https://s.test"
+    )
+    # Operator env override is allowed only on the provider's own HTTPS host.
+    monkeypatch.setenv("PUSH_URL", "https://s.test/v1/")
+    plain = SimpleNamespace(config={}, is_sandbox=True)
+    assert (
+        _http.endpoint_for(plain, "PUSH_URL", "https://s.test", "https://l.test")
+        == "https://s.test/v1"
+    )
+    monkeypatch.setenv("PUSH_URL", "http://evil.test/collect")
+    with pytest.raises(_http.PaymentGatewayError):
+        _http.endpoint_for(plain, "PUSH_URL", "https://s.test", "https://l.test")
     kw = dict(payload={}, headers={}, idempotency="k")
     replies = (
         requests.ConnectionError(),
