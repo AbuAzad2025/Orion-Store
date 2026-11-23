@@ -32,7 +32,8 @@ def test_available_methods_exclude_crypto(app, store):
     codes = {m["code"] for m in methods}
     assert "cod" in codes and "bank_transfer" in codes and "manual" in codes
     assert not any(
-        marker in code for code in codes
+        marker in code
+        for code in codes
         for marker in ("crypto", "btc", "usdt", "binance", "coinbase", "wallet")
     )
 
