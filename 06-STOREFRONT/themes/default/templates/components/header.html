@@ -1,4 +1,5 @@
 <header class="orion-navbar">
+  {% set keep_q = ('&q=' ~ (search_q|urlencode)) if search_q else '' %}
   <div class="orion-navbar-inner">
     <a href="/?store={{ store_token }}" class="orion-brand" aria-label="{{ tenant.name }} — {{ t('home') }}">
       <span class="orion-brand-mark" aria-hidden="true">A</span>
@@ -22,14 +23,14 @@
 
     <div class="orion-nav-controls">
       <div class="orion-locale-switch" role="group" aria-label="{{ t('language') }}">
-        <a href="{{ request.path }}?locale=ar&currency={{ currency }}&store={{ store_token }}" class="orion-locale-link{% if locale[:2]|lower == 'ar' %} is-active{% endif %}"
+        <a href="{{ request.path }}?locale=ar&currency={{ currency }}{{ keep_q }}&store={{ store_token }}" class="orion-locale-link{% if locale[:2]|lower == 'ar' %} is-active{% endif %}"
            hreflang="ar" aria-label="{{ t('language_ar') }}" {% if locale[:2]|lower == 'ar' %}aria-current="true"{% endif %}>{{ t('language_ar_short') }}</a>
-        <a href="{{ request.path }}?locale=en&currency={{ currency }}&store={{ store_token }}" class="orion-locale-link{% if locale[:2]|lower == 'en' %} is-active{% endif %}"
+        <a href="{{ request.path }}?locale=en&currency={{ currency }}{{ keep_q }}&store={{ store_token }}" class="orion-locale-link{% if locale[:2]|lower == 'en' %} is-active{% endif %}"
            hreflang="en" aria-label="{{ t('language_en') }}" {% if locale[:2]|lower == 'en' %}aria-current="true"{% endif %}>{{ t('language_en_short') }}</a>
       </div>
       <label class="orion-currency-control" aria-label="{{ t('currency') }}">
         <select id="currency-switch" aria-label="{{ t('currency') }}"
-                onchange="if(this.value) location.href='{{ request.path }}?locale={{ locale }}&currency='+this.value+'&store={{ store_token }}'">
+                onchange="if(this.value) location.href='{{ request.path }}?locale={{ locale }}&currency='+this.value+'{{ keep_q }}&store={{ store_token }}'">
           {% for code in currencies %}
           <option value="{{ code }}"{% if code == currency %} selected{% endif %}>{{ code }}</option>
           {% endfor %}

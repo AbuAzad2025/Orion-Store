@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from support.http import tenant_headers
 
 from catalog_svc.category_service import CategoryService
@@ -117,6 +119,15 @@ def test_search_featured_filter(client, app) -> None:
     text = resp.get_data(as_text=True)
     assert "Hot Deal" in text
     assert "Regular Deal" not in text
+
+
+def test_language_switch_preserves_search_query(client, app) -> None:
+    tenant, _, _ = _seed()
+    _product(tenant, "Coffee Maker", "coffee-maker")
+    resp = client.get("/search?q=coffee", headers=tenant_headers(tenant.slug))
+    text = resp.get_data(as_text=True)
+    en_link = re.search(r'href="([^"]*locale=en[^"]*)"', text)
+    assert en_link and "q=coffee" in en_link.group(1)
 
 
 def test_search_sort_price_desc(client, app) -> None:
