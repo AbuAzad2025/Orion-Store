@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="orion-login-page max-w-2xl mx-auto">
+  <header class="mb-6">
+    <p class="orion-eyebrow">{{ tenant.name }}</p>
+    <h1 class="orion-title text-2xl">{{ t('sign_in') }}</h1>
+  </header>
+
+  <div class="orion-login-grid">
+    <a href="/account?store={{ store_token }}" class="orion-login-option">
+      <span class="orion-login-option-title">{{ t('login_customer') }}</span>
+      <span class="orion-login-option-desc">{{ t('login_customer_desc') }}</span>
+      <span class="orion-login-option-arrow" aria-hidden="true">&#8599;</span>
+    </a>
+    <a href="{{ store_admin_login_url }}" class="orion-login-option orion-login-option-admin"
+       {% if not store_admin_login_url.startswith('/') %}rel="noopener"{% endif %}>
+      <span class="orion-login-option-title">{{ t('login_store_admin') }}</span>
+      <span class="orion-login-option-desc">{{ t('login_store_admin_desc') }}</span>
+      <span class="orion-login-option-arrow" aria-hidden="true">&#8599;</span>
+    </a>
+  </div>
+
+  <p class="orion-login-note">
+    {{ t('login_platform_note') }}
+    <a href="{{ platform_admin_login_url }}" class="orion-login-inline"
+       {% if not platform_admin_login_url.startswith('/') %}rel="noopener"{% endif %}>{{ t('login_platform_link') }}</a>
+  </p>
+</section>
+{% endblock %}

@@ -116,6 +116,12 @@ _STRINGS: dict[str, dict[str, str]] = {
         "language_en_short": "EN",
         "empty_cart": "السلة فارغة.",
         "total_label": "المجموع:",
+        "login_customer": "حسابي (الزبون)",
+        "login_customer_desc": "تابع طلباتك ورصيدك في هذا المتجر.",
+        "login_store_admin": "لوحة المتجر",
+        "login_store_admin_desc": "إدارة المنتجات والطلبات والإعدادات لهذا المتجر.",
+        "login_platform_note": "مدير المنصة؟ استخدم رابط المنصة المخصص:",
+        "login_platform_link": "لوحة المنصة",
     },
     "en": {
         "home": "Home",
@@ -230,6 +236,12 @@ _STRINGS: dict[str, dict[str, str]] = {
         "language_en_short": "EN",
         "empty_cart": "The cart is empty.",
         "total_label": "Total:",
+        "login_customer": "My account (customer)",
+        "login_customer_desc": "Track your orders and balance in this store.",
+        "login_store_admin": "Store dashboard",
+        "login_store_admin_desc": "Manage products, orders and settings for this store.",
+        "login_platform_note": "Platform admin? Use the dedicated platform URL:",
+        "login_platform_link": "Platform dashboard",
     },
 }
 

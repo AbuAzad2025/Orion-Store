@@ -43,6 +43,53 @@ def admin_login():
     return render_template("admin_login.html", page_title="تسجيل الدخول", error=None)
 
 
+def _invalid_credentials():
+    return (
+        render_template(
+            "admin_login.html",
+            page_title="تسجيل الدخول",
+            error="Invalid credentials",
+        ),
+        401,
+    )
+
+
+def _authenticate_admin(email: str, password: str, tenant_slug: str):
+    """Resolve the admin's tenant strictly, then fall back to the platform admin.
+
+    - An explicit ``tenant_slug`` is authoritative: only that tenant is tried
+      (never a different tenant, never the platform fallback).
+    - With no slug, the tenant resolved from the request Host is tried first so
+      a store admin can log in on their own domain without typing the slug.
+      The platform superuser is tried last and works from any host.
+    """
+    if tenant_slug:
+        tenant = Tenant.query.filter_by(slug=tenant_slug, deleted_at=None).first()
+        if not tenant:
+            return None
+        try:
+            return _auth.authenticate(
+                email=email, password=password, tenant_id=tenant.id
+            )
+        except Exception:
+            return None
+
+    # Host-resolved tenant (e.g. demo.azadexa.com -> demo store).
+    if g.tenant_id:
+        try:
+            return _auth.authenticate(
+                email=email, password=password, tenant_id=g.tenant_id
+            )
+        except Exception:
+            pass
+
+    # Platform superuser has no tenant and may log in from any host.
+    try:
+        return _auth.authenticate(email=email, password=password, tenant_id=None)
+    except Exception:
+        return None
+
+
 @admin_auth_bp.post("/login")
 @limiter.limit("5 per minute")
 def admin_login_post():
@@ -50,23 +97,9 @@ def admin_login_post():
     password = request.form.get("password", "")
     tenant_slug = request.form.get("tenant_slug", "").strip()
 
-    tenant_id = None
-    if tenant_slug:
-        tenant = Tenant.query.filter_by(slug=tenant_slug).first()
-        if tenant:
-            tenant_id = tenant.id
-
-    try:
-        user = _auth.authenticate(email=email, password=password, tenant_id=tenant_id)
-    except Exception:
-        return (
-            render_template(
-                "admin_login.html",
-                page_title="تسجيل الدخول",
-                error="Invalid credentials",
-            ),
-            401,
-        )
+    user = _authenticate_admin(email, password, tenant_slug)
+    if user is None:
+        return _invalid_credentials()
 
     session["user_id"] = user.id
     session["tenant_id"] = user.tenant_id

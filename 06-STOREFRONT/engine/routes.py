@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from compliance.compliance import CookieConsentSetting
-from flask import Blueprint, g
+from flask import Blueprint, g, request
 from i18n_svc.page_service import PageService
 
 from catalog_svc.category_service import CategoryService
@@ -51,6 +52,43 @@ def _tenant_or_404():
     if not g.tenant:
         return None
     return g.tenant
+
+
+_HOSTNAME_RE = re.compile(r"^[a-z0-9.-]+$")
+
+
+def _base_domain() -> str | None:
+    """Registrable base domain from the current Host (demo.azadexa.com -> azadexa.com)."""
+    host = (request.host or "").split(":")[0].lower()
+    parts = host.split(".")
+    if len(parts) >= 3:
+        base = ".".join(parts[1:])
+        return base if _HOSTNAME_RE.fullmatch(base) else None
+    return None
+
+
+def _store_admin_login_url(tenant) -> str:
+    """Admin login on the store's own host so tenant resolution uses the Host.
+
+    This lets a store admin log in without typing a slug. A same-host relative
+    URL is the safe fallback when a base domain cannot be derived.
+    """
+    base = _base_domain()
+    if tenant.custom_domain and _HOSTNAME_RE.fullmatch(tenant.custom_domain.lower()):
+        host = tenant.custom_domain.lower()
+    elif tenant.domain and base:
+        host = f"{tenant.domain}.{base}"
+    else:
+        return "/admin/login"
+    if not _HOSTNAME_RE.fullmatch(host):
+        return "/admin/login"
+    return f"https://{host}/admin/login"
+
+
+def _platform_admin_login_url() -> str:
+    """Dedicated platform-admin login, separate from every store."""
+    base = _base_domain()
+    return f"https://orion.{base}/admin/login" if base else "/admin/login"
 
 
 @storefront_ui_bp.get("/")
@@ -123,6 +161,23 @@ def store_category(slug: str):
         products=products,
         products_i18n=products_i18n,
         page_title=category_i18n.get("name") or category.name,
+        locale=locale,
+    )
+
+
+@storefront_ui_bp.get("/login")
+def store_login():
+    """Unified sign-in entry: customer account or store admin on this store."""
+    tenant = _tenant_or_404()
+    if not tenant:
+        return "Store not found.", 404
+    locale = get_locale()
+    return _engine.render(
+        "login.html",
+        tenant=tenant,
+        page_title=translate("sign_in", locale),
+        store_admin_login_url=_store_admin_login_url(tenant),
+        platform_admin_login_url=_platform_admin_login_url(),
         locale=locale,
     )
 
