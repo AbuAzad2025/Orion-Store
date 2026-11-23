@@ -1,0 +1,93 @@
+"""Tenant-configurable non-crypto payment methods."""
+
+from __future__ import annotations
+
+import pytest
+from support.http import auth_headers
+
+from auth.auth_service import AuthService
+from core.exceptions import ValidationError
+from tenant_gateway_svc.gateway_service import GatewayService
+from tenant_svc.tenant_service import TenantService
+
+
+@pytest.fixture
+def store(app):
+    tenant = TenantService().create_tenant(
+        name="Methods Store", slug="methods-store", email="methods@test.com"
+    )
+    admin = AuthService().register_tenant_user(
+        tenant_id=tenant.id,
+        email="admin@methods.com",
+        password="password123",
+        is_admin=True,
+    )
+    return tenant, admin
+
+
+def test_available_methods_exclude_crypto(app, store):
+    tenant, _ = store
+    with app.app_context():
+        methods = GatewayService().available_methods(tenant.id, "en")
+    codes = {m["code"] for m in methods}
+    assert "cod" in codes and "bank_transfer" in codes and "manual" in codes
+    assert not any(
+        marker in code for code in codes
+        for marker in ("crypto", "btc", "usdt", "binance", "coinbase", "wallet")
+    )
+
+
+def test_upsert_method_with_instructions(app, store):
+    tenant, _ = store
+    with app.app_context():
+        svc = GatewayService()
+        gateway = svc.upsert_method(
+            tenant_id=tenant.id,
+            code="bank_transfer",
+            display_name="حوالة بنكية",
+            instructions="حوّل إلى IBAN ... ثم أرسل الإيصال",
+            is_enabled=True,
+        )
+        assert gateway.is_enabled is True
+        assert gateway.config["instructions"].startswith("حوّل")
+        methods = {m["code"]: m for m in svc.available_methods(tenant.id, "ar")}
+        assert methods["bank_transfer"]["is_enabled"] is True
+        assert methods["bank_transfer"]["instructions"].startswith("حوّل")
+        checkout = svc.list_enabled_for_checkout(tenant.id)
+        assert any(c["code"] == "bank_transfer" for c in checkout)
+
+
+def test_crypto_provider_rejected(app, store):
+    tenant, _ = store
+    with app.app_context():
+        svc = GatewayService()
+        for code in ("usdt", "binance", "crypto", "btc_wallet"):
+            with pytest.raises(ValidationError):
+                svc.upsert_method(tenant_id=tenant.id, code=code)
+
+
+def test_payment_methods_api(client, app, store):
+    tenant, admin = store
+    headers = auth_headers(admin, app=app, tenant_id=tenant.slug)
+    listed = client.get("/api/v1/tenant/payment-methods", headers=headers)
+    assert listed.status_code == 200
+    assert any(m["code"] == "bank_transfer" for m in listed.get_json()["methods"])
+
+    saved = client.post(
+        "/api/v1/tenant/payment-methods",
+        headers=headers,
+        json={
+            "code": "manual",
+            "display_name": "دفع يدوي",
+            "instructions": "ادفع في المتجر",
+            "is_enabled": True,
+        },
+    )
+    assert saved.status_code == 200
+
+    rejected = client.post(
+        "/api/v1/tenant/payment-methods",
+        headers=headers,
+        json={"code": "usdt", "is_enabled": True},
+    )
+    assert rejected.status_code == 400

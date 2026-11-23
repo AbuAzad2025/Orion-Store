@@ -10,6 +10,60 @@ from platform_models.tenant_gateway import TenantPaymentGateway
 
 PAYPAL_PROVIDER = "paypal"
 
+# Payment methods a tenant may offer. Crypto is intentionally absent — this
+# platform is a storefront, not a digital-asset processor.
+PAYMENT_METHODS: tuple[dict, ...] = (
+    {
+        "code": "cod",
+        "ar": "الدفع عند الاستلام",
+        "en": "Cash on delivery",
+        "manual": True,
+    },
+    {
+        "code": "bank_transfer",
+        "ar": "تحويل بنكي",
+        "en": "Bank transfer",
+        "manual": True,
+    },
+    {
+        "code": "card",
+        "ar": "بطاقة ائتمان أو خصم",
+        "en": "Credit or debit card",
+        "manual": False,
+    },
+    {"code": "paypal", "ar": "باي بال", "en": "PayPal", "manual": False},
+    {"code": "stripe", "ar": "سترايب", "en": "Stripe", "manual": False},
+    {
+        "code": "bnpl_tabby",
+        "ar": "تابي — ادفع لاحقاً",
+        "en": "Tabby — Pay later",
+        "manual": False,
+    },
+    {
+        "code": "bnpl_tamara",
+        "ar": "تمارا — ادفع لاحقاً",
+        "en": "Tamara — Pay later",
+        "manual": False,
+    },
+    {
+        "code": "manual",
+        "ar": "دفع يدوي بتعليمات خاصة",
+        "en": "Manual payment",
+        "manual": True,
+    },
+)
+ALLOWED_METHODS = frozenset(m["code"] for m in PAYMENT_METHODS)
+CRYPTO_MARKERS = (
+    "crypto",
+    "btc",
+    "usdt",
+    "usdc",
+    "binance",
+    "coinbase",
+    "wallet",
+    "eth",
+)
+
 
 class GatewayService:
     def get_enabled(self, tenant_id: int, provider: str) -> TenantPaymentGateway:
@@ -49,19 +103,81 @@ class GatewayService:
         from core.i18n_messages import localize
 
         labels = {
-            "cod": localize("الدفع عند الاستلام", "Cash on delivery"),
-            "stripe": "Stripe",
-            "paypal": "PayPal",
-            "bnpl_tabby": localize("Tabby — ادفع لاحقاً", "Tabby — Pay later"),
-            "bnpl_tamara": localize("Tamara — ادفع لاحقاً", "Tamara — Pay later"),
+            m["code"]: localize(m["ar"], m["en"])
+            for m in PAYMENT_METHODS
+            if m["code"] not in ("paypal", "stripe")
         }
+        labels["paypal"] = "PayPal"
+        labels["stripe"] = "Stripe"
         return [
             {
                 "code": gw.provider,
                 "label": labels.get(gw.provider, gw.display_name),
+                "instructions": (gw.config or {}).get("instructions", ""),
             }
             for gw in gateways
         ]
+
+    def available_methods(self, tenant_id: int, locale: str = "ar") -> list[dict]:
+        """All non-crypto payment methods with this tenant's current settings."""
+        from core.i18n_messages import localize
+
+        rows = {gw.provider: gw for gw in self.list_for_tenant(tenant_id)}
+        result = []
+        for method in PAYMENT_METHODS:
+            code = method["code"]
+            row = rows.get(code)
+            result.append(
+                {
+                    "code": code,
+                    "label": localize(method["ar"], method["en"], locale),
+                    "display_name": row.display_name if row else "",
+                    "is_enabled": bool(row and row.is_enabled),
+                    "instructions": (
+                        (row.config or {}).get("instructions", "") if row else ""
+                    ),
+                    "needs_credentials": not method["manual"],
+                }
+            )
+        return result
+
+    def upsert_method(
+        self,
+        *,
+        tenant_id: int,
+        code: str,
+        display_name: str = "",
+        instructions: str = "",
+        is_enabled: bool = True,
+    ) -> TenantPaymentGateway:
+        """Enable/configure one non-crypto payment method for a tenant."""
+        normalized = (code or "").strip().lower()
+        if normalized not in ALLOWED_METHODS or any(
+            marker in normalized for marker in CRYPTO_MARKERS
+        ):
+            raise ValidationError("Unsupported payment method.")
+
+        default = next(m for m in PAYMENT_METHODS if m["code"] == normalized)
+        gateway = TenantPaymentGateway.query.filter_by(
+            tenant_id=tenant_id, provider=normalized
+        ).first()
+        if gateway is None:
+            gateway = TenantPaymentGateway(
+                tenant_id=tenant_id,
+                provider=normalized,
+                display_name=default["ar"],
+                is_sandbox=True,
+            )
+            db.session.add(gateway)
+        gateway.display_name = (display_name or "").strip() or default["ar"]
+        gateway.config = {
+            **(gateway.config or {}),
+            "instructions": (instructions or "").strip(),
+        }
+        gateway.is_enabled = bool(is_enabled)
+        gateway.status = "active" if is_enabled else "disconnected"
+        db.session.commit()
+        return gateway
 
     def upsert_paypal(
         self,

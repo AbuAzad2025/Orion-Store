@@ -45,15 +45,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (paymentSelect) {
       SafeDOM.clear(paymentSelect);
+      const notes = document.getElementById("payment-instructions");
+      const instructionsByCode = {};
       (payRes.payment_methods || []).forEach((pm) => {
         const opt = document.createElement("option");
         opt.value = pm.code;
         opt.textContent = pm.label;
         paymentSelect.appendChild(opt);
+        if (pm.instructions) instructionsByCode[pm.code] = pm.instructions;
       });
       if (!payRes.payment_methods || !payRes.payment_methods.length) {
         SafeDOM.clear(paymentSelect);
         paymentSelect.appendChild(SafeDOM.elem("option", { value: "cod" }, ["الدفع عند الاستلام"]));
+      }
+      if (notes) {
+        const showNotes = () => {
+          const text = instructionsByCode[paymentSelect.value] || "";
+          notes.textContent = text;
+          notes.classList.toggle("hidden", !text);
+        };
+        paymentSelect.addEventListener("change", showNotes);
+        showNotes();
       }
     }
   } catch (err) {

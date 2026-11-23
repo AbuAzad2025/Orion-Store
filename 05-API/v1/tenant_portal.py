@@ -122,6 +122,41 @@ def list_gateways():
         return jsonify({"error": exc.message}), exc.status_code
 
 
+@tenant_portal_bp.get("/payment-methods")
+def list_payment_methods():
+    """All non-crypto payment methods with this tenant's configuration."""
+    try:
+        require_tenant_admin()
+        from core.context import get_locale
+
+        return (
+            jsonify(
+                {"methods": _gateways.available_methods(g.tenant_id, get_locale())}
+            ),
+            200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_portal_bp.post("/payment-methods")
+def save_payment_method():
+    """Enable/disable or configure one non-crypto payment method."""
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        gateway = _gateways.upsert_method(
+            tenant_id=g.tenant_id,
+            code=data.get("code", ""),
+            display_name=data.get("display_name", ""),
+            instructions=data.get("instructions", ""),
+            is_enabled=bool(data.get("is_enabled", True)),
+        )
+        return jsonify({"gateway": gateway.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
 @tenant_portal_bp.post("/gateways/cod")
 def ensure_cod_gateway():
     try:

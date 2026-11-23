@@ -47,7 +47,9 @@ class TenantPaymentGateway(db.Model):
                 "provider": self.provider,
                 "display_name": self.display_name,
                 "is_enabled": self.is_enabled,
+                "is_sandbox": self.is_sandbox,
                 "status": self.status,
+                "config": self.config or {},
                 "webhook_secret": self.webhook_secret,
                 "credentials_encrypted": self.credentials_encrypted,
             }

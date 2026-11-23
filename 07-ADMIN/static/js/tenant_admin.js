@@ -30,35 +30,61 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  const gatewaysEl = document.getElementById("gateways-list");
-  if (gatewaysEl) {
-    OrionAPI.get("/tenant/gateways")
+  const methodsEl = document.getElementById("payment-methods-list");
+  if (methodsEl) {
+    OrionAPI.get("/tenant/payment-methods")
       .then((data) => {
-        if (!data.gateways.length) {
-          SafeDOM.clear(gatewaysEl);
-          gatewaysEl.appendChild(SafeDOM.emptyMsg("لا توجد بوابات."));
-          return;
-        }
-        SafeDOM.clear(gatewaysEl);
-        data.gateways.forEach((g) => {
-          gatewaysEl.appendChild(SafeDOM.elem("div", { className: "rounded border p-3 mb-2" }, [
-            SafeDOM.elem("strong", null, [g.display_name]),
-            ` (${g.provider}) — ${g.status}`
-          ]));
+        SafeDOM.clear(methodsEl);
+        data.methods.forEach((m) => {
+          const toggle = SafeDOM.elem("input", { type: "checkbox", className: "pm-toggle" });
+          if (m.is_enabled) toggle.checked = "";
+          const nameInput = SafeDOM.elem("input", {
+            type: "text", className: "pm-name border rounded px-2 py-1 text-sm w-full mb-2",
+            value: m.display_name || m.label
+          });
+          const parts = [
+            SafeDOM.elem("label", { className: "inline-flex items-center gap-2 font-medium text-sm" }, [
+              toggle, m.label
+            ])
+          ];
+          if (!m.needs_credentials) {
+            const notes = SafeDOM.elem("textarea", {
+              className: "pm-notes border rounded px-2 py-1 text-sm w-full mb-2",
+              rows: "2", placeholder: "تعليمات تظهر للزبون عند الدفع"
+            });
+            notes.value = m.instructions || "";
+            parts.push(notes);
+          }
+          const status = SafeDOM.elem("span", { className: "pm-status text-xs text-gray-500" }, [m.is_enabled ? "مفعّل" : "معطّل"]);
+          const save = SafeDOM.elem("button", { type: "button", className: "pm-save rounded bg-emerald-600 px-3 py-1 text-white text-sm", "data-code": m.code }, ["حفظ"]);
+          parts.push(nameInput, status, save);
+          methodsEl.appendChild(SafeDOM.elem("div", { className: "rounded border p-3 bg-gray-50", "data-method": m.code }, parts));
+        });
+        methodsEl.querySelectorAll(".pm-toggle").forEach((el) => {
+          el.addEventListener("change", () => {
+            const wrap = el.closest("[data-method]");
+            wrap.querySelector(".pm-status").textContent = el.checked ? "مفعّل" : "معطّل";
+          });
+        });
+        methodsEl.querySelectorAll(".pm-save").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const wrap = btn.closest("[data-method]");
+            const notes = wrap.querySelector(".pm-notes");
+            OrionAPI.post("/tenant/payment-methods", {
+              code: btn.dataset.code,
+              display_name: wrap.querySelector(".pm-name").value.trim(),
+              instructions: notes ? notes.value.trim() : "",
+              is_enabled: wrap.querySelector(".pm-toggle").checked
+            }).then(() => {
+              btn.textContent = "تم الحفظ";
+              setTimeout(() => { btn.textContent = "حفظ"; }, 1500);
+            }).catch((err) => alert(err.message));
+          });
         });
       })
       .catch((err) => {
-        gatewaysEl.textContent = err.message;
+        methodsEl.textContent = err.message;
       });
-  }
-
-  const codBtn = document.getElementById("enable-cod");
-  if (codBtn) {
-    codBtn.addEventListener("click", () => {
-      OrionAPI.post("/tenant/gateways/cod")
-        .then(() => location.reload())
-        .catch((err) => alert(err.message));
-    });
   }
 
   const paypalBtn = document.getElementById("connect-paypal");
