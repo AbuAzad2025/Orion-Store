@@ -1325,12 +1325,8 @@ body.orion-surface {
 
 /* Auth pages — branded, organized login. */
 .orion-auth-wrap { min-block-size: 100vh; display: grid; place-items: center; padding: 1.5rem; }
-.orion-auth-card { inline-size: min(100%, 27rem); display: grid; gap: 1rem; }
-.orion-auth-brand {
-  display: flex; align-items: center; gap: .8rem;
-  padding: .9rem 1.1rem; border: 1px solid var(--orion-border); border-radius: 16px;
-  background: linear-gradient(135deg, var(--orion-panel-2), var(--orion-panel));
-}
+.orion-auth-card { inline-size: min(100%,27rem); display: grid; gap: 1rem; }
+.orion-auth-brand { display: flex; align-items: center; gap: .8rem; padding: .9rem 1.1rem; border: 1px solid var(--orion-border); border-radius: 16px; background: linear-gradient(135deg,var(--orion-panel-2),var(--orion-panel)); }
 .orion-auth-title { display: block; color: var(--orion-text); font-size: 1.2rem; font-weight: 800; }
 .orion-auth-subtitle { display: block; color: var(--orion-muted); font-size: .78rem; }
 .orion-auth-panel { display: grid; gap: 1rem; }
@@ -1384,3 +1380,19 @@ body.orion-surface {
 .orion-store-banner-info .orion-muted { font-size: .72rem; direction: ltr; text-align: start; }
 .orion-store-banner-cta { color: var(--orion-gold); font-size: .78rem; font-weight: 800; white-space: nowrap; }
 .orion-home-footer { text-align: center; color: var(--orion-muted); font-size: .76rem; padding-block: .5rem; }
+
+/* Company footer on the platform landing page. */
+.orion-company-footer { margin-block-start: 1rem; border: 1px solid var(--orion-border); border-radius: 18px; background: linear-gradient(180deg, var(--orion-panel), var(--orion-panel-2)); overflow: hidden; }
+.orion-company-footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 1.5rem; padding: 1.5rem; }
+.orion-company-brand p { color: var(--orion-muted); font-size: .82rem; line-height: 1.8; margin-block-start: .75rem; }
+.orion-company-logo { display: block; inline-size: min(100%,18rem); block-size: auto; background: #fff; padding: .6rem; border-radius: 10px; }
+.orion-company-contact h3, .orion-company-actions h3 { color: var(--orion-gold); font-size: .82rem; font-weight: 800; margin-block-end: .6rem; }
+.orion-company-contact p { color: var(--orion-text-soft); font-size: .8rem; margin-block: .35rem; }
+.orion-company-qr { display: block; inline-size: 6.5rem; block-size: 6.5rem; margin-block: .7rem .25rem; background: #fff; padding: .3rem; border-radius: 8px; }
+.orion-company-actions { display: grid; gap: .6rem; align-content: start; }
+.orion-company-bottom { padding: .85rem 1.5rem; border-block-start: 1px solid var(--orion-border); color: var(--orion-muted); font-size: .74rem; text-align: center; }
+.orion-company-banner-link { display: block; padding: 1rem; }
+.orion-company-banner { display: block; inline-size: 100%; block-size: auto; border-radius: 12px; }
+.orion-company-banner-link:hover .orion-company-banner { transform: translateY(-2px); }
+.orion-company-actions { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; padding: 0 1rem 1.2rem; }
+@media (max-width: 860px) { .orion-company-actions { flex-direction: column; } }
