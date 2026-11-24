@@ -28,10 +28,19 @@ def inject_platform_settings():
 
 @platform_admin_bp.get("/dashboard")
 def platform_dashboard():
+    from tenant.tenant import Tenant
+
+    stores = (
+        Tenant.query.filter_by(deleted_at=None)
+        .order_by(Tenant.created_at.desc())
+        .limit(6)
+        .all()
+    )
     return render_template(
         "platform_dashboard.html",
         page_title="لوحة المنصة",
         active_nav="dashboard",
+        stores=stores,
     )
 
 

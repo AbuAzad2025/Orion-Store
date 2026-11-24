@@ -8,6 +8,25 @@
     <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>
   </div>
 </div>
+<div class="orion-card mt-6">
+  <h2 class="orion-title text-lg mb-4">أحدث الطلبات</h2>
+  {% if recent_orders %}
+  <table class="orion-table w-full text-sm">
+    <thead><tr><th>رقم الطلب</th><th>الإجمالي</th><th>الدفع</th></tr></thead>
+    <tbody>
+      {% for order in recent_orders %}
+      <tr>
+        <td dir="ltr">{{ order.order_number }}</td>
+        <td class="orion-product-price">{{ order.total }}</td>
+        <td>{{ order.payment_status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="orion-muted">لا توجد طلبات بعد.</p>
+  {% endif %}
+</div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/tenant_admin.js') }}"></script>

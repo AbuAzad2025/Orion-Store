@@ -37,11 +37,20 @@ def tenant_dashboard():
     tenant = _require_tenant()
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
+    from order.order import Order
+
+    orders = (
+        Order.query.filter_by(tenant_id=tenant.id)
+        .order_by(Order.created_at.desc())
+        .limit(5)
+        .all()
+    )
     return render_template(
         "tenant_dashboard.html",
         tenant=tenant,
         page_title="لوحة المتجر",
         active_nav="dashboard",
+        recent_orders=orders,
     )
 
 

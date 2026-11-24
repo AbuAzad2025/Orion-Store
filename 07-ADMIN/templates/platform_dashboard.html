@@ -33,6 +33,30 @@
     <p class="text-sm text-gray-500">اسم المنصة، العملة، اللغة، معلومات المالك</p>
   </a>
 </div>
+
+<div class="orion-card mt-6" aria-live="polite">
+  <div class="flex items-center justify-between gap-3 mb-4">
+    <h2 class="orion-title text-lg">أحدث المتاجر</h2>
+    <a href="/admin/platform/tenants" class="orion-header-link text-sm">عرض الكل ←</a>
+  </div>
+  {% if stores %}
+  <table class="orion-table w-full text-sm">
+    <thead><tr><th>المتجر</th><th>المعرّف</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+    <tbody>
+      {% for store in stores %}
+      <tr>
+        <td class="font-semibold">{{ store.name }}</td>
+        <td dir="ltr">{{ store.slug }}</td>
+        <td>{{ 'نشط' if store.is_active and not store.deleted_at else 'موقوف' }}</td>
+        <td><a href="/admin/platform/stores/{{ store.id }}/finance" class="orion-header-link">التقرير المالي</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="orion-muted">لا توجد متاجر بعد.</p>
+  {% endif %}
+</div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_platform.js') }}"></script>
