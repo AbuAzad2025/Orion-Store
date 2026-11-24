@@ -1354,7 +1354,9 @@ body.orion-surface {
 .orion-home-brand { display: flex; align-items: center; gap: .8rem; }
 .orion-home-brand strong { display: block; color: var(--orion-text); font-size: 1.05rem; font-weight: 800; }
 .orion-home-brand .orion-muted { font-size: .74rem; }
-.orion-home-nav { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.orion-home-nav { display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap; }
+.orion-home-nav-group { display: inline-flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
+.orion-home-nav-sep { inline-size: 1px; block-size: 2rem; background: var(--orion-border); }
 .orion-home-hero { min-block-size: auto; }
 .orion-home-section { display: grid; gap: .4rem; }
 .orion-store-banners { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; }
