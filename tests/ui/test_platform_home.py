@@ -17,6 +17,10 @@ def test_platform_home_arabic_default(client, app) -> None:
     assert "متجرك الإلكتروني، جاهز للانطلاق" in text
     assert "دخول المنصة" in text and "دخول المتجر" in text
     assert "🧱 أنشئ متجرك الخاص" in text and "❤️ تبرع لنا" in text
+    # Four distinct access portals, each with a different destination.
+    assert text.count('class="orion-access-card"') == 4
+    assert "بوابات الدخول" in text
+    assert "account?store=" in text
     assert "My Store" in text and "mystore.azadexa.com" in text
     # Brand logo at the top-right (RTL start) of the header.
     assert 'class="orion-home-logo"' in text

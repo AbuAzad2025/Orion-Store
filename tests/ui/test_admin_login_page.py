@@ -12,6 +12,9 @@ def test_admin_login_page_is_branded_and_accessible(client, app) -> None:
     assert 'id="login-form" action="/admin/login" method="post"' in text
     assert 'id="email" name="email" type="email" required' in text
     assert 'id="password" name="password" type="password" required' in text
+    assert (
+        'id="tenant-slug"' not in text
+    )  # tenant resolved from host, no optional field
     assert 'aria-label="البريد الإلكتروني"' in text
     assert 'aria-label="كلمة المرور"' in text
     assert 'action="/admin/sso/exchange" method="post"' in text

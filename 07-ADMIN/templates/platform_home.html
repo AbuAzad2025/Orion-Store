@@ -13,7 +13,17 @@
     'stores_eyebrow': 'متاجر المنصة',
     'stores_title': 'متاجرنا النشطة',
     'visit': 'زيارة المتجر ↗',
-    'no_stores': 'لا توجد متاجر نشطة حالياً.'
+    'no_stores': 'لا توجد متاجر نشطة حالياً.',
+    'access_title': 'بوابات الدخول',
+    'access_sub': 'كل باب له صلاحيته المستقلة — لا اختلاط بين الحسابات.',
+    'access_platform': 'مدير المنصة',
+    'access_platform_d': 'إدارة المتاجر والمستخدمين والإعدادات — على نطاق المنصة.',
+    'access_store': 'مدير المتجر',
+    'access_store_d': 'إدارة المنتجات والطلبات داخل المتجر.',
+    'access_member': 'زبون مسجّل',
+    'access_member_d': 'طلباتك ورصيدك وبياناتك.',
+    'access_guest': 'ضيف / زائر',
+    'access_guest_d': 'تصفح المنتجات وإتمام الطلب دون حساب.'
   },
   'en': {
     'tagline': 'Smart e-commerce platform',
@@ -28,7 +38,17 @@
     'stores_eyebrow': 'Platform stores',
     'stores_title': 'Our active stores',
     'visit': 'Visit store ↗',
-    'no_stores': 'No active stores yet.'
+    'no_stores': 'No active stores yet.',
+    'access_title': 'Access portals',
+    'access_sub': 'Each portal has its own permissions — no account mixing.',
+    'access_platform': 'Platform admin',
+    'access_platform_d': 'Manage stores, users and settings — on the platform domain.',
+    'access_store': 'Store admin',
+    'access_store_d': 'Manage products and orders inside the store.',
+    'access_member': 'Registered customer',
+    'access_member_d': 'Your orders, balance and data.',
+    'access_guest': 'Guest / visitor',
+    'access_guest_d': 'Browse products and check out without an account.'
   }
 } %}
 {% set lang = locale %}
@@ -113,6 +133,43 @@
       {% else %}
       <p class="orion-muted">{{ t.no_stores }}</p>
       {% endif %}
+    </section>
+
+    <section class="orion-home-section orion-access-section">
+      <div class="orion-section-head">
+        <div>
+          <span class="orion-eyebrow">{{ t.access_title }}</span>
+          <h2 class="orion-section-title">{{ t.access_title }}</h2>
+        </div>
+        <span class="orion-section-line" aria-hidden="true"></span>
+      </div>
+      <p class="orion-muted">{{ t.access_sub }}</p>
+      <div class="orion-access-grid">
+        <a href="/admin/login" class="orion-access-card">
+          <span class="orion-access-icon" aria-hidden="true">🛡️</span>
+          <strong>{{ t.access_platform }}</strong>
+          <span class="orion-muted">{{ t.access_platform_d }}</span>
+          <span class="orion-access-go">orion.azadexa.com/admin/login ↗</span>
+        </a>
+        <a href="{{ store_admin_url }}" class="orion-access-card" target="_blank" rel="noopener">
+          <span class="orion-access-icon" aria-hidden="true">🏪</span>
+          <strong>{{ t.access_store }}</strong>
+          <span class="orion-muted">{{ t.access_store_d }}</span>
+          <span class="orion-access-go">متجر demo — /admin/login ↗</span>
+        </a>
+        <a href="{{ store_url }}account?store={{ store_token }}" class="orion-access-card" target="_blank" rel="noopener">
+          <span class="orion-access-icon" aria-hidden="true">👤</span>
+          <strong>{{ t.access_member }}</strong>
+          <span class="orion-muted">{{ t.access_member_d }}</span>
+          <span class="orion-access-go">/account?store=… ↗</span>
+        </a>
+        <a href="{{ store_url }}?store={{ store_token }}" class="orion-access-card" target="_blank" rel="noopener">
+          <span class="orion-access-icon" aria-hidden="true">🛒</span>
+          <strong>{{ t.access_guest }}</strong>
+          <span class="orion-muted">{{ t.access_guest_d }}</span>
+          <span class="orion-access-go">demo.azadexa.com ↗</span>
+        </a>
+      </div>
     </section>
 
     <footer class="orion-company-footer">

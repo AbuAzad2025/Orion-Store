@@ -39,7 +39,10 @@ def platform_home():
         .order_by(Tenant.id)
         .all()
     )
+    from core.store_token import issue as issue_store_token
+
     store_url = f"https://{stores[0].slug}.azadexa.com/" if stores else "#"
+    store_token = issue_store_token(stores[0]) if stores else ""
     store_admin_url = (
         f"https://{stores[0].slug}.azadexa.com/admin/login"
         if stores
@@ -51,5 +54,6 @@ def platform_home():
         stores=stores,
         locale=locale,
         store_url=store_url,
+        store_token=store_token,
         store_admin_url=store_admin_url,
     )

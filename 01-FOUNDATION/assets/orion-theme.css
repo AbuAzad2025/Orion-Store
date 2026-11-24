@@ -1056,21 +1056,8 @@ body.orion-surface {
 .orion-nav-wa:hover { background: var(--orion-gold-strong); }
 
 /* Small readable icons inline with chrome — organized spacing & alignment. */
-.orion-nav-icon {
-  display: inline-block;
-  margin-inline-end: .6rem;
-  font-size: .85rem;
-  line-height: 1;
-  color: var(--orion-gold);
-}
-
-.orion-footer-icon {
-  display: inline-block;
-  margin-inline-end: .55rem;
-  font-size: .85rem;
-  line-height: 1;
-  color: var(--orion-gold);
-}
+.orion-nav-icon { display: inline-block; margin-inline-end: .6rem; font-size: .85rem; line-height: 1; color: var(--orion-gold); }
+.orion-footer-icon { display: inline-block; margin-inline-end: .55rem; font-size: .85rem; line-height: 1; color: var(--orion-gold); }
 
 .orion-footer-cta .orion-footer-icon { font-size: .78rem; }
 
@@ -1392,6 +1379,13 @@ body.orion-surface {
 .orion-company-contact p { color: var(--orion-text-soft); font-size: .8rem; margin-block: .35rem; }
 .orion-company-qr { display: block; inline-size: 6.5rem; block-size: 6.5rem; margin-block: .7rem .25rem; background: #fff; padding: .3rem; border-radius: 8px; }
 .orion-company-actions { display: grid; gap: .6rem; align-content: start; }
+.orion-access-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(13rem,1fr)); gap: .9rem; margin-block-start: .75rem; }
+.orion-access-card { display: grid; gap: .35rem; padding: 1rem; border: 1px solid var(--orion-border); border-radius: 14px; background: var(--orion-panel-2); text-decoration: none; color: var(--orion-text); transition: transform 150ms ease,border-color 150ms ease; }
+.orion-access-card:hover { transform: translateY(-2px); border-color: var(--orion-gold); }
+.orion-access-icon { font-size: 1.5rem; }
+.orion-access-card strong { font-size: .9rem; }
+.orion-access-card .orion-muted { font-size: .75rem; line-height: 1.6; }
+.orion-access-go { color: var(--orion-gold); font-size: .7rem; direction: ltr; text-align: start; }
 .orion-company-banner-link { display: block; overflow: hidden; border-radius: 18px; }
 .orion-company-banner { display: block; inline-size: 100%; block-size: 230px; object-fit: cover; object-position: center; transition: transform 200ms ease; }
 .orion-company-banner-link:hover .orion-company-banner { transform: scale(1.015); }
