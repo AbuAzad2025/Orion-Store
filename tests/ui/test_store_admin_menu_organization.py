@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from auth.auth_service import AuthService
 from support.http import auth_headers, tenant_headers
+
+from auth.auth_service import AuthService
 from tenant_svc.tenant_service import TenantService
 
 
 def _store_admin(app, slug: str) -> dict[str, str]:
     from orion.extensions import db
-
     from tenant.tenant import Tenant
     from user.user import User
 
