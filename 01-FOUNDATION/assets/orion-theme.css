@@ -1347,13 +1347,13 @@ body.orion-surface {
 .orion-home-body { min-block-size: 100vh; display: grid; place-items: center; padding: 1.5rem; }
 .orion-home { inline-size: min(100%, 72rem); display: grid; gap: 1.5rem; }
 .orion-home-topbar {
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  display: flex; align-items: stretch; justify-content: space-between; gap: 2rem;
   padding: .9rem 1.1rem; border: 1px solid var(--orion-border); border-radius: 16px;
   background: linear-gradient(135deg, var(--orion-panel-2), var(--orion-panel));
 }
-.orion-home-brand { display: flex; align-items: center; gap: .8rem; }
-.orion-home-logo { display: block; block-size: 5.2rem; inline-size: auto; max-inline-size: 20rem; object-fit: contain; }
-@media (max-width: 860px) { .orion-home-logo { block-size: 3.4rem; max-inline-size: 14rem; } }
+.orion-home-brand { display: flex; align-items: stretch; flex: 1 1 auto; min-inline-size: 0; }
+.orion-home-logo { display: block; inline-size: 100%; block-size: 100%; min-block-size: 6rem; max-block-size: 8rem; object-fit: contain; object-position: center; }
+@media (max-width: 860px) { .orion-home-logo { min-block-size: 3.5rem; max-block-size: 5rem; } }
 .orion-home-nav { display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap; }
 .orion-home-nav-group { display: inline-flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
 .orion-home-nav-sep { inline-size: 1px; block-size: 2rem; background: var(--orion-border); }
