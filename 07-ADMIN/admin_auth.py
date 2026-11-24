@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from admin_locale import get_admin_locale, remember_admin_locale, t
 from flask import Blueprint, g, redirect, render_template, request, session, url_for
 from flask_jwt_extended import (
     set_access_cookies,
@@ -35,19 +36,33 @@ def inject_platform_settings():
         settings = PlatformSettingsService().get_singleton()
     except Exception:
         settings = None
-    return {"platform_settings": settings}
+    locale = get_admin_locale()
+    return {
+        "platform_settings": settings,
+        "t": t,
+        "locale": locale,
+        "lang": locale,
+        "dir": "rtl" if locale == "ar" else "ltr",
+    }
+
+
+@admin_auth_bp.after_request
+def remember_locale(response):
+    return remember_admin_locale(response)
 
 
 @admin_auth_bp.get("/login")
 def admin_login():
-    return render_template("admin_login.html", page_title="تسجيل الدخول", error=None)
+    return render_template(
+        "admin_login.html", page_title=t("تسجيل الدخول", "Sign in"), error=None
+    )
 
 
 def _invalid_credentials():
     return (
         render_template(
             "admin_login.html",
-            page_title="تسجيل الدخول",
+            page_title=t("تسجيل الدخول", "Sign in"),
             error="Invalid credentials",
         ),
         401,
@@ -134,7 +149,9 @@ def admin_sso_exchange():
     if not tenant:
         return (
             render_template(
-                "admin_login.html", page_title="تسجيل الدخول", error="Tenant not found."
+                "admin_login.html",
+                page_title=t("تسجيل الدخول", "Sign in"),
+                error="Tenant not found.",
             ),
             404,
         )
@@ -151,7 +168,7 @@ def admin_sso_exchange():
         return (
             render_template(
                 "admin_login.html",
-                page_title="تسجيل الدخول",
+                page_title=t("تسجيل الدخول", "Sign in"),
                 error="Invalid SSO credentials.",
             ),
             401,
@@ -188,7 +205,7 @@ def admin_profile():
         return redirect("/admin/login")
     return render_template(
         "admin_profile.html",
-        page_title="الملف الشخصي",
+        page_title=t("الملف الشخصي", "Profile"),
         user=g.user,
         tenant=g.tenant,
         is_platform_admin=g.is_platform_admin,

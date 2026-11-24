@@ -6,13 +6,13 @@ const OrionAdminAppPlatform = {
     try {
       const data = await OrionAPI.get("/app-platform/apps");
       const rows = data.apps || [];
-      if (!rows.length) { el.textContent = "لا توجد تطبيقات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد تطبيقات.', 'No apps found.'); return; }
       SafeDOM.clear(el);
       for (const a of rows) {
-        const install = SafeDOM.actionBtn("تثبيت", "orion-btn", async () => {
+        const install = SafeDOM.actionBtn(OrionI18n.t('تثبيت', 'Install'), "orion-btn", async () => {
           try {
             await OrionAPI.post(`/app-platform/apps/${a.id}/install`);
-            OrionUI.toast("تم تثبيت التطبيق", "success");
+            OrionUI.toast(OrionI18n.t('تم تثبيت التطبيق', 'App installed'), "success");
             OrionAdminAppPlatform.loadInstallations();
           } catch (err) { OrionUI.toast(err.message, "error"); }
         });
@@ -21,7 +21,7 @@ const OrionAdminAppPlatform = {
           install
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadInstallations() {
@@ -34,12 +34,12 @@ const OrionAdminAppPlatform = {
         const data = await OrionAPI.get(`/app-platform/apps/${a.id}/installations`);
         for (const inst of data.installations || []) {
           el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-            `${a.name} — تثبيت #${inst.id} (${inst.status || "active"})`
+            `${a.name} — ${OrionI18n.t('تثبيت', 'Installation')} #${inst.id} (${inst.status || OrionI18n.t('نشط', 'active')})`
           ]));
         }
       }
-      if (!el.children.length) el.textContent = "لا توجد تثبيتات.";
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+      if (!el.children.length) el.textContent = OrionI18n.t('لا توجد تثبيتات.', 'No installations found.');
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   subscribeWebhook() {
@@ -53,7 +53,7 @@ const OrionAdminAppPlatform = {
           topic: fd.get("topic"),
           callback_url: fd.get("callback_url"),
         });
-        OrionUI.toast("تم الاشتراك في الـ webhook", "success");
+        OrionUI.toast(OrionI18n.t('تم الاشتراك في الـ webhook', 'Subscribed to webhook'), "success");
         form.reset();
       } catch (err) { OrionUI.toast(err.message, "error"); }
     });
@@ -65,14 +65,14 @@ const OrionAdminAppPlatform = {
     try {
       const data = await OrionAPI.get("/app-platform/sandboxes");
       const rows = data.sandboxes || [];
-      if (!rows.length) { el.textContent = "لا توجد متاجر تجريبية."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد متاجر تجريبية.', 'No sandbox stores found.'); return; }
       SafeDOM.clear(el);
       for (const s of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           s.slug, " — ", s.name
         ]));
       }
-    } catch (err) { el.textContent = "تعذّر تحميل المتاجر التجريبية."; }
+    } catch (err) { el.textContent = OrionI18n.t('تعذّر تحميل المتاجر التجريبية.', 'Failed to load sandbox stores.'); }
   },
 
   // One-time reveal: the button is shown once after registration and removes
@@ -89,11 +89,11 @@ const OrionAdminAppPlatform = {
       else document.body.appendChild(panel);
     }
     SafeDOM.clear(panel);
-    panel.appendChild(SafeDOM.elem("span", {}, ["client_secret (يُعرض مرة واحدة فقط): "]));
+    panel.appendChild(SafeDOM.elem("span", {}, [OrionI18n.t('client_secret (يُعرض مرة واحدة فقط): ', 'client_secret (shown only once): ')]));
     const btn = SafeDOM.elem("button", {
       type: "button",
       className: "orion-btn ml-2",
-    }, ["إنشاء client_secret"]);
+    }, [OrionI18n.t('إنشاء client_secret', 'Generate client_secret')]);
     btn.addEventListener("click", async () => {
       try {
         if (navigator.clipboard) await navigator.clipboard.writeText(secret);

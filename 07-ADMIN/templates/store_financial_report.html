@@ -8,7 +8,7 @@
 {% endblock %}
 {% block body_attrs %}data-report-tenant-id="{{ tenant_id }}"{% endblock %}
 {% block content %}
-<div id="financial-report" class="orion-muted">جارٍ التحميل…</div>
+<div id="financial-report" class="orion-muted">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/platform_admin.js') }}"></script>

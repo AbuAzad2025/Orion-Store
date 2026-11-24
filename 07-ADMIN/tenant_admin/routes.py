@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from admin_locale import get_admin_locale, remember_admin_locale, t
 from flask import Blueprint, g, render_template
 
 from platform_svc.platform_settings_service import PlatformSettingsService
@@ -23,13 +24,25 @@ def inject_platform_settings():
         settings = PlatformSettingsService().get_singleton()
     except Exception:
         settings = None
-    return {"platform_settings": settings}
+    locale = get_admin_locale()
+    return {
+        "platform_settings": settings,
+        "t": t,
+        "locale": locale,
+        "lang": locale,
+        "dir": "rtl" if locale == "ar" else "ltr",
+    }
 
 
 def _require_tenant():
     if not g.tenant:
         return None
     return g.tenant
+
+
+@tenant_admin_bp.after_request
+def remember_locale(response):
+    return remember_admin_locale(response)
 
 
 @tenant_admin_bp.get("/dashboard")
@@ -48,7 +61,7 @@ def tenant_dashboard():
     return render_template(
         "tenant_dashboard.html",
         tenant=tenant,
-        page_title="لوحة المتجر",
+        page_title=t("لوحة المتجر", "Store dashboard"),
         active_nav="dashboard",
         recent_orders=orders,
     )
@@ -62,7 +75,7 @@ def tenant_products():
     return render_template(
         "products_management.html",
         tenant=tenant,
-        page_title="المنتجات",
+        page_title=t("المنتجات", "Products"),
         active_nav="products",
     )
 
@@ -75,7 +88,7 @@ def tenant_pages():
     return render_template(
         "pages_management.html",
         tenant=tenant,
-        page_title="الصفحات",
+        page_title=t("الصفحات", "Pages"),
         active_nav="pages",
     )
 
@@ -88,7 +101,7 @@ def tenant_ui_kit():
     return render_template(
         "ui_kit.html",
         tenant=tenant,
-        page_title="معاينة المكوّنات",
+        page_title=t("معاينة المكوّنات", "Component preview"),
         active_nav="ui_kit",
     )
 
@@ -101,7 +114,7 @@ def tenant_contact():
     return render_template(
         "contact_settings.html",
         tenant=tenant,
-        page_title="رقم التواصل (واتساب)",
+        page_title=t("رقم التواصل (واتساب)", "Contact number (WhatsApp)"),
         active_nav="contact",
     )
 
@@ -114,7 +127,7 @@ def tenant_gateways():
     return render_template(
         "tenant_gateways.html",
         tenant=tenant,
-        page_title="بوابات الدفع",
+        page_title=t("بوابات الدفع", "Payment gateways"),
         active_nav="gateways",
     )
 
@@ -127,7 +140,7 @@ def tenant_documents():
     return render_template(
         "document_templates.html",
         tenant=tenant,
-        page_title="قوالب المستندات",
+        page_title=t("قوالب المستندات", "Document templates"),
         active_nav="documents",
     )
 
@@ -140,7 +153,7 @@ def tenant_feature_flags():
     return render_template(
         "feature_flags_management.html",
         tenant=tenant,
-        page_title="ميزات المتجر",
+        page_title=t("ميزات المتجر", "Store features"),
         active_nav="feature_flags",
     )
 
@@ -153,7 +166,7 @@ def tenant_returns():
     return render_template(
         "returns_management.html",
         tenant=tenant,
-        page_title="المرتجعات",
+        page_title=t("المرتجعات", "Returns"),
         active_nav="returns",
     )
 
@@ -166,7 +179,7 @@ def tenant_b2b():
     return render_template(
         "b2b_management.html",
         tenant=tenant,
-        page_title="B2B — الجملة",
+        page_title=t("B2B — الجملة", "B2B — Wholesale"),
         active_nav="b2b",
     )
 
@@ -179,7 +192,7 @@ def tenant_oms():
     return render_template(
         "oms_management.html",
         tenant=tenant,
-        page_title="المستودعات والتنفيذ",
+        page_title=t("المستودعات والتنفيذ", "Warehouses & fulfillment"),
         active_nav="oms",
     )
 
@@ -192,7 +205,7 @@ def tenant_subscriptions():
     return render_template(
         "subscriptions_management.html",
         tenant=tenant,
-        page_title="الاشتراكات",
+        page_title=t("الاشتراكات", "Subscriptions"),
         active_nav="subscriptions",
     )
 
@@ -205,7 +218,7 @@ def tenant_vouchers():
     return render_template(
         "vouchers_management.html",
         tenant=tenant,
-        page_title="قسائم الخصم",
+        page_title=t("قسائم الخصم", "Discount coupons"),
         active_nav="vouchers",
     )
 
@@ -218,7 +231,7 @@ def tenant_tax():
     return render_template(
         "tax_management.html",
         tenant=tenant,
-        page_title="الضرائب",
+        page_title=t("الضرائب", "Taxes"),
         active_nav="tax",
     )
 
@@ -231,7 +244,7 @@ def tenant_bopis():
     return render_template(
         "bopis_management.html",
         tenant=tenant,
-        page_title="الاستلام من المتجر",
+        page_title=t("الاستلام من المتجر", "Store pickup"),
         active_nav="bopis",
     )
 
@@ -244,7 +257,7 @@ def tenant_bundles():
     return render_template(
         "bundles_management.html",
         tenant=tenant,
-        page_title="الحزم",
+        page_title=t("الحزم", "Bundles"),
         active_nav="bundles",
     )
 
@@ -257,7 +270,7 @@ def tenant_store_credit():
     return render_template(
         "store_credit_management.html",
         tenant=tenant,
-        page_title="رصيد المتجر",
+        page_title=t("رصيد المتجر", "Store credit"),
         active_nav="store_credit",
     )
 
@@ -270,7 +283,7 @@ def tenant_draft_orders():
     return render_template(
         "draft_orders_management.html",
         tenant=tenant,
-        page_title="الطلبات المسودة",
+        page_title=t("الطلبات المسودة", "Draft orders"),
         active_nav="draft_orders",
     )
 
@@ -283,7 +296,7 @@ def tenant_metafields():
     return render_template(
         "metafields_management.html",
         tenant=tenant,
-        page_title="البيانات الوصفية",
+        page_title=t("البيانات الوصفية", "Metafields"),
         active_nav="metafields",
     )
 
@@ -296,7 +309,7 @@ def tenant_currency():
     return render_template(
         "currency_management.html",
         tenant=tenant,
-        page_title="العملات",
+        page_title=t("العملات", "Currencies"),
         active_nav="currency",
     )
 
@@ -309,7 +322,7 @@ def tenant_import_export():
     return render_template(
         "import_export_management.html",
         tenant=tenant,
-        page_title="استيراد وتصدير",
+        page_title=t("استيراد وتصدير", "Import & export"),
         active_nav="import_export",
     )
 
@@ -322,7 +335,7 @@ def tenant_app_platform():
     return render_template(
         "app_platform_management.html",
         tenant=tenant,
-        page_title="منصة التطبيقات",
+        page_title=t("منصة التطبيقات", "App platform"),
         active_nav="app_platform",
     )
 
@@ -335,7 +348,7 @@ def tenant_fraud():
     return render_template(
         "fraud_management.html",
         tenant=tenant,
-        page_title="الاحتيال",
+        page_title=t("الاحتيال", "Fraud"),
         active_nav="fraud",
     )
 
@@ -348,7 +361,7 @@ def tenant_compliance():
     return render_template(
         "compliance_management.html",
         tenant=tenant,
-        page_title="الامتثال",
+        page_title=t("الامتثال", "Compliance"),
         active_nav="compliance",
     )
 
@@ -361,7 +374,7 @@ def tenant_workflows():
     return render_template(
         "workflows_management.html",
         tenant=tenant,
-        page_title="سير العمل",
+        page_title=t("سير العمل", "Workflows"),
         active_nav="workflows",
     )
 
@@ -372,7 +385,10 @@ def tenant_search():
     if not tenant:
         return "Tenant context required (X-Tenant-ID).", 404
     return render_template(
-        "search_management.html", tenant=tenant, page_title="البحث", active_nav="search"
+        "search_management.html",
+        tenant=tenant,
+        page_title=t("البحث", "Search"),
+        active_nav="search",
     )
 
 
@@ -384,7 +400,7 @@ def tenant_affiliates():
     return render_template(
         "affiliates_management.html",
         tenant=tenant,
-        page_title="المسوقين",
+        page_title=t("المسوقين", "Affiliates"),
         active_nav="affiliates",
     )
 
@@ -397,7 +413,7 @@ def tenant_gift_registries():
     return render_template(
         "gift_registry_management.html",
         tenant=tenant,
-        page_title="قوائم الهدايا",
+        page_title=t("قوائم الهدايا", "Gift registries"),
         active_nav="gift_registries",
     )
 
@@ -410,7 +426,7 @@ def tenant_dropship():
     return render_template(
         "dropship_management.html",
         tenant=tenant,
-        page_title="الدروبشيبنج",
+        page_title=t("الدروبشيبنج", "Dropshipping"),
         active_nav="dropship",
     )
 
@@ -423,7 +439,7 @@ def tenant_schema_markup():
     return render_template(
         "schema_markup_management.html",
         tenant=tenant,
-        page_title="ترميز البيانات المنظّمة",
+        page_title=t("ترميز البيانات المنظّمة", "Structured data markup"),
         active_nav="schema_markup",
     )
 
@@ -436,7 +452,7 @@ def tenant_accessibility():
     return render_template(
         "accessibility_management.html",
         tenant=tenant,
-        page_title="إمكانية الوصول",
+        page_title=t("إمكانية الوصول", "Accessibility"),
         active_nav="accessibility",
     )
 
@@ -449,7 +465,7 @@ def tenant_live_chat():
     return render_template(
         "live_chat_management.html",
         tenant=tenant,
-        page_title="الدردشة المباشرة",
+        page_title=t("الدردشة المباشرة", "Live chat"),
         active_nav="live_chat",
     )
 
@@ -462,7 +478,7 @@ def tenant_reconciliation():
     return render_template(
         "reconciliation_management.html",
         tenant=tenant,
-        page_title="التسوية المالية",
+        page_title=t("التسوية المالية", "Financial reconciliation"),
         active_nav="reconciliation",
     )
 
@@ -475,6 +491,6 @@ def tenant_platform_audit():
     return render_template(
         "platform_audit_management.html",
         tenant=tenant,
-        page_title="تدقيق المنصة",
+        page_title=t("تدقيق المنصة", "Platform audit"),
         active_nav="platform_audit",
     )

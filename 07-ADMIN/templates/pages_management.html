@@ -3,51 +3,51 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
   <section class="orion-card lg:col-span-2">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="orion-title">الصفحات</h2>
-      <button type="button" id="btn-refresh" class="orion-btn">تحديث القائمة</button>
+      <h2 class="orion-title">{{ t('الصفحات', 'Pages') }}</h2>
+      <button type="button" id="btn-refresh" class="orion-btn">{{ t('تحديث القائمة', 'Refresh list') }}</button>
     </div>
-    <div id="pages-list" class="space-y-2">جارٍ التحميل…</div>
+    <div id="pages-list" class="space-y-2">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 
   <section class="orion-card">
-    <h2 class="orion-title mb-4" id="form-title">إضافة صفحة</h2>
+    <h2 class="orion-title mb-4" id="form-title">{{ t('إضافة صفحة', 'Add page') }}</h2>
     <form id="page-form" class="space-y-3">
       <input type="hidden" id="page-edit-id" value="">
       <div>
-        <label class="orion-stat-label" for="p-title">العنوان</label>
-        <input id="p-title" class="orion-input" required aria-label="عنوان الصفحة">
+        <label class="orion-stat-label" for="p-title">{{ t('العنوان', 'Title') }}</label>
+        <input id="p-title" class="orion-input" required aria-label="{{ t('عنوان الصفحة', 'Page title') }}">
       </div>
       <div>
-        <label class="orion-stat-label" for="p-slug">الرابط (slug)</label>
-        <input id="p-slug" class="orion-input" dir="ltr" required aria-label="رابط الصفحة">
+        <label class="orion-stat-label" for="p-slug">{{ t('الرابط (slug)', 'URL (slug)') }}</label>
+        <input id="p-slug" class="orion-input" dir="ltr" required aria-label="{{ t('رابط الصفحة', 'Page URL') }}">
       </div>
       <label class="flex items-center gap-2 text-sm">
-        <input id="p-published" type="checkbox" aria-label="صفحة منشورة"> صفحة منشورة
+        <input id="p-published" type="checkbox" aria-label="{{ t('صفحة منشورة', 'Published page') }}"> {{ t('صفحة منشورة', 'Published page') }}
       </label>
 
       <hr class="border-slate-700">
-      <p class="orion-eyebrow text-sm">الترجمة (اختياري)</p>
+      <p class="orion-eyebrow text-sm">{{ t('الترجمة (اختياري)', 'Translation (optional)') }}</p>
       <div>
-        <label class="orion-stat-label" for="p-locale">اللغة</label>
-        <select id="p-locale" class="orion-select" aria-label="لغة الترجمة">
-          <option value="ar">العربية</option>
-          <option value="en">English</option>
-          <option value="he">עברית</option>
-          <option value="fr">Français</option>
+        <label class="orion-stat-label" for="p-locale">{{ t('اللغة', 'Language') }}</label>
+        <select id="p-locale" class="orion-select" aria-label="{{ t('لغة الترجمة', 'Translation language') }}">
+          <option value="ar">{{ t('العربية', 'Arabic') }}</option>
+          <option value="en">{{ t('English', 'English') }}</option>
+          <option value="he">{{ t('עברית', 'Hebrew') }}</option>
+          <option value="fr">{{ t('Français', 'French') }}</option>
         </select>
       </div>
       <div>
-        <label class="orion-stat-label" for="p-trans-title">عنوان الترجمة</label>
-        <input id="p-trans-title" class="orion-input" aria-label="عنوان الترجمة">
+        <label class="orion-stat-label" for="p-trans-title">{{ t('عنوان الترجمة', 'Translated title') }}</label>
+        <input id="p-trans-title" class="orion-input" aria-label="{{ t('عنوان الترجمة', 'Translated title') }}">
       </div>
       <div>
-        <label class="orion-stat-label" for="p-trans-body">محتوى الترجمة</label>
-        <textarea id="p-trans-body" class="orion-input" rows="5" aria-label="محتوى الترجمة"></textarea>
+        <label class="orion-stat-label" for="p-trans-body">{{ t('محتوى الترجمة', 'Translated content') }}</label>
+        <textarea id="p-trans-body" class="orion-input" rows="5" aria-label="{{ t('محتوى الترجمة', 'Translated content') }}"></textarea>
       </div>
 
       <div class="flex gap-2">
-        <button type="submit" class="orion-btn orion-btn-gold flex-1">حفظ الصفحة</button>
-        <button type="button" id="btn-cancel" class="orion-btn">إلغاء</button>
+        <button type="submit" class="orion-btn orion-btn-gold flex-1">{{ t('حفظ الصفحة', 'Save page') }}</button>
+        <button type="button" id="btn-cancel" class="orion-btn">{{ t('إلغاء', 'Cancel') }}</button>
       </div>
       <p id="page-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
     </form>

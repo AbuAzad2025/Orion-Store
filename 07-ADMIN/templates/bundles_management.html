@@ -2,14 +2,14 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">الحزم</h2>
+    <h2 class="orion-title mb-3">{{ t('الحزم', 'Bundles') }}</h2>
     <form id="bundle-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="اسم الحزمة" required>
-      <input name="slug" type="text" placeholder="رمز الحزمة في الرابط" required dir="ltr">
-      <input name="bundle_price" type="number" step="0.01" placeholder="سعر الحزمة" required>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة حزمة</button>
+      <input name="name" type="text" placeholder="{{ t('اسم الحزمة', 'Bundle name') }}" required>
+      <input name="slug" type="text" placeholder="{{ t('رمز الحزمة في الرابط', 'Bundle URL slug') }}" required dir="ltr">
+      <input name="bundle_price" type="number" step="0.01" placeholder="{{ t('سعر الحزمة', 'Bundle price') }}" required>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة حزمة', 'Add bundle') }}</button>
     </form>
-    <div id="bundles-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="bundles-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 </div>
 {% endblock %}

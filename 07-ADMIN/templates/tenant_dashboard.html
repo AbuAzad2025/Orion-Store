@@ -9,10 +9,10 @@
   </div>
 </div>
 <div class="orion-card mt-6">
-  <h2 class="orion-title text-lg mb-4">أحدث الطلبات</h2>
+  <h2 class="orion-title text-lg mb-4">{{ t('أحدث الطلبات', 'Recent orders') }}</h2>
   {% if recent_orders %}
   <table class="orion-table w-full text-sm">
-    <thead><tr><th>رقم الطلب</th><th>الإجمالي</th><th>الدفع</th></tr></thead>
+    <thead><tr><th>{{ t('رقم الطلب', 'Order number') }}</th><th>{{ t('الإجمالي', 'Total') }}</th><th>{{ t('الدفع', 'Payment') }}</th></tr></thead>
     <tbody>
       {% for order in recent_orders %}
       <tr>
@@ -24,7 +24,7 @@
     </tbody>
   </table>
   {% else %}
-  <p class="orion-muted">لا توجد طلبات بعد.</p>
+  <p class="orion-muted">{{ t('لا توجد طلبات بعد.', 'No orders yet.') }}</p>
   {% endif %}
 </div>
 {% endblock %}

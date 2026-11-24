@@ -2,34 +2,34 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">تطبيقات OAuth</h2>
+    <h2 class="orion-title mb-3">{{ t('تطبيقات OAuth', 'OAuth apps') }}</h2>
     <form id="app-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="اسم التطبيق" required>
-      <input name="redirect_uris" type="text" placeholder="روابط إعادة التوجيه (مفصولة بفواصل)">
-      <input name="scopes" type="text" placeholder="الصلاحيات">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">تسجيل تطبيق</button>
+      <input name="name" type="text" placeholder="{{ t('اسم التطبيق', 'App name') }}" required>
+      <input name="redirect_uris" type="text" placeholder="{{ t('روابط إعادة التوجيه (مفصولة بفواصل)', 'Redirect URIs (comma-separated)') }}">
+      <input name="scopes" type="text" placeholder="{{ t('الصلاحيات', 'Scopes') }}">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('تسجيل تطبيق', 'Register app') }}</button>
     </form>
-    <div id="apps-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="apps-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">التثبيتات والـ Webhooks</h2>
-    <div id="app-installations-list" class="orion-muted text-sm mb-4">جارٍ التحميل…</div>
+    <h2 class="orion-title mb-3">{{ t('التثبيتات والـ Webhooks', 'Installations and webhooks') }}</h2>
+    <div id="app-installations-list" class="orion-muted text-sm mb-4">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
     <form id="app-webhook-form" class="grid gap-2 max-w-md text-sm">
-      <input name="installation_id" type="number" min="1" placeholder="رقم التثبيت" class="orion-input" required aria-label="رقم التثبيت">
-      <input name="topic" type="text" placeholder="الموضوع (مثال: orders/create)" class="orion-input" required aria-label="موضوع الـ webhook" dir="ltr">
-      <input name="callback_url" type="url" placeholder="رابط الاستقبال" class="orion-input" required aria-label="رابط استقبال الـ webhook" dir="ltr">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">الاشتراك في Webhook</button>
+      <input name="installation_id" type="number" min="1" placeholder="{{ t('رقم التثبيت', 'Installation ID') }}" class="orion-input" required aria-label="{{ t('رقم التثبيت', 'Installation ID') }}">
+      <input name="topic" type="text" placeholder="{{ t('الموضوع (مثال: orders/create)', 'Topic (e.g. orders/create)') }}" class="orion-input" required aria-label="{{ t('موضوع الـ webhook', 'Webhook topic') }}" dir="ltr">
+      <input name="callback_url" type="url" placeholder="{{ t('رابط الاستقبال', 'Callback URL') }}" class="orion-input" required aria-label="{{ t('رابط استقبال الـ webhook', 'Webhook callback URL') }}" dir="ltr">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('الاشتراك في Webhook', 'Subscribe to webhook') }}</button>
     </form>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">متاجر تجريبية</h2>
+    <h2 class="orion-title mb-3">{{ t('متاجر تجريبية', 'Sandbox stores') }}</h2>
     <form id="sandbox-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="slug" type="text" placeholder="المعرف" required>
-      <input name="name" type="text" placeholder="الاسم" required>
-      <input name="expires_at" type="datetime-local" placeholder="تاريخ الانتهاء" class="orion-input" required aria-label="تاريخ انتهاء المتجر التجريبي">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إنشاء متجر تجريبي</button>
+      <input name="slug" type="text" placeholder="{{ t('المعرف', 'Slug') }}" required>
+      <input name="name" type="text" placeholder="{{ t('الاسم', 'Name') }}" required>
+      <input name="expires_at" type="datetime-local" placeholder="{{ t('تاريخ الانتهاء', 'Expiration date') }}" class="orion-input" required aria-label="{{ t('تاريخ انتهاء المتجر التجريبي', 'Sandbox store expiration date') }}">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء متجر تجريبي', 'Create sandbox store') }}</button>
     </form>
-    <div id="sandboxes-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="sandboxes-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 </div>
 {% endblock %}

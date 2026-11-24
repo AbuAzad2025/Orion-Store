@@ -1,17 +1,17 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <section class="orion-card">
-  <h2 class="orion-title mb-3">قوالب المستندات</h2>
-  <div id="templates-list" class="orion-muted text-sm mb-4">جارٍ التحميل…</div>
-  <label class="orion-stat-label" for="invoice-body">قالب الفاتورة (HTML)</label>
+  <h2 class="orion-title mb-3">{{ t('قوالب المستندات', 'Document templates') }}</h2>
+  <div id="templates-list" class="orion-muted text-sm mb-4">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
+  <label class="orion-stat-label" for="invoice-body">{{ t('قالب الفاتورة (HTML)', 'Invoice template (HTML)') }}</label>
   <p class="orion-muted text-xs mb-2">
-    يجب أن يحتوي القالب على تذييل المنصة <span dir="ltr">azadexa-platform-footer</span>
-    وعلامة <span dir="ltr">data-immutable="true"</span>؛ لا يمكن حذفهما.
+    {{ t('يجب أن يحتوي القالب على تذييل المنصة', 'The template must contain the platform footer') }} <span dir="ltr">azadexa-platform-footer</span>
+    {{ t('وعلامة', 'and the attribute') }} <span dir="ltr">data-immutable="true"</span>{{ t('؛ لا يمكن حذفهما.', '; neither can be removed.') }}
   </p>
-  <textarea id="invoice-body" rows="8" class="orion-input font-mono text-sm mb-4" dir="ltr" aria-label="قالب الفاتورة HTML">&lt;div class="invoice-header"&gt;&lt;h1&gt;فاتورة&lt;/h1&gt;&lt;/div&gt;
+  <textarea id="invoice-body" rows="8" class="orion-input font-mono text-sm mb-4" dir="ltr" aria-label="{{ t('قالب الفاتورة HTML', 'Invoice template HTML') }}">&lt;div class="invoice-header"&gt;&lt;h1&gt;فاتورة&lt;/h1&gt;&lt;/div&gt;
 &lt;div class="invoice-body"&gt;{% raw %}{{order_number}}{% endraw %}&lt;/div&gt;
 &lt;footer id="azadexa-platform-footer" class="azadexa-platform-footer" data-immutable="true"&gt;&lt;/footer&gt;</textarea>
-  <button id="save-invoice-template" class="orion-btn orion-btn-gold">حفظ القالب</button>
+  <button id="save-invoice-template" class="orion-btn orion-btn-gold">{{ t('حفظ القالب', 'Save template') }}</button>
   <p id="invoice-msg" class="orion-muted text-sm mt-2" role="status" aria-live="polite"></p>
 </section>
 {% endblock %}

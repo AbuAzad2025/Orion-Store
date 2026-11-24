@@ -6,15 +6,15 @@ const OrionAdminCurrency = {
     try {
       const data = await OrionAPI.get("/currency/rates");
       const rows = data.rates || [];
-      if (!rows.length) { el.textContent = "لا توجد أسعار."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد أسعار.', 'No rates found.'); return; }
       SafeDOM.clear(el);
       for (const r of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          r.from_currency, " → ", r.to_currency, " = ", r.rate, " (", r.source || "manual", ")"
+          r.from_currency, " → ", r.to_currency, " = ", r.rate, " (", r.source || OrionI18n.t('يدوي', 'manual'), ")"
         ]));
       }
     } catch (err) {
-      el.textContent = "تعذّر تحميل الأسعار. قد يقتصر التعديل على مسؤولي المنصة.";
+      el.textContent = OrionI18n.t('تعذّر تحميل الأسعار. قد يقتصر التعديل على مسؤولي المنصة.', 'Failed to load rates. Editing may be restricted to platform admins.');
     }
   },
 
@@ -41,7 +41,7 @@ const OrionAdminCurrency = {
           const data = await OrionAPI.get(`/currency/convert?amount=${amount}&from=${from}&to=${to}`);
           document.getElementById("conv-result").textContent = `${data.result} ${to}`;
         } catch (err) {
-          document.getElementById("conv-result").textContent = "تعذّر التحويل. تحقّق من المبلغ والعملات.";
+          document.getElementById("conv-result").textContent = OrionI18n.t('تعذّر التحويل. تحقّق من المبلغ والعملات.', 'Conversion failed. Check the amount and currencies.');
         }
       });
     }

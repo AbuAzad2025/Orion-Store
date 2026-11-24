@@ -3,75 +3,75 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
   <section class="orion-card lg:col-span-2">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="orion-title">المنتجات</h2>
-      <button type="button" id="btn-refresh" class="orion-btn">تحديث القائمة</button>
+      <h2 class="orion-title">{{ t('المنتجات', 'Products') }}</h2>
+      <button type="button" id="btn-refresh" class="orion-btn">{{ t('تحديث القائمة', 'Refresh list') }}</button>
     </div>
-    <div id="products-list" class="space-y-2">جارٍ التحميل…</div>
+    <div id="products-list" class="space-y-2">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 
   <section class="orion-card">
-    <h2 class="orion-title mb-4" id="form-title">إضافة منتج</h2>
+    <h2 class="orion-title mb-4" id="form-title">{{ t('إضافة منتج', 'Add product') }}</h2>
     <form id="product-form" class="space-y-3">
       <input type="hidden" id="product-edit-id" value="">
       <div>
-        <label class="orion-stat-label" for="p-name">الاسم</label>
-        <input id="p-name" class="orion-input" required aria-label="اسم المنتج">
+        <label class="orion-stat-label" for="p-name">{{ t('الاسم', 'Name') }}</label>
+        <input id="p-name" class="orion-input" required aria-label="{{ t('اسم المنتج', 'Product name') }}">
       </div>
       <div>
-        <label class="orion-stat-label" for="p-slug">الرابط (slug)</label>
-        <input id="p-slug" class="orion-input" dir="ltr" required aria-label="رابط المنتج">
+        <label class="orion-stat-label" for="p-slug">{{ t('الرابط (slug)', 'URL (slug)') }}</label>
+        <input id="p-slug" class="orion-input" dir="ltr" required aria-label="{{ t('رابط المنتج', 'Product URL') }}">
       </div>
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="orion-stat-label" for="p-price">السعر</label>
-          <input id="p-price" type="number" step="0.01" min="0" class="orion-input" required aria-label="السعر">
+          <label class="orion-stat-label" for="p-price">{{ t('السعر', 'Price') }}</label>
+          <input id="p-price" type="number" step="0.01" min="0" class="orion-input" required aria-label="{{ t('السعر', 'Price') }}">
         </div>
         <div>
-          <label class="orion-stat-label" for="p-quantity">الكمية</label>
-          <input id="p-quantity" type="number" min="0" class="orion-input" value="0" aria-label="الكمية">
+          <label class="orion-stat-label" for="p-quantity">{{ t('الكمية', 'Quantity') }}</label>
+          <input id="p-quantity" type="number" min="0" class="orion-input" value="0" aria-label="{{ t('الكمية', 'Quantity') }}">
         </div>
       </div>
       <div>
-        <label class="orion-stat-label" for="p-sku">SKU (اختياري)</label>
-        <input id="p-sku" class="orion-input" dir="ltr" aria-label="رمز المنتج">
+        <label class="orion-stat-label" for="p-sku">{{ t('SKU (اختياري)', 'SKU (optional)') }}</label>
+        <input id="p-sku" class="orion-input" dir="ltr" aria-label="{{ t('رمز المنتج', 'Product SKU') }}">
       </div>
       <div>
-        <label class="orion-stat-label" for="p-category">التصنيف</label>
-        <select id="p-category" class="orion-select" aria-label="تصنيف المنتج">
-          <option value="">بدون تصنيف</option>
+        <label class="orion-stat-label" for="p-category">{{ t('التصنيف', 'Category') }}</label>
+        <select id="p-category" class="orion-select" aria-label="{{ t('تصنيف المنتج', 'Product category') }}">
+          <option value="">{{ t('بدون تصنيف', 'No category') }}</option>
         </select>
       </div>
       <div>
-        <label class="orion-stat-label" for="p-brand">العلامة التجارية (اختياري)</label>
-        <select id="p-brand" class="orion-select" aria-label="العلامة التجارية">
-          <option value="">بدون علامة</option>
+        <label class="orion-stat-label" for="p-brand">{{ t('العلامة التجارية (اختياري)', 'Brand (optional)') }}</label>
+        <select id="p-brand" class="orion-select" aria-label="{{ t('العلامة التجارية', 'Brand') }}">
+          <option value="">{{ t('بدون علامة', 'No brand') }}</option>
         </select>
       </div>
       <div>
-        <label class="orion-stat-label" for="p-compare">سعر قبل الخصم (اختياري)</label>
-        <input id="p-compare" type="number" step="0.01" min="0" class="orion-input" aria-label="السعر قبل الخصم">
+        <label class="orion-stat-label" for="p-compare">{{ t('سعر قبل الخصم (اختياري)', 'Price before discount (optional)') }}</label>
+        <input id="p-compare" type="number" step="0.01" min="0" class="orion-input" aria-label="{{ t('السعر قبل الخصم', 'Price before discount') }}">
       </div>
       <div>
-        <label class="orion-stat-label" for="p-image">رابط الصورة</label>
-        <input id="p-image" class="orion-input" dir="ltr" placeholder="https://..." aria-label="رابط صورة المنتج">
+        <label class="orion-stat-label" for="p-image">{{ t('رابط الصورة', 'Image URL') }}</label>
+        <input id="p-image" class="orion-input" dir="ltr" placeholder="https://..." aria-label="{{ t('رابط صورة المنتج', 'Product image URL') }}">
       </div>
       <div>
-        <label class="orion-stat-label" for="p-short">وصف مختصر</label>
-        <input id="p-short" class="orion-input" aria-label="وصف مختصر">
+        <label class="orion-stat-label" for="p-short">{{ t('وصف مختصر', 'Short description') }}</label>
+        <input id="p-short" class="orion-input" aria-label="{{ t('وصف مختصر', 'Short description') }}">
       </div>
       <div>
-        <label class="orion-stat-label" for="p-description">الوصف الكامل</label>
-        <textarea id="p-description" rows="3" class="orion-input" aria-label="الوصف الكامل"></textarea>
+        <label class="orion-stat-label" for="p-description">{{ t('الوصف الكامل', 'Full description') }}</label>
+        <textarea id="p-description" rows="3" class="orion-input" aria-label="{{ t('الوصف الكامل', 'Full description') }}"></textarea>
       </div>
       <label class="flex items-center gap-2 text-sm">
-        <input id="p-published" type="checkbox" aria-label="منشور في المتجر"> منشور في المتجر
+        <input id="p-published" type="checkbox" aria-label="{{ t('منشور في المتجر', 'Published in store') }}"> {{ t('منشور في المتجر', 'Published in store') }}
       </label>
       <label class="flex items-center gap-2 text-sm">
-        <input id="p-featured" type="checkbox" aria-label="منتج مميز"> منتج مميز
+        <input id="p-featured" type="checkbox" aria-label="{{ t('منتج مميز', 'Featured product') }}"> {{ t('منتج مميز', 'Featured product') }}
       </label>
       <div class="flex gap-2">
-        <button type="submit" class="orion-btn orion-btn-gold flex-1">حفظ المنتج</button>
-        <button type="button" id="btn-cancel" class="orion-btn">إلغاء</button>
+        <button type="submit" class="orion-btn orion-btn-gold flex-1">{{ t('حفظ المنتج', 'Save product') }}</button>
+        <button type="button" id="btn-cancel" class="orion-btn">{{ t('إلغاء', 'Cancel') }}</button>
       </div>
       <p id="product-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
     </form>

@@ -1,3 +1,13 @@
+{% if locale is not defined %}
+{% set _codes = [] %}
+{% for _v in [request.args.get('locale'), request.cookies.get('orion_admin_locale'), request.headers.get('X-Locale')] %}
+{% set _ = _codes.append((((_v or '')|lower).split('-')[0]).split('_')[0]) %}
+{% endfor %}
+{% set locale = _codes[0] if _codes[0] in ['ar','en'] else (_codes[1] if _codes[1] in ['ar','en'] else (_codes[2] if _codes[2] in ['ar','en'] else 'ar')) %}
+{% endif %}
+{% if t is not defined %}
+{% macro t(ar, en) %}{{ en if locale == 'en' else ar }}{% endmacro %}
+{% endif %}
 {% set nav_groups = {
   'dashboard': 'home', 'products': 'home', 'pages': 'home', 'contact': 'home',
   'gateways': 'orders', 'draft_orders': 'orders', 'returns': 'orders', 'bopis': 'orders',
@@ -18,103 +28,103 @@
     <span class="orion-brand-mark orion-brand-mark-sm" aria-hidden="true">A</span>
     <span>
       <strong class="block">{{ platform_settings.platform_name | default('Azadexa') }}</strong>
-      <small class="orion-muted text-xs">{{ 'متجر: ' ~ tenant.name if tenant else 'لوحة المنصة' }}</small>
+      <small class="orion-muted text-xs">{{ (t('متجر: ', 'Store: ') ~ tenant.name) if tenant else t('لوحة المنصة', 'Platform dashboard') }}</small>
     </span>
   </div>
 
-  <nav class="orion-sidebar-nav space-y-1 text-sm flex-1" aria-label="القائمة الجانبية">
+  <nav class="orion-sidebar-nav space-y-1 text-sm flex-1" aria-label="{{ t('القائمة الجانبية', 'Sidebar') }}">
     {% if tenant %}
       {% set active_group = nav_groups.get(active_nav, 'home') %}
 
       <details class="orion-nav-group" {% if active_group == 'home' %}open{% endif %}>
-        <summary class="orion-nav-section">الرئيسية</summary>
+        <summary class="orion-nav-section">{{ t('الرئيسية', 'Home') }}</summary>
         <div class="orion-nav-group-items">
-          {{ nav_link('/admin/store/dashboard', 'لوحة المتجر', 'dashboard') }}
-          {{ nav_link('/admin/store/products', 'المنتجات', 'products') }}
-          {{ nav_link('/admin/store/pages', 'الصفحات', 'pages') }}
-          {{ nav_link('/admin/store/contact', 'رقم واتساب', 'contact') }}
+          {{ nav_link('/admin/store/dashboard', t('لوحة المتجر', 'Store dashboard'), 'dashboard') }}
+          {{ nav_link('/admin/store/products', t('المنتجات', 'Products'), 'products') }}
+          {{ nav_link('/admin/store/pages', t('الصفحات', 'Pages'), 'pages') }}
+          {{ nav_link('/admin/store/contact', t('رقم واتساب', 'WhatsApp number'), 'contact') }}
         </div>
       </details>
 
       <details class="orion-nav-group" {% if active_group == 'orders' %}open{% endif %}>
-        <summary class="orion-nav-section">الطلبات والتنفيذ</summary>
+        <summary class="orion-nav-section">{{ t('الطلبات والتنفيذ', 'Orders & fulfillment') }}</summary>
         <div class="orion-nav-group-items">
-          {{ nav_link('/admin/store/gateways', 'بوابات الدفع', 'gateways') }}
-          {{ nav_link('/admin/store/draft-orders', 'الطلبات المسودة', 'draft_orders') }}
-          {{ nav_link('/admin/store/returns', 'المرتجعات', 'returns') }}
-          {{ nav_link('/admin/store/bopis', 'الاستلام من المتجر', 'bopis') }}
-          {{ nav_link('/admin/store/oms', 'المستودعات والتنفيذ', 'oms') }}
-          {{ nav_link('/admin/store/store-credit', 'رصيد المتجر', 'store_credit') }}
-          {{ nav_link('/admin/store/b2b', 'B2B — الجملة', 'b2b') }}
-          {{ nav_link('/admin/store/bundles', 'الحزم', 'bundles') }}
+          {{ nav_link('/admin/store/gateways', t('بوابات الدفع', 'Payment gateways'), 'gateways') }}
+          {{ nav_link('/admin/store/draft-orders', t('الطلبات المسودة', 'Draft orders'), 'draft_orders') }}
+          {{ nav_link('/admin/store/returns', t('المرتجعات', 'Returns'), 'returns') }}
+          {{ nav_link('/admin/store/bopis', t('الاستلام من المتجر', 'Store pickup'), 'bopis') }}
+          {{ nav_link('/admin/store/oms', t('المستودعات والتنفيذ', 'Warehouses & fulfillment'), 'oms') }}
+          {{ nav_link('/admin/store/store-credit', t('رصيد المتجر', 'Store credit'), 'store_credit') }}
+          {{ nav_link('/admin/store/b2b', t('B2B — الجملة', 'B2B — Wholesale'), 'b2b') }}
+          {{ nav_link('/admin/store/bundles', t('الحزم', 'Bundles'), 'bundles') }}
         </div>
       </details>
 
       <details class="orion-nav-group" {% if active_group == 'finance' %}open{% endif %}>
-        <summary class="orion-nav-section">المالية والفوترة</summary>
+        <summary class="orion-nav-section">{{ t('المالية والفوترة', 'Finance & billing') }}</summary>
         <div class="orion-nav-group-items">
-          {{ nav_link('/admin/store/subscriptions', 'الاشتراكات', 'subscriptions') }}
-          {{ nav_link('/admin/store/vouchers', 'قسائم الخصم', 'vouchers') }}
-          {{ nav_link('/admin/store/tax', 'الضرائب', 'tax') }}
-          {{ nav_link('/admin/store/reconciliation', 'التسوية المالية', 'reconciliation') }}
+          {{ nav_link('/admin/store/subscriptions', t('الاشتراكات', 'Subscriptions'), 'subscriptions') }}
+          {{ nav_link('/admin/store/vouchers', t('قسائم الخصم', 'Discount coupons'), 'vouchers') }}
+          {{ nav_link('/admin/store/tax', t('الضرائب', 'Taxes'), 'tax') }}
+          {{ nav_link('/admin/store/reconciliation', t('التسوية المالية', 'Financial reconciliation'), 'reconciliation') }}
         </div>
       </details>
 
       <details class="orion-nav-group" {% if active_group == 'marketing' %}open{% endif %}>
-        <summary class="orion-nav-section">التسويق والمحتوى</summary>
+        <summary class="orion-nav-section">{{ t('التسويق والمحتوى', 'Marketing & content') }}</summary>
         <div class="orion-nav-group-items">
-          {{ nav_link('/admin/store/metafields', 'البيانات الوصفية', 'metafields') }}
-          {{ nav_link('/admin/store/documents', 'قوالب المستندات', 'documents') }}
-          {{ nav_link('/admin/store/search', 'البحث', 'search') }}
-          {{ nav_link('/admin/store/affiliates', 'المسوقون', 'affiliates') }}
-          {{ nav_link('/admin/store/gift-registries', 'قوائم الهدايا', 'gift_registries') }}
-          {{ nav_link('/admin/store/schema-markup', 'ترميز البيانات المنظّمة', 'schema_markup') }}
-          {{ nav_link('/admin/store/live-chat', 'الدردشة المباشرة', 'live_chat') }}
+          {{ nav_link('/admin/store/metafields', t('البيانات الوصفية', 'Metafields'), 'metafields') }}
+          {{ nav_link('/admin/store/documents', t('قوالب المستندات', 'Document templates'), 'documents') }}
+          {{ nav_link('/admin/store/search', t('البحث', 'Search'), 'search') }}
+          {{ nav_link('/admin/store/affiliates', t('المسوقون', 'Affiliates'), 'affiliates') }}
+          {{ nav_link('/admin/store/gift-registries', t('قوائم الهدايا', 'Gift registries'), 'gift_registries') }}
+          {{ nav_link('/admin/store/schema-markup', t('ترميز البيانات المنظّمة', 'Structured data markup'), 'schema_markup') }}
+          {{ nav_link('/admin/store/live-chat', t('الدردشة المباشرة', 'Live chat'), 'live_chat') }}
         </div>
       </details>
 
       <details class="orion-nav-group" {% if active_group == 'settings' %}open{% endif %}>
-        <summary class="orion-nav-section">الإعدادات والتكاملات</summary>
+        <summary class="orion-nav-section">{{ t('الإعدادات والتكاملات', 'Settings & integrations') }}</summary>
         <div class="orion-nav-group-items">
-          {{ nav_link('/admin/store/import-export', 'استيراد وتصدير', 'import_export') }}
-          {{ nav_link('/admin/store/app-platform', 'منصة التطبيقات', 'app_platform') }}
-          {{ nav_link('/admin/store/feature-flags', 'ميزات المتجر', 'feature_flags') }}
-          {{ nav_link('/admin/store/fraud', 'الاحتيال', 'fraud') }}
-          {{ nav_link('/admin/store/compliance', 'الامتثال', 'compliance') }}
-          {{ nav_link('/admin/store/workflows', 'سير العمل', 'workflows') }}
-          {{ nav_link('/admin/store/accessibility', 'إمكانية الوصول', 'accessibility') }}
-          {{ nav_link('/admin/store/dropship', 'الدروبشيبنج', 'dropship') }}
+          {{ nav_link('/admin/store/import-export', t('استيراد وتصدير', 'Import & export'), 'import_export') }}
+          {{ nav_link('/admin/store/app-platform', t('منصة التطبيقات', 'App platform'), 'app_platform') }}
+          {{ nav_link('/admin/store/feature-flags', t('ميزات المتجر', 'Store features'), 'feature_flags') }}
+          {{ nav_link('/admin/store/fraud', t('الاحتيال', 'Fraud'), 'fraud') }}
+          {{ nav_link('/admin/store/compliance', t('الامتثال', 'Compliance'), 'compliance') }}
+          {{ nav_link('/admin/store/workflows', t('سير العمل', 'Workflows'), 'workflows') }}
+          {{ nav_link('/admin/store/accessibility', t('إمكانية الوصول', 'Accessibility'), 'accessibility') }}
+          {{ nav_link('/admin/store/dropship', t('الدروبشيبنج', 'Dropshipping'), 'dropship') }}
         </div>
       </details>
 
       <details class="orion-nav-group" {% if active_group == 'tools' %}open{% endif %}>
-        <summary class="orion-nav-section">أدوات المطوّر</summary>
+        <summary class="orion-nav-section">{{ t('أدوات المطوّر', 'Developer tools') }}</summary>
         <div class="orion-nav-group-items">
-          {{ nav_link('/admin/store/ui-kit', 'معاينة المكوّنات', 'ui_kit') }}
+          {{ nav_link('/admin/store/ui-kit', t('معاينة المكوّنات', 'Component preview'), 'ui_kit') }}
         </div>
       </details>
     {% else %}
-      <p class="orion-nav-section">المنصة</p>
-      {{ nav_link('/admin/platform/dashboard', 'لوحة المنصة', 'dashboard') }}
-      {{ nav_link('/admin/platform/tenants', 'المتاجر', 'tenants') }}
-      {{ nav_link('/admin/platform/users', 'المستخدمون', 'users') }}
-      {{ nav_link('/admin/platform/settings', 'إعدادات المنصة', 'settings') }}
-      {{ nav_link('/admin/platform/audit', 'تدقيق المنصة', 'audit') }}
-      {{ nav_link('/admin/platform/reconciliation', 'التسوية', 'reconciliation') }}
-      {{ nav_link('/admin/platform/currency', 'العملات وأسعار الصرف', 'currency') }}
+      <p class="orion-nav-section">{{ t('المنصة', 'Platform') }}</p>
+      {{ nav_link('/admin/platform/dashboard', t('لوحة المنصة', 'Platform dashboard'), 'dashboard') }}
+      {{ nav_link('/admin/platform/tenants', t('المتاجر', 'Stores'), 'tenants') }}
+      {{ nav_link('/admin/platform/users', t('المستخدمون', 'Users'), 'users') }}
+      {{ nav_link('/admin/platform/settings', t('إعدادات المنصة', 'Platform settings'), 'settings') }}
+      {{ nav_link('/admin/platform/audit', t('تدقيق المنصة', 'Platform audit'), 'audit') }}
+      {{ nav_link('/admin/platform/reconciliation', t('التسوية', 'Reconciliation'), 'reconciliation') }}
+      {{ nav_link('/admin/platform/currency', t('العملات وأسعار الصرف', 'Currencies & exchange rates'), 'currency') }}
     {% endif %}
 
     {% if tenant %}
     <div class="orion-sidebar-store-link">
       <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="orion-nav-link orion-store-external">
-        رابط المتجر <span aria-hidden="true">↗</span>
+        {{ t('رابط المتجر', 'Store link') }} <span aria-hidden="true">↗</span>
       </a>
     </div>
     {% endif %}
   </nav>
 
   <div class="orion-sidebar-footer mt-4 pt-4 border-t border-slate-700 space-y-1 text-sm">
-    <a href="/admin/profile" class="orion-nav-link{% if active_nav == 'profile' %} is-active{% endif %}"{% if active_nav == 'profile' %} aria-current="page"{% endif %}>الملف الشخصي</a>
-    <a href="/admin/logout" class="orion-nav-link orion-logout">تسجيل الخروج</a>
+    <a href="/admin/profile" class="orion-nav-link{% if active_nav == 'profile' %} is-active{% endif %}"{% if active_nav == 'profile' %} aria-current="page"{% endif %}>{{ t('الملف الشخصي', 'Profile') }}</a>
+    <a href="/admin/logout" class="orion-nav-link orion-logout">{{ t('تسجيل الخروج', 'Logout') }}</a>
   </div>
 </aside>

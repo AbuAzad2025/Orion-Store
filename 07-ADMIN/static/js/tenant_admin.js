@@ -8,19 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
         SafeDOM.clear(statsEl);
         statsEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-4" }, [
           SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
-            SafeDOM.elem("p", { className: "orion-stat-label" }, ["الطلبات"]),
+            SafeDOM.elem("p", { className: "orion-stat-label" }, [OrionI18n.t("الطلبات", "Orders")]),
             SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.orders_total || 0).toLocaleString("ar")])
           ]),
           SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
-            SafeDOM.elem("p", { className: "orion-stat-label" }, ["مدفوعة"]),
+            SafeDOM.elem("p", { className: "orion-stat-label" }, [OrionI18n.t("مدفوعة", "Paid")]),
             SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.orders_paid || 0).toLocaleString("ar")])
           ]),
           SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
-            SafeDOM.elem("p", { className: "orion-stat-label" }, ["المنتجات"]),
+            SafeDOM.elem("p", { className: "orion-stat-label" }, [OrionI18n.t("المنتجات", "Products")]),
             SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.products_total || 0).toLocaleString("ar")])
           ]),
           SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
-            SafeDOM.elem("p", { className: "orion-stat-label" }, ["منشورة"]),
+            SafeDOM.elem("p", { className: "orion-stat-label" }, [OrionI18n.t("منشورة", "Published")]),
             SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.products_published || 0).toLocaleString("ar")])
           ])
         ]));
@@ -50,20 +50,20 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!m.needs_credentials) {
             const notes = SafeDOM.elem("textarea", {
               className: "pm-notes border rounded px-2 py-1 text-sm w-full mb-2",
-              rows: "2", placeholder: "تعليمات تظهر للزبون عند الدفع"
+              rows: "2", placeholder: OrionI18n.t("تعليمات تظهر للزبون عند الدفع", "Instructions shown to the customer at checkout")
             });
             notes.value = m.instructions || "";
             parts.push(notes);
           }
-          const status = SafeDOM.elem("span", { className: "pm-status text-xs text-gray-500" }, [m.is_enabled ? "مفعّل" : "معطّل"]);
-          const save = SafeDOM.elem("button", { type: "button", className: "pm-save rounded bg-emerald-600 px-3 py-1 text-white text-sm", "data-code": m.code }, ["حفظ"]);
+          const status = SafeDOM.elem("span", { className: "pm-status text-xs text-gray-500" }, [m.is_enabled ? OrionI18n.t("مفعّل", "Enabled") : OrionI18n.t("معطّل", "Disabled")]);
+          const save = SafeDOM.elem("button", { type: "button", className: "pm-save rounded bg-emerald-600 px-3 py-1 text-white text-sm", "data-code": m.code }, [OrionI18n.t("حفظ", "Save")]);
           parts.push(nameInput, status, save);
           methodsEl.appendChild(SafeDOM.elem("div", { className: "rounded border p-3 bg-gray-50", "data-method": m.code }, parts));
         });
         methodsEl.querySelectorAll(".pm-toggle").forEach((el) => {
           el.addEventListener("change", () => {
             const wrap = el.closest("[data-method]");
-            wrap.querySelector(".pm-status").textContent = el.checked ? "مفعّل" : "معطّل";
+            wrap.querySelector(".pm-status").textContent = el.checked ? OrionI18n.t("مفعّل", "Enabled") : OrionI18n.t("معطّل", "Disabled");
           });
         });
         methodsEl.querySelectorAll(".pm-save").forEach((btn) => {
@@ -76,8 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
               instructions: notes ? notes.value.trim() : "",
               is_enabled: wrap.querySelector(".pm-toggle").checked
             }).then(() => {
-              btn.textContent = "تم الحفظ";
-              setTimeout(() => { btn.textContent = "حفظ"; }, 1500);
+              btn.textContent = OrionI18n.t("تم الحفظ", "Saved");
+              setTimeout(() => { btn.textContent = OrionI18n.t("حفظ", "Save"); }, 1500);
             }).catch((err) => alert(err.message));
           });
         });
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
         is_enabled: true,
       })
         .then(() => {
-          alert("تم ربط PayPal");
+          alert(OrionI18n.t("تم ربط PayPal", "PayPal connected"));
           location.reload();
         })
         .catch((err) => alert(err.message));
@@ -118,15 +118,15 @@ document.addEventListener("DOMContentLoaded", () => {
           const wrap = SafeDOM.elem("div", { className: "rounded border p-3 mb-3 bg-gray-50", "data-bnpl": p.provider }, [
             SafeDOM.elem("div", { className: "flex justify-between items-center mb-2" }, [
               SafeDOM.elem("strong", null, [p.provider]),
-              SafeDOM.elem("span", { className: `text-xs ${p.is_enabled ? "text-green-700" : "text-gray-500"}` }, [p.is_enabled ? "مفعّل" : "معطّل"])
+              SafeDOM.elem("span", { className: `text-xs ${p.is_enabled ? "text-green-700" : "text-gray-500"}` }, [p.is_enabled ? OrionI18n.t("مفعّل", "Enabled") : OrionI18n.t("معطّل", "Disabled")])
             ]),
             SafeDOM.elem("input", { type: "text", className: "bnpl-merchant border rounded px-2 py-1 text-sm w-full mb-2", placeholder: "Merchant ID", value: p.merchant_id || "" }),
-            SafeDOM.elem("input", { type: "password", className: "bnpl-key border rounded px-2 py-1 text-sm w-full mb-2", placeholder: "API Key (اتركه فارغاً للإبقاء)" }),
+            SafeDOM.elem("input", { type: "password", className: "bnpl-key border rounded px-2 py-1 text-sm w-full mb-2", placeholder: OrionI18n.t("API Key (اتركه فارغاً للإبقاء)", "API Key (leave blank to keep)") }),
             SafeDOM.elem("label", { className: "inline-flex items-center gap-2 text-sm mb-2" }, [
               SafeDOM.elem("input", sandboxAttrs),
-              " وضع الاختبار"
+              OrionI18n.t(" وضع الاختبار", " Test mode")
             ]),
-            SafeDOM.elem("button", { type: "button", className: "bnpl-save rounded bg-indigo-600 px-3 py-1 text-white text-sm", "data-provider": p.provider }, ["حفظ"])
+            SafeDOM.elem("button", { type: "button", className: "bnpl-save rounded bg-indigo-600 px-3 py-1 text-white text-sm", "data-provider": p.provider }, [OrionI18n.t("حفظ", "Save")])
           ]);
           bnplEl.appendChild(wrap);
         });
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
               is_sandbox: wrap.querySelector(".bnpl-sandbox").checked,
             })
               .then(() => {
-                alert("تم الحفظ");
+                alert(OrionI18n.t("تم الحفظ", "Saved"));
                 location.reload();
               })
               .catch((err) => alert(err.message));
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         if (!data.templates.length) {
           SafeDOM.clear(templatesEl);
-          templatesEl.appendChild(SafeDOM.emptyMsg("لا توجد قوالب بعد."));
+          templatesEl.appendChild(SafeDOM.emptyMsg(OrionI18n.t("لا توجد قوالب بعد.", "No templates yet.")));
           return;
         }
         SafeDOM.clear(templatesEl);
@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
         await OrionUI.withLoading(saveBtn, () =>
           OrionAPI.put("/tenant/document-templates/invoice", { body_html: body })
         );
-        if (msg) msg.textContent = "تم حفظ القالب بنجاح";
+        if (msg) msg.textContent = OrionI18n.t("تم حفظ القالب بنجاح", "Template saved successfully");
         OrionAPI.get("/tenant/document-templates").then((data) => {
           const el = document.getElementById("templates-list");
           if (!el) return;
@@ -203,17 +203,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const flagsEl = document.getElementById("feature-flags-list");
   const flagNamesAr = {
-    ai_enabled: "المساعد الذكي",
-    booking_enabled: "الحجوزات",
-    multi_language: "تعدد اللغات",
-    subscriptions_enabled: "الاشتراكات",
-    bopis_enabled: "الاستلام من المتجر",
-    store_credit_enabled: "رصيد المتجر",
-    draft_orders_enabled: "الطلبات المسودة",
-    affiliates_enabled: "المسوقون",
-    gift_registries_enabled: "قوائم الهدايا",
-    dropship_enabled: "الدروبشيبنج",
-    live_chat_enabled: "الدردشة المباشرة"
+    ai_enabled: OrionI18n.t("المساعد الذكي", "AI Assistant"),
+    booking_enabled: OrionI18n.t("الحجوزات", "Bookings"),
+    multi_language: OrionI18n.t("تعدد اللغات", "Multi-language"),
+    subscriptions_enabled: OrionI18n.t("الاشتراكات", "Subscriptions"),
+    bopis_enabled: OrionI18n.t("الاستلام من المتجر", "Store Pickup"),
+    store_credit_enabled: OrionI18n.t("رصيد المتجر", "Store Credit"),
+    draft_orders_enabled: OrionI18n.t("الطلبات المسودة", "Draft Orders"),
+    affiliates_enabled: OrionI18n.t("المسوقون", "Affiliates"),
+    gift_registries_enabled: OrionI18n.t("قوائم الهدايا", "Gift Registries"),
+    dropship_enabled: OrionI18n.t("الدروبشيبنج", "Dropshipping"),
+    live_chat_enabled: OrionI18n.t("الدردشة المباشرة", "Live Chat")
   };
   if (flagsEl) {
     OrionAPI.get("/tenant/feature-flags")
@@ -223,33 +223,33 @@ document.addEventListener("DOMContentLoaded", () => {
           const checkboxAttrs = { type: "checkbox", "data-flag-code": f.code };
           if (f.value) checkboxAttrs.checked = "";
           const overrideSection = f.override_reason ? SafeDOM.elem("div", { className: "mt-2 text-xs text-gray-500 border-t pt-2" }, [
-            SafeDOM.elem("span", { className: "font-medium" }, ["السبب:"]),
+            SafeDOM.elem("span", { className: "font-medium" }, [OrionI18n.t("السبب:", "Reason:")]),
             ` ${f.override_reason}`,
             f.override_set_by_name ? SafeDOM.elem("span", { className: "text-gray-400 mr-2" }, [`— ${f.override_set_by_name}`]) : null
           ]) : null;
           const removeSection = f.has_override ? SafeDOM.elem("div", { className: "mt-2 text-right" }, [
-            SafeDOM.elem("button", { className: "remove-override text-xs text-red-500", "data-flag-code": f.code }, ["إزالة التخصيص"])
+            SafeDOM.elem("button", { className: "remove-override text-xs text-red-500", "data-flag-code": f.code }, [OrionI18n.t("إزالة التخصيص", "Remove override")])
           ]) : null;
           const flagWrap = SafeDOM.elem("div", { className: "rounded border p-3 bg-white", "data-flag": f.code }, [
             SafeDOM.elem("div", { className: "flex items-center justify-between" }, [
               SafeDOM.elem("div", null, [
                 SafeDOM.elem("strong", null, [flagNamesAr[f.code] || f.name]),
                 SafeDOM.elem("p", { className: "text-xs text-gray-500" }, [`${f.code} — ${f.description || ""}`]),
-                SafeDOM.elem("p", { className: "text-xs text-gray-400 mt-1" }, [`نسبة النشر: ${f.rollout_percent}%`])
+                SafeDOM.elem("p", { className: "text-xs text-gray-400 mt-1" }, [`${OrionI18n.t("نسبة النشر", "Rollout")}: ${f.rollout_percent}%`])
               ]),
               SafeDOM.elem("div", { className: "flex items-center gap-3" }, [
-                f.has_override ? SafeDOM.elem("span", { className: "text-xs text-amber-600" }, ["مخصّص"]) : SafeDOM.elem("span", { className: "text-xs text-gray-400" }, ["تلقائي"]),
+                f.has_override ? SafeDOM.elem("span", { className: "text-xs text-amber-600" }, [OrionI18n.t("مخصّص", "Custom")]) : SafeDOM.elem("span", { className: "text-xs text-gray-400" }, [OrionI18n.t("تلقائي", "Automatic")]),
                 SafeDOM.elem("label", { className: "inline-flex items-center gap-2" }, [
                   SafeDOM.elem("input", checkboxAttrs),
-                  SafeDOM.elem("span", { className: "text-sm" }, [f.value ? "مفعّل" : "معطّل"])
+                  SafeDOM.elem("span", { className: "text-sm" }, [f.value ? OrionI18n.t("مفعّل", "Enabled") : OrionI18n.t("معطّل", "Disabled")])
                 ])
               ])
             ]),
             overrideSection,
             removeSection,
             SafeDOM.elem("div", { className: "reason-field mt-2 hidden", "data-flag-code": f.code }, [
-              SafeDOM.elem("input", { type: "text", className: "reason-input w-full border rounded px-2 py-1 text-xs", placeholder: "سبب التغيير (اختياري)" }),
-              SafeDOM.elem("button", { className: "save-override mt-1 text-xs rounded bg-blue-600 px-3 py-1 text-white", "data-flag-code": f.code }, ["حفظ مع السبب"])
+              SafeDOM.elem("input", { type: "text", className: "reason-input w-full border rounded px-2 py-1 text-xs", placeholder: OrionI18n.t("سبب التغيير (اختياري)", "Reason for change (optional)") }),
+              SafeDOM.elem("button", { className: "save-override mt-1 text-xs rounded bg-blue-600 px-3 py-1 text-white", "data-flag-code": f.code }, [OrionI18n.t("حفظ مع السبب", "Save with reason")])
             ])
           ]);
           flagsEl.appendChild(flagWrap);
@@ -278,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
         flagsEl.querySelectorAll(".remove-override").forEach((btn) => {
           btn.addEventListener("click", () => {
             const code = btn.getAttribute("data-flag-code");
-            if (!confirm("إزالة التخصيص لهذه الميزة؟")) return;
+            if (!confirm(OrionI18n.t("إزالة التخصيص لهذه الميزة؟", "Remove the override for this feature?"))) return;
             OrionAPI.put(`/tenant/feature-flags/${code}`, { value: null })
               .then(() => location.reload())
               .catch((err) => alert(err.message));

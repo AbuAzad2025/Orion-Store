@@ -2,18 +2,18 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">قوائم الهدايا</h2>
+    <h2 class="orion-title mb-3">{{ t('قوائم الهدايا', 'Gift Registries') }}</h2>
     <form id="gift-registry-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
-      <input name="registry_name" type="text" placeholder="اسم القائمة" required>
-      <input name="event_type" type="text" placeholder="نوع المناسبة">
-      <input name="event_date" type="date" placeholder="تاريخ المناسبة">
+      <input name="customer_email" type="email" placeholder="{{ t('البريد الإلكتروني', 'Email') }}" required>
+      <input name="registry_name" type="text" placeholder="{{ t('اسم القائمة', 'Registry name') }}" required>
+      <input name="event_type" type="text" placeholder="{{ t('نوع المناسبة', 'Event type') }}">
+      <input name="event_date" type="date" placeholder="{{ t('تاريخ المناسبة', 'Event date') }}">
       <label class="inline-flex items-center gap-2">
-        <input name="is_public" type="checkbox" checked aria-label="عامة"> عامة
+        <input name="is_public" type="checkbox" checked aria-label="{{ t('عامة', 'Public') }}"> {{ t('عامة', 'Public') }}
       </label>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إنشاء قائمة</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء قائمة', 'Create registry') }}</button>
     </form>
-    <div id="gift-registries-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="gift-registries-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 </div>
 {% endblock %}

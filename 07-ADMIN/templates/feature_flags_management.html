@@ -1,7 +1,7 @@
 {% extends "admin_base.html" %}
 {% block content %}
-<p class="orion-muted text-sm mb-4">فعّل ميزات المتاجر من مكان واحد.</p>
-<div id="feature-flags-list" class="space-y-3 text-gray-500">جارٍ التحميل…</div>
+<p class="orion-muted text-sm mb-4">{{ t('فعّل ميزات المتاجر من مكان واحد.', 'Enable store features from one place.') }}</p>
+<div id="feature-flags-list" class="space-y-3 text-gray-500">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/tenant_admin.js') }}"></script>

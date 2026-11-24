@@ -2,33 +2,33 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">مرادفات البحث</h2>
+    <h2 class="orion-title mb-3">{{ t('مرادفات البحث', 'Search Synonyms') }}</h2>
     <form id="search-synonym-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="term" type="text" placeholder="الكلمة" required>
-      <input name="synonyms" type="text" placeholder="المرادفات (مفصولة بفواصل)" required>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة مرادف</button>
+      <input name="term" type="text" placeholder="{{ t('الكلمة', 'Term') }}" required>
+      <input name="synonyms" type="text" placeholder="{{ t('المرادفات (مفصولة بفواصل)', 'Synonyms (comma-separated)') }}" required>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة مرادف', 'Add synonym') }}</button>
     </form>
-    <div id="search-synonyms-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="search-synonyms-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">إعادة توجيه البحث</h2>
+    <h2 class="orion-title mb-3">{{ t('إعادة توجيه البحث', 'Search Redirects') }}</h2>
     <form id="search-redirect-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="query_term" type="text" placeholder="كلمة البحث" required>
-      <input name="redirect_url" type="url" placeholder="رابط التوجيه" required>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة توجيه</button>
+      <input name="query_term" type="text" placeholder="{{ t('كلمة البحث', 'Search term') }}" required>
+      <input name="redirect_url" type="url" placeholder="{{ t('رابط التوجيه', 'Redirect URL') }}" required>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة توجيه', 'Add redirect') }}</button>
     </form>
-    <div id="search-redirects-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="search-redirects-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">قواعد التعزيز (Boost)</h2>
+    <h2 class="orion-title mb-3">{{ t('قواعد التعزيز (Boost)', 'Boost Rules') }}</h2>
     <form id="search-boost-form" class="grid gap-2 max-w-md text-sm">
-      <input name="product_id" type="number" placeholder="معرف المنتج">
-      <input name="category_id" type="number" placeholder="معرف التصنيف">
-      <input name="query_keyword" type="text" placeholder="كلمة مفتاحية">
-      <input name="boost_factor" type="number" placeholder="معامل التعزيز" value="1">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة قاعدة</button>
+      <input name="product_id" type="number" placeholder="{{ t('معرف المنتج', 'Product ID') }}">
+      <input name="category_id" type="number" placeholder="{{ t('معرف التصنيف', 'Category ID') }}">
+      <input name="query_keyword" type="text" placeholder="{{ t('كلمة مفتاحية', 'Keyword') }}">
+      <input name="boost_factor" type="number" placeholder="{{ t('معامل التعزيز', 'Boost factor') }}" value="1">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة قاعدة', 'Add rule') }}</button>
     </form>
-    <div id="search-boosts-list" class="orion-muted text-sm mt-3">جارٍ التحميل…</div>
+    <div id="search-boosts-list" class="orion-muted text-sm mt-3">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 </div>
 {% endblock %}

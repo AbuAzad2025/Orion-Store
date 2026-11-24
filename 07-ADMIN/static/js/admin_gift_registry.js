@@ -6,15 +6,15 @@ const OrionAdminGiftRegistry = {
     try {
       const data = await OrionAPI.get("/gift-registries");
       const rows = data.registries || [];
-      if (!rows.length) { el.textContent = "لا توجد قوائم."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد قوائم.', 'No registries found.'); return; }
       SafeDOM.clear(el);
       for (const r of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           SafeDOM.elem("strong", {}, [r.registry_name]),
-          " — ", r.customer_email, " — ", r.event_type || "", " — ", r.is_public ? "عامة" : "خاصة"
+          " — ", r.customer_email, " — ", r.event_type || "", " — ", r.is_public ? OrionI18n.t('عامة', 'Public') : OrionI18n.t('خاصة', 'Private')
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {

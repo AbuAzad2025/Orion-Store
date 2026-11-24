@@ -1,4 +1,7 @@
 /** Unified /api/v1 client for admin UIs — loading, errors, dedupe, timeout. */
+/** Shared bilingual helper — English when the document locale is English, Arabic otherwise. */
+const OrionI18n = { t(ar, en) { return (document.documentElement.lang || 'ar').split('_')[0].toLowerCase().startsWith('en') ? en : ar; } };
+
 const OrionAPI = {
   timeoutMs: 15000,
   _inflight: new Map(),
@@ -26,7 +29,7 @@ const OrionAPI = {
       const message = data.error || data.message || data.detail;
       if (message) return String(message);
     }
-    return `طلب فشل (${status})`;
+    return OrionI18n.t(`طلب فشل (${status})`, `Request failed (${status})`);
   },
 
   notifyError(error, path) {
@@ -67,7 +70,7 @@ const OrionAPI = {
         return data;
       } catch (error) {
         if (error.name === "AbortError") {
-          const timeoutError = new Error("انتهت مهلة الطلب — حاول مرة أخرى");
+          const timeoutError = new Error(OrionI18n.t("انتهت مهلة الطلب — حاول مرة أخرى", "Request timed out — please try again"));
           timeoutError.status = 408;
           this.notifyError(timeoutError, path);
           throw timeoutError;

@@ -6,7 +6,7 @@ const OrionAdminFraud = {
     try {
       const data = await OrionAPI.get("/fraud/rules");
       const rows = data.rules || [];
-      if (!rows.length) { el.textContent = "لا توجد قواعد."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد قواعد.', 'No rules found.'); return; }
       SafeDOM.clear(el);
       for (const r of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
@@ -14,7 +14,7 @@ const OrionAdminFraud = {
           " — ", r.rule_type, " ", r.operator, " ", r.threshold_value, " → ", r.action
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {
@@ -40,7 +40,7 @@ const OrionAdminFraud = {
           order_id: parseInt(fd.get("order_id")), risk_score: parseInt(fd.get("risk_score") || "0"),
         });
         reviewForm.reset();
-        alert("تمت المراجعة");
+        alert(OrionI18n.t('تمت المراجعة', 'Reviewed'));
       });
     }
     OrionAdminFraud.loadRules();

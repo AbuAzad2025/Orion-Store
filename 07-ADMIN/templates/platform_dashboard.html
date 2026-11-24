@@ -2,59 +2,59 @@
 {% block content %}
 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" aria-live="polite">
   <div class="orion-card orion-stat">
-    <span class="orion-stat-label">إجمالي المتاجر</span>
+    <span class="orion-stat-label">{{ t('إجمالي المتاجر', 'Total Stores') }}</span>
     <span id="stat-tenants" class="orion-stat-value"><span class="orion-skeleton"></span></span>
   </div>
   <div class="orion-card orion-stat">
-    <span class="orion-stat-label">المتاجر النشطة</span>
+    <span class="orion-stat-label">{{ t('المتاجر النشطة', 'Active Stores') }}</span>
     <span id="stat-active-tenants" class="orion-stat-value"><span class="orion-skeleton"></span></span>
   </div>
   <div class="orion-card orion-stat">
-    <span class="orion-stat-label">إجمالي المستخدمين</span>
+    <span class="orion-stat-label">{{ t('إجمالي المستخدمين', 'Total Users') }}</span>
     <span id="stat-users" class="orion-stat-value"><span class="orion-skeleton"></span></span>
   </div>
   <div class="orion-card orion-stat">
-    <span class="orion-stat-label">المستخدمون النشطون</span>
+    <span class="orion-stat-label">{{ t('المستخدمون النشطون', 'Active Users') }}</span>
     <span id="stat-active-users" class="orion-stat-value"><span class="orion-skeleton"></span></span>
   </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
   <a href="/admin/platform/tenants" class="bg-white rounded border p-4 hover:shadow transition">
-    <h3 class="font-semibold mb-1">إدارة المتاجر</h3>
-    <p class="text-sm text-gray-500">إضافة، تعديل، حذف، تعليق المتاجر</p>
+    <h3 class="font-semibold mb-1">{{ t('إدارة المتاجر', 'Store Management') }}</h3>
+    <p class="text-sm text-gray-500">{{ t('إضافة، تعديل، حذف، تعليق المتاجر', 'Add, edit, delete, suspend stores') }}</p>
   </a>
   <a href="/admin/platform/users" class="bg-white rounded border p-4 hover:shadow transition">
-    <h3 class="font-semibold mb-1">إدارة المستخدمين</h3>
-    <p class="text-sm text-gray-500">إضافة مديرين للمتاجر ومديرين للمنصة</p>
+    <h3 class="font-semibold mb-1">{{ t('إدارة المستخدمين', 'User Management') }}</h3>
+    <p class="text-sm text-gray-500">{{ t('إضافة مديرين للمتاجر ومديرين للمنصة', 'Add store admins and platform admins') }}</p>
   </a>
   <a href="/admin/platform/settings" class="bg-white rounded border p-4 hover:shadow transition">
-    <h3 class="font-semibold mb-1">إعدادات المنصة</h3>
-    <p class="text-sm text-gray-500">اسم المنصة، العملة، اللغة، معلومات المالك</p>
+    <h3 class="font-semibold mb-1">{{ t('إعدادات المنصة', 'Platform Settings') }}</h3>
+    <p class="text-sm text-gray-500">{{ t('اسم المنصة، العملة، اللغة، معلومات المالك', 'Platform name, currency, language, owner info') }}</p>
   </a>
 </div>
 
 <div class="orion-card mt-6" aria-live="polite">
   <div class="flex items-center justify-between gap-3 mb-4">
-    <h2 class="orion-title text-lg">أحدث المتاجر</h2>
-    <a href="/admin/platform/tenants" class="orion-header-link text-sm">عرض الكل ←</a>
+    <h2 class="orion-title text-lg">{{ t('أحدث المتاجر', 'Recent Stores') }}</h2>
+    <a href="/admin/platform/tenants" class="orion-header-link text-sm">{{ t('عرض الكل ←', 'View All ←') }}</a>
   </div>
   {% if stores %}
   <table class="orion-table w-full text-sm">
-    <thead><tr><th>المتجر</th><th>المعرّف</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+    <thead><tr><th>{{ t('المتجر', 'Store') }}</th><th>{{ t('المعرّف', 'Slug') }}</th><th>{{ t('الحالة', 'Status') }}</th><th>{{ t('الإجراءات', 'Actions') }}</th></tr></thead>
     <tbody>
       {% for store in stores %}
       <tr>
         <td class="font-semibold">{{ store.name }}</td>
         <td dir="ltr">{{ store.slug }}</td>
-        <td>{{ 'نشط' if store.is_active and not store.deleted_at else 'موقوف' }}</td>
-        <td><a href="/admin/platform/stores/{{ store.id }}/finance" class="orion-header-link">التقرير المالي</a></td>
+        <td>{{ t('نشط', 'Active') if store.is_active and not store.deleted_at else t('موقوف', 'Suspended') }}</td>
+        <td><a href="/admin/platform/stores/{{ store.id }}/finance" class="orion-header-link">{{ t('التقرير المالي', 'Financial Report') }}</a></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
-  <p class="orion-muted">لا توجد متاجر بعد.</p>
+  <p class="orion-muted">{{ t('لا توجد متاجر بعد.', 'No stores yet.') }}</p>
   {% endif %}
 </div>
 {% endblock %}

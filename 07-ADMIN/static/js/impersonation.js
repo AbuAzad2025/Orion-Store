@@ -10,18 +10,18 @@
     if (exiting) return;
     exiting = true;
     exitBtn.disabled = true;
-    exitBtn.textContent = "جاري الخروج...";
+    exitBtn.textContent = OrionI18n.t('جاري الخروج...', 'Exiting...');
 
     try {
       await OrionAPI.post("/end");
       window.location.reload();
     } catch (e) {
       console.error("Exit impersonation error:", e);
-      alert("حدث خطأ غير متوقع");
+      alert(OrionI18n.t('حدث خطأ غير متوقع', 'An unexpected error occurred'));
     } finally {
       exiting = false;
       exitBtn.disabled = false;
-      exitBtn.textContent = "إنهاء انتحال الهوية";
+      exitBtn.textContent = OrionI18n.t('إنهاء انتحال الهوية', 'End impersonation');
     }
   }
 

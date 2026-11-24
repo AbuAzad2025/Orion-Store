@@ -6,14 +6,14 @@ const OrionAdminCompliance = {
     try {
       const data = await OrionAPI.get("/compliance/consent");
       const rows = data.consent_records || [];
-      if (!rows.length) { el.textContent = "لا توجد سجلات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد سجلات.', 'No records.'); return; }
       SafeDOM.clear(el);
       for (const c of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          c.customer_email, " — ", c.consent_type, " — ", c.granted ? "ممنوحة" : "ملغاة"
+          c.customer_email, " — ", c.consent_type, " — ", c.granted ? OrionI18n.t('ممنوحة', 'Granted') : OrionI18n.t('ملغاة', 'Revoked')
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadDSR() {
@@ -22,19 +22,19 @@ const OrionAdminCompliance = {
     try {
       const data = await OrionAPI.get("/compliance/data-requests");
       const rows = data.data_requests || [];
-      if (!rows.length) { el.textContent = "لا توجد طلبات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد طلبات.', 'No requests.'); return; }
       SafeDOM.clear(el);
       for (const r of rows) {
         const actions = SafeDOM.elem("span", { className: "inline-flex gap-2 ms-3" }, []);
         if (["export", "delete", "rectify"].includes(r.request_type) && r.status !== "completed") {
           const url = r.request_type === "export" ? "export"
             : r.request_type === "delete" ? "execute-delete" : "rectify";
-          const label = r.request_type === "export" ? "تصدير"
-            : r.request_type === "delete" ? "تنفيذ الحذف" : "تنفيذ التصحيح";
+          const label = r.request_type === "export" ? OrionI18n.t('تصدير', 'Export')
+            : r.request_type === "delete" ? OrionI18n.t('تنفيذ الحذف', 'Execute deletion') : OrionI18n.t('تنفيذ التصحيح', 'Execute rectification');
           actions.appendChild(SafeDOM.actionBtn(label, "orion-btn", async () => {
             try {
               await OrionAPI.post(`/compliance/data-requests/${r.id}/${url}`);
-              OrionUI.toast("تم تنفيذ الطلب", "success");
+              OrionUI.toast(OrionI18n.t('تم تنفيذ الطلب', 'Request executed'), "success");
               OrionAdminCompliance.loadDSR();
             } catch (err) { OrionUI.toast(err.message, "error"); }
           }));
@@ -44,7 +44,7 @@ const OrionAdminCompliance = {
           actions
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadCookieSettings() {
@@ -53,12 +53,12 @@ const OrionAdminCompliance = {
     try {
       const data = await OrionAPI.get("/compliance/cookie-settings");
       const s = data.cookie_settings;
-      if (!s) { el.textContent = "لا توجد إعدادات."; return; }
+      if (!s) { el.textContent = OrionI18n.t('لا توجد إعدادات.', 'No settings.'); return; }
       SafeDOM.clear(el);
       el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-        s.banner_message || "بدون نص", " — ", s.is_active ? "مفعّل" : "معطّل"
+        s.banner_message || OrionI18n.t('بدون نص', 'No text'), " — ", s.is_active ? OrionI18n.t('مفعّل', 'Active') : OrionI18n.t('معطّل', 'Disabled')
       ]));
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadSSO() {
@@ -67,14 +67,14 @@ const OrionAdminCompliance = {
     try {
       const data = await OrionAPI.get("/compliance/sso");
       const rows = data.sso_providers || [];
-      if (!rows.length) { el.textContent = "لا توجد مزودين."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد مزودين.', 'No providers.'); return; }
       SafeDOM.clear(el);
       for (const p of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          p.provider_type, " — ", p.issuer_url || "بدون issuer"
+          p.provider_type, " — ", p.issuer_url || OrionI18n.t('بدون issuer', 'No issuer')
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async ssoExchange(providerCode, externalEmail, tenantId) {
@@ -147,7 +147,7 @@ const OrionAdminCompliance = {
         if (out) {
           SafeDOM.clear(out);
           out.appendChild(SafeDOM.elem("span", {}, [
-            result && result.user ? result.user.email : "تم تسجيل الدخول"
+            result && result.user ? result.user.email : OrionI18n.t('تم تسجيل الدخول', 'Logged in')
           ]));
         }
         ssoExchangeForm.reset();

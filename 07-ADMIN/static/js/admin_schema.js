@@ -6,14 +6,14 @@ const OrionAdminSchema = {
     try {
       const data = await OrionAPI.get("/schema-markup");
       const rows = data.markups || [];
-      if (!rows.length) { el.textContent = "لا توجد إعدادات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد إعدادات.', 'No settings found.'); return; }
       SafeDOM.clear(el);
       for (const m of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          "منتج #", m.product_id, " — ", m.schema_type
+          OrionI18n.t('منتج #', 'Product #'), m.product_id, " — ", m.schema_type
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {

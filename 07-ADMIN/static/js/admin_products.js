@@ -7,7 +7,7 @@ const OrionAdminProducts = {
       const data = await OrionAPI.get("/categories/");
       const current = select.value;
       SafeDOM.clear(select);
-      select.appendChild(SafeDOM.elem("option", { value: "" }, ["بدون تصنيف"]));
+      select.appendChild(SafeDOM.elem("option", { value: "" }, [OrionI18n.t('بدون تصنيف', 'No category')]));
       for (const category of data.categories || []) {
         select.appendChild(
           SafeDOM.elem("option", { value: category.id }, [category.name])
@@ -26,7 +26,7 @@ const OrionAdminProducts = {
       const data = await OrionAPI.get("/brands/");
       const current = select.value;
       SafeDOM.clear(select);
-      select.appendChild(SafeDOM.elem("option", { value: "" }, ["بدون علامة"]));
+      select.appendChild(SafeDOM.elem("option", { value: "" }, [OrionI18n.t('بدون علامة', 'No brand')]));
       for (const brand of data.brands || []) {
         select.appendChild(SafeDOM.elem("option", { value: brand.id }, [brand.name]));
       }
@@ -42,7 +42,7 @@ const OrionAdminProducts = {
       const products = data.products || [];
       SafeDOM.clear(list);
       if (!products.length) {
-        list.appendChild(SafeDOM.elem("p", { className: "orion-muted" }, ["لا توجد منتجات بعد."]));
+        list.appendChild(SafeDOM.elem("p", { className: "orion-muted" }, [OrionI18n.t('لا توجد منتجات بعد.', 'No products yet.')]));
         return;
       }
       for (const product of products) {
@@ -52,19 +52,19 @@ const OrionAdminProducts = {
               alt: product.name,
               className: "w-12 h-12 object-cover rounded border border-slate-700",
             })
-          : SafeDOM.elem("span", { className: "orion-muted text-xs" }, ["لا صورة"]);
+          : SafeDOM.elem("span", { className: "orion-muted text-xs" }, [OrionI18n.t('لا صورة', 'No image')]);
         const info = SafeDOM.elem("div", { className: "flex-1" }, [
           SafeDOM.elem("div", { className: "font-semibold" }, [product.name]),
           SafeDOM.elem("div", { className: "orion-muted text-xs" }, [
-            `${product.price} ₪ · مخزون: ${product.quantity} · ${product.is_published ? "منشور" : "مخفي"}`,
+            `${product.price} ₪ · ${OrionI18n.t('مخزون', 'Stock')}: ${product.quantity} · ${product.is_published ? OrionI18n.t('منشور', 'Published') : OrionI18n.t('مخفي', 'Hidden')}`,
           ]),
         ]);
-        const edit = SafeDOM.actionBtn("تعديل", "orion-btn", () => this.fillForm(product));
-        const remove = SafeDOM.actionBtn("حذف", "orion-btn", async () => {
-          if (!OrionUI.confirmDanger(`حذف "${product.name}"؟`)) return;
+        const edit = SafeDOM.actionBtn(OrionI18n.t('تعديل', 'Edit'), "orion-btn", () => this.fillForm(product));
+        const remove = SafeDOM.actionBtn(OrionI18n.t('حذف', 'Delete'), "orion-btn", async () => {
+          if (!OrionUI.confirmDanger(`${OrionI18n.t('حذف', 'Delete')} "${product.name}"?`)) return;
           try {
             await OrionAPI.delete(`/products/${product.public_id}`);
-            OrionUI.toast("تم حذف المنتج", "success");
+            OrionUI.toast(OrionI18n.t('تم حذف المنتج', 'Product deleted'), "success");
             this.loadProducts();
           } catch (err) {
             OrionUI.toast(err.message, "error");
@@ -86,7 +86,7 @@ const OrionAdminProducts = {
 
   fillForm(product) {
     document.getElementById("product-edit-id").value = product.public_id || "";
-    document.getElementById("form-title").textContent = "تعديل المنتج";
+    document.getElementById("form-title").textContent = OrionI18n.t('تعديل المنتج', 'Edit product');
     document.getElementById("p-name").value = product.name || "";
     document.getElementById("p-slug").value = product.slug || "";
     document.getElementById("p-price").value = product.price || "";
@@ -105,7 +105,7 @@ const OrionAdminProducts = {
   clearForm() {
     document.getElementById("product-form")?.reset();
     document.getElementById("product-edit-id").value = "";
-    document.getElementById("form-title").textContent = "إضافة منتج";
+    document.getElementById("form-title").textContent = OrionI18n.t('إضافة منتج', 'Add product');
     document.getElementById("p-quantity").value = "0";
   },
 
@@ -146,7 +146,7 @@ const OrionAdminProducts = {
             : OrionAPI.post("/products/", body)
         );
         this.clearForm();
-        msg.textContent = editId ? "تم تعديل المنتج" : "تمت إضافة المنتج";
+        msg.textContent = editId ? OrionI18n.t('تم تعديل المنتج', 'Product updated') : OrionI18n.t('تمت إضافة المنتج', 'Product added');
         OrionUI.toast(msg.textContent, "success");
         this.loadProducts();
       } catch (err) {

@@ -2,35 +2,35 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">قواعد الاحتيال</h2>
+    <h2 class="orion-title mb-3">{{ t('قواعد الاحتيال', 'Fraud rules') }}</h2>
     <form id="fraud-rule-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="اسم القاعدة" required>
+      <input name="name" type="text" placeholder="{{ t('اسم القاعدة', 'Rule name') }}" required>
       <select name="rule_type" class="orion-input">
-        <option value="amount">قيمة الطلب</option>
-        <option value="velocity">عدد المرات</option>
-        <option value="ip">عنوان IP</option>
+        <option value="amount">{{ t('قيمة الطلب', 'Order amount') }}</option>
+        <option value="velocity">{{ t('عدد المرات', 'Velocity') }}</option>
+        <option value="ip">{{ t('عنوان IP', 'IP address') }}</option>
       </select>
       <select name="operator" class="orion-input">
-        <option value=">">أكبر من</option>
-        <option value="<">أصغر من</option>
-        <option value="==">يساوي</option>
+        <option value=">">{{ t('أكبر من', 'Greater than') }}</option>
+        <option value="<">{{ t('أصغر من', 'Less than') }}</option>
+        <option value="==">{{ t('يساوي', 'Equals') }}</option>
       </select>
-      <input name="threshold_value" type="text" placeholder="الحد" required>
+      <input name="threshold_value" type="text" placeholder="{{ t('الحد', 'Threshold') }}" required>
       <select name="action" class="orion-input">
-        <option value="review">مراجعة</option>
-        <option value="block">حظر</option>
-        <option value="allow">سماح</option>
+        <option value="review">{{ t('مراجعة', 'Review') }}</option>
+        <option value="block">{{ t('حظر', 'Block') }}</option>
+        <option value="allow">{{ t('سماح', 'Allow') }}</option>
       </select>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة قاعدة</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة قاعدة', 'Add rule') }}</button>
     </form>
-    <div id="fraud-rules-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="fraud-rules-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">مراجعة طلب مشبوه</h2>
+    <h2 class="orion-title mb-3">{{ t('مراجعة طلب مشبوه', 'Review suspicious order') }}</h2>
     <form id="fraud-review-form" class="grid gap-2 max-w-md text-sm">
-      <input name="order_id" type="number" placeholder="معرف الطلب" required>
-      <input name="risk_score" type="number" placeholder="درجة الخطورة (0-100)">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">مراجعة</button>
+      <input name="order_id" type="number" placeholder="{{ t('معرف الطلب', 'Order ID') }}" required>
+      <input name="risk_score" type="number" placeholder="{{ t('درجة الخطورة (0-100)', 'Risk score (0-100)') }}">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('مراجعة', 'Review') }}</button>
     </form>
   </section>
 </div>

@@ -1,7 +1,7 @@
 {% extends "admin_base.html" %}
 {% block content %}
-<div id="reconciliation-status" class="mb-6 text-gray-500">جارٍ التحميل…</div>
-<button id="run-reconciliation" class="orion-btn orion-btn-gold">تشغيل التسوية</button>
+<div id="reconciliation-status" class="mb-6 text-gray-500">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
+<button id="run-reconciliation" class="orion-btn orion-btn-gold">{{ t('تشغيل التسوية', 'Run reconciliation') }}</button>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/platform_admin.js') }}"></script>

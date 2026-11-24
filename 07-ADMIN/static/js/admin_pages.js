@@ -8,22 +8,22 @@ const OrionAdminPages = {
       const pages = data.pages || [];
       SafeDOM.clear(list);
       if (!pages.length) {
-        list.appendChild(SafeDOM.emptyMsg("لا توجد صفحات بعد."));
+        list.appendChild(SafeDOM.emptyMsg(OrionI18n.t('لا توجد صفحات بعد.', 'No pages yet.')));
         return;
       }
       for (const page of pages) {
         const info = SafeDOM.elem("div", { className: "flex-1" }, [
           SafeDOM.elem("div", { className: "font-semibold" }, [page.title]),
           SafeDOM.elem("div", { className: "orion-muted text-xs" }, [
-            `/pages/${page.slug} · ${page.is_published ? "منشورة" : "مخفية"}`,
+            `/pages/${page.slug} · ${page.is_published ? OrionI18n.t('منشورة', 'Published') : OrionI18n.t('مخفية', 'Hidden')}`,
           ]),
         ]);
-        const edit = SafeDOM.actionBtn("تعديل", "orion-btn", () => this.fillForm(page));
-        const remove = SafeDOM.actionBtn("حذف", "orion-btn", async () => {
-          if (!OrionUI.confirmDanger(`حذف "${page.title}"؟`)) return;
+        const edit = SafeDOM.actionBtn(OrionI18n.t('تعديل', 'Edit'), "orion-btn", () => this.fillForm(page));
+        const remove = SafeDOM.actionBtn(OrionI18n.t('حذف', 'Delete'), "orion-btn", async () => {
+          if (!OrionUI.confirmDanger(`${OrionI18n.t('حذف', 'Delete')} "${page.title}"?`)) return;
           try {
             await OrionAPI.delete(`/i18n/pages/${page.id}`);
-            OrionUI.toast("تم حذف الصفحة", "success");
+            OrionUI.toast(OrionI18n.t('تم حذف الصفحة', 'Page deleted'), "success");
             this.loadPages();
           } catch (err) {
             OrionUI.toast(err.message, "error");
@@ -44,7 +44,7 @@ const OrionAdminPages = {
 
   fillForm(page) {
     document.getElementById("page-edit-id").value = page.id || "";
-    document.getElementById("form-title").textContent = "تعديل الصفحة";
+    document.getElementById("form-title").textContent = OrionI18n.t('تعديل الصفحة', 'Edit page');
     document.getElementById("p-title").value = page.title || "";
     document.getElementById("p-slug").value = page.slug || "";
     document.getElementById("p-published").checked = Boolean(page.is_published);
@@ -55,7 +55,7 @@ const OrionAdminPages = {
   clearForm() {
     document.getElementById("page-form")?.reset();
     document.getElementById("page-edit-id").value = "";
-    document.getElementById("form-title").textContent = "إضافة صفحة";
+    document.getElementById("form-title").textContent = OrionI18n.t('إضافة صفحة', 'Add page');
   },
 
   payload() {
@@ -102,7 +102,7 @@ const OrionAdminPages = {
           });
         }
         this.clearForm();
-        msg.textContent = editId ? "تم تعديل الصفحة" : "تمت إضافة الصفحة";
+        msg.textContent = editId ? OrionI18n.t('تم تعديل الصفحة', 'Page updated') : OrionI18n.t('تمت إضافة الصفحة', 'Page added');
         OrionUI.toast(msg.textContent, "success");
         this.loadPages();
       } catch (err) {

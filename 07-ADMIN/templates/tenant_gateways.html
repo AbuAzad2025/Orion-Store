@@ -2,25 +2,25 @@
 {% block content %}
 <div class="space-y-6">
   <section>
-    <h2 class="orion-title mb-1">وسائل الدفع</h2>
-    <p class="text-sm text-gray-500 mb-4">فعّل ما يناسب متجرك واكتب تعليمات الدفع للزبون. العملات الرقمية غير متاحة.</p>
-    <div id="payment-methods-list" class="space-y-3">جارٍ التحميل…</div>
+    <h2 class="orion-title mb-1">{{ t('وسائل الدفع', 'Payment methods') }}</h2>
+    <p class="text-sm text-gray-500 mb-4">{{ t('فعّل ما يناسب متجرك واكتب تعليمات الدفع للزبون. العملات الرقمية غير متاحة.', 'Enable what suits your store and write payment instructions for the customer. Cryptocurrencies are not available.') }}</p>
+    <div id="payment-methods-list" class="space-y-3">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">ربط باي بال</h2>
+    <h2 class="orion-title mb-3">{{ t('ربط باي بال', 'Connect PayPal') }}</h2>
     <div class="grid gap-3 max-w-md">
-      <input id="paypal-client-id" type="text" placeholder="Client ID" class="border rounded px-3 py-2 text-sm" aria-label="Client ID">
-      <input id="paypal-client-secret" type="password" placeholder="Client Secret" class="border rounded px-3 py-2 text-sm" aria-label="Client Secret">
+      <input id="paypal-client-id" type="text" placeholder="{{ t('Client ID', 'Client ID') }}" class="border rounded px-3 py-2 text-sm" aria-label="{{ t('Client ID', 'Client ID') }}">
+      <input id="paypal-client-secret" type="password" placeholder="{{ t('Client Secret', 'Client Secret') }}" class="border rounded px-3 py-2 text-sm" aria-label="{{ t('Client Secret', 'Client Secret') }}">
       <label class="inline-flex items-center gap-2 text-sm">
-        <input id="paypal-sandbox" type="checkbox" checked aria-label="وضع الاختبار (Sandbox)">
-        وضع الاختبار
+        <input id="paypal-sandbox" type="checkbox" checked aria-label="{{ t('وضع الاختبار (Sandbox)', 'Test mode (Sandbox)') }}">
+        {{ t('وضع الاختبار', 'Test mode') }}
       </label>
-      <button id="connect-paypal" class="orion-btn orion-btn-gold w-fit">حفظ PayPal</button>
+      <button id="connect-paypal" class="orion-btn orion-btn-gold w-fit">{{ t('حفظ PayPal', 'Save PayPal') }}</button>
     </div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">مزوّدو الدفع بالتقسيط</h2>
-    <div id="bnpl-providers-list" class="orion-muted">جارٍ التحميل…</div>
+    <h2 class="orion-title mb-3">{{ t('مزوّدو الدفع بالتقسيط', 'Installment payment providers') }}</h2>
+    <div id="bnpl-providers-list" class="orion-muted">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 </div>
 {% endblock %}

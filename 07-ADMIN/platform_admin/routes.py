@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from admin_locale import get_admin_locale, remember_admin_locale, t
 from flask import Blueprint, g, render_template
 
 from platform_svc.platform_settings_service import PlatformSettingsService
@@ -23,7 +24,19 @@ def inject_platform_settings():
         settings = PlatformSettingsService().get_singleton()
     except Exception:
         settings = None
-    return {"platform_settings": settings}
+    locale = get_admin_locale()
+    return {
+        "platform_settings": settings,
+        "t": t,
+        "locale": locale,
+        "lang": locale,
+        "dir": "rtl" if locale == "ar" else "ltr",
+    }
+
+
+@platform_admin_bp.after_request
+def remember_locale(response):
+    return remember_admin_locale(response)
 
 
 @platform_admin_bp.get("/dashboard")
@@ -38,7 +51,7 @@ def platform_dashboard():
     )
     return render_template(
         "platform_dashboard.html",
-        page_title="لوحة المنصة",
+        page_title=t("لوحة المنصة", "Platform dashboard"),
         active_nav="dashboard",
         stores=stores,
     )
@@ -48,7 +61,7 @@ def platform_dashboard():
 def platform_tenants():
     return render_template(
         "platform_tenants.html",
-        page_title="إدارة المتاجر",
+        page_title=t("إدارة المتاجر", "Store management"),
         active_nav="tenants",
     )
 
@@ -57,7 +70,7 @@ def platform_tenants():
 def platform_users():
     return render_template(
         "platform_users.html",
-        page_title="إدارة المستخدمين",
+        page_title=t("إدارة المستخدمين", "User management"),
         active_nav="users",
     )
 
@@ -66,7 +79,7 @@ def platform_users():
 def platform_settings():
     return render_template(
         "platform_settings.html",
-        page_title="إعدادات المنصة",
+        page_title=t("إعدادات المنصة", "Platform settings"),
         active_nav="settings",
     )
 
@@ -75,7 +88,7 @@ def platform_settings():
 def reconciliation_dashboard():
     return render_template(
         "reconciliation_dashboard.html",
-        page_title="التسوية المالية",
+        page_title=t("التسوية المالية", "Financial reconciliation"),
         active_nav="reconciliation",
     )
 
@@ -84,7 +97,7 @@ def reconciliation_dashboard():
 def platform_currency():
     return render_template(
         "currency_management.html",
-        page_title="العملات وأسعار الصرف",
+        page_title=t("العملات وأسعار الصرف", "Currencies & exchange rates"),
         active_nav="currency",
     )
 
@@ -93,7 +106,7 @@ def platform_currency():
 def platform_audit():
     return render_template(
         "platform_audit_management.html",
-        page_title="تدقيق المنصة",
+        page_title=t("تدقيق المنصة", "Platform audit"),
         active_nav="audit",
     )
 
@@ -103,6 +116,6 @@ def store_financial_report(tenant_id: int):
     return render_template(
         "store_financial_report.html",
         tenant_id=tenant_id,
-        page_title="التقرير المالي للمتجر",
+        page_title=t("التقرير المالي للمتجر", "Store financial report"),
         active_nav="finance",
     )

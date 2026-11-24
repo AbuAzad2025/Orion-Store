@@ -2,60 +2,60 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">سجلات الموافقة</h2>
+    <h2 class="orion-title mb-3">{{ t('سجلات الموافقة', 'Consent records') }}</h2>
     <form id="consent-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
-      <input name="consent_type" type="text" placeholder="نوع الموافقة (مثال: تسويق)" required>
+      <input name="customer_email" type="email" placeholder="{{ t('البريد الإلكتروني', 'Email') }}" required>
+      <input name="consent_type" type="text" placeholder="{{ t('نوع الموافقة (مثال: تسويق)', 'Consent type (e.g. marketing)') }}" required>
       <label class="inline-flex items-center gap-2">
-        <input name="granted" type="checkbox" checked aria-label="ممنوحة"> ممنوحة
+        <input name="granted" type="checkbox" checked aria-label="{{ t('ممنوحة', 'Granted') }}"> {{ t('ممنوحة', 'Granted') }}
       </label>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة موافقة</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة موافقة', 'Add consent') }}</button>
     </form>
-    <div id="consent-records-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="consent-records-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">طلبات بيانات العملاء</h2>
+    <h2 class="orion-title mb-3">{{ t('طلبات بيانات العملاء', 'Customer data requests') }}</h2>
     <form id="dsr-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="customer_email" type="email" placeholder="البريد الإلكتروني" required>
+      <input name="customer_email" type="email" placeholder="{{ t('البريد الإلكتروني', 'Email') }}" required>
       <select name="request_type" class="orion-input">
-        <option value="export">تصدير البيانات</option>
-        <option value="delete">حذف البيانات</option>
-        <option value="rectify">تصحيح بيانات عميل</option>
+        <option value="export">{{ t('تصدير البيانات', 'Export data') }}</option>
+        <option value="delete">{{ t('حذف البيانات', 'Delete data') }}</option>
+        <option value="rectify">{{ t('تصحيح بيانات عميل', 'Rectify customer data') }}</option>
       </select>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إنشاء طلب</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء طلب', 'Create request') }}</button>
     </form>
-    <div id="dsr-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="dsr-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">إعدادات ملفات تعريف الارتباط</h2>
+    <h2 class="orion-title mb-3">{{ t('إعدادات ملفات تعريف الارتباط', 'Cookie settings') }}</h2>
     <form id="cookie-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <textarea name="banner_message" rows="2" placeholder="نص البانر" class="orion-input"></textarea>
+      <textarea name="banner_message" rows="2" placeholder="{{ t('نص البانر', 'Banner message') }}" class="orion-input"></textarea>
       <label class="inline-flex items-center gap-2">
-        <input name="is_active" type="checkbox" checked aria-label="مفعّل"> مفعّل
+        <input name="is_active" type="checkbox" checked aria-label="{{ t('مفعّل', 'Active') }}"> {{ t('مفعّل', 'Active') }}
       </label>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">حفظ الإعدادات</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('حفظ الإعدادات', 'Save settings') }}</button>
     </form>
-    <div id="cookie-settings-display" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="cookie-settings-display" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">مزودو SSO</h2>
+    <h2 class="orion-title mb-3">{{ t('مزودو SSO', 'SSO providers') }}</h2>
     <form id="sso-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <select name="provider_type" class="orion-input">
-        <option value="saml">SAML</option>
-        <option value="oidc">OpenID Connect</option>
+        <option value="saml">{{ t('SAML', 'SAML') }}</option>
+        <option value="oidc">{{ t('OpenID Connect', 'OpenID Connect') }}</option>
       </select>
-      <input name="client_id" type="text" placeholder="معرّف العميل" required>
-      <input name="client_secret" type="password" placeholder="المفتاح السري للعميل" required>
-      <input name="issuer_url" type="url" placeholder="رابط جهة الإصدار">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة مزود</button>
+      <input name="client_id" type="text" placeholder="{{ t('معرّف العميل', 'Client ID') }}" required>
+      <input name="client_secret" type="password" placeholder="{{ t('المفتاح السري للعميل', 'Client secret') }}" required>
+      <input name="issuer_url" type="url" placeholder="{{ t('رابط جهة الإصدار', 'Issuer URL') }}">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة مزود', 'Add provider') }}</button>
     </form>
-    <div id="sso-list" class="orion-muted text-sm">جارٍ التحميل…</div>
-    <h3 class="orion-title mt-4">تجربة الدخول الموحّد</h3>
+    <div id="sso-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
+    <h3 class="orion-title mt-4">{{ t('تجربة الدخول الموحّد', 'Test single sign-on') }}</h3>
     <form id="sso-exchange-form" class="grid gap-2 max-w-md text-sm">
-      <input name="provider_code" type="text" placeholder="رمز المزود" required aria-label="رمز مزود SSO">
-      <input name="external_email" type="email" placeholder="البريد الخارجي" required aria-label="البريد الخارجي">
-      <input name="tenant_id" type="text" placeholder="معرّف المتجر (اختياري)" aria-label="معرّف المتجر">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">تبادل</button>
+      <input name="provider_code" type="text" placeholder="{{ t('رمز المزود', 'Provider code') }}" required aria-label="{{ t('رمز مزود SSO', 'SSO provider code') }}">
+      <input name="external_email" type="email" placeholder="{{ t('البريد الخارجي', 'External email') }}" required aria-label="{{ t('البريد الخارجي', 'External email') }}">
+      <input name="tenant_id" type="text" placeholder="{{ t('معرّف المتجر (اختياري)', 'Store ID (optional)') }}" aria-label="{{ t('معرّف المتجر', 'Store ID') }}">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('تبادل', 'Exchange') }}</button>
     </form>
     <p id="sso-exchange-result" class="orion-muted text-sm" role="status" aria-live="polite"></p>
   </section>

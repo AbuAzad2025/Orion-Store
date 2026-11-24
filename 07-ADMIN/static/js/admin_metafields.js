@@ -6,7 +6,7 @@ const OrionAdminMetafields = {
     try {
       const data = await OrionAPI.get("/metafields/definitions");
       const rows = data.definitions || [];
-      if (!rows.length) { el.textContent = "لا توجد تعريفات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد تعريفات.', 'No definitions.'); return; }
       SafeDOM.clear(el);
       for (const d of rows) {
         const children = [
@@ -18,7 +18,7 @@ const OrionAdminMetafields = {
         }
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, children));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {
@@ -45,7 +45,7 @@ const OrionAdminMetafields = {
           value: fd.get("value") || undefined,
         });
         valForm.reset();
-        alert("تم الحفظ");
+        alert(OrionI18n.t('تم الحفظ', 'Saved'));
       });
     }
     OrionAdminMetafields.loadDefinitions();

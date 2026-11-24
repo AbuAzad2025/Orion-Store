@@ -2,32 +2,32 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">تعريفات البيانات الوصفية</h2>
+    <h2 class="orion-title mb-3">{{ t('تعريفات البيانات الوصفية', 'Metafield Definitions') }}</h2>
     <form id="metafield-def-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="owner_type" type="text" placeholder="نوع المالك (مثال: product)" required>
-      <input name="key" type="text" placeholder="المفتاح" required>
-      <input name="label" type="text" placeholder="العنوان" required>
+      <input name="owner_type" type="text" placeholder="{{ t('نوع المالك (مثال: product)', 'Owner type (e.g. product)') }}" required>
+      <input name="key" type="text" placeholder="{{ t('المفتاح', 'Key') }}" required>
+      <input name="label" type="text" placeholder="{{ t('العنوان', 'Label') }}" required>
       <select name="field_type" class="orion-input">
-        <option value="string">نص</option>
-        <option value="integer">رقم صحيح</option>
-        <option value="decimal">رقم عشري</option>
-        <option value="boolean">نعم/لا</option>
-        <option value="json">JSON</option>
+        <option value="string">{{ t('نص', 'Text') }}</option>
+        <option value="integer">{{ t('رقم صحيح', 'Integer') }}</option>
+        <option value="decimal">{{ t('رقم عشري', 'Decimal') }}</option>
+        <option value="boolean">{{ t('نعم/لا', 'Yes/No') }}</option>
+        <option value="json" dir="ltr">{{ t('JSON', 'JSON') }}</option>
       </select>
       <label class="inline-flex items-center gap-2">
-        <input name="is_required" type="checkbox" aria-label="مطلوب"> مطلوب
+        <input name="is_required" type="checkbox" aria-label="{{ t('مطلوب', 'Required') }}"> {{ t('مطلوب', 'Required') }}
       </label>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة تعريف</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة تعريف', 'Add definition') }}</button>
     </form>
-    <div id="metafield-defs-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="metafield-defs-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">قيم البيانات الوصفية</h2>
+    <h2 class="orion-title mb-3">{{ t('قيم البيانات الوصفية', 'Metafield Values') }}</h2>
     <form id="metafield-value-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="definition_id" type="number" placeholder="معرف التعريف" required>
-      <input name="owner_id" type="number" placeholder="معرف المالك" required>
-      <input name="value" type="text" placeholder="القيمة">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">حفظ قيمة</button>
+      <input name="definition_id" type="number" placeholder="{{ t('معرف التعريف', 'Definition ID') }}" required>
+      <input name="owner_id" type="number" placeholder="{{ t('معرف المالك', 'Owner ID') }}" required>
+      <input name="value" type="text" placeholder="{{ t('القيمة', 'Value') }}">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('حفظ قيمة', 'Save value') }}</button>
     </form>
   </section>
 </div>

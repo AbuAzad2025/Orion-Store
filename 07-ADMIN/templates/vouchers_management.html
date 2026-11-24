@@ -3,53 +3,53 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
   <section class="orion-card lg:col-span-2">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="orion-title">قسائم الخصم</h2>
-      <button type="button" id="btn-refresh" class="orion-btn">تحديث القائمة</button>
+      <h2 class="orion-title">{{ t('قسائم الخصم', 'Discount vouchers') }}</h2>
+      <button type="button" id="btn-refresh" class="orion-btn">{{ t('تحديث القائمة', 'Refresh list') }}</button>
     </div>
-    <div id="vouchers-list" class="space-y-2">جارٍ التحميل…</div>
+    <div id="vouchers-list" class="space-y-2">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-4">إضافة قسيمة</h2>
+    <h2 class="orion-title mb-4">{{ t('إضافة قسيمة', 'Add voucher') }}</h2>
     <form id="voucher-form" class="space-y-3">
       <div>
-        <label class="orion-stat-label" for="v-code">الرمز</label>
-        <input id="v-code" class="orion-input" required aria-label="رمز القسيمة" dir="ltr">
+        <label class="orion-stat-label" for="v-code">{{ t('الرمز', 'Code') }}</label>
+        <input id="v-code" class="orion-input" required aria-label="{{ t('رمز القسيمة', 'Voucher code') }}" dir="ltr">
       </div>
       <div>
-        <label class="orion-stat-label" for="v-name">الاسم</label>
-        <input id="v-name" class="orion-input" required aria-label="اسم القسيمة">
+        <label class="orion-stat-label" for="v-name">{{ t('الاسم', 'Name') }}</label>
+        <input id="v-name" class="orion-input" required aria-label="{{ t('اسم القسيمة', 'Voucher name') }}">
       </div>
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="orion-stat-label" for="v-type">النوع</label>
-          <select id="v-type" class="orion-select" aria-label="نوع الخصم">
-            <option value="percentage">نسبة مئوية</option>
-            <option value="fixed_amount">مبلغ ثابت</option>
+          <label class="orion-stat-label" for="v-type">{{ t('النوع', 'Type') }}</label>
+          <select id="v-type" class="orion-select" aria-label="{{ t('نوع الخصم', 'Discount type') }}">
+            <option value="percentage">{{ t('نسبة مئوية', 'Percentage') }}</option>
+            <option value="fixed_amount">{{ t('مبلغ ثابت', 'Fixed amount') }}</option>
           </select>
         </div>
         <div>
-          <label class="orion-stat-label" for="v-value">القيمة</label>
-          <input id="v-value" type="number" step="0.01" min="0" class="orion-input" required aria-label="قيمة الخصم">
+          <label class="orion-stat-label" for="v-value">{{ t('القيمة', 'Value') }}</label>
+          <input id="v-value" type="number" step="0.01" min="0" class="orion-input" required aria-label="{{ t('قيمة الخصم', 'Discount value') }}">
         </div>
       </div>
       <div>
-        <label class="orion-stat-label" for="v-limit">حد الاستخدام (اختياري)</label>
-        <input id="v-limit" type="number" min="1" class="orion-input" aria-label="حد الاستخدام">
+        <label class="orion-stat-label" for="v-limit">{{ t('حد الاستخدام (اختياري)', 'Usage limit (optional)') }}</label>
+        <input id="v-limit" type="number" min="1" class="orion-input" aria-label="{{ t('حد الاستخدام', 'Usage limit') }}">
       </div>
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label class="orion-stat-label" for="v-start">من تاريخ</label>
-          <input id="v-start" type="date" class="orion-input" aria-label="تاريخ البداية">
+          <label class="orion-stat-label" for="v-start">{{ t('من تاريخ', 'From date') }}</label>
+          <input id="v-start" type="date" class="orion-input" aria-label="{{ t('تاريخ البداية', 'Start date') }}">
         </div>
         <div>
-          <label class="orion-stat-label" for="v-end">إلى تاريخ</label>
-          <input id="v-end" type="date" class="orion-input" aria-label="تاريخ النهاية">
+          <label class="orion-stat-label" for="v-end">{{ t('إلى تاريخ', 'To date') }}</label>
+          <input id="v-end" type="date" class="orion-input" aria-label="{{ t('تاريخ النهاية', 'End date') }}">
         </div>
       </div>
       <label class="flex items-center gap-2 text-sm">
-        <input id="v-free-shipping" type="checkbox" aria-label="شحن مجاني"> شحن مجاني
+        <input id="v-free-shipping" type="checkbox" aria-label="{{ t('شحن مجاني', 'Free shipping') }}"> {{ t('شحن مجاني', 'Free shipping') }}
       </label>
-      <button type="submit" class="orion-btn orion-btn-gold w-full">حفظ القسيمة</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-full">{{ t('حفظ القسيمة', 'Save voucher') }}</button>
       <p id="voucher-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
     </form>
   </section>

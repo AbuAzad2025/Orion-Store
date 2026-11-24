@@ -1,5 +1,19 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+{% if locale is not defined %}
+{% set _codes = [] %}
+{% for _v in [request.args.get('locale'), request.cookies.get('orion_admin_locale'), request.headers.get('X-Locale')] %}
+{% set _ = _codes.append(((_v or '')|lower).split('-')[0].split('_')[0]) %}
+{% endfor %}
+{% set locale = _codes[0] if _codes[0] in ['ar','en'] else (_codes[1] if _codes[1] in ['ar','en'] else (_codes[2] if _codes[2] in ['ar','en'] else 'ar')) %}
+{% endif %}
+{% if lang is not defined %}{% set lang = locale %}{% endif %}
+{% if dir is not defined %}{% set dir = 'rtl' if locale == 'ar' else 'ltr' %}{% endif %}
+{% if t is not defined %}
+{% macro t(ar, en) %}{{ en if locale == 'en' else ar }}{% endmacro %}
+{% endif %}
+{% if page_title is defined and page_title == 'تسجيل الدخول' %}{% set page_title = t('تسجيل الدخول', 'Sign in') %}{% endif %}
+{% macro locale_href(code) %}{{ request.path }}?{% for k, v in request.args.items(multi=True) if k != 'locale' %}{{ k|urlencode }}={{ v|urlencode }}&amp;{% endfor %}locale={{ code }}{% endmacro %}
+<html lang="{{ lang }}" dir="{{ dir }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +29,13 @@
       <span class="orion-brand-mark orion-brand-mark-sm" aria-hidden="true">A</span>
       <span>
         <h1 class="orion-auth-title">{{ platform_settings.platform_name | default('Azadexa') }}</h1>
-        <span class="orion-auth-subtitle">لوحة الإدارة — تسجيل الدخول</span>
+        <span class="orion-auth-subtitle">{{ t('لوحة الإدارة — تسجيل الدخول', 'Admin dashboard — Sign in') }}</span>
+      </span>
+      <span class="orion-locale-switch" role="group" aria-label="{{ t('اللغة', 'Language') }}">
+        <a href="{{ locale_href('ar') }}" class="orion-locale-link{% if locale == 'ar' %} is-active{% endif %}"
+           hreflang="ar" aria-label="العربية" {% if locale == 'ar' %}aria-current="true"{% endif %}>ع</a>
+        <a href="{{ locale_href('en') }}" class="orion-locale-link{% if locale == 'en' %} is-active{% endif %}"
+           hreflang="en" aria-label="English" {% if locale == 'en' %}aria-current="true"{% endif %}>EN</a>
       </span>
     </header>
 
@@ -26,39 +46,39 @@
       <form id="login-form" action="/admin/login" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="orion-auth-field">
-          <label class="orion-auth-label" for="email">البريد الإلكتروني</label>
+          <label class="orion-auth-label" for="email">{{ t('البريد الإلكتروني', 'Email address') }}</label>
           <input id="email" name="email" type="email" required class="orion-input w-full"
-                 placeholder="name@example.com" aria-label="البريد الإلكتروني" autocomplete="username">
+                 placeholder="name@example.com" aria-label="{{ t('البريد الإلكتروني', 'Email address') }}" autocomplete="username">
         </div>
         <div class="orion-auth-field">
-          <label class="orion-auth-label" for="password">كلمة المرور</label>
+          <label class="orion-auth-label" for="password">{{ t('كلمة المرور', 'Password') }}</label>
           <input id="password" name="password" type="password" required class="orion-input w-full"
-                 placeholder="••••••••" aria-label="كلمة المرور" autocomplete="current-password">
+                 placeholder="••••••••" aria-label="{{ t('كلمة المرور', 'Password') }}" autocomplete="current-password">
         </div>
-        <button type="submit" class="orion-btn orion-btn-gold orion-auth-btn">تسجيل الدخول</button>
+        <button type="submit" class="orion-btn orion-btn-gold orion-auth-btn">{{ t('تسجيل الدخول', 'Sign in') }}</button>
       </form>
     </section>
 
     <details class="orion-card orion-auth-sso">
-      <summary>الدخول عبر SSO</summary>
+      <summary>{{ t('الدخول عبر SSO', 'Sign in via SSO') }}</summary>
       <form action="/admin/sso/exchange" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="orion-auth-field">
-          <label class="orion-auth-label" for="sso-provider-code">رمز مزوّد SSO</label>
+          <label class="orion-auth-label" for="sso-provider-code">{{ t('رمز مزوّد SSO', 'SSO provider code') }}</label>
           <input id="sso-provider-code" name="provider_code" type="text" required class="orion-input w-full"
-                 placeholder="provider-code" aria-label="رمز مزوّد SSO">
+                 placeholder="provider-code" aria-label="{{ t('رمز مزوّد SSO', 'SSO provider code') }}">
         </div>
         <div class="orion-auth-field">
-          <label class="orion-auth-label" for="sso-email">البريد الخارجي</label>
+          <label class="orion-auth-label" for="sso-email">{{ t('البريد الخارجي', 'External email') }}</label>
           <input id="sso-email" name="external_email" type="email" required class="orion-input w-full"
-                 placeholder="name@example.com" aria-label="البريد الإلكتروني الخارجي لـ SSO">
+                 placeholder="name@example.com" aria-label="{{ t('البريد الإلكتروني الخارجي لـ SSO', 'External email for SSO') }}">
         </div>
         <div class="orion-auth-field">
-          <label class="orion-auth-label" for="sso-tenant">معرّف المتجر</label>
+          <label class="orion-auth-label" for="sso-tenant">{{ t('معرّف المتجر', 'Store identifier') }}</label>
           <input id="sso-tenant" name="tenant_slug" type="text" required class="orion-input w-full"
-                 placeholder="my-store" aria-label="معرّف المتجر لـ SSO">
+                 placeholder="my-store" aria-label="{{ t('معرّف المتجر لـ SSO', 'Store identifier for SSO') }}">
         </div>
-        <button type="submit" class="orion-btn w-full">دخول عبر SSO</button>
+        <button type="submit" class="orion-btn w-full">{{ t('دخول عبر SSO', 'Sign in via SSO') }}</button>
       </form>
     </details>
   </main>

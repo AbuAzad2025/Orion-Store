@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         SafeDOM.clear(tenantsEl);
         data.tenants.forEach((t) => {
-          const link = SafeDOM.elem("a", { className: "text-blue-600", href: `/admin/platform/stores/${t.id}/finance` }, ["مالية"]);
+          const link = SafeDOM.elem("a", { className: "text-blue-600", href: `/admin/platform/stores/${t.id}/finance` }, [OrionI18n.t('مالية', 'Finance')]);
           tenantsEl.appendChild(SafeDOM.elem("tr", { className: "border-b" }, [
             SafeDOM.elem("td", { className: "py-2" }, [t.name]),
             SafeDOM.elem("td", { className: "py-2" }, [t.slug]),
@@ -32,20 +32,20 @@ document.addEventListener("DOMContentLoaded", () => {
         reportEl.appendChild(SafeDOM.elem("h2", { className: "text-xl font-bold mb-4" }, [data.tenant.name]));
         const cards = [
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["إجمالي الوارد"]),
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('إجمالي الوارد', 'Total inbound')]),
             SafeDOM.elem("p", { className: "text-xl font-bold" }, [s.total_inbound])
           ]),
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["العمولة"]),
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('العمولة', 'Commission')]),
             SafeDOM.elem("p", { className: "text-xl font-bold" }, [s.total_commission])
           ]),
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["طلبات مدفوعة"]),
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('طلبات مدفوعة', 'Paid orders')]),
             SafeDOM.elem("p", { className: "text-xl font-bold" }, [s.orders_paid])
           ])
         ];
         reportEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-3 mb-6" }, cards));
-        reportEl.appendChild(SafeDOM.elem("h3", { className: "font-semibold mb-2" }, ["أحداث مالية حديثة"]));
+        reportEl.appendChild(SafeDOM.elem("h3", { className: "font-semibold mb-2" }, [OrionI18n.t('أحداث مالية حديثة', 'Recent financial events')]));
         const events = data.recent_events.map((e) => SafeDOM.elem("li", null, [`${e.event_type}: ${e.amount} ${e.currency}`]));
         reportEl.appendChild(SafeDOM.elem("ul", { className: "space-y-1 text-sm" }, events));
       })
@@ -61,15 +61,15 @@ document.addEventListener("DOMContentLoaded", () => {
         SafeDOM.clear(reconEl);
         const reconCards = [
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["عمولات معلقة"]),
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('عمولات معلقة', 'Pending commissions')]),
             SafeDOM.elem("p", { className: "text-xl font-bold" }, [data.pending_commission_entries])
           ]),
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["عمولات مسوّاة"]),
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('عمولات مسوّاة', 'Settled commissions')]),
             SafeDOM.elem("p", { className: "text-xl font-bold" }, [data.settled_commission_entries])
           ]),
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
-            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, ["أحداث مالية"]),
+            SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('أحداث مالية', 'Financial events')]),
             SafeDOM.elem("p", { className: "text-xl font-bold" }, [data.financial_events_total])
           ])
         ];

@@ -2,39 +2,39 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">المستودعات</h2>
+    <h2 class="orion-title mb-3">{{ t('المستودعات', 'Warehouses') }}</h2>
     <form id="oms-warehouse-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="اسم المستودع" class="orion-input" required>
-      <input name="code" type="text" placeholder="رمز" class="orion-input" required>
+      <input name="name" type="text" placeholder="{{ t('اسم المستودع', 'Warehouse name') }}" class="orion-input" required>
+      <input name="code" type="text" placeholder="{{ t('رمز', 'Code') }}" class="orion-input" required>
       <label class="inline-flex items-center gap-2">
-        <input name="is_default" type="checkbox" aria-label="افتراضي">
-        افتراضي
+        <input name="is_default" type="checkbox" aria-label="{{ t('افتراضي', 'Default') }}">
+        {{ t('افتراضي', 'Default') }}
       </label>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة مستودع</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة مستودع', 'Add warehouse') }}</button>
     </form>
-    <div id="oms-warehouses-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="oms-warehouses-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">تحويلات المخزون</h2>
+    <h2 class="orion-title mb-3">{{ t('تحويلات المخزون', 'Stock Transfers') }}</h2>
     <form id="oms-transfer-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <select name="from_warehouse_id" class="orion-input" required aria-label="من مستودع">
-        <option value="">من مستودع...</option>
+      <select name="from_warehouse_id" class="orion-input" required aria-label="{{ t('من مستودع', 'From warehouse') }}">
+        <option value="">{{ t('من مستودع...', 'From warehouse...') }}</option>
       </select>
-      <select name="to_warehouse_id" class="orion-input" required aria-label="إلى مستودع">
-        <option value="">إلى مستودع...</option>
+      <select name="to_warehouse_id" class="orion-input" required aria-label="{{ t('إلى مستودع', 'To warehouse') }}">
+        <option value="">{{ t('إلى مستودع...', 'To warehouse...') }}</option>
       </select>
-      <input name="notes" type="text" placeholder="ملاحظات (اختياري)" class="orion-input">
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إنشاء تحويل</button>
+      <input name="notes" type="text" placeholder="{{ t('ملاحظات (اختياري)', 'Notes (optional)') }}" class="orion-input">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء تحويل', 'Create transfer') }}</button>
     </form>
     <form id="oms-transfer-item-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="transfer_id" type="number" min="1" placeholder="رقم التحويل" class="orion-input" required>
-      <select name="product_id" class="orion-input" required aria-label="اختر المنتج">
-        <option value="">اختر منتجاً...</option>
+      <input name="transfer_id" type="number" min="1" placeholder="{{ t('رقم التحويل', 'Transfer number') }}" class="orion-input" required>
+      <select name="product_id" class="orion-input" required aria-label="{{ t('اختر المنتج', 'Select product') }}">
+        <option value="">{{ t('اختر منتجاً...', 'Select a product...') }}</option>
       </select>
-      <input name="quantity" type="number" min="1" value="1" placeholder="الكمية" class="orion-input" required>
-      <button type="submit" class="orion-btn w-fit">إضافة صنف</button>
+      <input name="quantity" type="number" min="1" value="1" placeholder="{{ t('الكمية', 'Quantity') }}" class="orion-input" required>
+      <button type="submit" class="orion-btn w-fit">{{ t('إضافة صنف', 'Add item') }}</button>
     </form>
-    <div id="oms-transfers-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="oms-transfers-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 </div>
 {% endblock %}

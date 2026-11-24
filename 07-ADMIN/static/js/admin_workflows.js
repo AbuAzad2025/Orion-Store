@@ -6,13 +6,13 @@ const OrionAdminWorkflows = {
     try {
       const data = await OrionAPI.get("/workflow/definitions");
       const rows = data.definitions || [];
-      if (!rows.length) { el.textContent = "لا توجد تعريفات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد تعريفات.', 'No definitions found.'); return; }
       SafeDOM.clear(el);
       for (const d of rows) {
-        const runBtn = SafeDOM.actionBtn("تشغيل", "orion-btn", async () => {
+        const runBtn = SafeDOM.actionBtn(OrionI18n.t('تشغيل', 'Run'), "orion-btn", async () => {
           try {
             await OrionAPI.post(`/workflow/definitions/${d.id}/run`);
-            OrionUI.toast("تم تشغيل سير العمل", "success");
+            OrionUI.toast(OrionI18n.t('تم تشغيل سير العمل', 'Workflow started'), "success");
             OrionAdminWorkflows.loadRuns();
           } catch (err) { OrionUI.toast(err.message, "error"); }
         });
@@ -21,7 +21,7 @@ const OrionAdminWorkflows = {
           runBtn
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadRuns() {
@@ -30,7 +30,7 @@ const OrionAdminWorkflows = {
     try {
       const data = await OrionAPI.get("/workflow/runs");
       const rows = data.runs || [];
-      if (!rows.length) { el.textContent = "لا توجد تشغيلات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد تشغيلات.', 'No runs found.'); return; }
       SafeDOM.clear(el);
       for (const r of rows) {
         const children = ["#", r.id, " — ", r.status];
@@ -39,7 +39,7 @@ const OrionAdminWorkflows = {
         }
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, children));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {

@@ -6,7 +6,7 @@ const OrionAdminAffiliates = {
     try {
       const data = await OrionAPI.get("/affiliates/programs");
       const rows = data.programs || [];
-      if (!rows.length) { el.textContent = "لا توجد برامج."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد برامج.', 'No programs.'); return; }
       SafeDOM.clear(el);
       for (const p of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
@@ -14,7 +14,7 @@ const OrionAdminAffiliates = {
           " (", p.code, ") — ", p.commission_type, " ", p.commission_value
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadAffiliates() {
@@ -23,14 +23,14 @@ const OrionAdminAffiliates = {
     try {
       const data = await OrionAPI.get("/affiliates/affiliates");
       const rows = data.affiliates || [];
-      if (!rows.length) { el.textContent = "لا يوجد مسوقون."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا يوجد مسوقون.', 'No affiliates.'); return; }
       SafeDOM.clear(el);
       for (const a of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           a.email, " — ", a.referral_code, " — ", a.total_earned || 0
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadCommissions() {
@@ -39,14 +39,14 @@ const OrionAdminAffiliates = {
     try {
       const data = await OrionAPI.get("/affiliates/commissions");
       const rows = data.commissions || [];
-      if (!rows.length) { el.textContent = "لا توجد عمولات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد عمولات.', 'No commissions.'); return; }
       SafeDOM.clear(el);
       for (const c of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          "مسوق #", c.affiliate_id, " — طلب #", c.order_id, " — ", c.amount
+          OrionI18n.t('مسوق', 'Affiliate') + " #", c.affiliate_id, " — " + OrionI18n.t('طلب', 'Order') + " #", c.order_id, " — ", c.amount
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {

@@ -6,7 +6,7 @@ const OrionAdminSearch = {
     try {
       const data = await OrionAPI.get("/search/synonyms");
       const rows = data.synonyms || [];
-      if (!rows.length) { el.textContent = "لا توجد مرادفات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد مرادفات.', 'No synonyms.'); return; }
       SafeDOM.clear(el);
       for (const s of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
@@ -14,7 +14,7 @@ const OrionAdminSearch = {
           " → ", (s.synonyms || []).join(", ")
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadRedirects() {
@@ -23,7 +23,7 @@ const OrionAdminSearch = {
     try {
       const data = await OrionAPI.get("/search/redirects");
       const rows = data.redirects || [];
-      if (!rows.length) { el.textContent = "لا توجد توجيهات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد توجيهات.', 'No redirects.'); return; }
       SafeDOM.clear(el);
       for (const r of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
@@ -31,7 +31,7 @@ const OrionAdminSearch = {
           SafeDOM.elem("a", { href: r.redirect_url, className: "text-blue-600", target: "_blank" }, [r.redirect_url])
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadBoosts() {
@@ -40,14 +40,14 @@ const OrionAdminSearch = {
     try {
       const data = await OrionAPI.get("/search/boosts");
       const rows = data.boosts || [];
-      if (!rows.length) { el.textContent = "لا توجد قواعد تعزيز."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد قواعد تعزيز.', 'No boost rules.'); return; }
       SafeDOM.clear(el);
       for (const b of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           "product=", b.product_id || '-', " cat=", b.category_id || '-', " kw=", b.query_keyword || '-', " ×", b.boost_factor
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {

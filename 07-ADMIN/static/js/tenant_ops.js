@@ -7,7 +7,7 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/returns/");
       const rows = data.returns || [];
       if (!rows.length) {
-        el.textContent = "لا توجد طلبات إرجاع.";
+        el.textContent = OrionI18n.t("لا توجد طلبات إرجاع.", "No return requests yet.");
         return;
       }
       SafeDOM.clear(el);
@@ -15,7 +15,7 @@ const OrionTenantOps = {
         const row = SafeDOM.elem("div", { className: "border-b py-2 flex justify-between items-center gap-2" });
         row.appendChild(SafeDOM.elem("span", null, [`#${r.id} — ${r.status} — ${r.return_type || ""}`]));
         if (r.status === "requested") {
-          row.appendChild(SafeDOM.elem("button", { "data-approve": r.id, className: "text-emerald-700 text-xs" }, ["موافقة"]));
+          row.appendChild(SafeDOM.elem("button", { "data-approve": r.id, className: "text-emerald-700 text-xs" }, [OrionI18n.t("موافقة", "Approve")]));
         }
         el.appendChild(row);
       }
@@ -26,7 +26,7 @@ const OrionTenantOps = {
         });
       });
     } catch (err) {
-      el.textContent = err.message || "تعذّر التحميل";
+      el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load");
     }
   },
 
@@ -41,15 +41,15 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/b2b/customer-groups");
       const rows = data.groups || [];
       if (!rows.length) {
-        el.textContent = "لا توجد مجموعات.";
+        el.textContent = OrionI18n.t("لا توجد مجموعات.", "No groups.");
         return;
       }
       SafeDOM.clear(el);
       for (const g of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${g.name} (${g.code}) — خصم ${g.discount_percent}%`]));
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${g.name} (${g.code}) — ${OrionI18n.t("خصم", "Discount")} ${g.discount_percent}%`]));
       }
     } catch (err) {
-      el.textContent = err.message || "تعذّر التحميل";
+      el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load");
     }
   },
 
@@ -78,15 +78,15 @@ const OrionTenantOps = {
       const data = await OrionAPI.get("/oms/warehouses");
       const rows = data.warehouses || [];
       if (!rows.length) {
-        el.textContent = "لا توجد مستودعات.";
+        el.textContent = OrionI18n.t("لا توجد مستودعات.", "No warehouses.");
         return;
       }
       SafeDOM.clear(el);
       for (const w of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${w.name} (${w.code})${w.is_default ? " — افتراضي" : ""}`]));
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${w.name} (${w.code})${w.is_default ? ` — ${OrionI18n.t("افتراضي", "Default")}` : ""}`]));
       }
     } catch (err) {
-      el.textContent = err.message || "تعذّر التحميل";
+      el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load");
     }
   },
 
@@ -105,18 +105,18 @@ const OrionTenantOps = {
         if (!select) continue;
         const current = select.value;
         SafeDOM.clear(select);
-        select.appendChild(SafeDOM.elem("option", { value: "" }, [name === "from_warehouse_id" ? "من مستودع..." : "إلى مستودع..."]));
+        select.appendChild(SafeDOM.elem("option", { value: "" }, [name === "from_warehouse_id" ? OrionI18n.t("من مستودع...", "From warehouse...") : OrionI18n.t("إلى مستودع...", "To warehouse...")]));
         for (const w of warehouses) select.appendChild(SafeDOM.elem("option", { value: w.id }, [w.name]));
         select.value = current;
       }
       SafeDOM.clear(el);
-      if (!rows.length) { el.textContent = "لا توجد تحويلات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t("لا توجد تحويلات.", "No transfers."); return; }
       for (const t of rows) {
         const complete = t.status === "draft"
-          ? SafeDOM.actionBtn("إكمال", "orion-btn", async () => {
+          ? SafeDOM.actionBtn(OrionI18n.t("إكمال", "Complete"), "orion-btn", async () => {
               try {
                 await OrionAPI.post(`/oms-ext/transfers/${t.id}/complete`);
-                OrionUI.toast("تم إكمال التحويل", "success");
+                OrionUI.toast(OrionI18n.t("تم إكمال التحويل", "Transfer completed"), "success");
                 OrionTenantOps.loadTransfers();
               } catch (err) { OrionUI.toast(err.message, "error"); }
             })
@@ -125,7 +125,7 @@ const OrionTenantOps = {
           SafeDOM.elem("span", {}, [`#${t.id} — ${t.status}`]), complete,
         ].filter(Boolean)));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
 
   async loadOmsProducts() {
@@ -134,7 +134,7 @@ const OrionTenantOps = {
     try {
       const data = await OrionAPI.get("/oms/products");
       SafeDOM.clear(select);
-      select.appendChild(SafeDOM.elem("option", { value: "" }, ["اختر منتجاً..."]));
+      select.appendChild(SafeDOM.elem("option", { value: "" }, [OrionI18n.t("اختر منتجاً...", "Select a product...")]));
       for (const p of data.products || []) {
         select.appendChild(SafeDOM.elem("option", { value: p.id }, [`#${p.id} — ${p.name}`]));
       }
@@ -157,7 +157,7 @@ const OrionTenantOps = {
             notes: fd.get("notes") || undefined,
           });
           transferForm.reset();
-          OrionUI.toast("تم إنشاء التحويل", "success");
+          OrionUI.toast(OrionI18n.t("تم إنشاء التحويل", "Transfer created"), "success");
           OrionTenantOps.loadTransfers();
         } catch (err) { OrionUI.toast(err.message, "error"); }
       });
@@ -173,7 +173,7 @@ const OrionTenantOps = {
             quantity: Number(fd.get("quantity")),
           });
           itemForm.reset();
-          OrionUI.toast("تمت إضافة الصنف", "success");
+          OrionUI.toast(OrionI18n.t("تمت إضافة الصنف", "Item added"), "success");
           OrionTenantOps.loadTransfers();
         } catch (err) { OrionUI.toast(err.message, "error"); }
       });
@@ -202,12 +202,12 @@ const OrionTenantOps = {
     try {
       const data = await OrionAPI.get("/subscriptions/plans");
       const rows = data.plans || [];
-      if (!rows.length) { el.textContent = "لا توجد خطط بعد."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t("لا توجد خطط بعد.", "No plans yet."); return; }
       SafeDOM.clear(el);
       for (const p of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${p.name} (${p.code}) — ${p.price} ${p.currency} / ${p.billing_period_days} يوم${p.trial_period_days ? ` + ${p.trial_period_days} يوم تجريبي` : ""}`]));
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${p.name} (${p.code}) — ${p.price} ${p.currency} / ${p.billing_period_days} ${OrionI18n.t("يوم", "days")}${p.trial_period_days ? ` + ${p.trial_period_days} ${OrionI18n.t("يوم تجريبي", "trial days")}` : ""}`]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
 
   async loadCustomerSubscriptions() {
@@ -216,12 +216,12 @@ const OrionTenantOps = {
     try {
       const data = await OrionAPI.get("/subscriptions/subscriptions");
       const rows = data.subscriptions || [];
-      if (!rows.length) { el.textContent = "لا توجد اشتراكات حالية."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t("لا توجد اشتراكات حالية.", "No active subscriptions."); return; }
       SafeDOM.clear(el);
       for (const s of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${s.customer_email} — ${s.status} (تنتهي: ${new Date(s.current_period_end).toLocaleDateString("ar")})`]));
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${s.customer_email} — ${s.status} (${OrionI18n.t("تنتهي", "Expires")}: ${new Date(s.current_period_end).toLocaleDateString("ar")})`]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
 
   initSubscriptions() {
@@ -251,7 +251,7 @@ const OrionTenantOps = {
     try {
       const data = await OrionAPI.get("/tax/jurisdictions");
       const rows = data.jurisdictions || [];
-      if (!rows.length) { el.textContent = "لا توجد مناطق ضريبية بعد."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t("لا توجد مناطق ضريبية بعد.", "No tax jurisdictions yet."); return; }
       SafeDOM.clear(el);
       for (const j of rows) {
         const children = [
@@ -259,11 +259,11 @@ const OrionTenantOps = {
           ` (${j.code}) — ${j.country}${j.region ? ` / ${j.region}` : ""}`
         ];
         if (j.rates && j.rates.length) {
-          children.push(SafeDOM.elem("span", { className: "text-xs text-gray-500 mr-2" }, [`${j.rates.length} معدّل`]));
+          children.push(SafeDOM.elem("span", { className: "text-xs text-gray-500 mr-2" }, [`${j.rates.length} ${OrionI18n.t("معدّل", "rates")}`]));
         }
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, children));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
 
   initTax() {
@@ -289,19 +289,19 @@ const OrionTenantOps = {
     try {
       const data = await OrionAPI.get("/bopis/locations");
       const rows = data.locations || [];
-      if (!rows.length) { el.textContent = "لا توجد مواقع استلام."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t("لا توجد مواقع استلام.", "No pickup locations."); return; }
       SafeDOM.clear(el);
       for (const l of rows) {
         const a = l.address;
         const address = typeof a === "string"
           ? a
-          : (a && (a.text || a.city || a.line1 || Object.values(a).join("، "))) || "";
+          : (a && (a.text || a.city || a.line1 || Object.values(a).join(OrionI18n.t("، ", ", ")))) || "";
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           SafeDOM.elem("strong", null, [l.name]),
           ` — ${address}${l.phone ? ` (${l.phone})` : ""}`
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
 
   initBopis() {
@@ -328,7 +328,7 @@ const OrionTenantOps = {
     try {
       const data = await OrionAPI.get("/bundles");
       const rows = data.bundles || [];
-      if (!rows.length) { el.textContent = "لا توجد حزم بعد."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t("لا توجد حزم بعد.", "No bundles yet."); return; }
       SafeDOM.clear(el);
       for (const b of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
@@ -336,7 +336,7 @@ const OrionTenantOps = {
           ` (${b.slug}) — ${b.bundle_price} ${b.currency || ""}`
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
 
   initBundles() {
@@ -385,13 +385,13 @@ const OrionTenantOps = {
           const txEl = document.getElementById("credit-transactions");
           const txData = await OrionAPI.get(`/store-credit/transactions?customer_email=${encodeURIComponent(email)}`);
           const txRows = txData.transactions || [];
-          if (!txRows.length) { txEl.textContent = "لا توجد حركات."; return; }
+          if (!txRows.length) { txEl.textContent = OrionI18n.t("لا توجد حركات.", "No transactions."); return; }
           SafeDOM.clear(txEl);
           for (const t of txRows) {
             txEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 text-sm" }, [`${t.type} — ${t.amount} — ${t.reason || ""} (${new Date(t.created_at).toLocaleDateString("ar")})`]));
           }
         } catch (err) {
-          alert(err.message || "تعذّر تحميل الرصيد");
+          alert(err.message || OrionI18n.t("تعذّر تحميل الرصيد", "Failed to load balance"));
         }
       });
     }
@@ -403,7 +403,7 @@ const OrionTenantOps = {
     try {
       const data = await OrionAPI.get("/draft-orders");
       const rows = data.draft_orders || [];
-      if (!rows.length) { el.textContent = "لا توجد مسودات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t("لا توجد مسودات.", "No drafts."); return; }
       SafeDOM.clear(el);
       for (const d of rows) {
         const row = SafeDOM.elem("div", { className: "border-b py-2 flex justify-between items-center" });
@@ -412,7 +412,7 @@ const OrionTenantOps = {
           ` — ${d.customer_email} — ${d.status}${d.notes ? ` (${d.notes})` : ""}`
         ]));
         if (d.status === "draft") {
-          row.appendChild(SafeDOM.elem("button", { "data-convert": d.id, className: "text-emerald-700 text-xs" }, ["تحويل إلى طلب"]));
+          row.appendChild(SafeDOM.elem("button", { "data-convert": d.id, className: "text-emerald-700 text-xs" }, [OrionI18n.t("تحويل إلى طلب", "Convert to order")]));
         }
         el.appendChild(row);
       }
@@ -422,7 +422,7 @@ const OrionTenantOps = {
           OrionTenantOps.loadDraftOrders();
         });
       });
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
 
   initDraftOrders() {

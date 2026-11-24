@@ -6,15 +6,15 @@ const OrionAdminImportExport = {
     try {
       const data = await OrionAPI.get("/import-export/jobs");
       const rows = data.jobs || [];
-      if (!rows.length) { el.textContent = "لا توجد مهام."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد مهام.', 'No jobs found.'); return; }
       SafeDOM.clear(el);
       for (const j of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           SafeDOM.elem("strong", {}, [j.job_type]),
-          " — ", j.entity_type, " — ", j.status || "pending", " (", j.processed_count || 0, "/", j.total_count || 0, ")"
+          " — ", j.entity_type, " — ", j.status || OrionI18n.t('قيد الانتظار', 'pending'), " (", j.processed_count || 0, "/", j.total_count || 0, ")"
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {

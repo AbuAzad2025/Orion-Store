@@ -6,17 +6,17 @@ const OrionAdminAccessibility = {
     try {
       const data = await OrionAPI.get("/accessibility/audits");
       const rows = data.audits || [];
-      if (!rows.length) { el.textContent = "لا توجد تدقيقات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد تدقيقات.', 'No audits found.'); return; }
       SafeDOM.clear(el);
       for (const a of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           SafeDOM.elem("a", { href: a.page_url, target: "_blank", className: "text-blue-600" }, [a.page_url]),
-          " — درجة: ",
+          OrionI18n.t(' — درجة: ', ' — Score: '),
           SafeDOM.elem("strong", {}, [String(a.score)]),
           "/100"
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {

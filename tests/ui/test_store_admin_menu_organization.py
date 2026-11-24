@@ -89,7 +89,7 @@ def test_rectify_action_endpoint_exists(client, app):
         json={"customer_email": "buyer@rectify.test", "request_type": "rectify"},
     )
     assert created.status_code == 201, created.get_data(as_text=True)
-    rid = created.get_json()["data_request"]["id"]
+    rid = created.get_json()["request"]["id"]
     action = client.post(
         f"/api/v1/compliance/data-requests/{rid}/rectify", headers=headers
     )

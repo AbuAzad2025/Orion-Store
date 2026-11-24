@@ -2,19 +2,19 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
-    <h2 class="orion-title mb-3">تعريفات سير العمل</h2>
+    <h2 class="orion-title mb-3">{{ t('تعريفات سير العمل', 'Workflow definitions') }}</h2>
     <form id="workflow-def-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="اسم سير العمل" required>
-      <input name="trigger_event" type="text" placeholder="حدث المشغل (مثال: order.created)" required>
-      <textarea name="actions" rows="3" placeholder="الإجراءات (JSON)" class="orion-input font-mono text-xs"></textarea>
-      <textarea name="conditions" rows="2" placeholder="الشروط (JSON، اختياري)" class="orion-input font-mono text-xs"></textarea>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">إنشاء تعريف</button>
+      <input name="name" type="text" placeholder="{{ t('اسم سير العمل', 'Workflow name') }}" required>
+      <input name="trigger_event" type="text" placeholder="{{ t('حدث المشغل (مثال: order.created)', 'Trigger event (e.g. order.created)') }}" required>
+      <textarea name="actions" rows="3" placeholder="{{ t('الإجراءات (JSON)', 'Actions (JSON)') }}" class="orion-input font-mono text-xs"></textarea>
+      <textarea name="conditions" rows="2" placeholder="{{ t('الشروط (JSON، اختياري)', 'Conditions (JSON, optional)') }}" class="orion-input font-mono text-xs"></textarea>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء تعريف', 'Create definition') }}</button>
     </form>
-    <div id="workflow-defs-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <div id="workflow-defs-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
-    <h2 class="orion-title mb-3">تشغيلات سير العمل</h2>
-    <div id="workflow-runs-list" class="orion-muted text-sm">جارٍ التحميل…</div>
+    <h2 class="orion-title mb-3">{{ t('تشغيلات سير العمل', 'Workflow runs') }}</h2>
+    <div id="workflow-runs-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
 </div>
 {% endblock %}

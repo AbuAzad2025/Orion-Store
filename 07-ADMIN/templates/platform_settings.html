@@ -1,29 +1,29 @@
 {% extends "admin_base.html" %}
 {% block content %}
-<h2 class="text-lg font-semibold mb-4">إعدادات المنصة</h2>
+<h2 class="text-lg font-semibold mb-4">{{ t('إعدادات المنصة', 'Platform Settings') }}</h2>
 
 <form id="settings-form" class="bg-white rounded border p-6 max-w-lg space-y-4">
   <div>
-    <label class="block text-sm mb-1">اسم المنصة</label>
-    <input name="platform_name" id="setting-platform-name" class="orion-input w-full" aria-label="اسم المنصة">
+    <label class="block text-sm mb-1">{{ t('اسم المنصة', 'Platform Name') }}</label>
+    <input name="platform_name" id="setting-platform-name" class="orion-input w-full" aria-label="{{ t('اسم المنصة', 'Platform Name') }}">
   </div>
   <div>
-    <label class="block text-sm mb-1">اسم المالك</label>
-    <input name="owner_name" id="setting-owner-name" class="orion-input w-full" aria-label="اسم المالك">
+    <label class="block text-sm mb-1">{{ t('اسم المالك', 'Owner Name') }}</label>
+    <input name="owner_name" id="setting-owner-name" class="orion-input w-full" aria-label="{{ t('اسم المالك', 'Owner Name') }}">
   </div>
   <div>
-    <label class="block text-sm mb-1">بريد الدعم الإلكتروني</label>
-    <input name="support_email" id="setting-support-email" type="email" class="orion-input w-full" aria-label="بريد الدعم الإلكتروني">
+    <label class="block text-sm mb-1">{{ t('بريد الدعم الإلكتروني', 'Support Email') }}</label>
+    <input name="support_email" id="setting-support-email" type="email" class="orion-input w-full" aria-label="{{ t('بريد الدعم الإلكتروني', 'Support Email') }}">
   </div>
   <div>
-    <label class="block text-sm mb-1">العملة الافتراضية</label>
-    <input name="default_currency" id="setting-default-currency" class="orion-input w-full" aria-label="العملة الافتراضية">
+    <label class="block text-sm mb-1">{{ t('العملة الافتراضية', 'Default Currency') }}</label>
+    <input name="default_currency" id="setting-default-currency" class="orion-input w-full" aria-label="{{ t('العملة الافتراضية', 'Default Currency') }}">
   </div>
   <div>
-    <label class="block text-sm mb-1">اللغة الافتراضية</label>
-    <input name="default_language" id="setting-default-language" class="orion-input w-full" aria-label="اللغة الافتراضية">
+    <label class="block text-sm mb-1">{{ t('اللغة الافتراضية', 'Default Language') }}</label>
+    <input name="default_language" id="setting-default-language" class="orion-input w-full" aria-label="{{ t('اللغة الافتراضية', 'Default Language') }}">
   </div>
-  <button type="submit" class="orion-btn orion-btn-gold text-sm">حفظ الإعدادات</button>
+  <button type="submit" class="orion-btn orion-btn-gold text-sm">{{ t('حفظ الإعدادات', 'Save Settings') }}</button>
 </form>
 {% endblock %}
 {% block scripts %}

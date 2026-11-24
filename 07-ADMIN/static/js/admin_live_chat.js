@@ -8,21 +8,21 @@ const OrionAdminLiveChat = {
     try {
       const data = await OrionAPI.get("/live-chat/sessions");
       const rows = data.sessions || [];
-      if (!rows.length) { el.textContent = "لا توجد جلسات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد جلسات.', 'No sessions found.'); return; }
       SafeDOM.clear(el);
       for (const s of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex justify-between items-center" }, [
           SafeDOM.elem("span", {}, [
             SafeDOM.elem("strong", {}, [`#${s.id}`]),
-            " — ", s.customer_email || "زائر", " — ", s.status
+            " — ", s.customer_email || OrionI18n.t('زائر', 'Visitor'), " — ", s.status
           ]),
-          SafeDOM.elem("button", { "data-open": s.id, className: "text-blue-600 text-xs" }, ["فتح"])
+          SafeDOM.elem("button", { "data-open": s.id, className: "text-blue-600 text-xs" }, [OrionI18n.t('فتح', 'Open')])
         ]));
       }
       el.querySelectorAll("[data-open]").forEach((btn) => {
         btn.addEventListener("click", () => OrionAdminLiveChat.openSession(parseInt(btn.dataset.open)));
       });
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async openSession(sessionId) {
@@ -46,7 +46,7 @@ const OrionAdminLiveChat = {
         ]));
       }
       el.scrollTop = el.scrollHeight;
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {

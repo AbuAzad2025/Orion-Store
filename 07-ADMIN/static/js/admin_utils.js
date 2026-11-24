@@ -62,5 +62,5 @@ const OrionUI = {
 
 document.addEventListener("orion-api-error", (event) => {
   const detail = event.detail || {};
-  OrionUI.toast(detail.error?.message || "حدث خطأ غير متوقع", "error");
+  OrionUI.toast(detail.error?.message || OrionI18n.t("حدث خطأ غير متوقع", "An unexpected error occurred"), "error");
 });

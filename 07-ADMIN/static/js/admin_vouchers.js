@@ -8,15 +8,15 @@ const OrionAdminVouchers = {
       const rows = data.vouchers || [];
       SafeDOM.clear(el);
       if (!rows.length) {
-        el.appendChild(SafeDOM.elem("p", { className: "orion-muted" }, ["لا توجد قسائم."]));
+        el.appendChild(SafeDOM.elem("p", { className: "orion-muted" }, [OrionI18n.t('لا توجد قسائم.', 'No vouchers.')]));
         return;
       }
       for (const v of rows) {
-        const remove = SafeDOM.actionBtn("حذف", "orion-btn", async () => {
-          if (!OrionUI.confirmDanger(`حذف القسيمة ${v.code}؟`)) return;
+        const remove = SafeDOM.actionBtn(OrionI18n.t('حذف', 'Delete'), "orion-btn", async () => {
+          if (!OrionUI.confirmDanger(`${OrionI18n.t('حذف القسيمة', 'Delete voucher')} ${v.code}?`)) return;
           try {
             await OrionAPI.delete(`/vouchers/${encodeURIComponent(v.code)}`);
-            OrionUI.toast("تم حذف القسيمة", "success");
+            OrionUI.toast(OrionI18n.t('تم حذف القسيمة', 'Voucher deleted'), "success");
             OrionAdminVouchers.loadVouchers();
           } catch (err) { OrionUI.toast(err.message, "error"); }
         });
@@ -24,7 +24,7 @@ const OrionAdminVouchers = {
           SafeDOM.elem("span", {}, [
             SafeDOM.elem("strong", {}, [v.code]), " — ", v.value,
             " ", v.type === "percentage" ? "%" : "₪",
-            " — مستخدم: ", v.usage_count ?? 0, "/", v.usage_limit ?? "∞"
+            " — " + OrionI18n.t('مستخدم', 'Used') + ": ", v.usage_count ?? 0, "/", v.usage_limit ?? "∞"
           ]),
           remove
         ]));
@@ -52,7 +52,7 @@ const OrionAdminVouchers = {
           is_free_shipping: document.getElementById("v-free-shipping").checked,
         }));
         form.reset();
-        msg.textContent = "تم حفظ القسيمة";
+        msg.textContent = OrionI18n.t('تم حفظ القسيمة', 'Voucher saved');
         OrionUI.toast(msg.textContent, "success");
         OrionAdminVouchers.loadVouchers();
       } catch (err) {

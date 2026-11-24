@@ -2,18 +2,18 @@
 {% block content %}
 <section class="orion-card max-w-xl space-y-4">
   <div>
-    <span class="orion-eyebrow">واتساب</span>
-    <h2 class="orion-title">رقم تواصل المتجر</h2>
+    <span class="orion-eyebrow">{{ t('واتساب', 'WhatsApp') }}</span>
+    <h2 class="orion-title">{{ t('رقم تواصل المتجر', 'Store contact number') }}</h2>
     <p class="orion-muted text-sm">
-      يُستخدم الرقم في زر التواصل وزر «اطلب عبر واتساب» في المتجر.
-      اكتبه بصيغة دولية مثل <span dir="ltr">+970501234567</span>.
+      {{ t('يُستخدم الرقم في زر التواصل وزر «اطلب عبر واتساب» في المتجر.', 'The number is used for the contact button and the "Order via WhatsApp" button in the store.') }}
+      {{ t('اكتبه بصيغة دولية مثل', 'Enter it in international format, e.g.') }} <span dir="ltr">+970501234567</span>.
     </p>
   </div>
   <form id="contact-form" class="space-y-3">
-    <label class="orion-stat-label" for="contact-phone">رقم الهاتف</label>
+    <label class="orion-stat-label" for="contact-phone">{{ t('رقم الهاتف', 'Phone number') }}</label>
     <input id="contact-phone" name="phone" class="orion-input" dir="ltr"
-           placeholder="+970501234567" aria-label="رقم الهاتف للواتساب">
-    <button type="submit" class="orion-btn orion-btn-gold">حفظ التغييرات</button>
+           placeholder="+970501234567" aria-label="{{ t('رقم الهاتف للواتساب', 'WhatsApp phone number') }}">
+    <button type="submit" class="orion-btn orion-btn-gold">{{ t('حفظ التغييرات', 'Save changes') }}</button>
     <p id="contact-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
   </form>
 </section>
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
         OrionAPI.put("/tenant/contact", { phone: input.value.trim() })
       );
       input.value = data.phone || "";
-      msg.textContent = "تم الحفظ بنجاح";
+      msg.textContent = "{{ t('تم الحفظ بنجاح', 'Saved successfully') }}";
     } catch (err) {
       msg.textContent = err.message;
     }

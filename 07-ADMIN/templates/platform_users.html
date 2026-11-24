@@ -1,50 +1,50 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="flex justify-between items-center mb-4">
-  <h2 class="text-lg font-semibold">المستخدمون</h2>
-  <button onclick="OrionAdminPlatform.openUserModal()" class="orion-btn orion-btn-gold text-sm">+ مستخدم جديد</button>
+  <h2 class="text-lg font-semibold">{{ t('المستخدمون', 'Users') }}</h2>
+  <button onclick="OrionAdminPlatform.openUserModal()" class="orion-btn orion-btn-gold text-sm">{{ t('+ مستخدم جديد', '+ New User') }}</button>
 </div>
 
 <div class="orion-card">
   <table class="w-full text-sm">
     <thead><tr class="border-b bg-gray-50 text-start">
-      <th class="p-3">البريد الإلكتروني</th>
-      <th class="p-3">الاسم</th>
-      <th class="p-3">المتجر</th>
-      <th class="p-3">الصلاحيات</th>
-      <th class="p-3">الحالة</th>
-      <th class="p-3">إجراء</th>
+      <th class="p-3">{{ t('البريد الإلكتروني', 'Email') }}</th>
+      <th class="p-3">{{ t('الاسم', 'Name') }}</th>
+      <th class="p-3">{{ t('المتجر', 'Store') }}</th>
+      <th class="p-3">{{ t('الصلاحيات', 'Permissions') }}</th>
+      <th class="p-3">{{ t('الحالة', 'Status') }}</th>
+      <th class="p-3">{{ t('إجراء', 'Action') }}</th>
     </tr></thead>
-    <tbody id="users-list"><tr><td colspan="6" class="p-3">جارٍ التحميل…</td></tr></tbody>
+    <tbody id="users-list"><tr><td colspan="6" class="p-3">{{ t('جارٍ التحميل…', 'Loading…') }}</td></tr></tbody>
   </table>
 </div>
 
 <div id="user-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
   <div class="orion-card w-full max-w-md space-y-3">
-    <h3 class="font-semibold text-lg">إضافة مستخدم</h3>
+    <h3 class="font-semibold text-lg">{{ t('إضافة مستخدم', 'Add User') }}</h3>
     <form id="user-form" class="space-y-3">
       <div>
-        <label class="block text-sm mb-1">البريد الإلكتروني</label>
-        <input name="email" id="user-email" type="email" required class="orion-input w-full" aria-label="البريد الإلكتروني">
+        <label class="block text-sm mb-1">{{ t('البريد الإلكتروني', 'Email') }}</label>
+        <input name="email" id="user-email" type="email" required class="orion-input w-full" aria-label="{{ t('البريد الإلكتروني', 'Email') }}">
       </div>
       <div>
-        <label class="block text-sm mb-1">كلمة المرور</label>
-        <input name="password" id="user-password" type="password" required class="orion-input w-full" aria-label="كلمة المرور">
+        <label class="block text-sm mb-1">{{ t('كلمة المرور', 'Password') }}</label>
+        <input name="password" id="user-password" type="password" required class="orion-input w-full" aria-label="{{ t('كلمة المرور', 'Password') }}">
       </div>
       <div>
-        <label class="block text-sm mb-1">نوع الحساب</label>
+        <label class="block text-sm mb-1">{{ t('نوع الحساب', 'Account Type') }}</label>
         <select name="user_type" id="user-type" class="orion-input w-full">
-          <option value="tenant_admin">مدير متجر</option>
-          <option value="platform_admin">مدير منصة</option>
+          <option value="tenant_admin">{{ t('مدير متجر', 'Store Admin') }}</option>
+          <option value="platform_admin">{{ t('مدير منصة', 'Platform Admin') }}</option>
         </select>
       </div>
       <div id="user-tenant-wrap">
-        <label class="block text-sm mb-1">المتجر</label>
+        <label class="block text-sm mb-1">{{ t('المتجر', 'Store') }}</label>
         <select name="tenant_id" id="user-tenant-id" class="orion-input w-full"></select>
       </div>
       <div class="flex justify-end gap-2 pt-3">
-        <button type="button" onclick="OrionAdminPlatform.closeUserModal()" class="px-4 py-2 border rounded text-sm">إلغاء</button>
-        <button type="submit" class="orion-btn orion-btn-gold text-sm">حفظ التغييرات</button>
+        <button type="button" onclick="OrionAdminPlatform.closeUserModal()" class="px-4 py-2 border rounded text-sm">{{ t('إلغاء', 'Cancel') }}</button>
+        <button type="submit" class="orion-btn orion-btn-gold text-sm">{{ t('حفظ التغييرات', 'Save Changes') }}</button>
       </div>
     </form>
   </div>

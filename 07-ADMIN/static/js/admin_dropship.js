@@ -6,15 +6,15 @@ const OrionAdminDropship = {
     try {
       const data = await OrionAPI.get("/dropship/pod");
       const rows = data.connections || [];
-      if (!rows.length) { el.textContent = "لا توجد اتصالات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد اتصالات.', 'No connections found.'); return; }
       SafeDOM.clear(el);
       for (const c of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           SafeDOM.elem("strong", {}, [c.provider]),
-          " — ", c.api_url || "بدون رابط"
+          " — ", c.api_url || OrionI18n.t('بدون رابط', 'No link')
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadSuppliers() {
@@ -23,15 +23,15 @@ const OrionAdminDropship = {
     try {
       const data = await OrionAPI.get("/dropship/suppliers");
       const rows = data.suppliers || [];
-      if (!rows.length) { el.textContent = "لا يوجد موردون."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا يوجد موردون.', 'No suppliers found.'); return; }
       SafeDOM.clear(el);
       for (const s of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
           SafeDOM.elem("strong", {}, [s.name]),
-          " — ", s.contact_email, " — ", s.fulfillment_time_days, " يوم"
+          " — ", s.contact_email, " — ", s.fulfillment_time_days, OrionI18n.t(' يوم', ' days')
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   async loadOrders() {
@@ -40,14 +40,14 @@ const OrionAdminDropship = {
     try {
       const data = await OrionAPI.get("/dropship/orders");
       const rows = data.orders || data.dropship_orders || [];
-      if (!rows.length) { el.textContent = "لا توجد طلبات."; return; }
+      if (!rows.length) { el.textContent = OrionI18n.t('لا توجد طلبات.', 'No orders found.'); return; }
       SafeDOM.clear(el);
       for (const o of rows) {
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          "مورد #", o.supplier_id, " — طلب #", o.order_id, " — ", o.cost
+          OrionI18n.t('مورد #', 'Supplier #'), o.supplier_id, OrionI18n.t(' — طلب #', ' — Order #'), o.order_id, " — ", o.cost
         ]));
       }
-    } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
+    } catch (err) { el.textContent = err.message || OrionI18n.t('تعذّر التحميل', 'Failed to load'); }
   },
 
   init() {
