@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page_title }}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('admin_assets.static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/fonts.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
+</head>
+<body class="orion-surface orion-home-body">
+  <main class="orion-home">
+    <header class="orion-home-topbar">
+      <div class="orion-home-brand">
+        <span class="orion-brand-mark" aria-hidden="true">A</span>
+        <span>
+          <strong>{{ platform_settings.platform_name | default('Azadexa') }}</strong>
+          <span class="orion-muted">منصة التجارة الإلكترونية الذكية</span>
+        </span>
+      </div>
+      <nav class="orion-home-nav" aria-label="روابط الدخول">
+        <a href="/admin/login" class="orion-nav-login">دخول المتجر</a>
+        <a href="/admin/login" class="orion-btn orion-btn-gold">دخول المنصة</a>
+      </nav>
+    </header>
+
+    <section class="orion-hero orion-home-hero">
+      <div class="orion-hero-glow" aria-hidden="true"></div>
+      <div class="orion-hero-content">
+        <span class="orion-hero-badge">مرحباً بك في Azadexa</span>
+        <h1 class="orion-hero-title">متجرك الإلكتروني، جاهز للانطلاق</h1>
+        <p class="orion-hero-subtitle">إدارة المتاجر والمنتجات والطلبات والعملاء من منصة واحدة، بواجهة عربية وإنجليزية كاملة وتصميم متجاوب.</p>
+        <div class="orion-hero-actions">
+          {% if viewer_user and viewer_user.is_superuser %}
+          <a href="/admin/platform/dashboard" class="orion-btn orion-btn-gold">لوحة المنصة</a>
+          {% else %}
+          <a href="/admin/login" class="orion-btn orion-btn-gold">دخول لوحة المنصة</a>
+          {% endif %}
+          <a href="/admin/login" class="orion-btn orion-btn-ghost">دخول مدير المتجر</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="orion-home-section">
+      <div class="orion-section-head">
+        <div>
+          <span class="orion-eyebrow">متاجر المنصة</span>
+          <h2 class="orion-section-title">متاجرنا النشطة</h2>
+        </div>
+        <span class="orion-section-line" aria-hidden="true"></span>
+      </div>
+      {% if stores %}
+      <div class="orion-store-banners">
+        {% for store in stores %}
+        <a class="orion-store-banner" href="https://{{ store.slug }}.azadexa.com/" target="_blank" rel="noopener"
+           aria-label="زيارة متجر {{ store.name }}">
+          <span class="orion-store-banner-mark" aria-hidden="true">{{ store.name[:1]|upper }}</span>
+          <span class="orion-store-banner-info">
+            <strong>{{ store.name }}</strong>
+            <span class="orion-muted">{{ store.slug }}.azadexa.com</span>
+          </span>
+          <span class="orion-store-banner-cta">زيارة المتجر ↗</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="orion-muted">لا توجد متاجر نشطة حالياً.</p>
+      {% endif %}
+    </section>
+
+    <footer class="orion-home-footer">
+      {{ platform_settings.platform_name | default('Azadexa') }} — تطوير: {{ platform_settings.owner_name | default('Ahmad Ghannam') }}
+    </footer>
+  </main>
+</body>
+</html>

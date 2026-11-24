@@ -1346,3 +1346,41 @@ body.orion-surface {
 .orion-auth-sso { padding: 1.15rem 1.5rem; }
 .orion-auth-sso summary { cursor: pointer; color: var(--orion-gold); font-size: .84rem; font-weight: 800; }
 .orion-auth-sso form { margin-block-start: 1rem; display: grid; gap: .9rem; }
+
+/* Platform public landing page. */
+.orion-home-body { min-block-size: 100vh; display: grid; place-items: center; padding: 1.5rem; }
+.orion-home { inline-size: min(100%, 64rem); display: grid; gap: 1.5rem; }
+.orion-home-topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .9rem 1.1rem; border: 1px solid var(--orion-border); border-radius: 16px;
+  background: linear-gradient(135deg, var(--orion-panel-2), var(--orion-panel));
+}
+.orion-home-brand { display: flex; align-items: center; gap: .8rem; }
+.orion-home-brand strong { display: block; color: var(--orion-text); font-size: 1.05rem; font-weight: 800; }
+.orion-home-brand .orion-muted { font-size: .74rem; }
+.orion-home-nav { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.orion-home-hero { min-block-size: auto; }
+.orion-home-section { display: grid; gap: .4rem; }
+.orion-store-banners { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; }
+.orion-store-banner {
+  display: flex; align-items: center; gap: .85rem;
+  padding: 1rem; border: 1px solid var(--orion-border); border-radius: 16px;
+  background: linear-gradient(150deg, var(--orion-panel), var(--orion-panel-2));
+  text-decoration: none; color: var(--orion-text);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.orion-store-banner:hover {
+  transform: translateY(-3px); border-color: var(--orion-gold);
+  box-shadow: 0 16px 30px rgba(0,0,0,.32);
+}
+.orion-store-banner-mark {
+  display: inline-grid; place-items: center; inline-size: 2.8rem; block-size: 2.8rem;
+  flex: none; border-radius: 12px;
+  background: linear-gradient(135deg, var(--orion-gold), var(--orion-gold-strong));
+  color: #1b1405; font-size: 1.1rem; font-weight: 900;
+}
+.orion-store-banner-info { display: grid; gap: .1rem; min-inline-size: 0; flex: 1; }
+.orion-store-banner-info strong { font-size: .95rem; }
+.orion-store-banner-info .orion-muted { font-size: .72rem; direction: ltr; text-align: start; }
+.orion-store-banner-cta { color: var(--orion-gold); font-size: .78rem; font-weight: 800; white-space: nowrap; }
+.orion-home-footer { text-align: center; color: var(--orion-muted); font-size: .76rem; padding-block: .5rem; }

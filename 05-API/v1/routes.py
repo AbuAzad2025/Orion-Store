@@ -173,9 +173,13 @@ def register_ui_blueprints(app: Flask) -> None:
     from engine.routes import storefront_ui_bp
     from engine.storefront_assets import storefront_assets_bp
     from platform_admin.routes import platform_admin_bp
+    from platform_home import platform_home_bp
     from tenant_admin.routes import tenant_admin_bp
 
     app.register_blueprint(admin_assets_bp)
+    # Registered before the catch-all storefront so "/" on the platform domain
+    # renders the platform landing page instead of a storefront 404.
+    app.register_blueprint(platform_home_bp)
     app.register_blueprint(admin_auth_bp, url_prefix="/admin")
     app.register_blueprint(tenant_admin_bp, url_prefix="/admin/store")
     app.register_blueprint(platform_admin_bp, url_prefix="/admin/platform")
