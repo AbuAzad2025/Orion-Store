@@ -1351,8 +1351,8 @@ body.orion-surface {
   padding: .9rem 1.1rem; border: 1px solid var(--orion-border); border-radius: 16px;
   background: linear-gradient(135deg, var(--orion-panel-2), var(--orion-panel));
 }
-.orion-home-brand { display: flex; align-items: stretch; flex: 1 1 auto; min-inline-size: 0; }
-.orion-home-logo { display: block; inline-size: 100%; block-size: 100%; min-block-size: 6rem; max-block-size: 9rem; object-fit: cover; object-position: right center; }
+.orion-home-brand { display: block; flex: 1; min-inline-size: 0; align-self: stretch; }
+.orion-home-logo { display: block; inline-size: 100%; block-size: 100%; min-block-size: 6rem; object-fit: cover; object-position: right center; }
 @media (max-width: 860px) { .orion-home-logo { min-block-size: 3.5rem; max-block-size: 5rem; } }
 .orion-home-nav { display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap; }
 .orion-home-nav-group { display: inline-flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
