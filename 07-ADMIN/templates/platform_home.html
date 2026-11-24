@@ -119,12 +119,12 @@
       {% if stores %}
       <div class="orion-store-banners">
         {% for store in stores %}
-        <a class="orion-store-banner" href="https://{{ store.slug }}.azadexa.com/" target="_blank" rel="noopener"
+        <a class="orion-store-banner" href="{{ store.url }}" target="_blank" rel="noopener"
            aria-label="{{ t.visit }} {{ store.name }}">
           <span class="orion-store-banner-mark" aria-hidden="true">{{ store.name[:1]|upper }}</span>
           <span class="orion-store-banner-info">
             <strong>{{ store.name }}</strong>
-            <span class="orion-muted">{{ store.slug }}.azadexa.com</span>
+            <span class="orion-muted">orion.azadexa.com · {{ store.slug }}</span>
           </span>
           <span class="orion-store-banner-cta">{{ t.visit }}</span>
         </a>
@@ -155,19 +155,19 @@
           <span class="orion-access-icon" aria-hidden="true">🏪</span>
           <strong>{{ t.access_store }}</strong>
           <span class="orion-muted">{{ t.access_store_d }}</span>
-          <span class="orion-access-go">متجر demo — /admin/login ↗</span>
+          <span class="orion-access-go">slug — orion.azadexa.com/admin/login ↗</span>
         </a>
-        <a href="{{ store_url }}account?store={{ store_token }}" class="orion-access-card" target="_blank" rel="noopener">
+        <a href="{{ account_url }}" class="orion-access-card" target="_blank" rel="noopener">
           <span class="orion-access-icon" aria-hidden="true">👤</span>
           <strong>{{ t.access_member }}</strong>
           <span class="orion-muted">{{ t.access_member_d }}</span>
           <span class="orion-access-go">/account?store=… ↗</span>
         </a>
-        <a href="{{ store_url }}?store={{ store_token }}" class="orion-access-card" target="_blank" rel="noopener">
+        <a href="{{ store_url }}" class="orion-access-card" target="_blank" rel="noopener">
           <span class="orion-access-icon" aria-hidden="true">🛒</span>
           <strong>{{ t.access_guest }}</strong>
           <span class="orion-muted">{{ t.access_guest_d }}</span>
-          <span class="orion-access-go">demo.azadexa.com ↗</span>
+          <span class="orion-access-go">orion.azadexa.com/?store=… ↗</span>
         </a>
       </div>
     </section>

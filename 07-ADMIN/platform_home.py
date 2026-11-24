@@ -38,22 +38,38 @@ def platform_home():
 
         return render_store_index()
 
+    # One domain only: a signed store token on "/" renders that store's
+    # storefront instead of the landing page.
+    if request.args.get("store") or request.args.get("tenant_slug"):
+        from engine.routes import render_store_index
+
+        return render_store_index()
+
     locale = (request.args.get("locale") or "ar").strip().lower()
     if locale not in ("ar", "en"):
         locale = "ar"
-    stores = (
+    rows = (
         Tenant.query.filter_by(is_active=True, deleted_at=None)
         .order_by(Tenant.id)
         .all()
     )
     from core.store_token import issue as issue_store_token
 
-    store_url = f"https://{stores[0].slug}.azadexa.com/" if stores else "#"
-    store_token = issue_store_token(stores[0]) if stores else ""
-    store_admin_url = (
-        f"https://{stores[0].slug}.azadexa.com/admin/login"
-        if stores
-        else "/admin/login"
+    def card(store):
+        return {
+            "name": store.name,
+            "slug": store.slug,
+            "url": f"/?store={issue_store_token(store)}",
+            "admin_url": f"/admin/login?tenant_slug={store.slug}",
+        }
+
+    stores = [card(s) for s in rows]
+    primary = stores[0] if stores else None
+    store_url = primary["url"] if primary else "#"
+    store_token = request.args.get("store", "")
+    store_admin_url = primary["admin_url"] if primary else "/admin/login"
+    account_url = (
+        f"/account?store={issue_store_token(rows[0])}" if rows else "#"
     )
     return render_template(
         "platform_home.html",
@@ -63,4 +79,5 @@ def platform_home():
         store_url=store_url,
         store_token=store_token,
         store_admin_url=store_admin_url,
+        account_url=account_url,
     )
