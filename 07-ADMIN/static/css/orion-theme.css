@@ -1390,8 +1390,7 @@ body.orion-surface {
 .orion-company-contact p { color: var(--orion-text-soft); font-size: .8rem; margin-block: .35rem; }
 .orion-company-qr { display: block; inline-size: 6.5rem; block-size: 6.5rem; margin-block: .7rem .25rem; background: #fff; padding: .3rem; border-radius: 8px; }
 .orion-company-actions { display: grid; gap: .6rem; align-content: start; }
-.orion-company-bottom { padding: .85rem 1.5rem; border-block-start: 1px solid var(--orion-border); color: var(--orion-muted); font-size: .74rem; text-align: center; }
-.orion-company-banner-link { display: block; overflow: hidden; border-radius: 18px 18px 0 0; }
+.orion-company-banner-link { display: block; overflow: hidden; border-radius: 18px; }
 .orion-company-banner { display: block; inline-size: 100%; block-size: 230px; object-fit: cover; object-position: center; transition: transform 200ms ease; }
 .orion-company-banner-link:hover .orion-company-banner { transform: scale(1.015); }
 .orion-company-actions { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; padding: 1.2rem 1rem; }
