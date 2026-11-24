@@ -70,13 +70,17 @@ const OrionAdminPlatform = {
         const slugTd = SafeDOM.elem("td", { className: "p-3" }, [t.slug]);
         const emailTd = SafeDOM.elem("td", { className: "p-3" }, [t.email]);
         const statusTd = SafeDOM.elem("td", { className: "p-3" }, [t.status]);
+        const enterLink = SafeDOM.elem("a", {
+          className: "orion-btn text-sm ml-2",
+          href: `/admin/login?tenant_slug=${encodeURIComponent(t.slug)}`,
+        }, [OrionI18n.t("دخول المتجر", "Enter store")]);
         const editBtn = SafeDOM.actionBtn("تعديل", "text-blue-600 text-sm ml-2", () => OrionAdminPlatform.editTenant(t.id));
         const deleteBtn = SafeDOM.actionBtn("حذف", "text-red-600 text-sm", () => OrionAdminPlatform.deleteTenant(t.id));
         const financeLink = SafeDOM.elem("a", {
           className: "text-blue-600 text-sm ml-2",
           href: `/admin/platform/stores/${t.id}/finance`,
         }, ["مالية"]);
-        const actionsTd = SafeDOM.elem("td", { className: "p-3" }, [editBtn, financeLink, deleteBtn]);
+        const actionsTd = SafeDOM.elem("td", { className: "p-3" }, [enterLink, editBtn, financeLink, deleteBtn]);
         el.appendChild(SafeDOM.elem("tr", { className: "border-b" }, [nameTd, slugTd, emailTd, statusTd, actionsTd]));
       }
     } catch (err) {
