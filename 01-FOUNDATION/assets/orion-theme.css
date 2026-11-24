@@ -1345,7 +1345,7 @@ body.orion-surface {
 
 /* Platform public landing page. */
 .orion-home-body { min-block-size: 100vh; display: grid; place-items: center; padding: 1.5rem; }
-.orion-home { inline-size: min(100%, 64rem); display: grid; gap: 1.5rem; }
+.orion-home { inline-size: min(100%, 72rem); display: grid; gap: 1.5rem; }
 .orion-home-topbar {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   padding: .9rem 1.1rem; border: 1px solid var(--orion-border); border-radius: 16px;
@@ -1391,8 +1391,8 @@ body.orion-surface {
 .orion-company-qr { display: block; inline-size: 6.5rem; block-size: 6.5rem; margin-block: .7rem .25rem; background: #fff; padding: .3rem; border-radius: 8px; }
 .orion-company-actions { display: grid; gap: .6rem; align-content: start; }
 .orion-company-bottom { padding: .85rem 1.5rem; border-block-start: 1px solid var(--orion-border); color: var(--orion-muted); font-size: .74rem; text-align: center; }
-.orion-company-banner-link { display: block; padding: 1rem; }
-.orion-company-banner { display: block; inline-size: 100%; block-size: auto; border-radius: 12px; }
-.orion-company-banner-link:hover .orion-company-banner { transform: translateY(-2px); }
-.orion-company-actions { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; padding: 0 1rem 1.2rem; }
+.orion-company-banner-link { display: block; overflow: hidden; border-radius: 18px 18px 0 0; }
+.orion-company-banner { display: block; inline-size: 100%; block-size: 230px; object-fit: cover; object-position: center; transition: transform 200ms ease; }
+.orion-company-banner-link:hover .orion-company-banner { transform: scale(1.015); }
+.orion-company-actions { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; padding: 1.2rem 1rem; }
 @media (max-width: 860px) { .orion-company-actions { flex-direction: column; } }
