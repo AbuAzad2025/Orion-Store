@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flask import Blueprint, g, redirect, render_template, request
+from flask import Blueprint, g, make_response, render_template, request, url_for
 
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant.tenant import Tenant
@@ -29,13 +29,58 @@ def inject_platform_settings():
 
 @platform_home_bp.get("/s/<slug>")
 def short_store_link(slug: str):
-    """Short, human-friendly store link; the signed token stays server-side."""
-    from core.store_token import issue as issue_store_token
+    """Short, indexable store URL served directly (200) for SEO."""
+    from engine.routes import render_store_index
 
     tenant = Tenant.query.filter_by(
         slug=slug, is_active=True, deleted_at=None
     ).first_or_404()
-    return redirect(f"/?store={issue_store_token(tenant)}")
+    g.tenant = tenant
+    g.tenant_id = tenant.id
+    return render_store_index()
+
+
+@platform_home_bp.get("/robots.txt")
+def robots_txt():
+    body = (
+        "User-agent: *\n"
+        "Allow: /$\n"
+        "Disallow: /admin/\n"
+        "Disallow: /api/\n"
+        "Disallow: /*?store=\n"
+        f"Sitemap: {request.host_url.rstrip('/')}/sitemap.xml\n"
+    )
+    resp = make_response(body, 200)
+    resp.headers["Content-Type"] = "text/plain; charset=utf-8"
+    return resp
+
+
+@platform_home_bp.get("/sitemap.xml")
+def sitemap_xml():
+    from core.store_token import issue as issue_store_token
+
+    rows = (
+        Tenant.query.filter_by(is_active=True, deleted_at=None)
+        .order_by(Tenant.id)
+        .all()
+    )
+    base = request.host_url.rstrip("/")
+    urls = [(f"{base}/", "daily", "1.0"), (f"{base}/?locale=en", "weekly", "0.8")]
+    for store in rows:
+        urls.append((f"{base}/s/{store.slug}", "weekly", "0.9"))
+        urls.append((f"{base}/?store={issue_store_token(store)}", "never", "0.1"))
+    body = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for loc, freq, priority in urls:
+        body.append(
+            f"  <url><loc>{loc}</loc><changefreq>{freq}</changefreq><priority>{priority}</priority></url>"
+        )
+    body.append("</urlset>")
+    resp = make_response("\n".join(body), 200)
+    resp.headers["Content-Type"] = "application/xml; charset=utf-8"
+    return resp
 
 
 @platform_home_bp.get("/")
