@@ -58,3 +58,7 @@ node_modules/
 
 # Browser E2E artifacts
 test-results/
+
+# Local logo source folders (copies live in static/images)
+logos/
+logos-favicons/
