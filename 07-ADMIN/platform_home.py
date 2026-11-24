@@ -29,11 +29,27 @@ def inject_platform_settings():
 
 @platform_home_bp.get("/")
 def platform_home():
+    from flask import request
+
+    locale = (request.args.get("locale") or "ar").strip().lower()
+    if locale not in ("ar", "en"):
+        locale = "ar"
     stores = (
         Tenant.query.filter_by(is_active=True, deleted_at=None)
         .order_by(Tenant.id)
         .all()
     )
+    store_url = f"https://{stores[0].slug}.azadexa.com/" if stores else "#"
+    store_admin_url = (
+        f"https://{stores[0].slug}.azadexa.com/admin/login"
+        if stores
+        else "/admin/login"
+    )
     return render_template(
-        "platform_home.html", page_title="منصة Azadexa", stores=stores
+        "platform_home.html",
+        page_title="Azadexa Platform" if locale == "en" else "منصة Azadexa",
+        stores=stores,
+        locale=locale,
+        store_url=store_url,
+        store_admin_url=store_admin_url,
     )

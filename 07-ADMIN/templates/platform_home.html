@@ -1,5 +1,38 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+{% set L = {
+  'ar': {
+    'tagline': 'منصة التجارة الإلكترونية الذكية',
+    'login_store': 'دخول المتجر',
+    'login_platform': 'دخول المنصة',
+    'create_store': '🧱 أنشئ متجرك الخاص',
+    'donate': '❤️ تبرع لنا',
+    'badge': 'مرحباً بك في Azadexa',
+    'title': 'متجرك الإلكتروني، جاهز للانطلاق',
+    'subtitle': 'إدارة المتاجر والمنتجات والطلبات والعملاء من منصة واحدة، بواجهة عربية وإنجليزية كاملة وتصميم متجاوب.',
+    'browse': 'تصفح المتجر ↗',
+    'stores_eyebrow': 'متاجر المنصة',
+    'stores_title': 'متاجرنا النشطة',
+    'visit': 'زيارة المتجر ↗',
+    'no_stores': 'لا توجد متاجر نشطة حالياً.'
+  },
+  'en': {
+    'tagline': 'Smart e-commerce platform',
+    'login_store': 'Store admin',
+    'login_platform': 'Platform admin',
+    'create_store': '🧱 Create your store',
+    'donate': '❤️ Donate to us',
+    'badge': 'Welcome to Azadexa',
+    'title': 'Your online store, ready to launch',
+    'subtitle': 'Manage stores, products, orders and customers from one platform, with full Arabic/English interfaces and a responsive design.',
+    'browse': 'Browse the store ↗',
+    'stores_eyebrow': 'Platform stores',
+    'stores_title': 'Our active stores',
+    'visit': 'Visit store ↗',
+    'no_stores': 'No active stores yet.'
+  }
+} %}
+{% set t = L[locale] %}
+<html lang="{{ locale }}" dir="{{ 'rtl' if locale == 'ar' else 'ltr' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,18 +49,29 @@
         <span class="orion-brand-mark" aria-hidden="true">A</span>
         <span>
           <strong>{{ platform_settings.platform_name | default('Azadexa') }}</strong>
-          <span class="orion-muted">منصة التجارة الإلكترونية الذكية</span>
+          <span class="orion-muted">{{ t.tagline }}</span>
         </span>
       </div>
-      <nav class="orion-home-nav" aria-label="روابط الدخول">
-        <span class="orion-home-nav-group">
-          <a href="/admin/login" class="orion-nav-login">دخول المتجر</a>
-          <a href="/admin/login" class="orion-btn orion-btn-gold">دخول المنصة</a>
+      <nav class="orion-home-nav" aria-label="{{ t.login_platform }}">
+        <span class="orion-locale-switch" role="group" aria-label="{{ 'اللغة' if locale == 'ar' else 'Language' }}">
+          <a href="/?locale=ar" class="orion-locale-link{% if locale == 'ar' %} is-active{% endif %}"
+             hreflang="ar" aria-label="العربية" {% if locale == 'ar' %}aria-current="true"{% endif %}>ع</a>
+          <a href="/?locale=en" class="orion-locale-link{% if locale == 'en' %} is-active{% endif %}"
+             hreflang="en" aria-label="English" {% if locale == 'en' %}aria-current="true"{% endif %}>EN</a>
         </span>
         <span class="orion-home-nav-sep" aria-hidden="true"></span>
         <span class="orion-home-nav-group">
-          <a href="https://wa.me/972562150193?text=%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A5%D9%86%D8%B4%D8%A7%D8%A1%20%D9%85%D8%AA%D8%AC%D8%B1%D9%8A%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5" class="orion-btn" target="_blank" rel="noopener">🧱 أنشئ متجرك الخاص</a>
-          <a href="https://wa.me/972562150193?text=%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D9%84%D8%AA%D8%A8%D8%B1%D8%B9%20%D9%84%D8%AF%D8%B9%D9%85%20%D8%A7%D9%84%D9%85%D8%B4%D8%B1%D9%88%D8%B9" class="orion-btn" target="_blank" rel="noopener">❤️ تبرع لنا</a>
+          {% if viewer_user and viewer_user.is_superuser %}
+          <a href="/admin/platform/dashboard" class="orion-btn orion-btn-gold">{{ t.login_platform }}</a>
+          {% else %}
+          <a href="/admin/login" class="orion-btn orion-btn-gold">{{ t.login_platform }}</a>
+          {% endif %}
+          <a href="{{ store_admin_url }}" class="orion-nav-login" target="_blank" rel="noopener">{{ t.login_store }}</a>
+        </span>
+        <span class="orion-home-nav-sep" aria-hidden="true"></span>
+        <span class="orion-home-nav-group">
+          <a href="https://wa.me/972562150193?text=%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A5%D9%86%D8%B4%D8%A7%D8%A1%20%D9%85%D8%AA%D8%AC%D8%B1%D9%8A%20%D8%A7%D9%84%D8%AE%D8%A7%D8%B5" class="orion-btn" target="_blank" rel="noopener">{{ t.create_store }}</a>
+          <a href="https://wa.me/972562150193?text=%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D9%84%D8%AA%D8%A8%D8%B1%D8%B9%20%D9%84%D8%AF%D8%B9%D9%85%20%D8%A7%D9%84%D9%85%D8%B4%D8%B1%D9%88%D8%B9" class="orion-btn" target="_blank" rel="noopener">{{ t.donate }}</a>
         </span>
       </nav>
     </header>
@@ -35,16 +79,11 @@
     <section class="orion-hero orion-home-hero">
       <div class="orion-hero-glow" aria-hidden="true"></div>
       <div class="orion-hero-content">
-        <span class="orion-hero-badge">مرحباً بك في Azadexa</span>
-        <h1 class="orion-hero-title">متجرك الإلكتروني، جاهز للانطلاق</h1>
-        <p class="orion-hero-subtitle">إدارة المتاجر والمنتجات والطلبات والعملاء من منصة واحدة، بواجهة عربية وإنجليزية كاملة وتصميم متجاوب.</p>
+        <span class="orion-hero-badge">{{ t.badge }}</span>
+        <h1 class="orion-hero-title">{{ t.title }}</h1>
+        <p class="orion-hero-subtitle">{{ t.subtitle }}</p>
         <div class="orion-hero-actions">
-          {% if viewer_user and viewer_user.is_superuser %}
-          <a href="/admin/platform/dashboard" class="orion-btn orion-btn-gold">لوحة المنصة</a>
-          {% else %}
-          <a href="/admin/login" class="orion-btn orion-btn-gold">دخول لوحة المنصة</a>
-          {% endif %}
-          <a href="/admin/login" class="orion-btn orion-btn-ghost">دخول مدير المتجر</a>
+          <a href="{{ store_url }}" class="orion-btn orion-btn-gold" target="_blank" rel="noopener">{{ t.browse }}</a>
         </div>
       </div>
     </section>
@@ -52,8 +91,8 @@
     <section class="orion-home-section">
       <div class="orion-section-head">
         <div>
-          <span class="orion-eyebrow">متاجر المنصة</span>
-          <h2 class="orion-section-title">متاجرنا النشطة</h2>
+          <span class="orion-eyebrow">{{ t.stores_eyebrow }}</span>
+          <h2 class="orion-section-title">{{ t.stores_title }}</h2>
         </div>
         <span class="orion-section-line" aria-hidden="true"></span>
       </div>
@@ -61,24 +100,24 @@
       <div class="orion-store-banners">
         {% for store in stores %}
         <a class="orion-store-banner" href="https://{{ store.slug }}.azadexa.com/" target="_blank" rel="noopener"
-           aria-label="زيارة متجر {{ store.name }}">
+           aria-label="{{ t.visit }} {{ store.name }}">
           <span class="orion-store-banner-mark" aria-hidden="true">{{ store.name[:1]|upper }}</span>
           <span class="orion-store-banner-info">
             <strong>{{ store.name }}</strong>
             <span class="orion-muted">{{ store.slug }}.azadexa.com</span>
           </span>
-          <span class="orion-store-banner-cta">زيارة المتجر ↗</span>
+          <span class="orion-store-banner-cta">{{ t.visit }}</span>
         </a>
         {% endfor %}
       </div>
       {% else %}
-      <p class="orion-muted">لا توجد متاجر نشطة حالياً.</p>
+      <p class="orion-muted">{{ t.no_stores }}</p>
       {% endif %}
     </section>
 
     <footer class="orion-company-footer">
       <a href="https://wa.me/972562150193" target="_blank" rel="noopener" class="orion-company-banner-link"
-         aria-label="تواصل مع شركة آزاد للأنظمة الذكية عبر واتساب">
+         aria-label="{{ 'تواصل مع شركة آزاد للأنظمة الذكية عبر واتساب' if locale == 'ar' else 'Contact Azad Smart Company on WhatsApp' }}">
         <img src="{{ url_for('admin_assets.static', filename='images/azadexa-footer.png') }}"
              alt="شركة آزاد للأنظمة الذكية — Azad Electronic Systems — واتساب +972562150193 — بإدارة المهندس أحمد غنام"
              class="orion-company-banner">
