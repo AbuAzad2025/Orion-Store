@@ -160,9 +160,7 @@ def export_data_request(request_id: int):
 def rectify_data_request(request_id: int):
     try:
         require_tenant_admin()
-        result = _svc.rectify_subject_data(
-            tenant_id=g.tenant_id, request_id=request_id
-        )
+        result = _svc.rectify_subject_data(tenant_id=g.tenant_id, request_id=request_id)
         return jsonify(result), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

@@ -33,12 +33,17 @@ def list_products_for_selection():
         from catalog_svc.product_service import ProductService
 
         products = ProductService().list_for_tenant(g.tenant_id)
-        return jsonify({
-            "products": [
-                {"id": p.id, "name": p.name, "sku": getattr(p, "sku", None)}
-                for p in products
-            ]
-        }), 200
+        return (
+            jsonify(
+                {
+                    "products": [
+                        {"id": p.id, "name": p.name, "sku": getattr(p, "sku", None)}
+                        for p in products
+                    ]
+                }
+            ),
+            200,
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

@@ -35,9 +35,9 @@ def _store_admin(app, slug: str) -> dict[str, str]:
 def test_store_admin_sidebar_is_grouped(client, app):
     headers = auth_headers(
         AuthService().register_tenant_user(
-            tenant_id=TenantService().create_tenant(
-                name="Menu Groups", slug="menu-groups", email="mg@test.com"
-            ).id,
+            tenant_id=TenantService()
+            .create_tenant(name="Menu Groups", slug="menu-groups", email="mg@test.com")
+            .id,
             email="admin@mg.test",
             password="password123",
             is_admin=True,
@@ -73,7 +73,8 @@ def test_store_admin_sidebar_is_grouped(client, app):
 
 def test_platform_currency_page_is_reachable(client, platform_admin_headers):
     resp = client.get(
-        "/admin/platform/currency", headers={**platform_admin_headers, "Host": "orion.azadexa.com"}
+        "/admin/platform/currency",
+        headers={**platform_admin_headers, "Host": "orion.azadexa.com"},
     )
     assert resp.status_code == 200
     assert b"currency-rate-form" in resp.data
