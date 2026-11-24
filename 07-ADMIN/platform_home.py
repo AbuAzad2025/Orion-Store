@@ -42,9 +42,7 @@ def short_store_link(slug: str):
 
 @platform_home_bp.get("/google8a1714ed6e039773.html")
 def google_site_verification():
-    resp = make_response(
-        "google-site-verification: google8a1714ed6e039773.html", 200
-    )
+    resp = make_response("google-site-verification: google8a1714ed6e039773.html", 200)
     resp.headers["Content-Type"] = "text/html; charset=utf-8"
     return resp
 
