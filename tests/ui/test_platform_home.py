@@ -20,7 +20,7 @@ def test_platform_home_arabic_default(client, app) -> None:
     assert "My Store" in text and "mystore.azadexa.com" in text
     # Brand logo at the top-right (RTL start) of the header.
     assert 'class="orion-home-logo"' in text
-    assert "azadexa-header.png" in text
+    assert "azadexa-header-cropped.png" in text
     # Exactly one language switch, no duplicate login/donate actions.
     assert text.count('class="orion-locale-switch"') == 1
     assert text.count("تبرع لنا") == 1
