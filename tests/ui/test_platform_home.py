@@ -10,7 +10,7 @@ def test_platform_home_arabic_default(client, app) -> None:
         TenantService().create_tenant(
             name="My Store", slug="mystore", email="m@store.test"
         )
-    resp = client.get("/")
+    resp = client.get("/", headers={"Host": "orion.azadexa.com"})
     assert resp.status_code == 200
     text = resp.get_data(as_text=True)
     assert '<html lang="ar" dir="rtl">' in text
@@ -32,7 +32,7 @@ def test_platform_home_arabic_default(client, app) -> None:
 
 
 def test_platform_home_english_locale(client, app) -> None:
-    resp = client.get("/?locale=en")
+    resp = client.get("/?locale=en", headers={"Host": "orion.azadexa.com"})
     assert resp.status_code == 200
     text = resp.get_data(as_text=True)
     assert "Platform admin" in text
@@ -41,6 +41,29 @@ def test_platform_home_english_locale(client, app) -> None:
     assert "Create your store" in text and "Donate to us" in text
     assert "Browse the store" in text
     assert "متجرك الإلكتروني" not in text
+
+
+def test_store_domain_root_is_storefront_not_landing(client, app) -> None:
+    """A store subdomain must show the storefront, never the platform landing."""
+    from catalog_svc.product_service import ProductService
+
+    with app.app_context():
+        tenant = TenantService().create_tenant(
+            name="Root Store", slug="rootstore", email="r@store.test"
+        )
+        ProductService().create(
+            tenant_id=tenant.id,
+            name="Visible Product",
+            slug="visible",
+            price="10.00",
+            is_published=True,
+        )
+    resp = client.get("/", headers={"Host": "rootstore.azadexa.com"})
+    assert resp.status_code == 200
+    text = resp.get_data(as_text=True)
+    assert "Visible Product" in text
+    assert "بوابات الدخول" not in text
+    assert "orion-access-card" not in text
 
 
 def test_platform_home_inactive_store_hidden(client, app) -> None:
@@ -52,5 +75,5 @@ def test_platform_home_inactive_store_hidden(client, app) -> None:
         )
         inactive.is_active = False
         db.session.commit()
-    resp = client.get("/")
+    resp = client.get("/", headers={"Host": "orion.azadexa.com"})
     assert "Hidden Store" not in resp.get_data(as_text=True)

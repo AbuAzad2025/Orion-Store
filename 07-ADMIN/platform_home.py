@@ -31,6 +31,13 @@ def inject_platform_settings():
 def platform_home():
     from flask import request
 
+    # On a store subdomain, "/" belongs to the storefront, never to the platform.
+    host = (request.host or "").split(":")[0].lower()
+    if host != "orion.azadexa.com":
+        from engine.routes import render_store_index
+
+        return render_store_index()
+
     locale = (request.args.get("locale") or "ar").strip().lower()
     if locale not in ("ar", "en"):
         locale = "ar"

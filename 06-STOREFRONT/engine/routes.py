@@ -92,8 +92,8 @@ def _platform_admin_login_url() -> str:
     return f"https://orion.{base}/admin/login" if base else "/admin/login"
 
 
-@storefront_ui_bp.get("/")
-def store_index():
+def render_store_index():
+    """Render the storefront home (shared with the platform root on store hosts)."""
     tenant = _tenant_or_404()
     if not tenant:
         return "Store not found.", 404
@@ -132,6 +132,11 @@ def store_index():
         price_min=price_min,
         price_max=price_max,
     )
+
+
+@storefront_ui_bp.get("/")
+def store_index():
+    return render_store_index()
 
 
 @storefront_ui_bp.get("/product/<slug>")
