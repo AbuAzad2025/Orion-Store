@@ -24,7 +24,9 @@ def list_tenants():
         require_platform_admin()
         page, per_page = pagination_params()
         items, meta = paginate_query(
-            Tenant.query.order_by(Tenant.created_at.desc()), page, per_page
+            Tenant.query.filter_by(deleted_at=None).order_by(Tenant.created_at.desc()),
+            page,
+            per_page,
         )
         return (
             jsonify(paginated_payload("tenants", items, meta, lambda t: t.to_dict())),
