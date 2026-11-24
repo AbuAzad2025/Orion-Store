@@ -46,12 +46,13 @@
 <body class="orion-surface orion-home-body">
   <main class="orion-home">
     <header class="orion-home-topbar">
-      <div class="orion-home-brand">
-        <img src="{{ url_for('admin_assets.static', filename='images/azadexa-header-cropped.png') }}"
-             alt="{{ 'أزاد إكسبريس — منصة التجارة الإلكترونية الذكية' if locale == 'ar' else 'Azadexa — Smart e-commerce platform' }}"
-             class="orion-home-logo">
-      </div>
       <nav class="orion-home-nav" aria-label="{{ t.login_platform }}">
+        <span class="orion-home-brand">
+          <img src="{{ url_for('admin_assets.static', filename='images/azadexa-header-cropped.png') }}"
+               alt="{{ 'أزاد إكسبريس — منصة التجارة الإلكترونية الذكية' if locale == 'ar' else 'Azadexa — Smart e-commerce platform' }}"
+               class="orion-home-logo">
+        </span>
+        <span class="orion-home-nav-sep" aria-hidden="true"></span>
         <span class="orion-locale-switch" role="group" aria-label="{{ 'اللغة' if locale == 'ar' else 'Language' }}">
           <a href="/?locale=ar" class="orion-locale-link{% if locale == 'ar' %} is-active{% endif %}"
              hreflang="ar" aria-label="العربية" {% if locale == 'ar' %}aria-current="true"{% endif %}>ع</a>
