@@ -168,12 +168,12 @@ def register_blueprints(app: Flask) -> None:
 
 def register_ui_blueprints(app: Flask) -> None:
     from admin_auth import admin_auth_bp
+    from platform_home import platform_home_bp
 
     from admin_assets import admin_assets_bp
     from engine.routes import storefront_ui_bp
     from engine.storefront_assets import storefront_assets_bp
     from platform_admin.routes import platform_admin_bp
-    from platform_home import platform_home_bp
     from tenant_admin.routes import tenant_admin_bp
 
     app.register_blueprint(admin_assets_bp)
