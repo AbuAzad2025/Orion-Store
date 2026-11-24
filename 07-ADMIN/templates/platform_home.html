@@ -38,7 +38,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page_title }}</title>
-  <link rel="icon" type="image/svg+xml" href="{{ url_for('admin_assets.static', filename='favicon.svg') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('admin_assets.static', filename='images/azadexa-favicon-logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/fonts.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
@@ -47,11 +47,9 @@
   <main class="orion-home">
     <header class="orion-home-topbar">
       <div class="orion-home-brand">
-        <span class="orion-brand-mark" aria-hidden="true">A</span>
-        <span>
-          <strong>{{ platform_settings.platform_name | default('Azadexa') }}</strong>
-          <span class="orion-muted">{{ t.tagline }}</span>
-        </span>
+        <img src="{{ url_for('admin_assets.static', filename='images/azadexa-header.png') }}"
+             alt="{{ 'أزاد إكسبريس — منصة التجارة الإلكترونية الذكية' if locale == 'ar' else 'Azadexa — Smart e-commerce platform' }}"
+             class="orion-home-logo">
       </div>
       <nav class="orion-home-nav" aria-label="{{ t.login_platform }}">
         <span class="orion-locale-switch" role="group" aria-label="{{ 'اللغة' if locale == 'ar' else 'Language' }}">
