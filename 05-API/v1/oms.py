@@ -25,6 +25,24 @@ def list_warehouses():
         return jsonify({"error": exc.message}), exc.status_code
 
 
+@oms_bp.get("/products")
+def list_products_for_selection():
+    """Lightweight product picker for OMS forms (numeric ids)."""
+    try:
+        require_tenant_admin()
+        from catalog_svc.product_service import ProductService
+
+        products = ProductService().list_for_tenant(g.tenant_id)
+        return jsonify({
+            "products": [
+                {"id": p.id, "name": p.name, "sku": getattr(p, "sku", None)}
+                for p in products
+            ]
+        }), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
 @oms_bp.post("/warehouses")
 def create_warehouse():
     try:

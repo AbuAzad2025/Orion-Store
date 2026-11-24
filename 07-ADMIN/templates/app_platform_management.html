@@ -1,25 +1,35 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="space-y-6">
-  <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">تطبيقات OAuth</h2>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">تطبيقات OAuth</h2>
     <form id="app-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="name" type="text" placeholder="اسم التطبيق" required>
       <input name="redirect_uris" type="text" placeholder="روابط إعادة التوجيه (مفصولة بفواصل)">
       <input name="scopes" type="text" placeholder="الصلاحيات">
-      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">تسجيل تطبيق</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">تسجيل تطبيق</button>
     </form>
-    <div id="apps-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <div id="apps-list" class="orion-muted text-sm">جارٍ التحميل…</div>
   </section>
-  <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">متاجر تجريبية</h2>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">التثبيتات والـ Webhooks</h2>
+    <div id="app-installations-list" class="orion-muted text-sm mb-4">جارٍ التحميل…</div>
+    <form id="app-webhook-form" class="grid gap-2 max-w-md text-sm">
+      <input name="installation_id" type="number" min="1" placeholder="رقم التثبيت" class="orion-input" required aria-label="رقم التثبيت">
+      <input name="topic" type="text" placeholder="الموضوع (مثال: orders/create)" class="orion-input" required aria-label="موضوع الـ webhook" dir="ltr">
+      <input name="callback_url" type="url" placeholder="رابط الاستقبال" class="orion-input" required aria-label="رابط استقبال الـ webhook" dir="ltr">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">الاشتراك في Webhook</button>
+    </form>
+  </section>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">متاجر تجريبية</h2>
     <form id="sandbox-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="slug" type="text" placeholder="المعرف" required>
       <input name="name" type="text" placeholder="الاسم" required>
-      <input name="expires_at" type="datetime-local" placeholder="تاريخ الانتهاء">
-      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إنشاء متجر تجريبي</button>
+      <input name="expires_at" type="datetime-local" placeholder="تاريخ الانتهاء" class="orion-input" required aria-label="تاريخ انتهاء المتجر التجريبي">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">إنشاء متجر تجريبي</button>
     </form>
-    <div id="sandboxes-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <div id="sandboxes-list" class="orion-muted text-sm">جارٍ التحميل…</div>
   </section>
 </div>
 {% endblock %}

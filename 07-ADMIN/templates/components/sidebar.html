@@ -1,3 +1,18 @@
+{% set nav_groups = {
+  'dashboard': 'home', 'products': 'home', 'pages': 'home', 'contact': 'home',
+  'gateways': 'orders', 'draft_orders': 'orders', 'returns': 'orders', 'bopis': 'orders',
+  'oms': 'orders', 'store_credit': 'orders', 'b2b': 'orders', 'bundles': 'orders',
+  'subscriptions': 'finance', 'tax': 'finance', 'reconciliation': 'finance', 'currency': 'finance',
+  'vouchers': 'marketing', 'affiliates': 'marketing', 'gift_registries': 'marketing',
+  'search': 'marketing', 'schema_markup': 'marketing', 'live_chat': 'marketing',
+  'metafields': 'settings', 'documents': 'settings', 'import_export': 'settings',
+  'app_platform': 'settings', 'feature_flags': 'settings', 'fraud': 'settings',
+  'compliance': 'settings', 'workflows': 'settings', 'accessibility': 'settings',
+  'dropship': 'settings', 'ui_kit': 'tools'
+} %}
+{% macro nav_link(href, label, key) %}
+<a href="{{ href }}" class="orion-nav-link{% if active_nav == key %} is-active{% endif %}"{% if active_nav == key %} aria-current="page"{% endif %}>{{ label }}</a>
+{% endmacro %}
 <aside class="orion-sidebar w-60 bg-slate-900 text-white p-4 flex flex-col min-h-screen">
   <div class="orion-sidebar-brand mb-6">
     <span class="orion-brand-mark orion-brand-mark-sm" aria-hidden="true">A</span>
@@ -9,54 +24,84 @@
 
   <nav class="orion-sidebar-nav space-y-1 text-sm flex-1" aria-label="القائمة الجانبية">
     {% if tenant %}
-      <p class="orion-nav-section">الرئيسية</p>
-      <a href="/admin/store/dashboard" class="orion-nav-link{% if active_nav == 'dashboard' %} is-active{% endif %}" {% if active_nav == 'dashboard' %}aria-current="page"{% endif %}>لوحة المتجر</a>
-      <a href="/admin/store/products" class="orion-nav-link{% if active_nav == 'products' %} is-active{% endif %}" {% if active_nav == 'products' %}aria-current="page"{% endif %}>المنتجات</a>
-      <a href="/admin/store/pages" class="orion-nav-link{% if active_nav == 'pages' %} is-active{% endif %}" {% if active_nav == 'pages' %}aria-current="page"{% endif %}>الصفحات</a>
-      <a href="/admin/store/contact" class="orion-nav-link{% if active_nav == 'contact' %} is-active{% endif %}" {% if active_nav == 'contact' %}aria-current="page"{% endif %}>رقم واتساب</a>
-      <a href="/admin/store/ui-kit" class="orion-nav-link{% if active_nav == 'ui_kit' %} is-active{% endif %}" {% if active_nav == 'ui_kit' %}aria-current="page"{% endif %}>معاينة المكوّنات</a>
+      {% set active_group = nav_groups.get(active_nav, 'home') %}
 
-      <p class="orion-nav-section">البيع والطلبات</p>
-      <a href="/admin/store/gateways" class="orion-nav-link{% if active_nav == 'gateways' %} is-active{% endif %}" {% if active_nav == 'gateways' %}aria-current="page"{% endif %}>بوابات الدفع</a>
-      <a href="/admin/store/subscriptions" class="orion-nav-link{% if active_nav == 'subscriptions' %} is-active{% endif %}" {% if active_nav == 'subscriptions' %}aria-current="page"{% endif %}>الاشتراكات</a>
-      <a href="/admin/store/vouchers" class="orion-nav-link{% if active_nav == 'vouchers' %} is-active{% endif %}" {% if active_nav == 'vouchers' %}aria-current="page"{% endif %}>قسائم الخصم</a>
-      <a href="/admin/store/tax" class="orion-nav-link{% if active_nav == 'tax' %} is-active{% endif %}" {% if active_nav == 'tax' %}aria-current="page"{% endif %}>الضرائب</a>
-      <a href="/admin/store/bopis" class="orion-nav-link{% if active_nav == 'bopis' %} is-active{% endif %}" {% if active_nav == 'bopis' %}aria-current="page"{% endif %}>استلام من المتجر</a>
-      <a href="/admin/store/bundles" class="orion-nav-link{% if active_nav == 'bundles' %} is-active{% endif %}" {% if active_nav == 'bundles' %}aria-current="page"{% endif %}>الحزم</a>
-      <a href="/admin/store/store-credit" class="orion-nav-link{% if active_nav == 'store_credit' %} is-active{% endif %}" {% if active_nav == 'store_credit' %}aria-current="page"{% endif %}>رصيد المتجر</a>
-      <a href="/admin/store/draft-orders" class="orion-nav-link{% if active_nav == 'draft_orders' %} is-active{% endif %}" {% if active_nav == 'draft_orders' %}aria-current="page"{% endif %}>المسودات</a>
-      <a href="/admin/store/returns" class="orion-nav-link{% if active_nav == 'returns' %} is-active{% endif %}" {% if active_nav == 'returns' %}aria-current="page"{% endif %}>المرتجعات</a>
-      <a href="/admin/store/b2b" class="orion-nav-link{% if active_nav == 'b2b' %} is-active{% endif %}" {% if active_nav == 'b2b' %}aria-current="page"{% endif %}>B2B — الجملة</a>
-      <a href="/admin/store/oms" class="orion-nav-link{% if active_nav == 'oms' %} is-active{% endif %}" {% if active_nav == 'oms' %}aria-current="page"{% endif %}>المستودعات</a>
+      <details class="orion-nav-group" {% if active_group == 'home' %}open{% endif %}>
+        <summary class="orion-nav-section">الرئيسية</summary>
+        <div class="orion-nav-group-items">
+          {{ nav_link('/admin/store/dashboard', 'لوحة المتجر', 'dashboard') }}
+          {{ nav_link('/admin/store/products', 'المنتجات', 'products') }}
+          {{ nav_link('/admin/store/pages', 'الصفحات', 'pages') }}
+          {{ nav_link('/admin/store/contact', 'رقم واتساب', 'contact') }}
+        </div>
+      </details>
 
-      <p class="orion-nav-section">المحتوى والتسويق</p>
-      <a href="/admin/store/metafields" class="orion-nav-link{% if active_nav == 'metafields' %} is-active{% endif %}" {% if active_nav == 'metafields' %}aria-current="page"{% endif %}>البيانات الوصفية</a>
-      <a href="/admin/store/documents" class="orion-nav-link{% if active_nav == 'documents' %} is-active{% endif %}" {% if active_nav == 'documents' %}aria-current="page"{% endif %}>قوالب المستندات</a>
-      <a href="/admin/store/search" class="orion-nav-link{% if active_nav == 'search' %} is-active{% endif %}" {% if active_nav == 'search' %}aria-current="page"{% endif %}>البحث</a>
-      <a href="/admin/store/affiliates" class="orion-nav-link{% if active_nav == 'affiliates' %} is-active{% endif %}" {% if active_nav == 'affiliates' %}aria-current="page"{% endif %}>المسوقين</a>
-      <a href="/admin/store/gift-registries" class="orion-nav-link{% if active_nav == 'gift_registries' %} is-active{% endif %}" {% if active_nav == 'gift_registries' %}aria-current="page"{% endif %}>قوائم الهدايا</a>
-      <a href="/admin/store/dropship" class="orion-nav-link{% if active_nav == 'dropship' %} is-active{% endif %}" {% if active_nav == 'dropship' %}aria-current="page"{% endif %}>الدروبشيبنج</a>
-      <a href="/admin/store/schema-markup" class="orion-nav-link{% if active_nav == 'schema_markup' %} is-active{% endif %}" {% if active_nav == 'schema_markup' %}aria-current="page"{% endif %}>ترميز البيانات المنظّمة</a>
-      <a href="/admin/store/accessibility" class="orion-nav-link{% if active_nav == 'accessibility' %} is-active{% endif %}" {% if active_nav == 'accessibility' %}aria-current="page"{% endif %}>إمكانية الوصول</a>
-      <a href="/admin/store/live-chat" class="orion-nav-link{% if active_nav == 'live_chat' %} is-active{% endif %}" {% if active_nav == 'live_chat' %}aria-current="page"{% endif %}>الدردشة المباشرة</a>
+      <details class="orion-nav-group" {% if active_group == 'orders' %}open{% endif %}>
+        <summary class="orion-nav-section">الطلبات والتنفيذ</summary>
+        <div class="orion-nav-group-items">
+          {{ nav_link('/admin/store/gateways', 'بوابات الدفع', 'gateways') }}
+          {{ nav_link('/admin/store/draft-orders', 'الطلبات المسودة', 'draft_orders') }}
+          {{ nav_link('/admin/store/returns', 'المرتجعات', 'returns') }}
+          {{ nav_link('/admin/store/bopis', 'الاستلام من المتجر', 'bopis') }}
+          {{ nav_link('/admin/store/oms', 'المستودعات والتنفيذ', 'oms') }}
+          {{ nav_link('/admin/store/store-credit', 'رصيد المتجر', 'store_credit') }}
+          {{ nav_link('/admin/store/b2b', 'B2B — الجملة', 'b2b') }}
+          {{ nav_link('/admin/store/bundles', 'الحزم', 'bundles') }}
+        </div>
+      </details>
 
-      <p class="orion-nav-section">الإعدادات والتكاملات</p>
-      <a href="/admin/store/currency" class="orion-nav-link{% if active_nav == 'currency' %} is-active{% endif %}" {% if active_nav == 'currency' %}aria-current="page"{% endif %}>العملات</a>
-      <a href="/admin/store/import-export" class="orion-nav-link{% if active_nav == 'import_export' %} is-active{% endif %}" {% if active_nav == 'import_export' %}aria-current="page"{% endif %}>استيراد وتصدير</a>
-      <a href="/admin/store/app-platform" class="orion-nav-link{% if active_nav == 'app_platform' %} is-active{% endif %}" {% if active_nav == 'app_platform' %}aria-current="page"{% endif %}>منصة التطبيقات</a>
-      <a href="/admin/store/feature-flags" class="orion-nav-link{% if active_nav == 'feature_flags' %} is-active{% endif %}" {% if active_nav == 'feature_flags' %}aria-current="page"{% endif %}>ميزات المتجر</a>
-      <a href="/admin/store/fraud" class="orion-nav-link{% if active_nav == 'fraud' %} is-active{% endif %}" {% if active_nav == 'fraud' %}aria-current="page"{% endif %}>الاحتيال</a>
-      <a href="/admin/store/compliance" class="orion-nav-link{% if active_nav == 'compliance' %} is-active{% endif %}" {% if active_nav == 'compliance' %}aria-current="page"{% endif %}>الامتثال</a>
-      <a href="/admin/store/workflows" class="orion-nav-link{% if active_nav == 'workflows' %} is-active{% endif %}" {% if active_nav == 'workflows' %}aria-current="page"{% endif %}>سير العمل</a>
-      <a href="/admin/store/reconciliation" class="orion-nav-link{% if active_nav == 'reconciliation' %} is-active{% endif %}" {% if active_nav == 'reconciliation' %}aria-current="page"{% endif %}>التسوية المالية</a>
+      <details class="orion-nav-group" {% if active_group == 'finance' %}open{% endif %}>
+        <summary class="orion-nav-section">المالية والفوترة</summary>
+        <div class="orion-nav-group-items">
+          {{ nav_link('/admin/store/subscriptions', 'الاشتراكات', 'subscriptions') }}
+          {{ nav_link('/admin/store/vouchers', 'قسائم الخصم', 'vouchers') }}
+          {{ nav_link('/admin/store/tax', 'الضرائب', 'tax') }}
+          {{ nav_link('/admin/store/reconciliation', 'التسوية المالية', 'reconciliation') }}
+        </div>
+      </details>
+
+      <details class="orion-nav-group" {% if active_group == 'marketing' %}open{% endif %}>
+        <summary class="orion-nav-section">التسويق والمحتوى</summary>
+        <div class="orion-nav-group-items">
+          {{ nav_link('/admin/store/metafields', 'البيانات الوصفية', 'metafields') }}
+          {{ nav_link('/admin/store/documents', 'قوالب المستندات', 'documents') }}
+          {{ nav_link('/admin/store/search', 'البحث', 'search') }}
+          {{ nav_link('/admin/store/affiliates', 'المسوقون', 'affiliates') }}
+          {{ nav_link('/admin/store/gift-registries', 'قوائم الهدايا', 'gift_registries') }}
+          {{ nav_link('/admin/store/schema-markup', 'ترميز البيانات المنظّمة', 'schema_markup') }}
+          {{ nav_link('/admin/store/live-chat', 'الدردشة المباشرة', 'live_chat') }}
+        </div>
+      </details>
+
+      <details class="orion-nav-group" {% if active_group == 'settings' %}open{% endif %}>
+        <summary class="orion-nav-section">الإعدادات والتكاملات</summary>
+        <div class="orion-nav-group-items">
+          {{ nav_link('/admin/store/import-export', 'استيراد وتصدير', 'import_export') }}
+          {{ nav_link('/admin/store/app-platform', 'منصة التطبيقات', 'app_platform') }}
+          {{ nav_link('/admin/store/feature-flags', 'ميزات المتجر', 'feature_flags') }}
+          {{ nav_link('/admin/store/fraud', 'الاحتيال', 'fraud') }}
+          {{ nav_link('/admin/store/compliance', 'الامتثال', 'compliance') }}
+          {{ nav_link('/admin/store/workflows', 'سير العمل', 'workflows') }}
+          {{ nav_link('/admin/store/accessibility', 'إمكانية الوصول', 'accessibility') }}
+          {{ nav_link('/admin/store/dropship', 'الدروبشيبنج', 'dropship') }}
+        </div>
+      </details>
+
+      <details class="orion-nav-group" {% if active_group == 'tools' %}open{% endif %}>
+        <summary class="orion-nav-section">أدوات المطوّر</summary>
+        <div class="orion-nav-group-items">
+          {{ nav_link('/admin/store/ui-kit', 'معاينة المكوّنات', 'ui_kit') }}
+        </div>
+      </details>
     {% else %}
       <p class="orion-nav-section">المنصة</p>
-      <a href="/admin/platform/dashboard" class="orion-nav-link{% if active_nav == 'dashboard' %} is-active{% endif %}" {% if active_nav == 'dashboard' %}aria-current="page"{% endif %}>لوحة المنصة</a>
-      <a href="/admin/platform/tenants" class="orion-nav-link{% if active_nav == 'tenants' %} is-active{% endif %}" {% if active_nav == 'tenants' %}aria-current="page"{% endif %}>المتاجر</a>
-      <a href="/admin/platform/users" class="orion-nav-link{% if active_nav == 'users' %} is-active{% endif %}" {% if active_nav == 'users' %}aria-current="page"{% endif %}>المستخدمون</a>
-      <a href="/admin/platform/settings" class="orion-nav-link{% if active_nav == 'settings' %} is-active{% endif %}" {% if active_nav == 'settings' %}aria-current="page"{% endif %}>إعدادات المنصة</a>
-      <a href="/admin/platform/audit" class="orion-nav-link{% if active_nav == 'audit' %} is-active{% endif %}" {% if active_nav == 'audit' %}aria-current="page"{% endif %}>تدقيق المنصة</a>
-      <a href="/admin/platform/reconciliation" class="orion-nav-link{% if active_nav == 'reconciliation' %} is-active{% endif %}" {% if active_nav == 'reconciliation' %}aria-current="page"{% endif %}>التسوية</a>
+      {{ nav_link('/admin/platform/dashboard', 'لوحة المنصة', 'dashboard') }}
+      {{ nav_link('/admin/platform/tenants', 'المتاجر', 'tenants') }}
+      {{ nav_link('/admin/platform/users', 'المستخدمون', 'users') }}
+      {{ nav_link('/admin/platform/settings', 'إعدادات المنصة', 'settings') }}
+      {{ nav_link('/admin/platform/audit', 'تدقيق المنصة', 'audit') }}
+      {{ nav_link('/admin/platform/reconciliation', 'التسوية', 'reconciliation') }}
+      {{ nav_link('/admin/platform/currency', 'العملات وأسعار الصرف', 'currency') }}
     {% endif %}
 
     {% if tenant %}
@@ -69,7 +114,7 @@
   </nav>
 
   <div class="orion-sidebar-footer mt-4 pt-4 border-t border-slate-700 space-y-1 text-sm">
-    <a href="/admin/profile" class="orion-nav-link{% if active_nav == 'profile' %} is-active{% endif %}" {% if active_nav == 'profile' %}aria-current="page"{% endif %}>الملف الشخصي</a>
+    <a href="/admin/profile" class="orion-nav-link{% if active_nav == 'profile' %} is-active{% endif %}"{% if active_nav == 'profile' %} aria-current="page"{% endif %}>الملف الشخصي</a>
     <a href="/admin/logout" class="orion-nav-link orion-logout">تسجيل الخروج</a>
   </div>
 </aside>

@@ -177,11 +177,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const saveBtn = document.getElementById("save-invoice-template");
   if (saveBtn) {
-    saveBtn.addEventListener("click", () => {
+    saveBtn.addEventListener("click", async () => {
       const body = document.getElementById("invoice-body").value;
-      OrionAPI.put("/tenant/document-templates/invoice", { body_html: body })
-        .then(() => alert("تم الحفظ"))
-        .catch((err) => alert(err.message));
+      const msg = document.getElementById("invoice-msg");
+      try {
+        await OrionUI.withLoading(saveBtn, () =>
+          OrionAPI.put("/tenant/document-templates/invoice", { body_html: body })
+        );
+        if (msg) msg.textContent = "تم حفظ القالب بنجاح";
+        OrionAPI.get("/tenant/document-templates").then((data) => {
+          const el = document.getElementById("templates-list");
+          if (!el) return;
+          SafeDOM.clear(el);
+          (data.templates || []).forEach((t) => {
+            el.appendChild(SafeDOM.elem("div", { className: "border-b py-1" }, [
+              SafeDOM.elem("strong", null, [t.document_type]), ` (${t.locale})`
+            ]));
+          });
+        });
+      } catch (err) {
+        if (msg) msg.textContent = err.message;
+      }
     });
   }
 

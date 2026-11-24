@@ -1,8 +1,8 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="space-y-6">
-  <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">المستودعات</h2>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">المستودعات</h2>
     <form id="oms-warehouse-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="name" type="text" placeholder="اسم المستودع" class="orion-input" required>
       <input name="code" type="text" placeholder="رمز" class="orion-input" required>
@@ -12,10 +12,10 @@
       </label>
       <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة مستودع</button>
     </form>
-    <div id="oms-warehouses-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <div id="oms-warehouses-list" class="orion-muted text-sm">جارٍ التحميل…</div>
   </section>
-  <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">تحويلات المخزون</h2>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">تحويلات المخزون</h2>
     <form id="oms-transfer-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <select name="from_warehouse_id" class="orion-input" required aria-label="من مستودع">
         <option value="">من مستودع...</option>
@@ -28,11 +28,13 @@
     </form>
     <form id="oms-transfer-item-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="transfer_id" type="number" min="1" placeholder="رقم التحويل" class="orion-input" required>
-      <input name="product_id" type="number" min="1" placeholder="رقم المنتج" class="orion-input" required>
+      <select name="product_id" class="orion-input" required aria-label="اختر المنتج">
+        <option value="">اختر منتجاً...</option>
+      </select>
       <input name="quantity" type="number" min="1" value="1" placeholder="الكمية" class="orion-input" required>
       <button type="submit" class="orion-btn w-fit">إضافة صنف</button>
     </form>
-    <div id="oms-transfers-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <div id="oms-transfers-list" class="orion-muted text-sm">جارٍ التحميل…</div>
   </section>
 </div>
 {% endblock %}

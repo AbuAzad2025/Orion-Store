@@ -80,6 +80,15 @@ def reconciliation_dashboard():
     )
 
 
+@platform_admin_bp.get("/currency")
+def platform_currency():
+    return render_template(
+        "currency_management.html",
+        page_title="العملات وأسعار الصرف",
+        active_nav="currency",
+    )
+
+
 @platform_admin_bp.get("/audit")
 def platform_audit():
     return render_template(

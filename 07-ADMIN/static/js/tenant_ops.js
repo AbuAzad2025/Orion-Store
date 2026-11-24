@@ -128,7 +128,23 @@ const OrionTenantOps = {
     } catch (err) { el.textContent = err.message || "تعذّر التحميل"; }
   },
 
+  async loadOmsProducts() {
+    const select = document.querySelector('#oms-transfer-item-form [name=product_id]');
+    if (!select) return;
+    try {
+      const data = await OrionAPI.get("/oms/products");
+      SafeDOM.clear(select);
+      select.appendChild(SafeDOM.elem("option", { value: "" }, ["اختر منتجاً..."]));
+      for (const p of data.products || []) {
+        select.appendChild(SafeDOM.elem("option", { value: p.id }, [`#${p.id} — ${p.name}`]));
+      }
+    } catch (err) {
+      // Keep the manual input if the picker is unavailable.
+    }
+  },
+
   initOms() {
+    OrionTenantOps.loadOmsProducts();
     const transferForm = document.getElementById("oms-transfer-form");
     if (transferForm) {
       transferForm.addEventListener("submit", async (e) => {

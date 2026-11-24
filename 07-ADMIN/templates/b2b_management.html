@@ -1,15 +1,15 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="space-y-6">
-  <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">مجموعات العملاء</h2>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">مجموعات العملاء</h2>
     <form id="b2b-group-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="اسم المجموعة" class="border rounded px-3 py-2" required>
-      <input name="code" type="text" placeholder="رمز" class="border rounded px-3 py-2" required>
-      <input name="discount_percent" type="number" min="0" max="100" placeholder="خصم %" class="border rounded px-3 py-2" value="0">
-      <button type="submit" class="rounded bg-emerald-600 px-4 py-2 text-white w-fit">إضافة مجموعة</button>
+      <input name="name" type="text" placeholder="اسم المجموعة" class="orion-input" required>
+      <input name="code" type="text" placeholder="رمز" class="orion-input" required>
+      <input name="discount_percent" type="number" min="0" max="100" placeholder="خصم %" class="orion-input" value="0">
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة مجموعة</button>
     </form>
-    <div id="b2b-groups-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <div id="b2b-groups-list" class="orion-muted text-sm">جارٍ التحميل…</div>
   </section>
 </div>
 {% endblock %}

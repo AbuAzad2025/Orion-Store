@@ -26,9 +26,11 @@ const OrionAdminCompliance = {
       SafeDOM.clear(el);
       for (const r of rows) {
         const actions = SafeDOM.elem("span", { className: "inline-flex gap-2 ms-3" }, []);
-        if ((r.request_type === "export" || r.request_type === "delete") && r.status !== "completed") {
-          const url = r.request_type === "export" ? "export" : "execute-delete";
-          const label = r.request_type === "export" ? "تصدير" : "تنفيذ الحذف";
+        if (["export", "delete", "rectify"].includes(r.request_type) && r.status !== "completed") {
+          const url = r.request_type === "export" ? "export"
+            : r.request_type === "delete" ? "execute-delete" : "rectify";
+          const label = r.request_type === "export" ? "تصدير"
+            : r.request_type === "delete" ? "تنفيذ الحذف" : "تنفيذ التصحيح";
           actions.appendChild(SafeDOM.actionBtn(label, "orion-btn", async () => {
             try {
               await OrionAPI.post(`/compliance/data-requests/${r.id}/${url}`);

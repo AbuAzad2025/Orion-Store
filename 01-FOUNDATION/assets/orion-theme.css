@@ -629,6 +629,57 @@ body.orion-surface {
   opacity: 0.85;
 }
 
+.orion-nav-group {
+  margin-block-end: 0.15rem;
+}
+
+.orion-nav-group > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.orion-nav-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.orion-nav-group > summary::after {
+  content: "▾";
+  font-size: 0.7rem;
+  opacity: 0.7;
+  transition: transform 0.15s ease;
+}
+
+.orion-nav-group:not([open]) > summary::after {
+  transform: rotate(-90deg);
+}
+
+.orion-nav-group > summary:hover {
+  background: var(--orion-panel-2);
+  opacity: 1;
+}
+
+.orion-nav-group > summary:hover::after {
+  opacity: 1;
+}
+
+.orion-nav-group-items {
+  display: grid;
+  gap: 0.1rem;
+  padding-inline-start: 0.25rem;
+  border-inline-start: 1px solid rgba(230, 196, 121, 0.2);
+  margin-inline-start: 0.75rem;
+}
+
+.orion-nav-group-items .orion-nav-link {
+  font-size: 0.82rem;
+}
+
 .orion-sidebar-store-link {
   margin-block-start: 1.25rem;
   padding-block-start: 0.75rem;

@@ -1,19 +1,19 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="space-y-6">
-  <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">بيانات المنتجات المنظّمة (Schema)</h2>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">بيانات المنتجات المنظّمة (Schema)</h2>
     <form id="schema-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="product_id" type="number" placeholder="معرف المنتج" required>
-      <select name="schema_type" class="border rounded px-2 py-1">
+      <select name="schema_type" class="orion-input">
         <option value="Product">Product</option>
         <option value="Offer">Offer</option>
         <option value="Organization">Organization</option>
       </select>
-      <textarea name="json_ld" rows="4" placeholder="JSON-LD" class="border rounded px-2 py-1 font-mono text-xs"></textarea>
-      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">حفظ البيانات المنظّمة</button>
+      <textarea name="json_ld" rows="4" placeholder="JSON-LD" class="orion-input font-mono text-xs"></textarea>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">حفظ البيانات المنظّمة</button>
     </form>
-    <div id="schema-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <div id="schema-list" class="orion-muted text-sm">جارٍ التحميل…</div>
   </section>
 </div>
 {% endblock %}

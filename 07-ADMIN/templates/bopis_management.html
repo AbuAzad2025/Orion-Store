@@ -1,15 +1,15 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="space-y-6">
-  <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">مواقع الاستلام</h2>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">مواقع الاستلام</h2>
     <form id="bopis-location-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="name" type="text" placeholder="اسم الموقع" required>
       <input name="address" type="text" placeholder="العنوان" required>
       <input name="phone" type="text" placeholder="الهاتف">
-      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">إضافة موقع</button>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">إضافة موقع</button>
     </form>
-    <div id="bopis-locations-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <div id="bopis-locations-list" class="orion-muted text-sm">جارٍ التحميل…</div>
   </section>
 </div>
 {% endblock %}

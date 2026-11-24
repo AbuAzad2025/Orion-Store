@@ -1,10 +1,20 @@
 {% extends "admin_base.html" %}
 {% block content %}
-<div id="templates-list" class="mb-6 text-gray-500">جارٍ التحميل…</div>
-<label class="block text-sm font-medium mb-2" for="invoice-body">قالب الفاتورة (HTML)</label>
-<textarea id="invoice-body" rows="6" class="w-full rounded border p-2 mb-4 font-mono text-sm"></textarea>
-<button id="save-invoice-template" class="rounded bg-blue-600 px-4 py-2 text-white text-sm">حفظ القالب</button>
+<section class="orion-card">
+  <h2 class="orion-title mb-3">قوالب المستندات</h2>
+  <div id="templates-list" class="orion-muted text-sm mb-4">جارٍ التحميل…</div>
+  <label class="orion-stat-label" for="invoice-body">قالب الفاتورة (HTML)</label>
+  <p class="orion-muted text-xs mb-2">
+    يجب أن يحتوي القالب على تذييل المنصة <span dir="ltr">azadexa-platform-footer</span>
+    وعلامة <span dir="ltr">data-immutable="true"</span>؛ لا يمكن حذفهما.
+  </p>
+  <textarea id="invoice-body" rows="8" class="orion-input font-mono text-sm mb-4" dir="ltr" aria-label="قالب الفاتورة HTML">&lt;div class="invoice-header"&gt;&lt;h1&gt;فاتورة&lt;/h1&gt;&lt;/div&gt;
+&lt;div class="invoice-body"&gt;{% raw %}{{order_number}}{% endraw %}&lt;/div&gt;
+&lt;footer id="azadexa-platform-footer" class="azadexa-platform-footer" data-immutable="true"&gt;&lt;/footer&gt;</textarea>
+  <button id="save-invoice-template" class="orion-btn orion-btn-gold">حفظ القالب</button>
+  <p id="invoice-msg" class="orion-muted text-sm mt-2" role="status" aria-live="polite"></p>
+</section>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('admin_assets.static', filename='js/tenant_admin.js') }}"></script>
+<script src="{{ url_for('admin_assets.static', filename='js/tenant_admin.js') }}?v={{ asset_version }}"></script>
 {% endblock %}

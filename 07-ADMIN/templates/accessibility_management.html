@@ -1,15 +1,15 @@
 {% extends "admin_base.html" %}
 {% block content %}
 <div class="space-y-6">
-  <section class="rounded border bg-white p-4">
-    <h2 class="text-lg font-semibold mb-3">تدقيق إمكانية الوصول</h2>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">تدقيق إمكانية الوصول</h2>
     <form id="audit-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="page_url" type="url" placeholder="رابط الصفحة" required>
       <input name="score" type="number" placeholder="الدرجة (0-100)" required>
-      <textarea name="issues" rows="2" placeholder="المشاكل (JSON)" class="border rounded px-2 py-1 font-mono text-xs"></textarea>
-      <button type="submit" class="rounded bg-blue-600 px-4 py-2 text-white w-fit">تسجيل تدقيق</button>
+      <textarea name="issues" rows="2" placeholder="المشاكل (JSON)" class="orion-input font-mono text-xs"></textarea>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">تسجيل تدقيق</button>
     </form>
-    <div id="accessibility-audits-list" class="text-gray-500 text-sm">جارٍ التحميل…</div>
+    <div id="accessibility-audits-list" class="orion-muted text-sm">جارٍ التحميل…</div>
   </section>
 </div>
 {% endblock %}

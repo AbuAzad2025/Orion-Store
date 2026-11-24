@@ -200,6 +200,20 @@ class ComplianceService:
             "consent_records": [record.to_dict() for record in consents],
         }
 
+    def rectify_subject_data(self, *, tenant_id: int, request_id: int) -> dict:
+        """Review a subject's current data and close a rectification request."""
+        req = self._get_data_request(tenant_id=tenant_id, request_id=request_id)
+        email = req.customer_email.strip().lower()
+        user = User.query.filter_by(tenant_id=tenant_id, email=email).first()
+        req.status = "completed"
+        req.completed_at = utc_now()
+        db.session.commit()
+        return {
+            "request": req.to_dict(),
+            "subject": {"email": email},
+            "user": user.to_dict() if user else None,
+        }
+
     def execute_subject_deletion(self, *, tenant_id: int, request_id: int) -> dict:
         """Anonymise a subject's PII without destroying financial records."""
         req = self._get_data_request(tenant_id=tenant_id, request_id=request_id)
