@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flask import Blueprint, g, render_template
+from flask import Blueprint, g, redirect, render_template, request
 
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant.tenant import Tenant
@@ -27,10 +27,19 @@ def inject_platform_settings():
     return {"platform_settings": settings, "viewer_user": getattr(g, "user", None)}
 
 
+@platform_home_bp.get("/s/<slug>")
+def short_store_link(slug: str):
+    """Short, human-friendly store link; the signed token stays server-side."""
+    from core.store_token import issue as issue_store_token
+
+    tenant = Tenant.query.filter_by(
+        slug=slug, is_active=True, deleted_at=None
+    ).first_or_404()
+    return redirect(f"/?store={issue_store_token(tenant)}")
+
+
 @platform_home_bp.get("/")
 def platform_home():
-    from flask import request
-
     # On a store subdomain, "/" belongs to the storefront, never to the platform.
     host = (request.host or "").split(":")[0].lower()
     if host != "orion.azadexa.com":
@@ -55,12 +64,43 @@ def platform_home():
     )
     from core.store_token import issue as issue_store_token
 
+    identity = {
+        "demo": {
+            "tagline": "Azadexa Demo · منتج متنوع",
+            "mark": "A",
+            "a": "#13233a",
+            "b": "#1d3d5c",
+            "ink": "#e9c77b",
+            "pattern": "",
+        },
+        "palestinian-heritage": {
+            "tagline": "تراث فلسطيني · منتجات من الأرض",
+            "mark": "🇵🇸",
+            "a": "#0f3d2e",
+            "b": "#1c6347",
+            "ink": "#f3e9c8",
+            "pattern": "repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 8px, transparent 8px 16px)",
+        },
+    }
+
     def card(store):
+        style = identity.get(
+            store.slug,
+            {
+                "tagline": "",
+                "mark": store.name[:1].upper(),
+                "a": "#13233a",
+                "b": "#1d3d5c",
+                "ink": "#e9c77b",
+                "pattern": "",
+            },
+        )
         return {
             "name": store.name,
             "slug": store.slug,
-            "url": f"/?store={issue_store_token(store)}",
+            "url": f"/s/{store.slug}",
             "admin_url": f"/admin/login?tenant_slug={store.slug}",
+            **style,
         }
 
     stores = [card(s) for s in rows]
@@ -68,9 +108,7 @@ def platform_home():
     store_url = primary["url"] if primary else "#"
     store_token = request.args.get("store", "")
     store_admin_url = primary["admin_url"] if primary else "/admin/login"
-    account_url = (
-        f"/account?store={issue_store_token(rows[0])}" if rows else "#"
-    )
+    account_url = f"/account?store={issue_store_token(rows[0])}" if rows else "#"
     return render_template(
         "platform_home.html",
         page_title="Azadexa Platform" if locale == "en" else "منصة Azadexa",

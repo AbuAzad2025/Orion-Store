@@ -120,13 +120,16 @@
       <div class="orion-store-banners">
         {% for store in stores %}
         <a class="orion-store-banner" href="{{ store.url }}" target="_blank" rel="noopener"
+           style="background:{{ store.pattern }}, linear-gradient(135deg, {{ store.a }}, {{ store.b }}); border-color:{{ store.a }}; min-block-size:7.5rem"
            aria-label="{{ t.visit }} {{ store.name }}">
-          <span class="orion-store-banner-mark" aria-hidden="true">{{ store.name[:1]|upper }}</span>
+          <span class="orion-store-banner-mark" aria-hidden="true"
+                style="background:rgba(255,255,255,.14); color:{{ store.ink }}; border:1px solid {{ store.ink }}55; font-size:1.5rem">{{ store.mark }}</span>
           <span class="orion-store-banner-info">
-            <strong>{{ store.name }}</strong>
-            <span class="orion-muted">orion.azadexa.com · {{ store.slug }}</span>
+            <strong style="color:{{ store.ink }}; font-size:1.05rem">{{ store.name }}</strong>
+            <span style="color:{{ store.ink }}; opacity:.8; font-size:.75rem">{{ store.tagline }}</span>
+            <span dir="ltr" style="color:{{ store.ink }}; opacity:.65; font-size:.7rem">orion.azadexa.com/s/{{ store.slug }}</span>
           </span>
-          <span class="orion-store-banner-cta">{{ t.visit }}</span>
+          <span class="orion-store-banner-cta" style="color:{{ store.ink }}">{{ t.visit }}</span>
         </a>
         {% endfor %}
       </div>
