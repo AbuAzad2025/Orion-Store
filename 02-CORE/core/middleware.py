@@ -70,6 +70,13 @@ def register_middleware(app: Flask) -> None:
                     if preview:
                         g.tenant, g.tenant_id = preview, preview.id
 
+        # Per-store asset isolation: images live under /images/products/<slug>/.
+        path = request.path or ""
+        marker = "/store/static/images/products/"
+        if marker in path:
+            slug = path.split(marker, 1)[1].split("/", 1)[0]
+            if g.tenant is None or slug != g.tenant.slug:
+                return ("Not found", 404)
         if g.user:
             try:
                 claims = get_jwt()

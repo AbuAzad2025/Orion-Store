@@ -25,6 +25,7 @@ class ProductBundle(db.Model, TimestampMixin):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    image_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     bundle_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(3), default="ILS", nullable=False)
     is_published: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -36,6 +37,7 @@ class ProductBundle(db.Model, TimestampMixin):
             "name": self.name,
             "slug": self.slug,
             "description": self.description,
+            "image_url": self.image_url,
             "bundle_price": str(self.bundle_price),
             "currency": self.currency,
             "is_published": self.is_published,

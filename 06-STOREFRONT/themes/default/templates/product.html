@@ -8,7 +8,7 @@
 <section class="orion-product-detail">
   <div class="orion-detail-media">
     {% if product.image_url %}
-    <img src="{{ product.image_url }}" alt="{{ p_name }}">
+    <img src="{{ product.image_url }}{% if store_token %}?store={{ store_token }}{% endif %}" alt="{{ p_name }}">
     {% else %}
     <span class="orion-product-placeholder">{{ t('no_image') }}</span>
     {% endif %}
@@ -57,7 +57,7 @@
 
 <div class="orion-sticky-buy">
   <div class="orion-sticky-buy-inner">
-    {% if product.image_url %}<img src="{{ product.image_url }}" alt="" aria-hidden="true">{% endif %}
+    {% if product.image_url %}<img src="{{ product.image_url }}{% if store_token %}?store={{ store_token }}{% endif %}" alt="" aria-hidden="true">{% endif %}
     <div class="orion-sticky-buy-info">
       <strong>{{ p_name }}</strong>
       <span>{{ money(p_price) }} {{ currency }}</span>

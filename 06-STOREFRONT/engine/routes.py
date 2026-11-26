@@ -124,14 +124,32 @@ def render_store_index():
             "name": b.name,
             "slug": b.slug,
             "description": b.description,
+            "image_url": b.image_url,
             "price": str(b.bundle_price),
+            "max_per_order": b.max_per_order,
             "item_count": sum(x.quantity for x in BundleService().items_for(b.id)),
+            "bundle_items": [
+                {
+                    "name": (
+                        ProductService()
+                        .query_for_tenant(tenant.id)
+                        .filter_by(id=x.product_id)
+                        .first()
+                        or type("P", (), {"name": str(x.product_id)})()
+                    ).name,
+                    "quantity": x.quantity,
+                }
+                for x in BundleService().items_for(b.id)
+            ],
         }
         for b in BundleService().list_published(tenant.id)
     ]
+    from core.store_token import issue as issue_store_token
+
     return _engine.render(
         "index.html",
         bundles=bundles,
+        store_token=issue_store_token(tenant),
         tenant=tenant,
         products=products,
         products_i18n=products_i18n,
@@ -163,8 +181,11 @@ def store_product(slug: str):
     ts = TranslationService()
     product = ts.get_product_by_localized_slug(tenant.id, slug, locale)
     product_i18n = ts.merge_product(product, locale)
+    from core.store_token import issue as issue_store_token
+
     return _engine.render(
         "product.html",
+        store_token=issue_store_token(tenant),
         tenant=tenant,
         product=product,
         product_i18n=product_i18n,

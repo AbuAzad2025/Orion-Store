@@ -5,7 +5,7 @@
   <a href="/product/{{ product.slug }}?store={{ store_token }}" class="orion-product-link">
     <div class="orion-product-media">
       {% if product.image_url %}
-      <img src="{{ product.image_url }}" alt="{{ p_name }}">
+      <img src="{{ product.image_url }}{% if store_token %}?store={{ store_token }}{% endif %}" alt="{{ p_name }}">
       {% else %}
       <span class="orion-product-placeholder">{{ t('no_image') }}</span>
       {% endif %}
@@ -13,6 +13,7 @@
     </div>
     <div class="orion-product-body">
       <h3 class="orion-product-name">{{ p_name }}</h3>
+      <p class="orion-muted text-xs" style="margin:0">{{ t('available') }}: {{ product.quantity }}</p>
       <div class="orion-price-row">
         <span class="orion-product-price">{{ money(p_price) }} <small>{{ currency }}</small></span>
         {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}

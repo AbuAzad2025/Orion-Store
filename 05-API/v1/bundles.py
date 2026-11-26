@@ -30,6 +30,7 @@ def create_bundle():
             slug=data["slug"],
             bundle_price=data["bundle_price"],
             description=data.get("description"),
+            image_url=data.get("image_url"),
             is_published=bool(data.get("is_published", False)),
         )
         return jsonify({"bundle": bundle.to_dict()}), 201
@@ -51,7 +52,14 @@ def update_bundle(bundle_id: int):
         if not bundle:
             return jsonify({"error": "Bundle not found."}), 404
         data = request.get_json(silent=True) or {}
-        for field in ("name", "slug", "description", "bundle_price"):
+        for field in (
+            "name",
+            "slug",
+            "description",
+            "image_url",
+            "bundle_price",
+            "max_per_order",
+        ):
             if field in data:
                 setattr(bundle, field, data[field])
         if "is_published" in data:

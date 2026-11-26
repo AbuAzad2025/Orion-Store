@@ -8,6 +8,8 @@
       <input name="slug" type="text" placeholder="{{ t('رمز الحزمة في الرابط', 'Bundle URL slug') }}" required dir="ltr">
       <input name="bundle_price" type="number" step="0.01" placeholder="{{ t('سعر الحزمة', 'Bundle price') }}" required>
       <input name="description" type="text" placeholder="{{ t('وصف الحزمة (اختياري)', 'Bundle description (optional)') }}">
+      <input name="image_url" type="text" dir="ltr" placeholder="{{ t('رابط صورة الحزمة (اختياري)', 'Bundle image URL (optional)') }}">
+      <input name="max_per_order" type="number" min="1" placeholder="{{ t('الحد الأقصى لكل طلب (اختياري)', 'Max per order (optional)') }}">
       <label class="flex items-center gap-2 text-sm">
         <input name="is_published" type="checkbox" aria-label="{{ t('منشورة في المتجر', 'Published in store') }}">
         {{ t('منشورة في المتجر', 'Published in store') }}

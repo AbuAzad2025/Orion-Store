@@ -382,6 +382,8 @@ const OrionTenantOps = {
           name: fd.get("name"), slug: fd.get("slug"),
           bundle_price: String(fd.get("bundle_price") || "0"),
           description: fd.get("description") || undefined,
+          image_url: fd.get("image_url") || undefined,
+          max_per_order: fd.get("max_per_order") ? Number(fd.get("max_per_order")) : null,
           is_published: fd.get("is_published") === "on",
         });
         form.reset();

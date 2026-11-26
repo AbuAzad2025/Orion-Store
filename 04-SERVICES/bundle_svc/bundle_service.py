@@ -18,6 +18,7 @@ class BundleService:
         slug: str,
         bundle_price: str | Decimal,
         description: str | None = None,
+        image_url: str | None = None,
         is_published: bool = False,
     ) -> ProductBundle:
         b = ProductBundle(
@@ -25,6 +26,7 @@ class BundleService:
             name=name,
             slug=slug,
             description=description,
+            image_url=image_url,
             bundle_price=Decimal(str(bundle_price)),
             is_published=bool(is_published),
         )
