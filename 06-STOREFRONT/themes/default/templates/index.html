@@ -99,7 +99,7 @@ document.addEventListener("click", async (event) => {
       StoreAPI.setCartToken(token);
     }
     for (const item of data.bundle.items) {
-      await StoreAPI.addItem(token, item.public_id, item.quantity);
+      await StoreAPI.addItem(token, item.product_id, item.quantity);
     }
     const original = button.textContent;
     button.textContent = "{{ t('bundle_added') }}";

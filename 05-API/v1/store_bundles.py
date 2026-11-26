@@ -31,6 +31,7 @@ def _payload(bundle, locale: str) -> dict:
         line = price * (Decimal("1") - Decimal(str(item.discount_percent)) / 100)
         items.append(
             {
+                "product_id": product.id,
                 "public_id": product.public_id,
                 "name": merged.get("name") or product.name,
                 "slug": merged.get("slug") or product.slug,
