@@ -156,13 +156,13 @@ class TenantService:
         if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,62}", (slug or "").lower()):
             return None
         try:
-            root = Path(current_app.root_path).resolve().parents[1]
-            folder = (
-                root
-                / "06-STOREFRONT/themes/default/static/images/products"
-                / slug.lower()
-            )
-            folder.mkdir(parents=True, exist_ok=True)
+            configured = current_app.config.get("PRODUCT_IMAGES_DIR") or ""
+            root = Path(configured).expanduser()
+            if not root.is_absolute():
+                root = Path(current_app.root_path).resolve().parents[3] / root
+            folder = root.resolve() / slug.lower()
+            folder.mkdir(parents=True, exist_ok=True, mode=0o750)
+            folder.chmod(0o750)
             return folder
         except Exception as exc:  # pragma: no cover - filesystem edge cases
             logger.warning("asset folder for %s failed: %s", slug, exc)

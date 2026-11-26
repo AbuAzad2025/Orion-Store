@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from datetime import timedelta
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -35,6 +36,12 @@ def testing_database_uri() -> str:
 
 class Config:
     MAX_CONTENT_LENGTH = 6 * 1024 * 1024  # uploads: 5MB image + multipart overhead
+    # Product images live outside the application source tree so they survive
+    # release swaps. Override with PRODUCT_IMAGES_DIR in the server .env.
+    PRODUCT_IMAGES_DIR = os.environ.get(
+        "PRODUCT_IMAGES_DIR",
+        str(Path(__file__).resolve().parents[3] / "orion-data" / "product-images"),
+    )
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-change-me")
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)

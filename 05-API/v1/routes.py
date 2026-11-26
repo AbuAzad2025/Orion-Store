@@ -42,6 +42,7 @@ from v1.shipping import shipping_bp
 from v1.stock_notifications import stock_notifications_bp
 from v1.store_account import store_account_bp
 from v1.store_credit import store_credit_bp
+from v1.store_image_serving import store_image_serving_bp
 from v1.storefront import storefront_bp
 from v1.storefront_pickup import storefront_pickup_bp
 from v1.storefront_search import storefront_search_bp
@@ -186,5 +187,7 @@ def register_ui_blueprints(app: Flask) -> None:
     app.register_blueprint(admin_auth_bp, url_prefix="/admin")
     app.register_blueprint(tenant_admin_bp, url_prefix="/admin/store")
     app.register_blueprint(platform_admin_bp, url_prefix="/admin/platform")
+    # Specific image route must precede the static catch-all.
+    app.register_blueprint(store_image_serving_bp)
     app.register_blueprint(storefront_assets_bp)
     app.register_blueprint(storefront_ui_bp)

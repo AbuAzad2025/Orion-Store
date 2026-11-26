@@ -75,6 +75,7 @@ def create_app(config_name: str | None = None) -> Flask:
         "ENCRYPTION_KEY",
         "DATABASE_URL",
         "REDIS_URL",
+        "PRODUCT_IMAGES_DIR",
     ):
         value = os.environ.get(key)
         if value is not None:
