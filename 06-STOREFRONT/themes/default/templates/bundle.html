@@ -12,7 +12,7 @@
     {% if bundle.description %}<p class="orion-muted">{{ bundle.description }}</p>{% endif %}
     <p class="orion-stat-label" style="margin:0">{{ t('bundle_items') }}</p>
     <ul style="margin:0;padding-inline-start:1.2rem;line-height:1.9">
-      {% for it in bundle.items %}
+      {% for it in bundle['items'] %}
       <li>{{ it.name }} × {{ it.quantity }} — {{ money(it.line_total) }} {{ currency }}</li>
       {% endfor %}
     </ul>
