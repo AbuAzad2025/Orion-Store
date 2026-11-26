@@ -106,7 +106,13 @@ def render_store_index():
     sort = _parse_sort(request.args.get("sort"))
     price_min = _parse_decimal(request.args.get("price_min"))
     price_max = _parse_decimal(request.args.get("price_max"))
-    products = _products.query_published(
+    from math import ceil
+
+    from core.pagination import pagination_params
+
+    page, per_page = pagination_params()
+    per_page = min(per_page, 12)
+    all_products = _products.query_published(
         tenant.id,
         category_id=category_id,
         featured=featured,
@@ -114,7 +120,16 @@ def render_store_index():
         price_max=price_max,
         sort="featured" if sort == "default" else sort,
     ).all()
+    total_pages = max(1, ceil(len(all_products) / per_page))
+    page = min(max(page, 1), total_pages)
+    products = all_products[(page - 1) * per_page : page * per_page]
     products_i18n = [ts.merge_product(p, locale) for p in products]
+
+    def _page_url(n):
+        args = {k: v for k, v in request.args.items() if k != "page"}
+        args["page"] = str(n)
+        return url_for("storefront_ui.store_index", **args)
+
     categories = _categories.list_for_tenant(tenant.id)
     counts = _categories.category_product_counts(tenant.id)
     from v1.store_bundles import bundle_cards
@@ -138,6 +153,9 @@ def render_store_index():
         sort=sort,
         price_min=price_min,
         price_max=price_max,
+        pagination_page=page,
+        pagination_pages=total_pages,
+        page_url=_page_url,
     )
 
 

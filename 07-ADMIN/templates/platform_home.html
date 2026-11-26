@@ -14,6 +14,9 @@
     'stores_title': 'متاجرنا النشطة',
     'visit': 'زيارة المتجر ↗',
     'no_stores': 'لا توجد متاجر نشطة حالياً.',
+     'find_store': 'ابحث عن متجرك',
+     'find_store_ph': 'اكتب اسم المتجر أو الرابط…',
+     'no_match': 'لا يوجد متجر بهذا الاسم.',
     'access_title': 'بوابات الدخول',
     'access_sub': 'كل باب له صلاحيته المستقلة — لا اختلاط بين الحسابات.',
     'access_platform': 'مدير المنصة',
@@ -39,6 +42,9 @@
     'stores_title': 'Our active stores',
     'visit': 'Visit store ↗',
     'no_stores': 'No active stores yet.',
+     'find_store': 'Find your store',
+     'find_store_ph': 'Type a store name or link…',
+     'no_match': 'No store matches that name.',
     'access_title': 'Access portals',
     'access_sub': 'Each portal has its own permissions — no account mixing.',
     'access_platform': 'Platform admin',
@@ -69,16 +75,20 @@
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/fonts.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/landing.css') }}?v={{ asset_version }}">
 </head>
 <body class="orion-surface orion-home-body">
   <main class="orion-home">
     <header class="orion-home-topbar">
-      <nav class="orion-home-nav" aria-label="{{ t.login_platform }}">
-        <span class="orion-home-brand">
-          <img src="{{ url_for('admin_assets.static', filename='images/azadexa-header-cropped.png') }}"
-               alt="{{ 'Azadexa — Smart e-commerce platform' if locale == 'en' else 'أزادكسا — منصة التجارة الإلكترونية الذكية' }}"
-               class="orion-home-logo">
-        </span>
+      <nav class="orion-home-nav" aria-label="{{ 'التنقل الرئيسي' if locale == 'ar' else 'Main navigation' }}">
+        <a href="/" class="orion-home-brand" aria-label="Azadexa">
+          <img src="{{ url_for('admin_assets.static', filename='images/azadexa-favicon-logo.png') }}"
+               alt="" class="orion-home-mark" aria-hidden="true">
+          <span class="orion-home-brand-text">
+            <strong>Azadexa</strong>
+            <small>{{ 'منصة التجارة الإلكترونية الذكية' if locale == 'ar' else 'Smart e-commerce platform' }}</small>
+          </span>
+        </a>
         <span class="orion-home-nav-sep" aria-hidden="true"></span>
         <span class="orion-locale-switch" role="group" aria-label="{{ 'اللغة' if locale == 'ar' else 'Language' }}">
           <a href="/?locale=ar" class="orion-locale-link{% if locale == 'ar' %} is-active{% endif %}"
