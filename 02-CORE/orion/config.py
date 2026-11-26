@@ -35,13 +35,21 @@ def testing_database_uri() -> str:
 
 
 class Config:
-    MAX_CONTENT_LENGTH = 6 * 1024 * 1024  # uploads: 5MB image + multipart overhead
+    MAX_CONTENT_LENGTH = int(
+        os.environ.get("MAX_CONTENT_LENGTH", str(6 * 1024 * 1024))
+    )  # uploads: 5MB image + multipart overhead
     # Product images live outside the application source tree so they survive
-    # release swaps. Override with PRODUCT_IMAGES_DIR in the server .env.
-    PRODUCT_IMAGES_DIR = os.environ.get(
-        "PRODUCT_IMAGES_DIR",
-        str(Path(__file__).resolve().parents[3] / "orion-data" / "product-images"),
-    )
+    # release swaps. Always normalise to an absolute path so every consumer
+    # resolves the same directory (a relative value is anchored to the repo's
+    # parent, never to the process CWD).
+    _DATA_PARENT = Path(__file__).resolve().parents[3]
+    _IMAGES_CONFIGURED = Path(
+        os.environ.get("PRODUCT_IMAGES_DIR")
+        or (_DATA_PARENT / "orion-data" / "product-images")
+    ).expanduser()
+    if not _IMAGES_CONFIGURED.is_absolute():
+        _IMAGES_CONFIGURED = _DATA_PARENT / _IMAGES_CONFIGURED
+    PRODUCT_IMAGES_DIR = str(_IMAGES_CONFIGURED.resolve())
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-change-me")
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)

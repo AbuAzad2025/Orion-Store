@@ -90,8 +90,10 @@ DATABASE_URL=postgresql://... FLASK_ENV=development python scripts/seed_translat
 Seeds 5 tenants (`outlet`, `gulf`, `euro`, `atlantic`, `sterling`) with 12 products,
 6 categories, 2 warehouses, 4 customers, 8 paid orders, 1 partial refund,
 invoices, commissions, store credit, vouchers, gift registries and real FX rates.
-Free-stock product photos are downloaded into per-tenant asset folders and
-attached to every product. Admin logins: `admin@<slug>.test` / `password123`.
+Free-stock product photos are downloaded into the configured `PRODUCT_IMAGES_DIR`
+(outside the application source tree) and attached to every product. Set
+`PRODUCT_IMAGES_DIR=/srv/apps/orionstore/shared/product-images` in production.
+Admin logins: `admin@<slug>.test` / `password123`.
 Re-running skips existing tenants.
 
 Verify the full purchase/refund/ledger cycle (see `docs/ACCOUNTING_AUDIT.md`):

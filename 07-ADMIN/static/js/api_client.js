@@ -2,6 +2,46 @@
 /** Shared bilingual helper — English when the document locale is English, Arabic otherwise. */
 const OrionI18n = { t(ar, en) { return (document.documentElement.lang || 'ar').split('_')[0].toLowerCase().startsWith('en') ? en : ar; } };
 
+/**
+ * Upload a product image chosen on the admin's own device.
+ * Returns false on failure so the product form is NOT submitted with a stale URL.
+ */
+async function orionUploadProductImage() {
+  const input = document.getElementById("p-image-file");
+  if (!input || !input.files || !input.files.length) return true;
+  const msg = document.getElementById("p-image-msg");
+  const file = input.files[0];
+  const form = new FormData();
+  form.append("image", file, file.name);
+  const headers = {
+    Accept: "application/json",
+    "X-Locale": document.documentElement.lang || "ar",
+  };
+  const csrf = OrionAPI.getCookie("csrf_access_token");
+  if (csrf) headers["X-CSRF-TOKEN"] = csrf;
+  const tenantId = document.body.dataset.tenantId;
+  if (tenantId) headers["X-Tenant-ID"] = tenantId;
+  try {
+    const res = await fetch("/api/v1/product-images/upload", {
+      method: "POST",
+      headers,
+      body: form,
+      credentials: "same-origin",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(OrionAPI.normalizeError(data, res.status));
+    const urlField = document.getElementById("p-image");
+    if (urlField) urlField.value = data.url;
+    if (msg) msg.textContent = OrionI18n.t("تم رفع الصورة", "Image uploaded");
+    input.value = "";
+    return true;
+  } catch (err) {
+    if (msg) msg.textContent = err.message;
+    if (typeof OrionUI !== "undefined") OrionUI.toast(err.message, "error");
+    return false;
+  }
+}
+
 const OrionAPI = {
   timeoutMs: 15000,
   _inflight: new Map(),

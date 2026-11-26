@@ -234,13 +234,6 @@ class ProductService:
         _validate_category_brand(
             tenant_id, {"category_id": category_id, "brand_id": brand_id}
         )
-        if not image_url:
-            from tenant.tenant import Tenant
-
-            tenant = Tenant.query.get(tenant_id)
-            if tenant and re.fullmatch(r"[a-z0-9][a-z0-9-]{0,62}", tenant.slug):
-                image_url = f"/store/static/images/products/{tenant.slug}/{slug}.jpg"
-
         product = Product(
             tenant_id=tenant_id,
             name=name,

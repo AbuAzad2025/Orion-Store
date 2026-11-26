@@ -15,5 +15,6 @@ Flask-JWT-Extended==4.7.1
 Flask-WTF==1.2.2
 bcrypt==4.1.2
 fpdf2==2.8.8
+Pillow==13.0.0
 uharfbuzz==0.57.0
 pypdf==6.21.4

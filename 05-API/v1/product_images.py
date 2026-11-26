@@ -1,22 +1,26 @@
-"""Tenant-scoped product image upload and serving.
+"""Tenant-scoped product image upload.
 
-Images are stored OUTSIDE the application source tree in a configurable data
-directory (Config.PRODUCT_IMAGES_DIR / PRODUCT_IMAGES_DIR env var) so they
-survive release swaps. The public URL shape stays unchanged and is served by
-this blueprint, with strict per-store isolation.
+Images are written ONLY into the configured data directory, never into the
+application source tree. Every upload is fully decoded and re-encoded before
+it lands on disk, so polyglots, truncated files, decompression bombs and
+metadata payloads cannot survive.
 """
 
 from __future__ import annotations
 
-import re
+import os
 import secrets
+import tempfile
+from io import BytesIO
 from pathlib import Path
 
 from flask import Blueprint, current_app, g, jsonify, request
 
 from core.exceptions import OrionError, ValidationError
 from core.middleware import require_tenant_admin
+from core.rate_limit import limiter
 from core.store_token import issue as issue_store_token
+from orion.paths import images_root, store_folder
 from tenant.tenant import Tenant
 
 product_images_bp = Blueprint("product_images", __name__)
@@ -26,66 +30,81 @@ ALLOWED = {
     ".jpeg": "image/jpeg",
     ".webp": "image/webp",
 }
+PIL_FORMAT = {".png": "PNG", ".jpg": "JPEG", ".jpeg": "JPEG", ".webp": "WEBP"}
+MAGIC = {
+    ".png": lambda raw: raw.startswith(b"\x89PNG\r\n\x1a\n"),
+    ".jpg": lambda raw: raw.startswith(b"\xff\xd8\xff"),
+    ".jpeg": lambda raw: raw.startswith(b"\xff\xd8\xff"),
+    ".webp": lambda raw: raw.startswith(b"RIFF") and raw[8:12] == b"WEBP",
+}
 MAX_BYTES = 5 * 1024 * 1024
 URL_PREFIX = "/store/static/images/products/"
 
 
-def _images_root() -> Path:
-    """Configurable data directory, always outside the application source."""
-    configured = current_app.config.get("PRODUCT_IMAGES_DIR") or ""
-    root = Path(configured).expanduser()
-    if not root.is_absolute():
-        root = Path(current_app.root_path).resolve().parents[3] / root
-    return root.resolve()
-
-
-def _tenant_for_write():
+def _tenant_for_write() -> Tenant:
     """Write target is ALWAYS the authenticated user's own tenant."""
     uid = getattr(g.user, "tenant_id", None) if g.user else None
     if not uid:
         raise ValidationError("A store account is required to upload images.")
     tenant = Tenant.query.get(uid)
-    if not tenant or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,62}", tenant.slug):
+    if tenant is None:
         raise ValidationError("Invalid store.")
+    # store_folder() applies the strict slug regex and containment checks.
+    store_folder(tenant.slug)
     return tenant
 
 
-def _folder(slug: str) -> Path:
-    folder = _images_root() / slug
-    # mode 0750: owner (service user) can write; group read; others none.
-    folder.mkdir(parents=True, exist_ok=True, mode=0o750)
+def _normalise_image(raw: bytes, ext: str) -> bytes:
+    """Decode fully, then re-encode to strip polyglot/metadata payloads."""
     try:
-        folder.chmod(0o750)
-    except OSError:
-        pass
-    return folder
-
-
-def _valid_image(ext: str, raw: bytes) -> bool:
-    if ext == ".png":
-        return raw.startswith(b"\x89PNG\r\n\x1a\n")
-    if ext in (".jpg", ".jpeg"):
-        return raw.startswith(b"\xff\xd8\xff")
-    if ext == ".webp":
-        return raw.startswith(b"RIFF") and raw[8:12] == b"WEBP"
-    return False
-
-
-def _verify_image(path: Path) -> None:
-    """Extra validation with Pillow when available (defense in depth)."""
+        from PIL import Image, ImageFile, ImageOps
+    except ImportError as exc:  # fail closed if Pillow is unavailable
+        raise ValidationError("Server cannot validate images right now.") from exc
+    ImageFile.LOAD_TRUNCATED_IMAGES = False
+    Image.MAX_IMAGE_PIXELS = 10_000_000
+    expected = PIL_FORMAT[ext]
     try:
-        from PIL import Image
-    except ImportError:
-        return
-    try:
-        with Image.open(path) as image:
-            image.verify()
-    except Exception as exc:  # noqa: BLE001 - any decode failure is invalid
-        path.unlink(missing_ok=True)
+        with Image.open(BytesIO(raw)) as opened:
+            if opened.format != expected:
+                raise ValidationError("File content is not a valid image.")
+            opened.load()  # full decode — rejects truncated/malformed data
+            image = ImageOps.exif_transpose(opened)
+            out = BytesIO()
+            kwargs = {"format": expected}
+            if expected == "JPEG":
+                kwargs["quality"] = 92
+            image.save(out, **kwargs)
+            clean = out.getvalue()
+    except ValidationError:
+        raise
+    except Exception as exc:
         raise ValidationError("Image failed validation.") from exc
+    if not clean or len(clean) > MAX_BYTES:
+        raise ValidationError("Image is too large after validation.")
+    return clean
+
+
+def _write_atomic(folder: Path, data: bytes, ext: str) -> str:
+    """Create the final file 0640 via an atomic rename, never following links."""
+    fd, tmp = tempfile.mkstemp(prefix=".upload-", suffix=ext, dir=folder)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(data)
+        os.chmod(tmp, 0o640)
+        while True:
+            name = secrets.token_hex(12) + ext
+            destination = folder / name
+            if not destination.exists() and not destination.is_symlink():
+                break
+        os.replace(tmp, destination)
+        return name
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
 
 
 @product_images_bp.post("/upload")
+@limiter.limit("20 per hour;5 per minute")
 def upload_product_image():
     try:
         require_tenant_admin()
@@ -99,16 +118,13 @@ def upload_product_image():
         raw = file.read(MAX_BYTES + 1)
         if len(raw) > MAX_BYTES:
             raise ValidationError("Image is too large (max 5MB).")
-        if not _valid_image(ext, raw):
+        if not MAGIC[ext](raw):
             raise ValidationError("File content is not a valid image.")
-        name = secrets.token_hex(12) + ext
-        path = _folder(tenant.slug) / name
-        path.write_bytes(raw)
-        try:
-            path.chmod(0o640)
-        except OSError:
-            pass
-        _verify_image(path)
+        clean = _normalise_image(raw, ext)
+        folder = store_folder(tenant.slug)
+        if not images_root().is_dir():
+            raise ValidationError("Image storage is unavailable.")
+        name = _write_atomic(folder, clean, ext)
         return (
             jsonify(
                 {

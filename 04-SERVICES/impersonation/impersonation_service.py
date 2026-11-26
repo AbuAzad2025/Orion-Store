@@ -30,9 +30,13 @@ class ImpersonationService:
         tenant_id: int,
         duration: timedelta = MAX_IMPERSONATION_DURATION,
     ) -> ImpersonationSession:
-        impersonator = User.query.filter_by(
-            id=impersonator_user_id, is_active=True
-        ).first()
+        from core.rls_elevation import platform_read
+
+        with platform_read():
+            impersonator = User.query.filter_by(
+                id=impersonator_user_id,
+                is_active=True,
+            ).first()
         if not impersonator or not impersonator.is_superuser:
             raise AuthorizationError("Only platform admins can start impersonation.")
 

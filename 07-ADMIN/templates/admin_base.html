@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/admin-friendly.css') }}?v={{ asset_version }}">
   {% block head_extra %}{% endblock %}
 </head>
-<body class="bg-gray-100 min-h-screen orion-surface" {% if tenant %}data-tenant-id="{{ tenant.slug }}"{% endif %} {% block body_attrs %}{% endblock %}>
+<body class="bg-gray-100 min-h-screen orion-surface" {% if tenant %}data-tenant-id="{{ tenant.slug }}" data-store-token="{{ store_token_for(tenant) }}"{% endif %} {% block body_attrs %}{% endblock %}>
   {% include "components/impersonation_banner.html" %}
   <a class="orion-skip-link" href="#main-content">{{ t('تخطَّ إلى المحتوى', 'Skip to content') }}</a>
   <div class="flex min-h-screen">

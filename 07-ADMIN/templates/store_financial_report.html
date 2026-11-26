@@ -2,8 +2,6 @@
 {% block head_extra %}
   {% if admin_token %}
   <script>
-    localStorage.setItem("orion_access_token", {{ admin_token | tojson }});
-  </script>
   {% endif %}
 {% endblock %}
 {% block body_attrs %}data-report-tenant-id="{{ tenant_id }}"{% endblock %}

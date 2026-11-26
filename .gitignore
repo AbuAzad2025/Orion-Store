@@ -24,8 +24,15 @@ env/
 *.swp
 *.swo
 
-# TLS private keys / certificates
+# TLS private keys / certificates and local credential artifacts
 *.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*_CREDENTIALS
+*session*.json
+sessions/
 
 # Testing
 .pytest_cache/

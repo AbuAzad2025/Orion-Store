@@ -29,7 +29,10 @@ for part in (
 ):
     sys.path.insert(0, str(ROOT / part))
 
-ASSETS = ROOT / "06-STOREFRONT/themes/default/static/images/products"
+ASSETS = pathlib.Path(
+    os.environ.get("PRODUCT_IMAGES_DIR")
+    or (ROOT.parent / "orion-data" / "product-images")
+).resolve()
 TENANTS = ["outlet", "gulf", "euro", "atlantic", "sterling"]
 
 # product slug -> Unsplash photo id (keyword-matched, free-stock).

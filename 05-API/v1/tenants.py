@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, current_app, g, jsonify, request
 
 from auth.auth_service import AuthService
 from core.exceptions import OrionError
@@ -92,8 +92,9 @@ def update_tenant(tenant_id: int):
         return jsonify({"tenant": tenant.to_dict()}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
-    except Exception as exc:
-        return jsonify({"error": str(exc)}), 400
+    except Exception:
+        current_app.logger.exception("tenant update failed id=%s", tenant_id)
+        return jsonify({"error": "Tenant update failed."}), 400
 
 
 @tenant_bp.delete("/<int:tenant_id>")

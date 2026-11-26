@@ -13,7 +13,7 @@
   <div class="orion-footer-grid">
     <section class="orion-footer-brand">
       <div class="orion-brand mb-4">
-        {% if tenant.logo_url %}<img src="{{ tenant.logo_url }}" alt="{{ tenant.name }}" class="orion-brand-logo">{% else %}<span class="orion-brand-mark" aria-hidden="true">{{ tenant.name[:1]|upper }}</span>{% endif %}
+        {% if tenant.logo_url %}<img src="{% if tenant.logo_url.startswith('/store/static/images/products/') %}{{ tenant.logo_url }}{% if '?' in tenant.logo_url %}&{% else %}?{% endif %}store={{ store_token }}{% else %}{{ tenant.logo_url }}{% endif %}" alt="{{ tenant.name }}" class="orion-brand-logo">{% else %}<span class="orion-brand-mark" aria-hidden="true">{{ tenant.name[:1]|upper }}</span>{% endif %}
         <span class="orion-brand-name">{{ tenant.name }}</span>
       </div>
       <p class="orion-footer-about">{{ t('footer_about') }}</p>

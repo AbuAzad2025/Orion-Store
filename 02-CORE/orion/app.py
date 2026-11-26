@@ -5,8 +5,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 
+from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -24,16 +26,25 @@ from orion.extensions import csrf, db, jwt, migrate
 from v1.routes import API_BLUEPRINTS, register_blueprints, register_ui_blueprints
 
 
+def _is_placeholder(value: str) -> bool:
+    return not value or bool(
+        re.match(r"^(change[_-]?me|dev[_-]?only|changeme|xxx|placeholder)", value, re.I)
+    )
+
+
 def _validate_production_secrets(app: Flask) -> None:
-    """Refuse to boot production with placeholder or missing secrets."""
+    """Refuse to boot production with placeholder or malformed secrets."""
     invalid: list[str] = []
     secret = str(app.config.get("SECRET_KEY") or "")
-    if not secret or secret == "dev-only-change-me":
+    if _is_placeholder(secret) or len(secret) < 32:
         invalid.append("SECRET_KEY")
     jwt_secret = str(app.config.get("JWT_SECRET_KEY") or "")
-    if not jwt_secret or jwt_secret == "dev-only-change-me" or len(jwt_secret) < 16:
+    if _is_placeholder(jwt_secret) or len(jwt_secret) < 32:
         invalid.append("JWT_SECRET_KEY")
-    if not app.config.get("ENCRYPTION_KEY"):
+    enc = str(app.config.get("ENCRYPTION_KEY") or "")
+    try:
+        Fernet(enc.encode())
+    except Exception:
         invalid.append("ENCRYPTION_KEY")
     if invalid:
         raise RuntimeError(
@@ -76,9 +87,14 @@ def create_app(config_name: str | None = None) -> Flask:
         "DATABASE_URL",
         "REDIS_URL",
         "PRODUCT_IMAGES_DIR",
+        "MAX_CONTENT_LENGTH",
     ):
         value = os.environ.get(key)
         if value is not None:
+            if key == "PRODUCT_IMAGES_DIR":
+                value = str(Path(value).expanduser().resolve())
+            elif key == "MAX_CONTENT_LENGTH":
+                value = int(value)
             app.config[key] = value
 
     # JWT_SECRET_KEY defaults to the import-time SECRET_KEY (placeholder).
@@ -153,9 +169,13 @@ def create_app(config_name: str | None = None) -> Flask:
     register_monitoring(app)
     init_rate_limiter(app)
     app.extensions["redis_cache"] = RedisCache(app.config.get("REDIS_URL"))
+    from core.store_token import issue as issue_store_token
     from engine.whatsapp import whatsapp_url
 
     app.jinja_env.globals["whatsapp_url"] = whatsapp_url
+    app.jinja_env.globals["store_token_for"] = lambda tenant: (
+        issue_store_token(tenant) if tenant else ""
+    )
 
     from orion.celery_app import init_celery
 

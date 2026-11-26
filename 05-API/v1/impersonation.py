@@ -13,9 +13,11 @@ from flask_jwt_extended import (
     jwt_required,
     set_access_cookies,
     set_refresh_cookies,
+    unset_access_cookies,
+    unset_refresh_cookies,
 )
 
-from core.jwt_auth import issue_tokens_for_user
+from core.jwt_auth import issue_tokens_for_user, revoke_current_tokens
 from core.middleware import require_platform_admin
 from core.rate_limit import limiter
 from core.utils import utc_now
@@ -167,36 +169,36 @@ def end_impersonation():
                 .order_by(ImpersonationSession.id.desc())
                 .first()
             )
-            if session:
-                active = session.is_active()
-                if active:
-                    session.ended_at = utc_now()
-                    session.revoked = True
-                    from core.audit_log import audit_log
+            if session and session.is_active():
+                # The impersonation token belongs to the TARGET admin. It may
+                # end its own session, but must never mint platform tokens or
+                # revoke somebody else's session.
+                if not g.user or g.user.id != target_user_id:
+                    return jsonify({"error": "Unauthorized"}), 403
+                session.ended_at = utc_now()
+                session.revoked = True
+                from core.audit_log import audit_log
 
-                    audit_log(
-                        action="impersonation_end",
-                        resource_type="user",
-                        resource_id=str(session.target_user_id),
-                        tenant_id=session.tenant_id,
-                        details={"session_id": session.id},
-                    )
-                    db.session.commit()
-                    impersonator = User.query.filter_by(
-                        id=impersonator_id, is_active=True, is_superuser=True
-                    ).first()
-                    if impersonator:
-                        tokens = issue_tokens_for_user(impersonator)
-                        response = jsonify(
-                            {
-                                "message": "Impersonation ended",
-                                "session": session.to_dict(),
-                            }
-                        )
-                        set_access_cookies(response, tokens["access_token"])
-                        set_refresh_cookies(response, tokens["refresh_token"])
-                        return response, 200
-                    return jsonify({"error": "Impersonator not found"}), 404
+                audit_log(
+                    action="impersonation_end",
+                    resource_type="user",
+                    resource_id=str(session.target_user_id),
+                    tenant_id=session.tenant_id,
+                    details={"session_id": session.id, "actor_user_id": g.user.id},
+                )
+                revoke_current_tokens()
+                response = jsonify(
+                    {
+                        "message": (
+                            "Impersonation ended. Sign in again to restore "
+                            "platform access."
+                        ),
+                        "session": session.to_dict(),
+                    }
+                )
+                unset_access_cookies(response)
+                unset_refresh_cookies(response)
+                return response, 200
                 return (
                     jsonify({"active": False, "reason": "Session expired or revoked"}),
                     200,
@@ -221,9 +223,10 @@ def end_impersonation():
             resource_type="user",
             resource_id=str(session.target_user_id),
             tenant_id=session.tenant_id,
-            details={"session_id": session.id},
+            details={"session_id": session.id, "actor_user_id": g.user.id},
         )
         db.session.commit()
+        revoke_current_tokens()
         tokens = issue_tokens_for_user(g.user)
         response = jsonify(
             {"message": "Impersonation ended", "session": session.to_dict()}

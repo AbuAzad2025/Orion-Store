@@ -68,16 +68,30 @@ class AuthService:
         return user
 
     def authenticate(self, *, email: str, password: str, tenant_id: int | None) -> User:
+        from core.rls_elevation import platform_read
+
         query = User.query.filter_by(email=email, is_active=True, deleted_at=None)
         if tenant_id is None:
             query = query.filter_by(is_superuser=True, tenant_id=None)
         else:
             query = query.filter_by(tenant_id=tenant_id, is_superuser=False)
-        user = query.first()
-        if not user or not self.verify_password(password, user.password_hash):
-            raise AuthenticationError("Invalid credentials.")
-        user.last_login_at = utc_now()
-        db.session.commit()
+        with platform_read():
+            user = query.first()
+            if not user or not self.verify_password(password, user.password_hash):
+                raise AuthenticationError("Invalid credentials.")
+            # The user row is RLS-protected: flush the login-time write while
+            # elevated, and keep the loaded attributes available after the
+            # transaction so callers never re-query under a blocked context.
+            user.last_login_at = utc_now()
+            db.session.flush()
+            session = db.session()
+            previous = session.expire_on_commit
+            session.expire_on_commit = False
+            try:
+                db.session.commit()
+            finally:
+                session.expire_on_commit = previous
+            db.session.expunge(user)
         g.user = user
         return user
 

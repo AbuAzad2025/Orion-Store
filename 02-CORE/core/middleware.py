@@ -46,6 +46,10 @@ def register_middleware(app: Flask) -> None:
             g.tenant_id = g.user.tenant_id
             g.tenant = Tenant.query.get(g.user.tenant_id)
 
+        # The first bind happened before authentication. Re-bind now that the
+        # real user/role is known so RLS matches the rest of this request.
+        bind_rls_context()
+
         # Debug-only tenant preview. Runs after auth so platform admins keep
         # their no-tenant context; only the read-only tenants/me API endpoint
         # is included for local tooling.
@@ -344,7 +348,10 @@ def _resolve_authenticated_user() -> None:
         return
 
     if "user_id" in session:
-        user = User.query.filter_by(id=session["user_id"], is_active=True).first()
+        from core.rls_elevation import platform_read
+
+        with platform_read():
+            user = User.query.filter_by(id=session["user_id"], is_active=True).first()
         if user:
             g.user = user
             g.is_platform_admin = user.is_superuser
@@ -363,7 +370,10 @@ def _bind_user_to_context(user_public_id: str) -> None:
         # Legacy clients/test helpers use a slug as identity. Treat as anonymous;
         # a real (valid UUID) token from another tenant is still rejected below.
         return
-    user = User.query.filter_by(public_id=uid, is_active=True).first()
+    from core.rls_elevation import platform_read
+
+    with platform_read():
+        user = User.query.filter_by(public_id=uid, is_active=True).first()
     if not user:
         raise AuthenticationError("Invalid user context.")
     if user.is_superuser:

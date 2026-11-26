@@ -233,7 +233,7 @@ def main() -> None:
                         short_description=f"{p_name} — جودة عالية وسعر مناسب",
                         description=f"وصف تفصيلي لمنتج {p_name} ضمن فئة {cat_name}.",
                         compare_at_price=old,
-                        image_url=f"/store/static/images/products/{slug}/{p_slug}.jpg",
+                        image_url=None,  # images must be uploaded into PRODUCT_IMAGES_DIR
                     )
 
             # Inventory in both warehouses.

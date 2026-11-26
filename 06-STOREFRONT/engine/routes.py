@@ -227,11 +227,15 @@ def store_product(slug: str):
     product_i18n = ts.merge_product(product, locale)
     from core.store_token import issue as issue_store_token
 
+    image_url = product.image_url
+    if image_url and image_url.startswith("/store/static/images/products/"):
+        separator = "&" if "?" in image_url else "?"
+        image_url = f"{image_url}{separator}store={issue_store_token(tenant)}"
     structured = {
         "@context": "https://schema.org",
         "@type": "Product",
         "name": product_i18n.get("name") or product.name,
-        "image": ([product.image_url] if product.image_url else []),
+        "image": ([image_url] if image_url else []),
         "offers": {
             "@type": "Offer",
             "price": str(product_i18n.get("price") or product.price),
