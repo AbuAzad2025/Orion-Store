@@ -1,0 +1,41 @@
+/* Admin dashboard typography — readable, consistent sizes. Loaded after theme CSS. */
+:root { --orion-ui-base: 1rem; }
+body { font-size: 1rem; line-height: 1.6; }
+
+/* Headings */
+.orion-title { font-size: 1.6rem !important; line-height: 1.3; }
+h2.orion-title { font-size: 1.3rem !important; }
+h3 { font-size: 1.1rem; }
+
+/* Stat cards */
+.orion-stat { padding: 1.1rem 1.25rem; }
+.orion-stat-label { font-size: .95rem !important; font-weight: 600; }
+.orion-stat-value { font-size: 2.1rem !important; line-height: 1.2; }
+
+/* Sidebar */
+.orion-sidebar { font-size: 1rem; }
+.orion-nav-link { font-size: .98rem !important; padding: .55rem .8rem; }
+.orion-nav-group > summary { font-size: .9rem; }
+.orion-nav-group-items .orion-nav-link { font-size: .9rem !important; }
+.orion-sidebar-brand strong { font-size: 1.05rem; }
+.orion-sidebar-brand small { font-size: .85rem; }
+
+/* Topbar */
+.orion-topbar-link, .orion-breadcrumb { font-size: .95rem; }
+.orion-badge { font-size: .88rem; padding: .22rem .6rem; }
+.orion-user-meta .orion-muted { font-size: .86rem; }
+
+/* Tables and content */
+.orion-card { font-size: 1rem; }
+table, .orion-table { font-size: 1rem; }
+th { font-size: 1rem; font-weight: 700; }
+td { font-size: 1rem; }
+.orion-muted { font-size: .95rem; }
+button, .orion-btn, input, select, textarea { font-size: 1rem; }
+label { font-size: .97rem; }
+
+@media (max-width: 1024px) {
+  .orion-title { font-size: 1.4rem !important; }
+  .orion-stat-value { font-size: 1.8rem !important; }
+  .orion-nav-link { font-size: .92rem !important; }
+}

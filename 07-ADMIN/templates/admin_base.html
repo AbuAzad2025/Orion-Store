@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/fonts.css') }}?v={{ asset_version }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}?v={{ asset_version }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/admin-fonts.css') }}?v={{ asset_version }}">
   {% block head_extra %}{% endblock %}
 </head>
 <body class="bg-gray-100 min-h-screen orion-surface" {% if tenant %}data-tenant-id="{{ tenant.slug }}"{% endif %} {% block body_attrs %}{% endblock %}>
