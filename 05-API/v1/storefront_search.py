@@ -57,12 +57,23 @@ def storefront_search():
             page,
             per_page,
         )
+        from bundle_svc.bundle_service import BundleService
+
+        from v1.store_bundles import bundle_matches
+
+        query = request.args.get("q", "").strip()
+        bundles = [
+            bundle_matches(b, query, locale)
+            for b in BundleService().list_published(tenant.id)
+            if bundle_matches(b, query, locale) is not None
+        ]
         return (
             jsonify(
                 {
                     "products": [
                         _translations.merge_product(p, locale) for p in products
                     ],
+                    "bundles": bundles,
                     "categories": [
                         c.to_dict() for c in _categories.list_for_tenant(tenant.id)
                     ],

@@ -23,6 +23,7 @@ class ProductBundle(db.Model, TimestampMixin):
         index=True,
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    name_en: Mapped[str | None] = mapped_column(String(255), nullable=True)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
@@ -35,6 +36,7 @@ class ProductBundle(db.Model, TimestampMixin):
         return {
             "id": self.id,
             "name": self.name,
+            "name_en": self.name_en,
             "slug": self.slug,
             "description": self.description,
             "image_url": self.image_url,

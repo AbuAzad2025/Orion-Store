@@ -27,6 +27,7 @@ def create_bundle():
         bundle = _svc.create_bundle(
             tenant_id=g.tenant_id,
             name=data["name"],
+            name_en=data.get("name_en"),
             slug=data["slug"],
             bundle_price=data["bundle_price"],
             description=data.get("description"),

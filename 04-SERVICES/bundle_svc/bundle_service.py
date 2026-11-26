@@ -15,6 +15,7 @@ class BundleService:
         *,
         tenant_id: int,
         name: str,
+        name_en: str | None = None,
         slug: str,
         bundle_price: str | Decimal,
         description: str | None = None,
@@ -24,6 +25,7 @@ class BundleService:
         b = ProductBundle(
             tenant_id=tenant_id,
             name=name,
+            name_en=name_en,
             slug=slug,
             description=description,
             image_url=image_url,

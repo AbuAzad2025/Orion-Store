@@ -73,3 +73,50 @@ def get_bundle(slug: str, locale: str):
         return jsonify({"bundle": _payload(bundle, locale)}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
+
+
+def bundle_matches(bundle, query: str, locale: str):
+    """Return bundle payload when it matches the search term, else None."""
+    payload = _payload(bundle, locale)
+    term = (query or "").strip().lower()
+    if not term:
+        return payload
+    haystack = " ".join(
+        [payload.get("name") or "", payload.get("description") or ""]
+        + [i.get("name") or "" for i in payload.get("items", [])]
+    ).lower()
+    return payload if term in haystack else None
+
+
+def bundle_cards(tenant_id: int) -> list[dict]:
+    """Compact home-page bundle cards with localized names."""
+    svc = BundleService()
+    cards = []
+    for b in svc.list_published(tenant_id):
+        cards.append(
+            {
+                "name": b.name,
+                "name_en": b.name_en,
+                "slug": b.slug,
+                "description": b.description,
+                "image_url": b.image_url,
+                "price": str(b.bundle_price),
+                "max_per_order": b.max_per_order,
+                "item_count": sum(x.quantity for x in svc.items_for(b.id)),
+                "bundle_items": [
+                    {
+                        "name": getattr(
+                            ProductService()
+                            .query_for_tenant(tenant_id)
+                            .filter_by(id=x.product_id)
+                            .first()
+                            or type("P", (), {"name": str(x.product_id)})(),
+                            "name",
+                        ),
+                        "quantity": x.quantity,
+                    }
+                    for x in svc.items_for(b.id)
+                ],
+            }
+        )
+    return cards

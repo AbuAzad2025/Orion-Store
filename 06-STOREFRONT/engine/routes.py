@@ -117,33 +117,9 @@ def render_store_index():
     products_i18n = [ts.merge_product(p, locale) for p in products]
     categories = _categories.list_for_tenant(tenant.id)
     counts = _categories.category_product_counts(tenant.id)
-    from bundle_svc.bundle_service import BundleService
+    from v1.store_bundles import bundle_cards
 
-    bundles = [
-        {
-            "name": b.name,
-            "slug": b.slug,
-            "description": b.description,
-            "image_url": b.image_url,
-            "price": str(b.bundle_price),
-            "max_per_order": b.max_per_order,
-            "item_count": sum(x.quantity for x in BundleService().items_for(b.id)),
-            "bundle_items": [
-                {
-                    "name": (
-                        ProductService()
-                        .query_for_tenant(tenant.id)
-                        .filter_by(id=x.product_id)
-                        .first()
-                        or type("P", (), {"name": str(x.product_id)})()
-                    ).name,
-                    "quantity": x.quantity,
-                }
-                for x in BundleService().items_for(b.id)
-            ],
-        }
-        for b in BundleService().list_published(tenant.id)
-    ]
+    bundles = bundle_cards(tenant.id)
     from core.store_token import issue as issue_store_token
 
     return _engine.render(
@@ -323,6 +299,11 @@ def _parse_sort(value: str | None) -> str:
     return value if value in ProductService.SORT_OPTIONS else "default"
 
 
+@storefront_ui_bp.get("/s/<slug>/search")
+def store_search_clean(slug: str):
+    return store_search()
+
+
 @storefront_ui_bp.get("/search")
 def store_search():
     """Product search page: text search + category/featured/price/sort filters."""
@@ -366,6 +347,17 @@ def store_search():
         params["page"] = str(n)
         return url_for("storefront_ui.store_search", **params)
 
+    from bundle_svc.bundle_service import BundleService
+    from v1.store_bundles import bundle_matches
+
+    bundles = [
+        b
+        for b in (
+            bundle_matches(bundle, query, locale)
+            for bundle in BundleService().list_published(tenant.id)
+        )
+        if b is not None
+    ]
     return _engine.render(
         "search.html",
         tenant=tenant,
@@ -374,6 +366,7 @@ def store_search():
         search_q=query,
         products=products,
         products_i18n=products_i18n,
+        bundles=bundles,
         categories=categories,
         category_counts=counts,
         selected_category_id=category_id,

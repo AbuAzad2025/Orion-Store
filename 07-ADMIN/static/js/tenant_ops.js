@@ -379,7 +379,7 @@ const OrionTenantOps = {
         e.preventDefault();
         const fd = new FormData(form);
         await OrionAPI.post("/bundles", {
-          name: fd.get("name"), slug: fd.get("slug"),
+          name: fd.get("name"), name_en: fd.get("name_en") || undefined, slug: fd.get("slug"),
           bundle_price: String(fd.get("bundle_price") || "0"),
           description: fd.get("description") || undefined,
           image_url: fd.get("image_url") || undefined,

@@ -152,6 +152,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "bundle_pieces": "قطع",
         "bundle_max": "الحد الأقصى للطلب",
         "available": "المتوفر",
+        "search_bundles_title": "حزم مطابقة",
     },
     "en": {
         "home": "Home",
@@ -302,6 +303,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "bundle_pieces": "items",
         "bundle_max": "Max per order",
         "available": "Available",
+        "search_bundles_title": "Matching bundles",
     },
 }
 
