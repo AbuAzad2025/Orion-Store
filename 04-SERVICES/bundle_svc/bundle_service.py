@@ -11,13 +11,22 @@ from orion.extensions import db
 
 class BundleService:
     def create_bundle(
-        self, *, tenant_id: int, name: str, slug: str, bundle_price: str | Decimal
+        self,
+        *,
+        tenant_id: int,
+        name: str,
+        slug: str,
+        bundle_price: str | Decimal,
+        description: str | None = None,
+        is_published: bool = False,
     ) -> ProductBundle:
         b = ProductBundle(
             tenant_id=tenant_id,
             name=name,
             slug=slug,
+            description=description,
             bundle_price=Decimal(str(bundle_price)),
+            is_published=bool(is_published),
         )
         db.session.add(b)
         db.session.commit()
@@ -50,6 +59,21 @@ class BundleService:
 
     def list_bundles(self, tenant_id: int) -> list[ProductBundle]:
         return ProductBundle.query.filter_by(tenant_id=tenant_id).all()
+
+    def list_published(self, tenant_id: int) -> list[ProductBundle]:
+        return (
+            ProductBundle.query.filter_by(tenant_id=tenant_id, is_published=True)
+            .order_by(ProductBundle.id.desc())
+            .all()
+        )
+
+    def get_published_by_slug(self, tenant_id: int, slug: str) -> ProductBundle | None:
+        return ProductBundle.query.filter_by(
+            tenant_id=tenant_id, slug=slug, is_published=True
+        ).first()
+
+    def items_for(self, bundle_id: int) -> list[BundleItem]:
+        return BundleItem.query.filter_by(bundle_id=bundle_id).all()
 
     def resolve_bundle_price(self, bundle: ProductBundle) -> Decimal:
         items = BundleItem.query.filter_by(bundle_id=bundle.id).all()

@@ -29,6 +29,7 @@ from order_svc.checkout_service import CheckoutService
 from order_svc.order_service import OrderService
 from payment_svc.payment_service import PaymentService
 from tenant_gateway_svc.gateway_service import GatewayService
+from v1 import store_bundles
 from v1.order_access import is_order_owner as _order_owner
 from v1.order_access import order_access_token as _order_access_token
 from v1.order_access import public_order_payload as _order_public_payload
@@ -73,6 +74,16 @@ def list_products():
         return jsonify(read_through_json(key, build)), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
+
+
+@storefront_bp.get("/bundles")
+def list_bundles():
+    return v1.store_bundles.list_bundles(_locale())
+
+
+@storefront_bp.get("/bundles/<slug>")
+def get_bundle(slug: str):
+    return v1.store_bundles.get_bundle(slug, _locale())
 
 
 @storefront_bp.get("/categories")

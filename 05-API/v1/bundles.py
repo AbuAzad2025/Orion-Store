@@ -1,3 +1,4 @@
+from bundle.bundle import ProductBundle
 from bundle_svc.bundle_service import BundleService
 from flask import Blueprint, g, jsonify, request
 
@@ -28,12 +29,37 @@ def create_bundle():
             name=data["name"],
             slug=data["slug"],
             bundle_price=data["bundle_price"],
+            description=data.get("description"),
+            is_published=bool(data.get("is_published", False)),
         )
         return jsonify({"bundle": bundle.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
     except (KeyError, TypeError, ValueError):
         return jsonify({"error": "Invalid request."}), 400
+
+
+@bundles_bp.route("/<int:bundle_id>", methods=["PUT"])
+def update_bundle(bundle_id: int):
+    from orion.extensions import db
+
+    try:
+        require_tenant_admin()
+        bundle = ProductBundle.query.filter_by(
+            id=bundle_id, tenant_id=g.tenant_id
+        ).first()
+        if not bundle:
+            return jsonify({"error": "Bundle not found."}), 404
+        data = request.get_json(silent=True) or {}
+        for field in ("name", "slug", "description", "bundle_price"):
+            if field in data:
+                setattr(bundle, field, data[field])
+        if "is_published" in data:
+            bundle.is_published = bool(data["is_published"])
+        db.session.commit()
+        return jsonify({"bundle": bundle.to_dict()}), 200
+    except (OrionError, ValueError, TypeError) as exc:
+        return jsonify({"error": str(exc)}), 400
 
 
 @bundles_bp.route("/<int:bundle_id>/items", methods=["POST"])

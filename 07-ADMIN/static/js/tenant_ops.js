@@ -330,13 +330,46 @@ const OrionTenantOps = {
       const rows = data.bundles || [];
       if (!rows.length) { el.textContent = OrionI18n.t("لا توجد حزم بعد.", "No bundles yet."); return; }
       SafeDOM.clear(el);
+      const select = document.getElementById("bundle-item-bundle");
+      if (select) {
+        const current = select.value;
+        SafeDOM.clear(select);
+        select.appendChild(SafeDOM.elem("option", { value: "" }, [OrionI18n.t("اختر حزمة…", "Choose a bundle…")]));
+        for (const b of rows) select.appendChild(SafeDOM.elem("option", { value: b.id }, [`#${b.id} — ${b.name}`]));
+        select.value = current;
+      }
       for (const b of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [
-          SafeDOM.elem("strong", null, [b.name]),
-          ` (${b.slug}) — ${b.bundle_price} ${b.currency || ""}`
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex items-center justify-between gap-2" }, [
+          SafeDOM.elem("span", null, [
+            SafeDOM.elem("strong", null, [b.name]),
+            ` (${b.slug}) — ${b.bundle_price} ${b.currency || ""}`
+          ]),
+          SafeDOM.actionBtn(
+            b.is_published ? OrionI18n.t("إلغاء النشر", "Unpublish") : OrionI18n.t("نشر", "Publish"),
+            "orion-btn text-xs",
+            async () => {
+              await OrionAPI.put(`/bundles/${b.id}`, { is_published: !b.is_published });
+              OrionTenantOps.loadBundles();
+            }
+          )
         ]));
       }
     } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
+  },
+
+  async loadBundleProducts() {
+    const select = document.getElementById("bundle-item-product");
+    if (!select) return;
+    try {
+      const data = await OrionAPI.get("/oms/products");
+      const current = select.value;
+      SafeDOM.clear(select);
+      select.appendChild(SafeDOM.elem("option", { value: "" }, [OrionI18n.t("اختر منتجاً…", "Choose a product…")]));
+      for (const p of data.products || []) {
+        select.appendChild(SafeDOM.elem("option", { value: p.id }, [`#${p.id} — ${p.name}`]));
+      }
+      select.value = current;
+    } catch (err) { /* keep empty */ }
   },
 
   initBundles() {
@@ -348,11 +381,33 @@ const OrionTenantOps = {
         await OrionAPI.post("/bundles", {
           name: fd.get("name"), slug: fd.get("slug"),
           bundle_price: String(fd.get("bundle_price") || "0"),
+          description: fd.get("description") || undefined,
+          is_published: fd.get("is_published") === "on",
         });
         form.reset();
         OrionTenantOps.loadBundles();
       });
     }
+    const itemForm = document.getElementById("bundle-item-form");
+    if (itemForm) {
+      itemForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fd = new FormData(itemForm);
+        const msg = document.getElementById("bundle-item-msg");
+        try {
+          await OrionAPI.post(`/bundles/${fd.get("bundle_id")}/items`, {
+            product_id: Number(fd.get("product_id")),
+            quantity: Number(fd.get("quantity") || 1),
+            discount_percent: String(fd.get("discount_percent") || "0"),
+          });
+          if (msg) msg.textContent = OrionI18n.t("تمت إضافة الصنف", "Item added");
+          itemForm.reset();
+        } catch (err) {
+          if (msg) msg.textContent = err.message;
+        }
+      });
+    }
+    OrionTenantOps.loadBundleProducts();
     OrionTenantOps.loadBundles();
   },
 

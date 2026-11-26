@@ -35,6 +35,7 @@ class ProductBundle(db.Model, TimestampMixin):
             "id": self.id,
             "name": self.name,
             "slug": self.slug,
+            "description": self.description,
             "bundle_price": str(self.bundle_price),
             "currency": self.currency,
             "is_published": self.is_published,

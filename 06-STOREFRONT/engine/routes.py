@@ -117,8 +117,21 @@ def render_store_index():
     products_i18n = [ts.merge_product(p, locale) for p in products]
     categories = _categories.list_for_tenant(tenant.id)
     counts = _categories.category_product_counts(tenant.id)
+    from bundle_svc.bundle_service import BundleService
+
+    bundles = [
+        {
+            "name": b.name,
+            "slug": b.slug,
+            "description": b.description,
+            "price": str(b.bundle_price),
+            "item_count": sum(x.quantity for x in BundleService().items_for(b.id)),
+        }
+        for b in BundleService().list_published(tenant.id)
+    ]
     return _engine.render(
         "index.html",
+        bundles=bundles,
         tenant=tenant,
         products=products,
         products_i18n=products_i18n,
