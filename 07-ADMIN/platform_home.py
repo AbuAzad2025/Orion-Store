@@ -142,16 +142,9 @@ def platform_home():
     from core.store_token import issue as issue_store_token
 
     identity = {
-        "demo": {
-            "tagline": "Azadexa Demo · منتج متنوع",
-            "mark": "A",
-            "a": "#13233a",
-            "b": "#1d3d5c",
-            "ink": "#e9c77b",
-            "pattern": "",
-        },
         "palestinian-heritage": {
             "tagline": "تراث فلسطيني · منتجات من الأرض",
+            "tagline_en": "Palestinian heritage · products from the land",
             "mark": "🇵🇸",
             "a": "#0f3d2e",
             "b": "#1c6347",

@@ -76,7 +76,7 @@
       <nav class="orion-home-nav" aria-label="{{ t.login_platform }}">
         <span class="orion-home-brand">
           <img src="{{ url_for('admin_assets.static', filename='images/azadexa-header-cropped.png') }}"
-               alt="{{ 'أزاد إكسبريس — منصة التجارة الإلكترونية الذكية' if locale == 'ar' else 'Azadexa — Smart e-commerce platform' }}"
+               alt="{{ 'Azadexa — Smart e-commerce platform' if locale == 'en' else 'أزادكسا — منصة التجارة الإلكترونية الذكية' }}"
                class="orion-home-logo">
         </span>
         <span class="orion-home-nav-sep" aria-hidden="true"></span>
@@ -137,7 +137,7 @@
                 style="background:rgba(255,255,255,.14); color:{{ store.ink }}; border:1px solid {{ store.ink }}55; font-size:1.5rem">{{ store.mark }}</span>
           <span class="orion-store-banner-info">
             <strong style="color:{{ store.ink }}; font-size:1.05rem">{{ store.name }}</strong>
-            <span style="color:{{ store.ink }}; opacity:.8; font-size:.75rem">{{ store.tagline }}</span>
+            <span style="color:{{ store.ink }}; opacity:.8; font-size:.75rem">{{ store.tagline_en if locale == "en" and store.tagline_en else store.tagline }}</span>
             <span dir="ltr" style="color:{{ store.ink }}; opacity:.65; font-size:.7rem">orion.azadexa.com/s/{{ store.slug }}</span>
           </span>
           <span class="orion-store-banner-cta" style="color:{{ store.ink }}">{{ t.visit }}</span>
@@ -169,9 +169,9 @@
     </script>
     <footer class="orion-company-footer">
       <a href="https://wa.me/972562150193" target="_blank" rel="noopener" class="orion-company-banner-link"
-         aria-label="{{ 'تواصل مع شركة آزاد للأنظمة الذكية عبر واتساب' if locale == 'ar' else 'Contact Azad Smart Company on WhatsApp' }}">
+         aria-label="{{ 'Contact Azad Smart Systems on WhatsApp' if locale == 'en' else 'تواصل مع شركة آزاد للأنظمة الذكية عبر واتساب' }}">
         <img src="{{ url_for('admin_assets.static', filename='images/azadexa-footer.png') }}"
-             alt="شركة آزاد للأنظمة الذكية — Azad Electronic Systems — واتساب +972562150193 — بإدارة المهندس أحمد غنام"
+             alt="{{ 'Azad Smart Systems — WhatsApp +972562150193' if locale == 'en' else 'شركة آزاد للأنظمة الذكية — واتساب +972562150193' }}"
              class="orion-company-banner">
       </a>
     </footer>

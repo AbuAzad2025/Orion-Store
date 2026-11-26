@@ -27,7 +27,7 @@
           {% set wa_msg = t('bundle_order_whatsapp') ~ ' ' ~ (b.name_en if locale[:2]|lower == "en" and b.name_en else b.name) ~ ' — ' ~ money(b.price) ~ ' ' ~ currency %}
           {% set wa_link = whatsapp_url(tenant.phone, wa_msg) %}
           {% if wa_link %}<a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn">💬 {{ t('whatsapp') }}</a>{% endif %}
-          <a href="/s/{{ tenant.slug }}/#bundles" class="orion-btn orion-btn-gold">{{ t('bundle_add') }}</a>
+          <a href="/s/{{ tenant.slug }}/#bundles" class="orion-btn orion-btn-gold">{{ t('bundle_details') }}</a>
         </div>
       </article>
       {% endfor %}

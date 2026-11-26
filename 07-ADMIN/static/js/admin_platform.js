@@ -18,7 +18,7 @@ const OrionAdminPlatform = {
       Object.keys(ids).forEach((key) => show(key, s[key]));
     } catch (err) {
       Object.keys(ids).forEach((key) => show(key, "—"));
-      OrionUI.toast("تعذّر تحميل إحصاءات المنصة", "error");
+      OrionUI.toast(OrionI18n.t("تعذّر تحميل إحصاءات المنصة", "Failed to load platform stats"), "error");
     }
   },
 
@@ -47,7 +47,7 @@ const OrionAdminPlatform = {
           this.closeTenantModal();
           await this.loadTenants();
         } catch (err) {
-          alert(err.message || "فشل الحفظ");
+          alert(err.message || OrionI18n.t("فشل الحفظ", "Save failed"));
         }
       });
     }
@@ -62,7 +62,7 @@ const OrionAdminPlatform = {
       if (!rows.length) {
         SafeDOM.clear(el);
         el.appendChild(SafeDOM.elem("tr", null, [
-          SafeDOM.elem("td", { className: "p-3", colspan: "5" }, ["لا توجد متاجر."])
+          SafeDOM.elem("td", { className: "p-3", colspan: "5" }, [OrionI18n.t("لا توجد متاجر.", "No stores.")])
         ]));
         return;
       }
@@ -122,7 +122,7 @@ const OrionAdminPlatform = {
   },
 
   async deleteTenant(id) {
-    if (!confirm("هل أنت متأكد من حذف المتجر؟")) return;
+    if (!confirm(OrionI18n.t("هل أنت متأكد من حذف المتجر؟", "Delete this store?"))) return;
     try {
       await OrionAPI.delete(`/tenants/${id}`);
       await this.loadTenants();
@@ -150,7 +150,7 @@ const OrionAdminPlatform = {
           this.closeUserModal();
           await this.loadUsers();
         } catch (err) {
-          alert(err.message || "فشل الحفظ");
+          alert(err.message || OrionI18n.t("فشل الحفظ", "Save failed"));
         }
       });
     }
@@ -274,9 +274,9 @@ const OrionAdminPlatform = {
       };
       try {
         await OrionAPI.put("/platform/settings", payload);
-        alert("تم الحفظ");
+        alert(OrionI18n.t("تم الحفظ", "Saved"));
       } catch (err) {
-        alert(err.message || "فشل الحفظ");
+        alert(err.message || OrionI18n.t("فشل الحفظ", "Save failed"));
       }
     });
   },

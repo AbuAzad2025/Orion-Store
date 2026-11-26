@@ -1,38 +1,38 @@
 {% extends "admin_base.html" %}
 {% block content %}
-<div class="bg-white rounded border p-6 max-w-lg">
-  <h2 class="text-lg font-semibold mb-4">الملف الشخصي</h2>
+<div class="orion-card p-6 max-w-lg">
+  <h2 class="orion-title text-lg mb-4">{{ t('الملف الشخصي', 'Profile') }}</h2>
 
   <div class="space-y-4">
     <div>
-      <label class="block text-sm text-gray-500 mb-1">الاسم</label>
+      <label class="orion-stat-label block">{{ t('الاسم', 'Name') }}</label>
       <div class="text-base font-medium">{{ user.first_name or '-' }} {{ user.last_name or '' }}</div>
     </div>
     <div>
-      <label class="block text-sm text-gray-500 mb-1">البريد الإلكتروني</label>
-      <div class="text-base font-medium">{{ user.email }}</div>
+      <label class="orion-stat-label block">{{ t('البريد الإلكتروني', 'Email address') }}</label>
+      <div class="text-base font-medium" dir="ltr" style="text-align:start">{{ user.email }}</div>
     </div>
     <div>
-      <label class="block text-sm text-gray-500 mb-1">الصلاحيات</label>
+      <label class="orion-stat-label block">{{ t('الصلاحيات', 'Role') }}</label>
       <div class="text-base font-medium">
-        {% if is_platform_admin %}مدير المنصة{% elif tenant %}مدير المتجر: {{ tenant.name }}{% else %}مستخدم{% endif %}
+        {% if is_platform_admin %}{{ t('مدير المنصة', 'Platform admin') }}{% elif tenant %}{{ t('مدير المتجر', 'Store admin') }}: {{ tenant.name }}{% else %}{{ t('مستخدم', 'User') }}{% endif %}
       </div>
     </div>
     <div>
-      <label class="block text-sm text-gray-500 mb-1">حالة الحساب</label>
-      <div class="text-base font-medium">{% if user.is_active %}نشط{% else %}معطل{% endif %}</div>
+      <label class="orion-stat-label block">{{ t('حالة الحساب', 'Account status') }}</label>
+      <div class="text-base font-medium">{% if user.is_active %}{{ t('نشط', 'Active') }}{% else %}{{ t('معطل', 'Inactive') }}{% endif %}</div>
     </div>
     {% if tenant %}
     <div>
-      <label class="block text-sm text-gray-500 mb-1">المتجر</label>
+      <label class="orion-stat-label block">{{ t('المتجر', 'Store') }}</label>
       <div class="text-base font-medium">{{ tenant.name }} ({{ tenant.slug }})</div>
     </div>
     {% endif %}
   </div>
 
-  <div class="mt-6 pt-6 border-t flex gap-3">
-    <a href="{{ url_for('platform_admin.platform_dashboard') if is_platform_admin else url_for('tenant_admin.tenant_dashboard') }}" class="orion-btn">العودة للوحة</a>
-    <a href="/admin/logout" class="bg-red-600 text-white px-4 py-2 rounded text-sm">تسجيل الخروج</a>
+  <div class="mt-6 pt-6 border-t flex gap-3 flex-wrap">
+    <a href="{{ url_for('platform_admin.platform_dashboard') if is_platform_admin else url_for('tenant_admin.tenant_dashboard') }}" class="orion-btn">{{ t('العودة للوحة', 'Back to dashboard') }}</a>
+    <a href="/admin/logout" class="orion-btn orion-logout">{{ t('تسجيل الخروج', 'Logout') }}</a>
   </div>
 </div>
 {% endblock %}

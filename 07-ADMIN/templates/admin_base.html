@@ -54,8 +54,6 @@
           {% if tenant %}
           <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="orion-topbar-link" rel="noopener">{{ t('عرض المتجر ↗', 'View store ↗') }}</a>
           {% endif %}
-          <a href="/admin/profile" class="orion-topbar-link">{{ t('الملف الشخصي', 'Profile') }}</a>
-          <a href="/admin/logout" class="orion-topbar-link orion-topbar-logout">{{ t('تسجيل الخروج', 'Logout') }}</a>
           {% block page_actions %}{% endblock %}
         </div>
       </header>
