@@ -181,6 +181,11 @@ def store_category_clean(slug: str, category_slug: str):
     return store_category(category_slug)
 
 
+@storefront_ui_bp.get("/s/<slug>/login")
+def store_login_page(slug: str):
+    return store_login()
+
+
 @storefront_ui_bp.post("/s/<slug>/login")
 def store_login_submit(slug: str):
     tenant = _tenant_or_404()
