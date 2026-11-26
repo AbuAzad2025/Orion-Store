@@ -44,6 +44,7 @@ class Tenant(db.Model):
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     name_en: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    logo_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     domain: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     custom_domain: Mapped[str | None] = mapped_column(
@@ -95,6 +96,7 @@ class Tenant(db.Model):
             "custom_domain": self.custom_domain,
             "name": self.name,
             "name_en": self.name_en,
+            "logo_url": self.logo_url,
             "slug": self.slug,
             "domain": self.domain,
             "status": self.status,

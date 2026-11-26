@@ -13,7 +13,7 @@
   <div class="orion-footer-grid">
     <section class="orion-footer-brand">
       <div class="orion-brand mb-4">
-        <span class="orion-brand-mark" aria-hidden="true">A</span>
+        {% if tenant.logo_url %}<img src="{{ tenant.logo_url }}" alt="{{ tenant.name }}" class="orion-brand-logo">{% else %}<span class="orion-brand-mark" aria-hidden="true">{{ tenant.name[:1]|upper }}</span>{% endif %}
         <span class="orion-brand-name">{{ tenant.name }}</span>
       </div>
       <p class="orion-footer-about">{{ t('footer_about') }}</p>
@@ -23,6 +23,10 @@
     </section>
 
     <nav aria-label="{{ t('quick_links') }}">
+      <a href="https://orion.azadexa.com/" target="_blank" rel="noopener" class="orion-platform-chip" aria-label="Azadexa Platform">
+        <img src="/admin/static/images/azadexa-header-cropped.png" alt="Azadexa">
+        <span>{{ 'منصة أزادكسا' if locale[:2]|lower == 'ar' else 'Azadexa Platform' }}</span>
+      </a>
       <h2 class="orion-footer-col-title"><span aria-hidden="true" class="orion-footer-icon">🔗</span>{{ t('quick_links') }}</h2>
       <div class="orion-footer-links">
         <a href="/s/{{ tenant.slug }}/"><span aria-hidden="true" class="orion-footer-icon">🏠</span>{{ t('home') }}</a>

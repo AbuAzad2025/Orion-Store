@@ -41,3 +41,9 @@
   .orion-card { padding: 1rem; }
   .orion-section-head { flex-wrap: wrap; }
 }
+
+/* Store & platform logos */
+.orion-brand-logo { inline-size: 2.2rem; block-size: 2.2rem; object-fit: contain; border-radius: 10px; flex: none; }
+.orion-platform-chip { display: inline-flex; align-items: center; gap: .5rem; padding: .4rem .6rem; border: 1px solid var(--orion-border); border-radius: 10px; text-decoration: none; color: var(--orion-muted); font-size: .78rem; }
+.orion-platform-chip img { inline-size: 5rem; block-size: auto; object-fit: contain; }
+.orion-platform-chip:hover { border-color: var(--orion-gold); color: var(--orion-text); }

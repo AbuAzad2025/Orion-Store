@@ -32,6 +32,7 @@ const OrionAdminPlatform = {
         const payload = {
           name: form.querySelector("[name='name']").value,
           name_en: form.querySelector("[name='name_en']").value || undefined,
+          logo_url: form.querySelector("[name='logo_url']").value || undefined,
           slug: form.querySelector("[name='slug']").value,
           email: form.querySelector("[name='email']").value,
           domain: form.querySelector("[name='domain']").value || undefined,

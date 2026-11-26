@@ -45,6 +45,7 @@ def create_tenant():
         tenant = _tenants.create_tenant(
             name=data["name"],
             name_en=data.get("name_en"),
+            logo_url=data.get("logo_url"),
             slug=data["slug"],
             email=data["email"],
             domain=data.get("domain"),

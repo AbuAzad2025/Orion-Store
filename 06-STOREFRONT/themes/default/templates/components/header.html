@@ -18,7 +18,8 @@
   </style>
   <div class="orion-navbar-inner">
     <a href="{{ home_path }}" class="orion-brand" aria-label="{{ tenant.name_for(locale) }} — {{ t('home') }}">
-      <span class="orion-brand-mark" aria-hidden="true">{{ (tenant.name_for(locale)[:1])|upper }}</span>
+      {% if tenant.logo_url %}<img src="{{ tenant.logo_url }}" alt="{{ tenant.name_for(locale) }}" class="orion-brand-logo">
+      {% else %}<span class="orion-brand-mark" aria-hidden="true">{{ (tenant.name_for(locale)[:1])|upper }}</span>{% endif %}
       <span class="orion-brand-name">{{ tenant.name_for(locale) }}</span>
     </a>
 

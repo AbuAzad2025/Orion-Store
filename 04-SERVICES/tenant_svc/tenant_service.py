@@ -42,6 +42,7 @@ class TenantService:
         *,
         name: str,
         name_en: str | None = None,
+        logo_url: str | None = None,
         slug: str,
         email: str,
         domain: str | None = None,
@@ -56,6 +57,7 @@ class TenantService:
         tenant = Tenant(
             name=name,
             name_en=name_en,
+            logo_url=logo_url,
             slug=slug,
             email=email,
             domain=domain or slug,
