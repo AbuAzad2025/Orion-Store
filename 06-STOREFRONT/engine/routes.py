@@ -151,6 +151,26 @@ def store_index_clean(slug: str):
     return render_store_index()
 
 
+@storefront_ui_bp.get("/s/<slug>/bundle/<bundle_slug>")
+def store_bundle_detail(slug: str, bundle_slug: str):
+    tenant = _tenant_or_404()
+    if not tenant:
+        return "Store not found.", 404
+    from v1.store_bundles import find_bundle_payload
+
+    locale = get_locale()
+    bundle = find_bundle_payload(tenant.id, bundle_slug, locale)
+    if not bundle:
+        return "Bundle not found.", 404
+    return _engine.render(
+        "bundle.html",
+        tenant=tenant,
+        bundle=bundle,
+        page_title=bundle["name"],
+        locale=locale,
+    )
+
+
 @storefront_ui_bp.get("/s/<slug>/product/<product_slug>")
 def store_product_clean(slug: str, product_slug: str):
     return store_product(product_slug)

@@ -55,10 +55,16 @@
         {% for it in b.bundle_items %}<li>{{ it.name }} × {{ it.quantity }}</li>{% endfor %}
       </ul>
       {% if b.max_per_order %}<p class="orion-muted text-xs" style="margin:0"> {{ t('bundle_max') }}: {{ b.max_per_order }}</p>{% endif %}
-      <p class="orion-product-price text-xl" style="margin:0">{{ money(b.price) }} {{ currency }}</p>
-      <button type="button" class="orion-btn orion-btn-gold bundle-add"
-              data-slug="{{ b.slug }}" data-token="{{ store_token }}"
-              aria-label="{{ t('bundle_add') }} — {{ b.name }}">{{ t('bundle_add') }}</button>
+      <p class="orion-product-price text-2xl orion-badge" style="margin:.25rem 0;width:fit-content">{{ money(b.price) }} {{ currency }}</p>
+      <div class="flex flex-wrap gap-2" style="margin-block-start:auto">
+        <a href="/s/{{ tenant.slug }}/bundle/{{ b.slug }}" class="orion-btn orion-btn-ghost">{{ t('bundle_details') }}</a>
+        {% set wa_msg = t('bundle_order_whatsapp') ~ ' ' ~ (b.name_en if locale[:2]|lower == "en" and b.name_en else b.name) ~ ' — ' ~ money(b.price) ~ ' ' ~ currency %}
+        {% set wa_link = whatsapp_url(tenant.phone, wa_msg) %}
+        {% if wa_link %}<a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn">💬 {{ t('whatsapp') }}</a>{% endif %}
+        <button type="button" class="orion-btn orion-btn-gold bundle-add"
+                data-slug="{{ b.slug }}" data-token="{{ store_token }}"
+                aria-label="{{ t('bundle_add') }} — {{ b.name }}">{{ t('bundle_add') }}</button>
+      </div>
     </article>
     {% endfor %}
   </div>

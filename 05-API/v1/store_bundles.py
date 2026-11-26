@@ -120,3 +120,9 @@ def bundle_cards(tenant_id: int) -> list[dict]:
             }
         )
     return cards
+
+
+def find_bundle_payload(tenant_id: int, slug: str, locale: str):
+    """Payload for a published bundle, or None."""
+    bundle = BundleService().get_published_by_slug(tenant_id, slug)
+    return _payload(bundle, locale) if bundle else None

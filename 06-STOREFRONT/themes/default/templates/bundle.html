@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="orion-card p-5" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1.5rem">
+  <div>
+    {% if bundle.image_url %}
+    <img src="{{ bundle.image_url }}{% if store_token %}?store={{ store_token }}{% endif %}" alt="{{ bundle.name }}" style="width:100%;border-radius:16px;object-fit:cover">
+    {% endif %}
+  </div>
+  <div style="display:flex;flex-direction:column;gap:.75rem">
+    <span class="orion-eyebrow">{{ t('bundles_eyebrow') }}</span>
+    <h1 class="orion-title text-2xl">{{ bundle.name }}</h1>
+    {% if bundle.description %}<p class="orion-muted">{{ bundle.description }}</p>{% endif %}
+    <p class="orion-stat-label" style="margin:0">{{ t('bundle_items') }}</p>
+    <ul style="margin:0;padding-inline-start:1.2rem;line-height:1.9">
+      {% for it in bundle.items %}
+      <li>{{ it.name }} × {{ it.quantity }} — {{ money(it.line_total) }} {{ currency }}</li>
+      {% endfor %}
+    </ul>
+    <p class="orion-muted text-sm" style="margin:0">{{ t('bundle_original') }}: {{ money(bundle.original_total) }} {{ currency }}</p>
+    <p class="orion-product-price text-2xl" style="margin:0">{{ money(bundle.bundle_price) }} {{ currency }}</p>
+    <p class="orion-badge" style="width:fit-content">{{ t('bundle_savings') }}: {{ money(bundle.savings) }} {{ currency }}</p>
+    {% if bundle.max_per_order %}<p class="orion-muted text-xs" style="margin:0">{{ t('bundle_max') }}: {{ bundle.max_per_order }}</p>{% endif %}
+    <div class="flex flex-wrap gap-2" style="margin-block-start:.5rem">
+      <button type="button" class="orion-btn orion-btn-gold bundle-add" data-slug="{{ bundle.slug }}">{{ t('bundle_add') }}</button>
+      {% set wa_msg = t('bundle_order_whatsapp') ~ ' ' ~ bundle.name ~ ' — ' ~ money(bundle.bundle_price) ~ ' ' ~ currency %}
+      {% set wa_link = whatsapp_url(tenant.phone, wa_msg) %}
+      {% if wa_link %}
+      <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost">💬 {{ t('order_whatsapp') }}</a>
+      {% endif %}
+    </div>
+    <p id="bundle-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>
+<script>
+document.addEventListener("click", async (event) => {
+  const button = event.target.closest(".bundle-add");
+  if (!button) return;
+  button.disabled = true;
+  try {
+    const res = await fetch("/api/v1/store/bundles/" + encodeURIComponent(button.dataset.slug), {
+      headers: { "X-Tenant-ID": document.body.dataset.tenantId || "", "X-Locale": document.documentElement.lang || "ar" }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    let token = StoreAPI.getCartToken();
+    if (!token) {
+      token = (await StoreAPI.createCart()).cart.cart_token;
+      StoreAPI.setCartToken(token);
+    }
+    for (const item of data.bundle.items) {
+      await StoreAPI.addItem(token, item.product_id, item.quantity);
+    }
+    const msg = document.getElementById("bundle-msg");
+    if (msg) msg.textContent = "{{ t('bundle_added') }}";
+    button.disabled = false;
+  } catch (err) {
+    button.disabled = false;
+    window.alert(err.message);
+  }
+});
+</script>
+{% endblock %}

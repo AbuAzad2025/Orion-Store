@@ -21,8 +21,14 @@
         {% if b.image_url %}<img src="{{ b.image_url }}{% if store_token %}?store={{ store_token }}{% endif %}" alt="{{ b.name_en if locale[:2]|lower == "en" and b.name_en else b.name }}" style="width:100%;height:140px;object-fit:cover;border-radius:12px">{% endif %}
         <strong class="text-lg">{{ b.name_en if locale[:2]|lower == "en" and b.name_en else b.name }}</strong>
         {% if b.description %}<p class="orion-muted text-sm" style="margin:0">{{ b.description }}</p>{% endif %}
-        <p class="orion-product-price" style="margin:0">{{ money(b.price) }} {{ currency }}</p>
-        <a href="/s/{{ tenant.slug }}/#bundles" class="orion-btn orion-btn-gold w-fit">{{ t('bundle_add') }}</a>
+        <p class="orion-product-price text-xl orion-badge" style="margin:.25rem 0;width:fit-content">{{ money(b.price) }} {{ currency }}</p>
+        <div class="flex flex-wrap gap-2">
+          <a href="/s/{{ tenant.slug }}/bundle/{{ b.slug }}" class="orion-btn orion-btn-ghost">{{ t('bundle_details') }}</a>
+          {% set wa_msg = t('bundle_order_whatsapp') ~ ' ' ~ (b.name_en if locale[:2]|lower == "en" and b.name_en else b.name) ~ ' — ' ~ money(b.price) ~ ' ' ~ currency %}
+          {% set wa_link = whatsapp_url(tenant.phone, wa_msg) %}
+          {% if wa_link %}<a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn">💬 {{ t('whatsapp') }}</a>{% endif %}
+          <a href="/s/{{ tenant.slug }}/#bundles" class="orion-btn orion-btn-gold">{{ t('bundle_add') }}</a>
+        </div>
       </article>
       {% endfor %}
     </div>
