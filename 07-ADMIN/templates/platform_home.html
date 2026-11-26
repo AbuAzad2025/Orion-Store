@@ -71,7 +71,7 @@
   <link rel="canonical" href="{{ request.host_url.rstrip('/') }}/{% if lang == 'en' %}?locale=en{% endif %}">
   <link rel="alternate" hreflang="ar" href="{{ request.host_url.rstrip('/') }}/">
   <link rel="alternate" hreflang="en" href="{{ request.host_url.rstrip('/') }}/?locale=en">
-  <link rel="icon" type="image/png" href="{{ url_for('admin_assets.static', filename='images/azadexa-favicon-logo.png') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('admin_assets.static', filename='images/azadexa-favicon-64.png') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/fonts.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
   <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
@@ -82,7 +82,7 @@
     <header class="orion-home-topbar">
       <nav class="orion-home-nav" aria-label="{{ 'التنقل الرئيسي' if locale == 'ar' else 'Main navigation' }}">
         <a href="/" class="orion-home-brand" aria-label="Azadexa">
-          <img src="{{ url_for('admin_assets.static', filename='images/azadexa-favicon-logo.png') }}"
+          <img src="{{ url_for('admin_assets.static', filename='images/azadexa-navbar.png') }}"
                alt="" class="orion-home-mark" aria-hidden="true">
           <span class="orion-home-brand-text">
             <strong>Azadexa</strong>
