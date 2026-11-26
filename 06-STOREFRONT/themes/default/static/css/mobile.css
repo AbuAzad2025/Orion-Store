@@ -46,7 +46,7 @@
 .orion-brand-logo { inline-size: 3rem; block-size: 3rem; object-fit: contain; border-radius: 14px; flex: none; }
 .orion-powered-chip { display: inline-flex; align-items: center; gap: .45rem; }
 .orion-platform-chip { display: inline-flex; align-items: center; padding: .35rem .6rem; border: 1px solid var(--orion-border); border-radius: 6px; text-decoration: none; background: rgba(255,255,255,.03); }
-.orion-platform-chip img { inline-size: 7rem; block-size: 2.4rem; object-fit: contain; }
+.orion-platform-chip img { inline-size: 5.5rem; block-size: 1.875rem; object-fit: contain; }
 .orion-platform-chip:hover { border-color: var(--orion-gold); }
 .orion-fx-note { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .orion-footer-brand .orion-brand-name { font-size: 1.15rem; font-weight: 800; }

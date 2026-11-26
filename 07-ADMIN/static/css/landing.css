@@ -1,10 +1,10 @@
 /* Platform landing navbar — clean, branded and responsive. */
 .orion-home-nav { flex-wrap: wrap; gap: .6rem; }
 .orion-home-brand { display: inline-flex; align-items: center; gap: .85rem; text-decoration: none; color: var(--orion-text); }
-.orion-home-mark { inline-size: 3.6rem; block-size: 3.6rem; object-fit: contain; border-radius: 10px; background: rgba(255,255,255,.06); padding: .2rem; }
+.orion-home-mark { inline-size: 3.5rem; block-size: 3.5rem; object-fit: contain; border-radius: 10px; background: rgba(255,255,255,.06); padding: .2rem; }
 .orion-home-brand-text { display: grid; gap: .05rem; line-height: 1.2; }
-.orion-home-brand-text strong { font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; }
-.orion-home-brand-text small { font-size: .85rem; color: var(--orion-muted); }
+.orion-home-brand-text strong { font-size: 1.375rem; font-weight: 800; letter-spacing: -.02em; }
+.orion-home-brand-text small { font-size: .8125rem; color: var(--orion-muted); }
 .orion-home-nav-group { display: inline-flex; align-items: center; gap: .5rem; }
 .orion-home-nav-sep { inline-size: 1px; block-size: 1.6rem; background: var(--orion-border); }
 @media (max-width: 860px) {
