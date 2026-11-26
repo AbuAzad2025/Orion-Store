@@ -60,28 +60,6 @@
       </form>
     </section>
 
-    <details class="orion-card orion-auth-sso">
-      <summary>{{ t('الدخول عبر SSO', 'Sign in via SSO') }}</summary>
-      <form action="/admin/sso/exchange" method="post">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="orion-auth-field">
-          <label class="orion-auth-label" for="sso-provider-code">{{ t('رمز مزوّد SSO', 'SSO provider code') }}</label>
-          <input id="sso-provider-code" name="provider_code" type="text" required class="orion-input w-full"
-                 placeholder="provider-code" aria-label="{{ t('رمز مزوّد SSO', 'SSO provider code') }}">
-        </div>
-        <div class="orion-auth-field">
-          <label class="orion-auth-label" for="sso-email">{{ t('البريد الخارجي', 'External email') }}</label>
-          <input id="sso-email" name="external_email" type="email" required class="orion-input w-full"
-                 placeholder="name@example.com" aria-label="{{ t('البريد الإلكتروني الخارجي لـ SSO', 'External email for SSO') }}">
-        </div>
-        <div class="orion-auth-field">
-          <label class="orion-auth-label" for="sso-tenant">{{ t('معرّف المتجر', 'Store identifier') }}</label>
-          <input id="sso-tenant" name="tenant_slug" type="text" required class="orion-input w-full"
-                 value="{{ request.args.get('tenant_slug', '') }}" placeholder="my-store" aria-label="{{ t('معرّف المتجر لـ SSO', 'Store identifier for SSO') }}">
-        </div>
-        <button type="submit" class="orion-btn w-full">{{ t('دخول عبر SSO', 'Sign in via SSO') }}</button>
-      </form>
-    </details>
   </main>
   <script src="{{ url_for('admin_assets.static', filename='js/admin_utils.js') }}"></script>
   <script src="{{ url_for('admin_assets.static', filename='js/api_client.js') }}"></script>
