@@ -12,10 +12,10 @@
   'dashboard': 'home', 'products': 'home', 'pages': 'home', 'contact': 'home',
   'gateways': 'orders', 'draft_orders': 'orders', 'returns': 'orders', 'bopis': 'orders',
   'oms': 'orders', 'store_credit': 'orders', 'b2b': 'orders', 'bundles': 'orders',
-  'subscriptions': 'finance', 'tax': 'finance', 'reconciliation': 'finance', 'currency': 'finance',
-  'vouchers': 'marketing', 'affiliates': 'marketing', 'gift_registries': 'marketing',
+  'subscriptions': 'finance', 'tax': 'finance', 'reconciliation': 'finance', 'vouchers': 'finance',
+  'affiliates': 'marketing', 'gift_registries': 'marketing',
   'search': 'marketing', 'schema_markup': 'marketing', 'live_chat': 'marketing',
-  'metafields': 'settings', 'documents': 'settings', 'import_export': 'settings',
+  'metafields': 'marketing', 'documents': 'marketing', 'import_export': 'settings',
   'app_platform': 'settings', 'feature_flags': 'settings', 'fraud': 'settings',
   'compliance': 'settings', 'workflows': 'settings', 'accessibility': 'settings',
   'dropship': 'settings', 'ui_kit': 'tools'
@@ -115,11 +115,6 @@
     {% endif %}
 
     {% if tenant %}
-    <div class="orion-sidebar-store-link">
-      <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="orion-nav-link orion-store-external">
-        {{ t('رابط المتجر', 'Store link') }} <span aria-hidden="true">↗</span>
-      </a>
-    </div>
     {% endif %}
   </nav>
 

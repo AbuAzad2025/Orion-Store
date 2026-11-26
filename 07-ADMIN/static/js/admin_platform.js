@@ -1,5 +1,6 @@
 /** Platform admin — dashboard, tenants, users, settings. */
 const OrionAdminPlatform = {
+  tenantNames: {},
 
   async initDashboard() {
     const ids = {
@@ -10,7 +11,7 @@ const OrionAdminPlatform = {
     };
     const show = (key, value) => {
       const el = document.getElementById(ids[key]);
-      if (el) el.textContent = Number(value || 0).toLocaleString("ar");
+      if (el) el.textContent = Number(value || 0).toLocaleString(document.documentElement.lang || "ar");
     };
     try {
       const data = await OrionAPI.get("/platform/stats");
@@ -76,12 +77,12 @@ const OrionAdminPlatform = {
           className: "orion-btn text-sm ml-2",
           href: `/admin/login?tenant_slug=${encodeURIComponent(t.slug)}`,
         }, [OrionI18n.t("دخول المتجر", "Enter store")]);
-        const editBtn = SafeDOM.actionBtn("تعديل", "text-blue-600 text-sm ml-2", () => OrionAdminPlatform.editTenant(t.id));
-        const deleteBtn = SafeDOM.actionBtn("حذف", "text-red-600 text-sm", () => OrionAdminPlatform.deleteTenant(t.id));
+        const editBtn = SafeDOM.actionBtn(OrionI18n.t("تعديل", "Edit"), "text-blue-600 text-sm ml-2", () => OrionAdminPlatform.editTenant(t.id));
+        const deleteBtn = SafeDOM.actionBtn(OrionI18n.t("حذف", "Delete"), "text-red-600 text-sm", () => OrionAdminPlatform.deleteTenant(t.id));
         const financeLink = SafeDOM.elem("a", {
           className: "text-blue-600 text-sm ml-2",
           href: `/admin/platform/stores/${t.id}/finance`,
-        }, ["مالية"]);
+        }, [OrionI18n.t("مالية", "Finance")]);
         const actionsTd = SafeDOM.elem("td", { className: "p-3" }, [enterLink, editBtn, financeLink, deleteBtn]);
         el.appendChild(SafeDOM.elem("tr", { className: "border-b" }, [nameTd, slugTd, emailTd, statusTd, actionsTd]));
       }
@@ -96,7 +97,7 @@ const OrionAdminPlatform = {
   openTenantModal() {
     document.getElementById("tenant-id").value = "";
     document.getElementById("tenant-form").reset();
-    document.getElementById("tenant-modal-title").textContent = "إضافة متجر";
+    document.getElementById("tenant-modal-title").textContent = OrionI18n.t("إضافة متجر", "Add store");
     document.getElementById("tenant-modal").classList.remove("hidden");
   },
 
@@ -114,7 +115,7 @@ const OrionAdminPlatform = {
       document.getElementById("tenant-email").value = t.email;
       document.getElementById("tenant-domain").value = t.domain || "";
       document.getElementById("tenant-status").value = t.status;
-      document.getElementById("tenant-modal-title").textContent = "تعديل متجر";
+      document.getElementById("tenant-modal-title").textContent = OrionI18n.t("تعديل متجر", "Edit store");
       document.getElementById("tenant-modal").classList.remove("hidden");
     } catch (err) {
       alert(err.message);
@@ -186,7 +187,7 @@ const OrionAdminPlatform = {
       if (!rows.length) {
         SafeDOM.clear(el);
         el.appendChild(SafeDOM.elem("tr", null, [
-          SafeDOM.elem("td", { className: "p-3", colspan: "6" }, ["لا يوجد مستخدمين."])
+          SafeDOM.elem("td", { className: "p-3", colspan: "6" }, [OrionI18n.t("لا يوجد مستخدمين.", "No users.")])
         ]));
         return;
       }
@@ -195,10 +196,10 @@ const OrionAdminPlatform = {
         const emailTd = SafeDOM.elem("td", { className: "p-3" }, [u.email]);
         const nameTd = SafeDOM.elem("td", { className: "p-3" }, [`${u.first_name || ""} ${u.last_name || ""}`]);
         const tenantTd = SafeDOM.elem("td", { className: "p-3" }, [u.tenant_id || "—"]);
-        const roleTd = SafeDOM.elem("td", { className: "p-3" }, [u.is_superuser ? "مدير منصة" : (u.is_admin ? "مدير متجر" : "—")]);
-        const activeTd = SafeDOM.elem("td", { className: "p-3" }, [u.is_active ? "نشط" : "معطل"]);
-        const roleBtn = SafeDOM.actionBtn("الأدوار", "text-purple-600 text-sm ml-2", () => OrionAdminPlatform.assignUserRole(u));
-        const deleteBtn = SafeDOM.actionBtn("حذف", "text-red-600 text-sm", () => OrionAdminPlatform.deleteUser(u.id));
+        const roleTd = SafeDOM.elem("td", { className: "p-3" }, [u.is_superuser ? OrionI18n.t("مدير منصة", "Platform admin") : (u.is_admin ? OrionI18n.t("مدير متجر", "Store admin") : "—")]);
+        const activeTd = SafeDOM.elem("td", { className: "p-3" }, [u.is_active ? OrionI18n.t("نشط", "Active") : OrionI18n.t("معطل", "Inactive")]);
+        const roleBtn = SafeDOM.actionBtn(OrionI18n.t("الأدوار", "Roles"), "text-purple-600 text-sm ml-2", () => OrionAdminPlatform.assignUserRole(u));
+        const deleteBtn = SafeDOM.actionBtn(OrionI18n.t("حذف", "Delete"), "text-red-600 text-sm", () => OrionAdminPlatform.deleteUser(u.id));
         const actionsTd = SafeDOM.elem("td", { className: "p-3" }, [roleBtn, deleteBtn]);
         el.appendChild(SafeDOM.elem("tr", { className: "border-b" }, [emailTd, nameTd, tenantTd, roleTd, activeTd, actionsTd]));
       }
@@ -220,7 +221,7 @@ const OrionAdminPlatform = {
   },
 
   async deleteUser(id) {
-    if (!confirm("هل أنت متأكد من حذف المستخدم؟")) return;
+    if (!confirm(OrionI18n.t("هل أنت متأكد من حذف المستخدم؟", "Delete this user?"))) return;
     try {
       await OrionAPI.delete(`/users/${id}`);
       await this.loadUsers();
@@ -232,20 +233,20 @@ const OrionAdminPlatform = {
   async assignUserRole(user) {
     // Minimal assignment UI: no role-list endpoint exists yet, so the code is
     // entered directly. Full role/permission management is deferred.
-    const roleCode = (prompt("رمز الدور (مثال: store_staff)") || "").trim();
+    const roleCode = (prompt(OrionI18n.t("رمز الدور (مثال: store_staff)", "Role code (e.g. store_staff)")) || "").trim();
     if (!roleCode) return;
     const tenantRaw = (prompt(
-      "معرّف المتجر (اتركه فارغاً لاستخدام متجر المستخدم)",
+      OrionI18n.t("معرّف المتجر (اتركه فارغاً لاستخدام متجر المستخدم)", "Store ID (leave blank to use the user’s store)"),
       user.tenant_id || ""
     ) || "").trim();
     const payload = { role_code: roleCode };
     if (tenantRaw) payload.tenant_id = parseInt(tenantRaw, 10);
     try {
       await OrionAPI.post(`/users/${user.public_id}/roles`, payload);
-      OrionUI.toast("تم تعيين الدور", "success");
+      OrionUI.toast(OrionI18n.t("تم تعيين الدور", "Role assigned"), "success");
       await this.loadUsers();
     } catch (err) {
-      OrionUI.toast(err.message || "فشل تعيين الدور", "error");
+      OrionUI.toast(err.message || OrionI18n.t("فشل تعيين الدور", "Failed to assign role"), "error");
     }
   },
 

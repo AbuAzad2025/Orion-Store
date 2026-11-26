@@ -8,9 +8,35 @@
     <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>
   </div>
 </div>
+
+<section class="orion-card mt-6">
+  <div class="flex items-center justify-between gap-2 mb-4 flex-wrap">
+    <h2 class="orion-title text-lg">{{ t('جاهز للبيع؟', 'Ready to sell?') }}</h2>
+    <span class="orion-muted text-sm">{{ t('خطوات بسيطة لتهيئة متجرك', 'A few quick steps to set up your store') }}</span>
+  </div>
+  <div class="grid gap-3 md:grid-cols-2" id="setup-checklist">
+    <a href="/admin/store/products" class="orion-card flex items-center gap-3" style="text-decoration:none">
+      <span class="orion-badge" aria-hidden="true">1</span>
+      <span><strong>{{ t('أضف منتجاتك', 'Add your products') }}</strong><br><small class="orion-muted">{{ t('المنتجات هي أساس متجرك', 'Products are the heart of your store') }}</small></span>
+    </a>
+    <a href="/admin/store/bundles" class="orion-card flex items-center gap-3" style="text-decoration:none">
+      <span class="orion-badge" aria-hidden="true">2</span>
+      <span><strong>{{ t('أنشئ حزمة offer', 'Create a bundle offer') }}</strong><br><small class="orion-muted">{{ t('اجمع منتجات بسعر واحد', 'Group products at one price') }}</small></span>
+    </a>
+    <a href="/admin/store/contact" class="orion-card flex items-center gap-3" style="text-decoration:none">
+      <span class="orion-badge" aria-hidden="true">3</span>
+      <span><strong>{{ t('رقم واتساب', 'WhatsApp number') }}</strong><br><small class="orion-muted" id="check-phone">{{ t('أضف رقم الطلبات', 'Add your order number') }}</small></span>
+    </a>
+    <a href="/admin/store/gateways" class="orion-card flex items-center gap-3" style="text-decoration:none">
+      <span class="orion-badge" aria-hidden="true">4</span>
+      <span><strong>{{ t('طرق الدفع', 'Payment methods') }}</strong><br><small class="orion-muted" id="check-pay">{{ t('فعّل الدفع المناسب', 'Enable a payment method') }}</small></span>
+    </a>
+  </div>
+</section>
+
+{% if recent_orders %}
 <div class="orion-card mt-6">
   <h2 class="orion-title text-lg mb-4">{{ t('أحدث الطلبات', 'Recent orders') }}</h2>
-  {% if recent_orders %}
   <table class="orion-table w-full text-sm">
     <thead><tr><th>{{ t('رقم الطلب', 'Order number') }}</th><th>{{ t('الإجمالي', 'Total') }}</th><th>{{ t('الدفع', 'Payment') }}</th></tr></thead>
     <tbody>
@@ -23,11 +49,26 @@
       {% endfor %}
     </tbody>
   </table>
-  {% else %}
-  <p class="orion-muted">{{ t('لا توجد طلبات بعد.', 'No orders yet.') }}</p>
-  {% endif %}
 </div>
+{% endif %}
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/tenant_admin.js') }}"></script>
+<script>
+(async function () {
+  const h = { "X-Tenant-ID": document.body.dataset.tenantId || "", "X-CSRF-TOKEN": document.cookie.match(/(?:^|; )csrf_access_token=([^;]+)/)?.[1] || "" };
+  try {
+    const [bundles, methods, contact] = await Promise.all([
+      fetch("/api/v1/bundles", { headers: h }).then(r => r.json()).catch(() => ({ bundles: [] })),
+      fetch("/api/v1/tenant/payment-methods", { headers: h }).then(r => r.json()).catch(() => ({ methods: [] })),
+      fetch("/api/v1/tenant/contact", { headers: h }).then(r => r.json()).catch(() => ({}))
+    ]);
+    const bp = document.getElementById("check-phone");
+    if (bp && contact.phone) bp.textContent = contact.phone;
+    const pay = document.getElementById("check-pay");
+    const enabled = (methods.methods || []).filter(m => m.is_enabled).length;
+    if (pay) pay.textContent = enabled ? (document.documentElement.lang === "en" ? enabled + " methods enabled" : enabled + " طرق مفعّلة") : (document.documentElement.lang === "en" ? "Not configured" : "غير مُعدّ");
+  } catch (e) {}
+})();
+</script>
 {% endblock %}
