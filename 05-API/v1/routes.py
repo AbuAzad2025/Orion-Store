@@ -32,6 +32,7 @@ from v1.payments import payments_bp
 from v1.platform_reconciliation import register_platform_reconciliation_routes
 from v1.platform_settings import platform_settings_bp
 from v1.platform_stores import register_platform_store_routes
+from v1.product_images import product_images_bp
 from v1.products import products_bp
 from v1.reconciliation_v2 import reconciliation_v2_bp
 from v1.returns import returns_bp
@@ -116,6 +117,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(tenant_bp, url_prefix="/api/v1/tenants")
     app.register_blueprint(users_bp, url_prefix="/api/v1/users")
     app.register_blueprint(products_bp, url_prefix="/api/v1/products")
+    app.register_blueprint(product_images_bp, url_prefix="/api/v1/product-images")
     app.register_blueprint(categories_bp, url_prefix="/api/v1/categories")
     app.register_blueprint(brands_bp, url_prefix="/api/v1/brands")
     app.register_blueprint(payments_bp, url_prefix="/api/v1/payments")

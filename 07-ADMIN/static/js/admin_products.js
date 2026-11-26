@@ -138,6 +138,7 @@ const OrionAdminProducts = {
       event.preventDefault();
       const msg = document.getElementById("product-msg");
       const editId = document.getElementById("product-edit-id").value;
+      if (!(await orionUploadProductImage())) return;
       const body = this.payload();
       try {
         await OrionUI.withLoading(form, () =>
