@@ -282,3 +282,18 @@ const OrionAdminPlatform = {
     });
   },
 };
+function orionWireTableSearch(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input || input.dataset.wired) return;
+  input.dataset.wired = "1";
+  input.addEventListener("input", function () {
+    const q = input.value.trim().toLowerCase();
+    document.querySelectorAll("table tbody tr").forEach(function (tr) {
+      tr.hidden = q ? (tr.textContent || "").toLowerCase().indexOf(q) === -1 : false;
+    });
+  });
+}
+document.addEventListener("DOMContentLoaded", function () {
+  orionWireTableSearch("tenant-search");
+  orionWireTableSearch("user-search");
+});

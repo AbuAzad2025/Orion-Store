@@ -1,5 +1,14 @@
 {% extends "admin_base.html" %}
 {% block content %}
+<section class="orion-welcome mb-6">
+  <div>
+    <span class="orion-eyebrow">{{ tenant.name }}</span>
+    <h2 class="orion-title text-xl">{{ t('متجرك جاهز لك', 'Your store is ready') }}</h2>
+    <p class="orion-muted text-sm">{{ t('تابع منتجاتك وحزمك وجاهزية البيع من هنا', 'Track your products, bundles and selling readiness here') }}</p>
+  </div>
+  <a href="/admin/store/products" class="orion-btn orion-btn-gold">+ {{ t('منتج جديد', 'New product') }}</a>
+</section>
+
 <div id="tenant-stats" class="orion-muted" aria-live="polite">
   <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
     <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>

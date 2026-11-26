@@ -1,0 +1,22 @@
+/* Friendly admin UI — welcoming, scannable and easy to act on. */
+.orion-welcome {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1.25rem 1.5rem; border: 1px solid var(--orion-border); border-radius: 18px;
+  background: linear-gradient(135deg, var(--orion-panel), var(--orion-panel-2));
+}
+.orion-live-badge { color: #4ade80; border-color: rgba(74,222,128,.4); white-space: nowrap; }
+.orion-action-card {
+  display: grid; gap: .35rem; padding: 1.25rem; border: 1px solid var(--orion-border);
+  border-radius: 16px; background: var(--orion-panel); color: var(--orion-text);
+  text-decoration: none; transition: border-color .15s ease, transform .15s ease;
+}
+.orion-action-card:hover { border-color: var(--orion-gold); transform: translateY(-3px); }
+.orion-action-card strong { font-size: 1.1rem; }
+.orion-action-icon { font-size: 1.6rem; line-height: 1; }
+.orion-action-go { color: var(--orion-gold); font-size: .85rem; font-weight: 700; margin-block-start: .35rem; }
+.orion-ok { color: #4ade80; border-color: rgba(74,222,128,.4); }
+#setup-checklist .orion-card { transition: border-color .15s ease; }
+#setup-checklist .orion-card:hover { border-color: var(--orion-gold); }
+@media (max-width: 640px) {
+  .orion-welcome { flex-direction: column; align-items: flex-start; }
+}
