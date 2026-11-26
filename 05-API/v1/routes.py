@@ -68,6 +68,7 @@ API_BLUEPRINTS: list[Blueprint] = [
     tenant_bp,
     users_bp,
     products_bp,
+    product_images_bp,
     categories_bp,
     brands_bp,
     payments_bp,

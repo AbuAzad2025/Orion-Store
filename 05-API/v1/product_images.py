@@ -10,6 +10,8 @@ from flask import Blueprint, current_app, g, jsonify, request
 
 from core.exceptions import OrionError, ValidationError
 from core.middleware import require_tenant_admin
+from core.store_token import issue as issue_store_token
+from tenant.tenant import Tenant
 
 product_images_bp = Blueprint("product_images", __name__)
 ALLOWED = {
@@ -56,7 +58,12 @@ def upload_product_image():
         path = _folder() / name
         path.write_bytes(raw)
         return (
-            jsonify({"url": f"/store/static/images/products/{_store_slug()}/{name}"}),
+            jsonify({
+                "url": (
+                    f"/store/static/images/products/{_store_slug()}/{name}"
+                    f"?store={issue_store_token(Tenant.query.get(g.tenant_id))}"
+                )
+            }),
             201,
         )
     except OrionError as exc:
