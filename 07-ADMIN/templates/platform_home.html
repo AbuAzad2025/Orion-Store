@@ -93,7 +93,6 @@
           {% else %}
           <a href="/admin/login" class="orion-btn orion-btn-gold">{{ t.login_platform }}</a>
           {% endif %}
-          <a href="{{ store_admin_url }}" class="orion-nav-login" target="_blank" rel="noopener">{{ t.login_store }}</a>
         </span>
         <span class="orion-home-nav-sep" aria-hidden="true"></span>
         <span class="orion-home-nav-group">
@@ -143,43 +142,6 @@
       {% else %}
       <p class="orion-muted">{{ t.no_stores }}</p>
       {% endif %}
-    </section>
-
-    <section class="orion-home-section orion-access-section">
-      <div class="orion-section-head">
-        <div>
-          <span class="orion-eyebrow">{{ t.access_title }}</span>
-          <h2 class="orion-section-title">{{ t.access_title }}</h2>
-        </div>
-        <span class="orion-section-line" aria-hidden="true"></span>
-      </div>
-      <p class="orion-muted">{{ t.access_sub }}</p>
-      <div class="orion-access-grid">
-        <a href="/admin/login" class="orion-access-card">
-          <span class="orion-access-icon" aria-hidden="true">🛡️</span>
-          <strong>{{ t.access_platform }}</strong>
-          <span class="orion-muted">{{ t.access_platform_d }}</span>
-          <span class="orion-access-go">orion.azadexa.com/admin/login ↗</span>
-        </a>
-        <a href="{{ store_admin_url }}" class="orion-access-card" target="_blank" rel="noopener">
-          <span class="orion-access-icon" aria-hidden="true">🏪</span>
-          <strong>{{ t.access_store }}</strong>
-          <span class="orion-muted">{{ t.access_store_d }}</span>
-          <span class="orion-access-go">slug — orion.azadexa.com/admin/login ↗</span>
-        </a>
-        <a href="{{ account_url }}" class="orion-access-card" target="_blank" rel="noopener">
-          <span class="orion-access-icon" aria-hidden="true">👤</span>
-          <strong>{{ t.access_member }}</strong>
-          <span class="orion-muted">{{ t.access_member_d }}</span>
-          <span class="orion-access-go">/account?store=… ↗</span>
-        </a>
-        <a href="{{ store_url }}" class="orion-access-card" target="_blank" rel="noopener">
-          <span class="orion-access-icon" aria-hidden="true">🛒</span>
-          <strong>{{ t.access_guest }}</strong>
-          <span class="orion-muted">{{ t.access_guest_d }}</span>
-          <span class="orion-access-go">orion.azadexa.com/?store=… ↗</span>
-        </a>
-      </div>
     </section>
 
     <footer class="orion-company-footer">

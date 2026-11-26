@@ -368,6 +368,7 @@ def store_search():
         return url_for("storefront_ui.store_search", **params)
 
     from bundle_svc.bundle_service import BundleService
+
     from v1.store_bundles import bundle_matches
 
     bundles = [

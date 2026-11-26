@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page_title }}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('admin_assets.static', filename='images/azadexa-favicon-logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/fonts.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/tailwind.css') }}">
+  <link rel="stylesheet" href="{{ url_for('admin_assets.static', filename='css/orion-theme.css') }}">
+  <style>
+    body { min-height: 100vh; display: grid; place-items: center; padding: 1.25rem; }
+    .picker { width: min(34rem,100%); display: grid; gap: 1rem; }
+    .picker a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.2rem; border: 1px solid var(--orion-border); border-radius: 14px; background: var(--orion-panel); color: var(--orion-text); text-decoration: none; transition: border-color .15s ease, transform .15s ease; }
+    .picker a:hover { border-color: var(--orion-gold); transform: translateY(-2px); }
+    .picker small { color: var(--orion-muted); direction: ltr; }
+  </style>
+</head>
+<body class="orion-surface">
+  <main class="picker">
+    <div style="text-align:center">
+      <span class="orion-eyebrow">Azadexa</span>
+      <h1 class="orion-title text-2xl">{{ page_title }}</h1>
+      <p class="orion-muted text-sm">{{ 'اختر المتجر الذي تريد إدارته' if locale == 'ar' else 'Choose the store you want to manage' }}</p>
+    </div>
+    {% for s in stores %}
+    <a href="/admin/login?tenant_slug={{ s.slug }}&locale={{ locale }}">
+      <strong>{{ s.name_en if locale == 'en' else s.name }}</strong>
+      <small>orion.azadexa.com/s/{{ s.slug }} ↗</small>
+    </a>
+    {% else %}
+    <p class="orion-muted">{{ 'لا توجد متاجر نشطة' if locale == 'ar' else 'No active stores' }}</p>
+    {% endfor %}
+    <a href="/?locale={{ locale }}" class="orion-btn" style="justify-content:center">← {{ 'الرئيسية' if locale == 'ar' else 'Home' }}</a>
+  </main>
+</body>
+</html>

@@ -1,29 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="orion-login-page max-w-2xl mx-auto">
-  <header class="mb-6">
-    <p class="orion-eyebrow">{{ tenant.name }}</p>
+<section class="orion-login-page max-w-md mx-auto">
+  <header class="mb-6" style="text-align:center">
+    <p class="orion-eyebrow">{{ tenant.name_for(locale) }}</p>
     <h1 class="orion-title text-2xl">{{ t('sign_in') }}</h1>
+    <p class="orion-muted text-sm">
+      {{ 'أدخل بريدك وكلمة المرور — سيتم توجيهك تلقائياً' if locale[:2]|lower == 'ar' else 'Enter your email and password — you will be routed automatically' }}
+    </p>
   </header>
 
-  <div class="orion-login-grid">
-    <a href="/account?store={{ store_token }}" class="orion-login-option">
-      <span class="orion-login-option-title">{{ t('login_customer') }}</span>
-      <span class="orion-login-option-desc">{{ t('login_customer_desc') }}</span>
-      <span class="orion-login-option-arrow" aria-hidden="true">&#8599;</span>
-    </a>
-    <a href="{{ store_admin_login_url }}" class="orion-login-option orion-login-option-admin"
-       {% if not store_admin_login_url.startswith('/') %}rel="noopener"{% endif %}>
-      <span class="orion-login-option-title">{{ t('login_store_admin') }}</span>
-      <span class="orion-login-option-desc">{{ t('login_store_admin_desc') }}</span>
-      <span class="orion-login-option-arrow" aria-hidden="true">&#8599;</span>
-    </a>
-  </div>
+  {% if request.args.get('error') %}
+  <p class="orion-auth-error" role="alert">
+    {{ 'بيانات الدخول غير صحيحة' if locale[:2]|lower == 'ar' else 'Invalid credentials' }}
+  </p>
+  {% endif %}
 
-  <p class="orion-login-note">
-    {{ t('login_platform_note') }}
-    <a href="{{ platform_admin_login_url }}" class="orion-login-inline"
-       {% if not platform_admin_login_url.startswith('/') %}rel="noopener"{% endif %}>{{ t('login_platform_link') }}</a>
+  <form method="post" action="/s/{{ tenant.slug }}/login" class="space-y-4">
+    <input type="hidden" name="store" value="{{ store_token }}">
+    <div>
+      <label class="orion-stat-label block" for="login-email">{{ t('email') if t('email') != 'email' else ('البريد الإلكتروني' if locale[:2]|lower == 'ar' else 'Email address') }}</label>
+      <input id="login-email" name="email" type="email" required class="orion-input w-full" autocomplete="username">
+    </div>
+    <div>
+      <label class="orion-stat-label block" for="login-password">
+        {{ 'كلمة المرور' if locale[:2]|lower == 'ar' else 'Password' }}
+      </label>
+      <input id="login-password" name="password" type="password" required class="orion-input w-full" autocomplete="current-password">
+    </div>
+    <button type="submit" class="orion-btn orion-btn-gold w-full">{{ t('sign_in') }}</button>
+  </form>
+
+  <p class="orion-login-note" style="margin-block-start:1.25rem;text-align:center">
+    <a href="{{ store_admin_login_url }}" class="orion-login-inline">
+      {{ 'دخول مدير المتجر' if locale[:2]|lower == 'ar' else 'Store admin sign in' }}
+    </a>
   </p>
 </section>
 {% endblock %}
