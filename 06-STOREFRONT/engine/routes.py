@@ -181,6 +181,16 @@ def store_category_clean(slug: str, category_slug: str):
     return store_category(category_slug)
 
 
+@storefront_ui_bp.post("/s/<slug>/login")
+def store_login_submit(slug: str):
+    tenant = _tenant_or_404()
+    if not tenant:
+        return "Store not found.", 404
+    from engine.store_login import handle_store_login
+
+    return handle_store_login(tenant)
+
+
 @storefront_ui_bp.get("/product/<slug>")
 def store_product(slug: str):
     tenant = _tenant_or_404()
