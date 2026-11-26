@@ -34,6 +34,7 @@ def testing_database_uri() -> str:
 
 
 class Config:
+    MAX_CONTENT_LENGTH = 6 * 1024 * 1024  # uploads: 5MB image + multipart overhead
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-change-me")
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)

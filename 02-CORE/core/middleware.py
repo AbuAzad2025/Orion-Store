@@ -71,12 +71,21 @@ def register_middleware(app: Flask) -> None:
                     if preview:
                         g.tenant, g.tenant_id = preview, preview.id
 
-        # Per-store asset isolation: images live under /images/products/<slug>/.
+        # Per-store asset isolation: ONLY a valid signed store token (or a
+        # logged-in user of that same store) may read a store's image folder.
+        # X-Tenant-ID / Host / debug preview must NOT grant asset access.
         path = request.path or ""
         marker = "/store/static/images/products/"
         if marker in path:
             slug = path.split(marker, 1)[1].split("/", 1)[0]
-            if g.tenant is None or slug != g.tenant.slug:
+            from core.store_token import resolve as resolve_store_token
+
+            token_tenant = resolve_store_token(request.args.get("store", ""))
+            allowed = token_tenant is not None and token_tenant.slug == slug
+            if not allowed and g.user is not None and g.user.tenant_id:
+                user_tenant = db.session.get(Tenant, g.user.tenant_id)
+                allowed = bool(user_tenant and user_tenant.slug == slug)
+            if not allowed:
                 return ("Not found", 404)
         if g.user:
             try:
