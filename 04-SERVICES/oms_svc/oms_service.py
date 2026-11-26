@@ -192,7 +192,20 @@ class OmsService:
         product = Product.query.filter_by(id=product_id, tenant_id=tenant_id).first()
         if not product:
             raise NotFoundError("Product not found.")
-        wh_id = warehouse_id or self.ensure_default_warehouse(tenant_id).id
+        if warehouse_id is None:
+            holding = (
+                InventoryLevel.query.filter_by(
+                    tenant_id=tenant_id, product_id=product_id
+                )
+                .order_by(InventoryLevel.quantity.desc())
+                .first()
+            )
+            warehouse_id = (
+                holding.warehouse_id
+                if holding
+                else self.ensure_default_warehouse(tenant_id).id
+            )
+        wh_id = warehouse_id
         # products.quantity is the tenant-wide sellable total. Only write the
         # remainder to this warehouse so per-warehouse levels never double count.
         elsewhere = (
