@@ -1,7 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="تراث فلسطيني">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f3d2e"/><stop offset="1" stop-color="#1c6347"/></linearGradient></defs>
-<rect width="120" height="120" rx="26" fill="url(#g)"/>
-<path d="M20 78c14-5 22-18 26-32 5 14 13 27 27 32-14 5-22 18-27 32-4-14-12-27-26-32z" fill="#e9c77b" opacity=".9"/>
-<circle cx="88" cy="36" r="9" fill="#f3e9c8"/>
-<text x="60" y="112" fill="#f3e9c8" font-family="sans-serif" font-size="11" text-anchor="middle">تراث فلسطيني</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="تراث فلسطيني">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0f3d2e"/><stop offset="1" stop-color="#1c6347"/>
+  </linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f3e9c8"/><stop offset="1" stop-color="#e9c77b"/>
+  </linearGradient>
+</defs>
+<rect width="160" height="160" rx="36" fill="url(#bg)"/>
+<rect x="8" y="8" width="144" height="144" rx="30" fill="none" stroke="url(#gold)" stroke-opacity=".55" stroke-width="2"/>
+<path d="M30 96c18-7 28-24 34-42 6 18 16 35 34 42-18 7-28 24-34 42-6-18-16-35-34-42z" fill="url(#gold)"/>
+<path d="M98 30c8-3 13-10 16-18 3 8 8 15 16 18-8 3-13 10-16 18-3-8-8-15-16-18z" fill="#f3e9c8" opacity=".9"/>
+<circle cx="124" cy="102" r="10" fill="#e9c77b" opacity=".85"/>
+<text x="80" y="148" fill="#f3e9c8" font-family="sans-serif" font-size="15" font-weight="700" text-anchor="middle">تراث فلسطيني</text>
 </svg>

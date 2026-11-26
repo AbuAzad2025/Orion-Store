@@ -23,10 +23,6 @@
     </section>
 
     <nav aria-label="{{ t('quick_links') }}">
-      <a href="https://orion.azadexa.com/" target="_blank" rel="noopener" class="orion-platform-chip" aria-label="Azadexa Platform">
-        <img src="/admin/static/images/azadexa-header-cropped.png" alt="Azadexa">
-        <span>{{ 'منصة أزادكسا' if locale[:2]|lower == 'ar' else 'Azadexa Platform' }}</span>
-      </a>
       <h2 class="orion-footer-col-title"><span aria-hidden="true" class="orion-footer-icon">🔗</span>{{ t('quick_links') }}</h2>
       <div class="orion-footer-links">
         <a href="/s/{{ tenant.slug }}/"><span aria-hidden="true" class="orion-footer-icon">🏠</span>{{ t('home') }}</a>
@@ -70,7 +66,12 @@
           <span class="orion-badge">{{ t('fx_markup') }} +{{ fx_markup_percent }}% → {{ fx_rate_info.customer_rate }}</span>
           {% endif %}
         {% endif %}
-        <span>{{ t('powered_by') }} <strong>Azadexa</strong></span>
+        <span class="orion-powered-chip">
+          {{ t('powered_by') }}
+          <a href="https://orion.azadexa.com/" target="_blank" rel="noopener" class="orion-platform-chip" aria-label="Azadexa Platform">
+            <img src="/admin/static/images/azadexa-header-cropped.png" alt="Azadexa">
+          </a>
+        </span>
       </p>
     </div>
   </div>

@@ -43,7 +43,10 @@
 }
 
 /* Store & platform logos */
-.orion-brand-logo { inline-size: 2.2rem; block-size: 2.2rem; object-fit: contain; border-radius: 10px; flex: none; }
-.orion-platform-chip { display: inline-flex; align-items: center; gap: .5rem; padding: .4rem .6rem; border: 1px solid var(--orion-border); border-radius: 10px; text-decoration: none; color: var(--orion-muted); font-size: .78rem; }
-.orion-platform-chip img { inline-size: 5rem; block-size: auto; object-fit: contain; }
-.orion-platform-chip:hover { border-color: var(--orion-gold); color: var(--orion-text); }
+.orion-brand-logo { inline-size: 3rem; block-size: 3rem; object-fit: contain; border-radius: 14px; flex: none; }
+.orion-powered-chip { display: inline-flex; align-items: center; gap: .45rem; }
+.orion-platform-chip { display: inline-flex; align-items: center; padding: .18rem .35rem; border: 1px solid var(--orion-border); border-radius: 6px; text-decoration: none; background: rgba(255,255,255,.03); }
+.orion-platform-chip img { inline-size: 4.2rem; block-size: 1.35rem; object-fit: contain; }
+.orion-platform-chip:hover { border-color: var(--orion-gold); }
+.orion-fx-note { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.orion-footer-brand .orion-brand-name { font-size: 1.15rem; font-weight: 800; }
