@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import logging
+import re
+from pathlib import Path
 
+from flask import current_app
 from sqlalchemy.orm import joinedload
 
 from base.types import TenantStatus
@@ -60,6 +63,8 @@ class TenantService:
         db.session.add(tenant)
         db.session.commit()
 
+        self.ensure_asset_folder(slug)
+
         from core.audit_log import audit_log
 
         audit_log(
@@ -85,6 +90,24 @@ class TenantService:
                 exc,
             )
         return tenant
+
+    @staticmethod
+    def ensure_asset_folder(slug: str) -> Path | None:
+        """Create the per-store product image folder (isolated assets)."""
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,62}", (slug or "").lower()):
+            return None
+        try:
+            root = Path(current_app.root_path).resolve().parents[1]
+            folder = (
+                root
+                / "06-STOREFRONT/themes/default/static/images/products"
+                / slug.lower()
+            )
+            folder.mkdir(parents=True, exist_ok=True)
+            return folder
+        except Exception as exc:  # pragma: no cover - filesystem edge cases
+            logger.warning("asset folder for %s failed: %s", slug, exc)
+            return None
 
     def list_users_for_tenant(self, tenant_id: int):
         from user.user import User
