@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import uuid
 
 from flask import Flask, current_app, g, jsonify, redirect, request, session
@@ -263,6 +264,16 @@ def _resolve_tenant_from_request() -> Tenant | None:
                 .filter_by(
                     slug=request.args["tenant_slug"], is_active=True, deleted_at=None
                 )
+                .first()
+            )
+            if tenant:
+                return tenant
+        # Clean SEO storefront paths: /s/<slug>/... (public pages only).
+        path_match = re.match(r"^/s/([a-z0-9][a-z0-9-]{0,62})(/|$)", request.path or "")
+        if path_match:
+            tenant = (
+                _tenant_query()
+                .filter_by(slug=path_match.group(1), is_active=True, deleted_at=None)
                 .first()
             )
             if tenant:

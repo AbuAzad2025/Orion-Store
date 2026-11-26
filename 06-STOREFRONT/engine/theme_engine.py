@@ -58,6 +58,30 @@ class ThemeEngine:
             source_currency, context["currency"]
         )
         context["t"] = lambda key: translate(key, locale)
+        if tenant is not None and has_request_context():
+            base = request.host_url.rstrip("/")
+            path = request.path or ""
+            slug = tenant.slug
+            if path == "/":
+                clean = f"/s/{slug}/"
+            elif path.startswith(("/product/", "/category/")):
+                clean = f"/s/{slug}{path}"
+            else:
+                clean = path
+            context.setdefault("canonical_url", base + clean)
+            context.setdefault(
+                "meta_description",
+                f"{tenant.name_for(locale)} — " + translate("hero_subtitle", locale),
+            )
+            context.setdefault(
+                "structured_data",
+                {
+                    "@context": "https://schema.org",
+                    "@type": "Organization",
+                    "name": tenant.name_for(locale),
+                    "url": base + f"/s/{slug}/",
+                },
+            )
         context["money"] = lambda value: _format_money(
             value, source_currency, context["currency"], markup
         )

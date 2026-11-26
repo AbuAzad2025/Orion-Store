@@ -41,6 +41,7 @@ class TenantService:
         self,
         *,
         name: str,
+        name_en: str | None = None,
         slug: str,
         email: str,
         domain: str | None = None,
@@ -54,6 +55,7 @@ class TenantService:
             raise ValidationError("Slug already exists.")
         tenant = Tenant(
             name=name,
+            name_en=name_en,
             slug=slug,
             email=email,
             domain=domain or slug,
@@ -64,6 +66,7 @@ class TenantService:
         db.session.commit()
 
         self.ensure_asset_folder(slug)
+        self.ensure_policy_pages(tenant.id)
 
         from core.audit_log import audit_log
 
@@ -90,6 +93,60 @@ class TenantService:
                 exc,
             )
         return tenant
+
+    @staticmethod
+    def ensure_policy_pages(tenant_id: int) -> None:
+        """Seed minimal published privacy/terms pages for a new store."""
+        from i18n.cms_page import CmsPage
+        from i18n.page_translation import PageTranslation
+
+        seeds = (
+            (
+                "privacy",
+                "سياسة الخصوصية",
+                "Privacy Policy",
+                "نحن نحترم خصوصيتك ولا نشارك بياناتك مع أطراف ثالثة.",
+                "We respect your privacy and do not share your data with third parties.",
+            ),
+            (
+                "terms",
+                "الشروط والأحكام",
+                "Terms & Conditions",
+                "باستخدام المتجر فإنك توافق على الشروط والأحكام.",
+                "By using this store you agree to the terms and conditions.",
+            ),
+        )
+        for slug, ar_title, en_title, ar_body, en_body in seeds:
+            page = CmsPage.query.filter_by(tenant_id=tenant_id, slug=slug).first()
+            if page is None:
+                page = CmsPage(
+                    tenant_id=tenant_id, slug=slug, title=ar_title, is_published=True
+                )
+                db.session.add(page)
+                db.session.flush()
+            else:
+                page.is_published = True
+            for locale, title, body in (
+                ("ar", ar_title, ar_body),
+                ("en", en_title, en_body),
+            ):
+                row = PageTranslation.query.filter_by(
+                    tenant_id=tenant_id, page_id=page.id, locale=locale
+                ).first()
+                if row is None:
+                    db.session.add(
+                        PageTranslation(
+                            tenant_id=tenant_id,
+                            page_id=page.id,
+                            locale=locale,
+                            title=title,
+                            body=body,
+                            slug=slug,
+                        )
+                    )
+                else:
+                    row.title, row.body, row.slug = title, body, slug
+        db.session.commit()
 
     @staticmethod
     def ensure_asset_folder(slug: str) -> Path | None:

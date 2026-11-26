@@ -31,6 +31,7 @@ const OrionAdminPlatform = {
         const id = document.getElementById("tenant-id").value;
         const payload = {
           name: form.querySelector("[name='name']").value,
+          name_en: form.querySelector("[name='name_en']").value || undefined,
           slug: form.querySelector("[name='slug']").value,
           email: form.querySelector("[name='email']").value,
           domain: form.querySelector("[name='domain']").value || undefined,

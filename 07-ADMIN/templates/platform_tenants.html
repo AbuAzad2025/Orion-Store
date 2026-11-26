@@ -24,8 +24,10 @@
     <form id="tenant-form" class="space-y-3">
       <input type="hidden" name="tenant_id" id="tenant-id">
       <div>
-        <label class="block text-sm mb-1">{{ t('اسم المتجر', 'Store Name') }}</label>
+        <label class="block text-sm mb-1">{{ t('اسم المتجر (عربي)', 'Store Name (Arabic)') }}</label>
         <input name="name" id="tenant-name" required class="orion-input w-full" aria-label="{{ t('اسم المتجر', 'Store Name') }}">
+        <label class="block text-sm mb-1">{{ t('اسم المتجر (إنجليزي)', 'Store Name (English)') }}</label>
+        <input name="name_en" id="tenant-name-en" class="orion-input w-full" dir="ltr" aria-label="{{ t('اسم المتجر بالإنجليزية', 'Store name in English') }}">
       </div>
       <div>
         <label class="block text-sm mb-1">{{ t('رابط المتجر', 'Store URL') }}</label>

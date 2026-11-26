@@ -2,7 +2,7 @@
   {% set p_name = (product_i18n.name or product.name) if product_i18n else product.name %}
   {% set p_price = (product_i18n.price or product.price) if product_i18n else product.price %}
   {% set featured = product.is_featured if product else false %}
-  <a href="/product/{{ product.slug }}?store={{ store_token }}" class="orion-product-link">
+  <a href="/s/{{ tenant.slug }}/product/{{ (product_i18n.slug if product_i18n else product.slug) or product.slug }}" class="orion-product-link">
     <div class="orion-product-media">
       {% if product.image_url %}
       <img src="{{ product.image_url }}{% if store_token %}?store={{ store_token }}{% endif %}" alt="{{ p_name }}">

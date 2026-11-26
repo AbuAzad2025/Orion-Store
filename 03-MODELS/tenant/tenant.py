@@ -43,6 +43,7 @@ class Tenant(db.Model):
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
+    name_en: Mapped[str | None] = mapped_column(String(100), nullable=True)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     domain: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     custom_domain: Mapped[str | None] = mapped_column(
@@ -82,6 +83,10 @@ class Tenant(db.Model):
         "TenantConfig", back_populates="tenant", uselist=False, lazy="joined"
     )
 
+    def name_for(self, locale: str | None = None) -> str:
+        code = (locale or "").split("_")[0].lower()
+        return self.name_en if code == "en" and self.name_en else self.name
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -89,6 +94,7 @@ class Tenant(db.Model):
             "is_active": self.is_active,
             "custom_domain": self.custom_domain,
             "name": self.name,
+            "name_en": self.name_en,
             "slug": self.slug,
             "domain": self.domain,
             "status": self.status,

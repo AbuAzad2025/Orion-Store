@@ -153,7 +153,7 @@ def render_store_index():
         tenant=tenant,
         products=products,
         products_i18n=products_i18n,
-        page_title=tenant.name,
+        page_title=tenant.name_for(locale),
         locale=locale,
         categories=categories,
         category_counts=counts,
@@ -170,6 +170,21 @@ def store_index():
     return render_store_index()
 
 
+@storefront_ui_bp.get("/s/<slug>/")
+def store_index_clean(slug: str):
+    return render_store_index()
+
+
+@storefront_ui_bp.get("/s/<slug>/product/<product_slug>")
+def store_product_clean(slug: str, product_slug: str):
+    return store_product(product_slug)
+
+
+@storefront_ui_bp.get("/s/<slug>/category/<category_slug>")
+def store_category_clean(slug: str, category_slug: str):
+    return store_category(category_slug)
+
+
 @storefront_ui_bp.get("/product/<slug>")
 def store_product(slug: str):
     tenant = _tenant_or_404()
@@ -183,6 +198,22 @@ def store_product(slug: str):
     product_i18n = ts.merge_product(product, locale)
     from core.store_token import issue as issue_store_token
 
+    structured = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product_i18n.get("name") or product.name,
+        "image": ([product.image_url] if product.image_url else []),
+        "offers": {
+            "@type": "Offer",
+            "price": str(product_i18n.get("price") or product.price),
+            "priceCurrency": (tenant.default_currency or "ILS"),
+            "availability": (
+                "https://schema.org/InStock"
+                if product.quantity > 0
+                else "https://schema.org/OutOfStock"
+            ),
+        },
+    }
     return _engine.render(
         "product.html",
         store_token=issue_store_token(tenant),
@@ -191,6 +222,7 @@ def store_product(slug: str):
         product_i18n=product_i18n,
         page_title=product_i18n.get("name") or product.name,
         locale=locale,
+        structured_data=structured,
     )
 
 
@@ -409,6 +441,11 @@ def store_consent():
         page_title=translate("privacy_cookies", get_locale()),
         locale=get_locale(),
     )
+
+
+@storefront_ui_bp.get("/s/<slug>/pages/<page_slug>")
+def store_page_clean(slug: str, page_slug: str):
+    return store_page(page_slug)
 
 
 @storefront_ui_bp.get("/pages/<slug>")

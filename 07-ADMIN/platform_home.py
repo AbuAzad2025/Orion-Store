@@ -35,9 +35,7 @@ def short_store_link(slug: str):
     tenant = Tenant.query.filter_by(
         slug=slug, is_active=True, deleted_at=None
     ).first_or_404()
-    g.tenant = tenant
-    g.tenant_id = tenant.id
-    return render_store_index()
+    return redirect(f"/s/{tenant.slug}/", code=301)
 
 
 @platform_home_bp.get("/google8a1714ed6e039773.html")
@@ -51,10 +49,13 @@ def google_site_verification():
 def robots_txt():
     body = (
         "User-agent: *\n"
-        "Allow: /$\n"
+        "Allow: /\n"
         "Disallow: /admin/\n"
         "Disallow: /api/\n"
-        "Disallow: /*?store=\n"
+        "Disallow: /cart\n"
+        "Disallow: /checkout\n"
+        "Disallow: /account\n"
+        "Disallow: /login\n"
         f"Sitemap: {request.host_url.rstrip('/')}/sitemap.xml\n"
     )
     resp = make_response(body, 200)
@@ -72,10 +73,26 @@ def sitemap_xml():
         .all()
     )
     base = request.host_url.rstrip("/")
+    from catalog.category import Category
+    from catalog.product import Product
+
     urls = [(f"{base}/", "daily", "1.0"), (f"{base}/?locale=en", "weekly", "0.8")]
     for store in rows:
-        urls.append((f"{base}/s/{store.slug}", "weekly", "0.9"))
-        urls.append((f"{base}/?store={issue_store_token(store)}", "never", "0.1"))
+        home = f"{base}/s/{store.slug}/"
+        urls.append((home, "daily", "0.9"))
+        products = Product.query.filter_by(
+            tenant_id=store.id, is_published=True, deleted_at=None
+        ).all()
+        for product in products:
+            urls.append((f"{home}product/{product.slug}", "weekly", "0.8"))
+        categories = Category.query.filter_by(tenant_id=store.id).all()
+        for category in categories:
+            urls.append((f"{home}category/{category.slug}", "weekly", "0.6"))
+        from i18n.cms_page import CmsPage
+
+        pages = CmsPage.query.filter_by(tenant_id=store.id, is_published=True).all()
+        for page in pages:
+            urls.append((f"{home}pages/{page.slug}", "monthly", "0.4"))
     body = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -149,8 +166,9 @@ def platform_home():
         )
         return {
             "name": store.name,
+            "name_en": store.name_en or store.slug,
             "slug": store.slug,
-            "url": f"/s/{store.slug}",
+            "url": f"/s/{store.slug}/",
             "admin_url": f"/admin/login?tenant_slug={store.slug}",
             **style,
         }

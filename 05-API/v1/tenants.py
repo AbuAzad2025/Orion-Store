@@ -44,6 +44,7 @@ def create_tenant():
         data = request.get_json(silent=True) or {}
         tenant = _tenants.create_tenant(
             name=data["name"],
+            name_en=data.get("name_en"),
             slug=data["slug"],
             email=data["email"],
             domain=data.get("domain"),
