@@ -1,0 +1,29 @@
+/* Mobile-first refinements for the storefront. Loaded after theme/rtl CSS. */
+@media (max-width: 860px) {
+  #main-content { padding-inline: .8rem; }
+  .orion-navbar-inner { padding: .55rem .75rem; gap: .45rem; }
+  .orion-brand-name { font-size: .9rem; max-inline-size: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .orion-nav-controls { inline-size: 100%; justify-content: space-between; flex-wrap: wrap; gap: .4rem; }
+  .orion-nav-search { order: 3; flex: 1 1 100%; }
+  .orion-search-input { inline-size: 100%; }
+  .orion-nav-links { order: 4; inline-size: 100%; justify-content: center; flex-wrap: wrap; }
+  .orion-nav-link { padding: .35rem .6rem; font-size: .82rem; }
+  .orion-nav-login, .orion-nav-sep { display: none; }
+  .orion-trustbar-inner { padding: .45rem .75rem; gap: .35rem .6rem; }
+  .orion-trust-item { padding: .25rem .55rem; font-size: .7rem; }
+  .orion-hero-inner { grid-template-columns: 1fr; gap: 1.25rem; }
+  .orion-hero-visual { inline-size: 100%; max-inline-size: 22rem; }
+  .orion-product-grid { grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: .8rem; }
+  .orion-store-banners, .orion-access-grid { grid-template-columns: 1fr; }
+  .orion-bundle-detail { grid-template-columns: 1fr !important; }
+  .orion-product-actions { flex-wrap: wrap; }
+  table { display: block; overflow-x: auto; }
+}
+@media (max-width: 480px) {
+  .orion-product-grid { grid-template-columns: 1fr; }
+  .orion-brand-name { max-inline-size: 8rem; }
+  .orion-nav-wa { padding: .35rem .6rem; font-size: .75rem; }
+  .orion-search-input { font-size: .8rem; }
+  .orion-footer-grid { grid-template-columns: 1fr; }
+  .orion-card { padding: 1rem; }
+}

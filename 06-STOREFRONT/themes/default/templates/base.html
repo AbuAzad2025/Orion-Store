@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/orion-theme.css') }}?v={{ asset_version }}">
   <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/main.css') }}?v={{ asset_version }}">
   <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/rtl.css') }}?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/mobile.css') }}?v={{ asset_version }}">
 </head>
 <body class="bg-gray-50 min-h-screen orion-surface flex flex-col" data-tenant-id="{{ tenant.slug }}" data-currency="{{ currency }}" data-source-currency="{{ tenant.default_currency }}" data-fx-rate="{{ fx_rate_info.customer_rate if fx_rate_info else '' }}">
   <a class="orion-skip-link" href="#main-content">{{ t('skip_to_content') }}</a>
