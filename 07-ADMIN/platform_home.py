@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flask import Blueprint, g, make_response, render_template, request, url_for
+from flask import Blueprint, g, make_response, redirect, render_template, request, url_for
 
 from platform_svc.platform_settings_service import PlatformSettingsService
 from tenant.tenant import Tenant
