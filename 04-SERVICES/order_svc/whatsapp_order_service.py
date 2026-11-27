@@ -158,9 +158,11 @@ class WhatsAppOrderService:
         ).rowcount
         if changed != 1:
             raise ValidationError("Order is no longer pending.")
+        product_ids: list[int] = []
         for item in db.session.query(OrderItem).filter_by(order_id=order.id).all():
             if not item.product_id:
                 continue
+            product_ids.append(item.product_id)
             reserved = db.session.execute(
                 update(Product)
                 .where(
@@ -173,13 +175,34 @@ class WhatsAppOrderService:
             if reserved != 1:
                 db.session.rollback()
                 raise ValidationError("Insufficient stock to confirm this order.")
-        self._record_payment_and_invoice(order)
+        self._record_payment_and_invoice(order, commit=False)
+        _commit_keep_loaded()
         db.session.refresh(order)
+
+        import logging
+
+        log = logging.getLogger(__name__)
+        try:
+            from core.events import publish
+
+            publish("order.paid", order_id=order.id, tenant_id=order.tenant_id)
+        except Exception:
+            log.exception("order.paid side effects failed for %s", order.order_number)
+        try:
+            from core.caching import invalidate_tenant_catalog
+
+            invalidate_tenant_catalog(tenant_id)
+            from oms_svc.oms_service import OmsService
+
+            oms = OmsService()
+            for pid in set(product_ids):
+                oms.sync_product_to_warehouse(tenant_id=tenant_id, product_id=pid)
+        except Exception:
+            log.exception("warehouse/cache sync failed for %s", order.order_number)
         return order
 
-    def _record_payment_and_invoice(self, order: Order) -> None:
+    def _record_payment_and_invoice(self, order: Order, *, commit: bool = True) -> None:
         """Book the manual payment through the same pipeline as gateway payments."""
-        from core.events import publish
         from payment.payment import Payment
         from platform_svc.commission_service import CommissionService
         from platform_svc.document_renderer import DocumentRenderer
@@ -208,15 +231,15 @@ class WhatsAppOrderService:
             source_id=payment.id,
             currency=currency,
             description=f"Manual WhatsApp payment for {order.order_number}",
+            commit=commit,
         )
         payment.financial_event_id = event.id
         CommissionService().apply_from_event(
-            event, payment_id=payment.id, order_id=order.id
+            event, payment_id=payment.id, order_id=order.id, commit=commit
         )
         DocumentRenderer().generate_invoice(
-            order=order, payment=payment, financial_event=event
+            order=order, payment=payment, financial_event=event, commit=commit
         )
-        publish("order.paid", order_id=order.id, tenant_id=order.tenant_id)
 
     def cancel(self, tenant_id: int, public_id: str) -> Order:
         order = self._get(tenant_id, public_id)

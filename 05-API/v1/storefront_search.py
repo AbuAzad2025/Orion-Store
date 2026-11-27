@@ -35,7 +35,11 @@ def storefront_search():
         tenant = require_tenant_context()
         locale = get_locale()
         featured_raw = request.args.get("featured")
-        featured = featured_raw in ("1", "true", "on") if featured_raw else None
+        featured = (
+            featured_raw.strip().lower() in ("1", "true", "on", "yes")
+            if featured_raw
+            else None
+        )
         sort = request.args.get("sort", "default")
         if sort not in _products.SORT_OPTIONS:
             sort = "default"
@@ -44,10 +48,11 @@ def storefront_search():
         if slug:
             category_id = _categories.get_by_slug(tenant.id, slug).id
         page, per_page = pagination_params()
+        q = request.args.get("q", "").strip()
         products, meta = paginate_query(
             _products.query_search_published(
                 tenant.id,
-                request.args.get("q", "").strip(),
+                q,
                 category_id=category_id,
                 featured=featured,
                 price_min=_parse_decimal(request.args.get("price_min")),

@@ -71,8 +71,10 @@ def update_bundle(bundle_id: int):
             bundle.is_published = bool(data["is_published"])
         db.session.commit()
         return jsonify({"bundle": bundle.to_dict()}), 200
-    except (OrionError, ValueError, TypeError) as exc:
-        return jsonify({"error": str(exc)}), 400
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid request."}), 400
 
 
 @bundles_bp.route("/<int:bundle_id>/items", methods=["POST"])
@@ -92,3 +94,42 @@ def add_bundle_item(bundle_id: int):
         return jsonify({"error": exc.message}), exc.status_code
     except (KeyError, TypeError, ValueError):
         return jsonify({"error": "Invalid request."}), 400
+
+
+@bundles_bp.route("/<int:bundle_id>/items", methods=["GET"])
+def list_bundle_items(bundle_id: int):
+    try:
+        require_tenant_admin()
+        items = _svc.list_items(tenant_id=g.tenant_id, bundle_id=bundle_id)
+        return jsonify({"items": [item.to_dict() for item in items]}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@bundles_bp.route("/<int:bundle_id>/items/<int:item_id>", methods=["PUT"])
+def update_bundle_item(bundle_id: int, item_id: int):
+    try:
+        require_tenant_admin()
+        data = request.get_json(silent=True) or {}
+        item = _svc.update_item(
+            tenant_id=g.tenant_id,
+            bundle_id=bundle_id,
+            item_id=item_id,
+            quantity=data.get("quantity"),
+            discount_percent=data.get("discount_percent"),
+        )
+        return jsonify({"item": item.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+    except (KeyError, TypeError, ValueError):
+        return jsonify({"error": "Invalid request."}), 400
+
+
+@bundles_bp.route("/<int:bundle_id>/items/<int:item_id>", methods=["DELETE"])
+def delete_bundle_item(bundle_id: int, item_id: int):
+    try:
+        require_tenant_admin()
+        _svc.delete_item(tenant_id=g.tenant_id, bundle_id=bundle_id, item_id=item_id)
+        return jsonify({"deleted": True}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code

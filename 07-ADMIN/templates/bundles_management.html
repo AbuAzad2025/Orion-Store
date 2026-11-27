@@ -26,6 +26,8 @@
   </section>
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('إضافة صنف إلى حزمة', 'Add item to bundle') }}</h2>
+    <h3 class="text-sm font-medium mb-2">{{ t('أصناف الحزمة', 'Bundle items') }}</h3>
+    <div id="bundle-items-list" class="orion-muted text-sm mb-3" role="region" aria-live="polite">{{ t('اختر حزمة لعرض أصنافها.', 'Choose a bundle to see its items.') }}</div>
     <form id="bundle-item-form" class="grid gap-2 max-w-md text-sm">
       <select name="bundle_id" id="bundle-item-bundle" class="orion-input" required aria-label="{{ t('الحزمة', 'Bundle') }}">
         <option value="">{{ t('اختر حزمة…', 'Choose a bundle…') }}</option>

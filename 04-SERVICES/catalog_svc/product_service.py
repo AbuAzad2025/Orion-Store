@@ -34,6 +34,7 @@ _PUBLISHED_COLUMNS = load_only(
     Product.is_featured,
     Product.compare_at_price,
     Product.price,
+    Product.cost_price,
     Product.quantity,
     Product.is_published,
     Product.category_id,

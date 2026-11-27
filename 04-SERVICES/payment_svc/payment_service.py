@@ -290,10 +290,12 @@ class PaymentService:
     ) -> dict:
         """Dispatch a refund to the provider that originally captured the payment."""
         provider = payment.payment_provider
-        if provider == "cod":
+        # Manual/offline payments have no gateway to call back — the merchant
+        # already returned the money. Book the refund locally with a stable id.
+        if provider in ("cod", "manual", "whatsapp") or payment.payment_method == "manual":
             return {
                 "success": True,
-                "provider_refund_id": f"cod_refund_{payment.id}",
+                "provider_refund_id": f"manual_refund_{payment.id}",
                 "uncertain": False,
             }
         gateway_fn = {

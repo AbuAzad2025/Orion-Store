@@ -33,6 +33,7 @@ class FinancialEventsService:
         currency: str = "ILS",
         description: str | None = None,
         apply_commission: bool = True,
+        commit: bool = True,
     ) -> FinancialEvent:
         value = Decimal(str(amount))
         if value <= 0:
@@ -59,7 +60,9 @@ class FinancialEventsService:
             completed_at=utc_now(),
         )
         db.session.add(event)
-        db.session.commit()
+        db.session.flush()
+        if commit:
+            db.session.commit()
         return event
 
     def record_outbound(

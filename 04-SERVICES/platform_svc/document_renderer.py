@@ -130,6 +130,7 @@ class DocumentRenderer:
         order: Order,
         payment: Payment,
         financial_event: FinancialEvent,
+        commit: bool = True,
     ) -> Invoice:
         existing = Invoice.query.filter_by(
             tenant_id=order.tenant_id, order_id=order.id
@@ -181,7 +182,8 @@ class DocumentRenderer:
         )
         invoice.pdf_artifact_path = storage_key
         invoice.storage_key = storage_key
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return invoice
 
     def footer_html(self) -> str:

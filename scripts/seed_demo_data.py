@@ -92,11 +92,15 @@ CATEGORIES = [
 
 
 def main() -> None:
-    app = create_app(os.environ.get("FLASK_ENV", "development"))
-    if app.config.get("ENV") == "production":
+    env = os.environ.get("FLASK_ENV", "development")
+    app = create_app(env)
+    if (
+        app.config.get("ENV") == "production"
+        or env.strip().lower() in ("production", "prod")
+        or os.environ.get("ALLOW_DEMO_SEED") != "1"
+    ):
         raise SystemExit(
-            "Refusing to seed demo data in production: fixed demo passwords "
-            "would create a publicly known superuser."
+            "Refusing demo seed: set ALLOW_DEMO_SEED=1 and use a non-production env/DB."
         )
     with app.app_context():
         from bopis_svc.bopis_service import BopisService

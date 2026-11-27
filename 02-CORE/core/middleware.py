@@ -296,11 +296,15 @@ def _resolve_tenant_from_request() -> Tenant | None:
     if header_id:
         tenant = None
         try:
-            tenant = _tenant_query().filter_by(public_id=uuid.UUID(header_id)).first()
+            tenant = _tenant_query().filter_by(
+                public_id=uuid.UUID(header_id), is_active=True, deleted_at=None
+            ).first()
         except ValueError:
             tenant = None
         if not tenant:
-            tenant = _tenant_query().filter_by(slug=header_id).first()
+            tenant = _tenant_query().filter_by(
+                slug=header_id, is_active=True, deleted_at=None
+            ).first()
         if tenant:
             return tenant
 
@@ -309,10 +313,14 @@ def _resolve_tenant_from_request() -> Tenant | None:
         parts = host.split(".")
         if len(parts) >= 3:
             subdomain = parts[0]
-            tenant = _tenant_query().filter_by(domain=subdomain).first()
+            tenant = _tenant_query().filter_by(
+                domain=subdomain, is_active=True, deleted_at=None
+            ).first()
             if tenant:
                 return tenant
-        tenant = _tenant_query().filter_by(custom_domain=host).first()
+        tenant = _tenant_query().filter_by(
+            custom_domain=host, is_active=True, deleted_at=None
+        ).first()
         if tenant:
             return tenant
 

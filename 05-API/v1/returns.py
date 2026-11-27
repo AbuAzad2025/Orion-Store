@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from flask import Blueprint, g, jsonify, request
+from v1.order_access import is_order_owner as _is_order_owner
+from v1.order_access import verify_order_access_token as _verify_order_token
 from flask_jwt_extended import jwt_required
 
 from core.exceptions import OrionError
@@ -52,7 +54,13 @@ def create_return():
         tenant = require_tenant_context()
         data = request.get_json(silent=True) or {}
         order = _orders.get_by_public_id(tenant.id, data["order_public_id"])
-        current_user_id = g.user.id if g.user else None
+        capability = (
+            request.headers.get("X-Order-Access-Token")
+            or request.args.get("access_token")
+            or data.get("order_access_token")
+        )
+        if not (_is_order_owner(order) or _verify_order_token(capability, order)):
+            return jsonify({"error": "Order not found."}), 404
         if (
             order.user_id is not None
             and current_user_id is not None

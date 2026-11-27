@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 from flask import Blueprint, g, jsonify, request
+from flask import session as flask_session
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -196,13 +197,10 @@ def end_impersonation():
                         "session": session.to_dict(),
                     }
                 )
+                flask_session.clear()
                 unset_access_cookies(response)
                 unset_refresh_cookies(response)
                 return response, 200
-                return (
-                    jsonify({"active": False, "reason": "Session expired or revoked"}),
-                    200,
-                )
 
     if g.is_platform_admin and g.user:
         session = (
@@ -226,6 +224,7 @@ def end_impersonation():
             details={"session_id": session.id, "actor_user_id": g.user.id},
         )
         db.session.commit()
+        flask_session.clear()
         revoke_current_tokens()
         tokens = issue_tokens_for_user(g.user)
         response = jsonify(

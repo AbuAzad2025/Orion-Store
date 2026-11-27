@@ -1,6 +1,8 @@
 /** Bundle management — create, edit, publish, add items. */
 const OrionAdminBundles = {
   resetBundleForm() {
+    const bundleSelect = document.getElementById("bundle-item-bundle");
+    if (bundleSelect) bundleSelect.addEventListener("change", () => OrionAdminBundles.loadBundleItems(bundleSelect.value));
     const form = document.getElementById("bundle-form");
     if (!form) return;
     form.reset();
@@ -67,6 +69,82 @@ const OrionAdminBundles = {
     } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
 
+  async loadBundleItems(bundleId) {
+    const el = document.getElementById("bundle-items-list");
+    if (!el) return;
+    if (!bundleId) {
+      SafeDOM.clear(el);
+      SafeDOM.text(el, OrionI18n.t("اختر حزمة لعرض أصنافها.", "Choose a bundle to see its items."));
+      return;
+    }
+    try {
+      SafeDOM.clear(el);
+      SafeDOM.text(el, OrionI18n.t("جارٍ التحميل…", "Loading…"));
+      const data = await OrionAPI.get(`/bundles/${bundleId}/items`);
+      SafeDOM.clear(el);
+      const rows = data.items || [];
+      if (!rows.length) {
+        SafeDOM.text(el, OrionI18n.t("لا توجد أصناف في هذه الحزمة.", "No items in this bundle."));
+        return;
+      }
+      for (const item of rows) {
+        const qty = SafeDOM.elem("input", {
+          type: "number", min: "1", step: "1", value: String(item.quantity),
+          className: "orion-input w-20",
+          "aria-label": OrionI18n.t("الكمية", "Quantity"),
+        });
+        const discount = SafeDOM.elem("input", {
+          type: "number", min: "0", max: "100", step: "0.01",
+          value: String(item.discount_percent),
+          className: "orion-input w-20",
+          "aria-label": OrionI18n.t("خصم %", "Discount %"),
+        });
+        const save = SafeDOM.actionBtn(
+          OrionI18n.t("حفظ", "Save"), "orion-btn text-xs", async () => {
+            const quantity = Number(qty.value);
+            const percent = discount.value === "" ? "0" : String(discount.value);
+            if (!Number.isInteger(quantity) || quantity < 1) {
+              OrionUI.toast(OrionI18n.t("الكمية يجب أن تكون 1 على الأقل", "Quantity must be at least 1"), "error");
+              return;
+            }
+            if (!(Number(percent) >= 0 && Number(percent) <= 100)) {
+              OrionUI.toast(OrionI18n.t("الخصم يجب أن يكون بين 0 و 100", "Discount must be between 0 and 100"), "error");
+              return;
+            }
+            try {
+              await OrionAPI.put(`/bundles/${bundleId}/items/${item.id}`, {
+                quantity, discount_percent: percent,
+              });
+              OrionUI.toast(OrionI18n.t("تم حفظ الصنف", "Item saved"), "success");
+              OrionAdminBundles.loadBundleItems(bundleId);
+            } catch (err) { OrionUI.toast(err.message, "error"); }
+          }
+        );
+        const remove = SafeDOM.actionBtn(
+          OrionI18n.t("حذف", "Delete"), "orion-btn text-xs", async () => {
+            if (!OrionUI.confirmDanger(OrionI18n.t("حذف الصنف من الحزمة؟", "Delete this item from the bundle?"))) return;
+            try {
+              await OrionAPI.delete(`/bundles/${bundleId}/items/${item.id}`);
+              OrionUI.toast(OrionI18n.t("تم حذف الصنف", "Item deleted"), "success");
+              OrionAdminBundles.loadBundleItems(bundleId);
+            } catch (err) { OrionUI.toast(err.message, "error"); }
+          }
+        );
+        el.appendChild(SafeDOM.elem(
+          "div",
+          { className: "border-b py-2 flex items-center justify-between gap-2 flex-wrap" },
+          [
+            SafeDOM.elem("span", null, [`#${item.product_id}`]),
+            SafeDOM.elem("div", { className: "flex gap-2 items-center" }, [qty, discount, save, remove]),
+          ]
+        ));
+      }
+    } catch (err) {
+      SafeDOM.clear(el);
+      SafeDOM.text(el, err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"));
+    }
+  },
+
   async loadBundleProducts() {
     const select = document.getElementById("bundle-item-product");
     if (!select) return;
@@ -126,7 +204,10 @@ const OrionAdminBundles = {
             discount_percent: String(fd.get("discount_percent") || "0"),
           });
           if (msg) msg.textContent = OrionI18n.t("تمت إضافة الصنف", "Item added");
+          const bundleId = fd.get("bundle_id");
           itemForm.reset();
+          if (bundleSelect) bundleSelect.value = bundleId;
+          OrionAdminBundles.loadBundleItems(bundleId);
         } catch (err) {
           if (msg) msg.textContent = err.message;
         }

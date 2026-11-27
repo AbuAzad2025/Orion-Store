@@ -140,13 +140,10 @@ def admin_sso_exchange():
 
     provider_code = request.form.get("provider_code", "").strip()
     external_email = request.form.get("external_email", "").strip().lower()
-    tenant_slug = request.form.get("tenant_slug", "").strip()
-    tenant = (
-        Tenant.query.filter_by(slug=tenant_slug, deleted_at=None).first()
-        if tenant_slug
-        else None
-    )
-    if not tenant:
+    # Tenant context is resolved by middleware (signed token / host); never
+    # accept an attacker-controlled tenant selector on an auth endpoint.
+    tenant = getattr(g, "tenant", None)
+    if not tenant or not g.tenant_id:
         return (
             render_template(
                 "admin_login.html",
@@ -155,9 +152,6 @@ def admin_sso_exchange():
             ),
             404,
         )
-    g.tenant_id = tenant.id
-    g.tenant = tenant
-    bind_rls_context()
     try:
         user = ComplianceService().exchange_sso_code(
             tenant_id=tenant.id,

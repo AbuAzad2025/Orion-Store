@@ -21,6 +21,7 @@ class CommissionService:
         *,
         payment_id: int | None = None,
         order_id: int | None = None,
+        commit: bool = True,
     ) -> PlatformCommissionLedger | None:
         if not event.commission_applied or not event.commission_amount:
             return None
@@ -43,6 +44,8 @@ class CommissionService:
         db.session.add(entry)
         db.session.flush()
         event.commission_ledger_id = entry.id
+        if commit:
+            db.session.commit()
         db.session.commit()
         return entry
 
