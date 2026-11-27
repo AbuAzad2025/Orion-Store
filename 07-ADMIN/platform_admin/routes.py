@@ -39,6 +39,15 @@ def remember_locale(response):
     return remember_admin_locale(response)
 
 
+@platform_admin_bp.get("/backups")
+def platform_backups_page():
+    return render_template(
+        "platform_backups.html",
+        page_title=t("نسخ المنصة", "Platform backups"),
+        active_nav="backups",
+    )
+
+
 @platform_admin_bp.get("/dashboard")
 def platform_dashboard():
     from tenant.tenant import Tenant

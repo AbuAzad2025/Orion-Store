@@ -18,7 +18,7 @@
   'metafields': 'marketing', 'documents': 'marketing', 'import_export': 'settings',
   'app_platform': 'settings', 'feature_flags': 'settings', 'fraud': 'settings',
   'compliance': 'settings', 'workflows': 'settings', 'accessibility': 'settings',
-  'dropship': 'settings', 'ui_kit': 'tools', 'manual_orders': 'orders'
+  'dropship': 'settings', 'ui_kit': 'tools', 'manual_orders': 'orders', 'backups': 'tools'
 } %}
 {% macro nav_link(href, label, key) %}
 <a href="{{ href }}" class="orion-nav-link{% if active_nav == key %} is-active{% endif %}"{% if active_nav == key %} aria-current="page"{% endif %}>{{ label }}</a>
@@ -104,6 +104,7 @@
         <summary class="orion-nav-section">{{ t('أدوات المطوّر', 'Developer tools') }}</summary>
         <div class="orion-nav-group-items">
           {{ nav_link('/admin/store/ui-kit', t('معاينة المكوّنات', 'Component preview'), 'ui_kit') }}
+          {{ nav_link('/admin/store/backups', t('النسخ الاحتياطي', 'Backups'), 'backups') }}
         </div>
       </details>
     {% else %}
@@ -112,6 +113,7 @@
       {{ nav_link('/admin/platform/tenants', t('المتاجر', 'Stores'), 'tenants') }}
       {{ nav_link('/admin/platform/users', t('المستخدمون', 'Users'), 'users') }}
       {{ nav_link('/admin/platform/settings', t('إعدادات المنصة', 'Platform settings'), 'settings') }}
+      {{ nav_link('/admin/platform/backups', t('النسخ الاحتياطي', 'Backups'), 'backups') }}
       {{ nav_link('/admin/platform/audit', t('تدقيق المنصة', 'Platform audit'), 'audit') }}
       {{ nav_link('/admin/platform/reconciliation', t('التسوية', 'Reconciliation'), 'reconciliation') }}
       {{ nav_link('/admin/platform/currency', t('العملات وأسعار الصرف', 'Currencies & exchange rates'), 'currency') }}

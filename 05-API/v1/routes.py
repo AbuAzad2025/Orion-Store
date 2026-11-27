@@ -30,6 +30,7 @@ from v1.oms import oms_bp
 from v1.oms_extensions import oms_ext_bp
 from v1.payments import payments_bp
 from v1.platform_reconciliation import register_platform_reconciliation_routes
+from v1.platform_backup import platform_backup_bp
 from v1.platform_settings import platform_settings_bp
 from v1.platform_stores import register_platform_store_routes
 from v1.product_images import product_images_bp
@@ -51,6 +52,7 @@ from v1.tax_api import tax_bp
 from v1.tenant_portal import tenant_portal_bp
 from v1.tenant_reports import tenant_reports_bp
 from v1.tenant_orders import tenant_orders_bp
+from v1.tenant_backup import tenant_backup_bp
 from v1.tenant_tax_config import tenant_tax_config_bp
 from v1.tenants import tenant_bp
 from v1.users import users_bp
@@ -90,6 +92,8 @@ API_BLUEPRINTS: list[Blueprint] = [
     tenant_portal_bp,
     tenant_reports_bp,
     tenant_orders_bp,
+    tenant_backup_bp,
+    platform_backup_bp,
     tenant_tax_config_bp,
     platform_bp,
     webhooks_bp,
@@ -144,6 +148,8 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(tenant_portal_bp, url_prefix="/api/v1/tenant")
     app.register_blueprint(tenant_reports_bp, url_prefix="/api/v1/tenant")
     app.register_blueprint(tenant_orders_bp, url_prefix="/api/v1/tenant")
+    app.register_blueprint(tenant_backup_bp, url_prefix="/api/v1/tenant")
+    app.register_blueprint(platform_backup_bp, url_prefix="/api/v1/platform")
     app.register_blueprint(tenant_tax_config_bp, url_prefix="/api/v1/tenant")
     register_platform_store_routes(platform_bp)
     register_platform_reconciliation_routes(platform_bp)

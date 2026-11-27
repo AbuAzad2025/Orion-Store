@@ -37,6 +37,12 @@ def remember_locale(response):
     return remember_admin_locale(response)
 
 
+@tenant_reports_ui_bp.get("/backups")
+def tenant_backups_page():
+    title = t("النسخ الاحتياطي", "Backups")
+    return render_template("backups.html", page_title=title, active_nav="backups")
+
+
 @tenant_reports_ui_bp.get("/invoices")
 def tenant_invoices_page():
     title = t("الفواتير", "Invoices")

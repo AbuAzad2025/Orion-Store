@@ -1,0 +1,29 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div id="backups-root" data-backup-scope="store" class="space-y-6">
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">{{ t('نسخة احتياطية للمتجر', 'Store backup') }}</h2>
+    <p class="orion-muted text-sm">{{ t('أنشئ نسخة من بيانات المتجر وصوره، ثم نزّلها. الاستعادة تتم من السيرفر فقط.', 'Create a copy of this store data and images, then download it. Restore is server-side only.') }}</p>
+    <button type="button" id="backup-create" class="orion-btn orion-btn-gold mt-3">{{ t('إنشاء نسخة الآن', 'Create backup now') }}</button>
+    <p id="backup-msg" class="orion-muted text-sm mt-2" role="status" aria-live="polite"></p>
+  </section>
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">{{ t('النسخ المتاحة', 'Available backups') }}</h2>
+    <div class="overflow-x-auto">
+      <table class="orion-table w-full text-sm">
+        <thead><tr>
+          <th class="p-2 text-start">{{ t('التاريخ', 'Date') }}</th>
+          <th class="p-2 text-start">{{ t('النوع', 'Type') }}</th>
+          <th class="p-2 text-start">{{ t('الحجم', 'Size') }}</th>
+          <th class="p-2 text-start">{{ t('تنزيل', 'Download') }}</th>
+        </tr></thead>
+        <tbody id="backups-list"><tr><td colspan="4" class="p-3 orion-muted">{{ t('جارٍ التحميل…', 'Loading…') }}</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_backups.js') }}?v={{ asset_version }}"></script>
+<script nonce="{{ csp_nonce }}">OrionAdminBackups.init();</script>
+{% endblock %}
