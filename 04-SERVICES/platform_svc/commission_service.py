@@ -61,7 +61,7 @@ class CommissionService:
         return self._create_reversal(original, event)
 
     def reverse_for_payment(
-        self, tenant_id: int, payment_id: int
+        self, tenant_id: int, payment_id: int, *, refund_id: int | None = None
     ) -> PlatformCommissionLedger | None:
         """Reverse the commission booked for ``payment_id`` (tenant-scoped).
 
@@ -71,9 +71,14 @@ class CommissionService:
         payment = Payment.query.filter_by(id=payment_id, tenant_id=tenant_id).first()
         if not payment:
             return None
-        refund = Refund.query.filter_by(
-            tenant_id=tenant_id, payment_id=payment_id
-        ).first()
+        if refund_id is not None:
+            refund = Refund.query.filter_by(
+                id=refund_id, tenant_id=tenant_id, payment_id=payment_id
+            ).first()
+        else:
+            refund = Refund.query.filter_by(
+                tenant_id=tenant_id, payment_id=payment_id
+            ).first()
         if not refund or not refund.financial_event_id:
             return None
         event = FinancialEvent.query.filter_by(

@@ -52,7 +52,9 @@ def _on_payment_refunded(
 
         refund = Refund.query.filter_by(id=refund_id, tenant_id=tenant_id).first()
         if refund:
-            CommissionService().reverse_for_payment(tenant_id, refund.payment_id)
+            CommissionService().reverse_for_payment(
+                tenant_id, refund.payment_id, refund_id=refund.id
+            )
             payment = Payment.query.filter_by(
                 id=refund.payment_id, tenant_id=tenant_id
             ).first()

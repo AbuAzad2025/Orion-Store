@@ -73,7 +73,8 @@ def format_cart_order(
     """Build a tidy, locale-aware order message from server-side cart data."""
     chosen = locale or request_locale()
     rtl = _is_rtl(chosen)
-    symbol = currency or "ILS"
+    code = (currency or "ILS").upper()
+    symbol = {"ILS": "₪"}.get(code, code)
     grand_total = total if total is not None else subtotal
 
     def tr(arabic: str, english: str) -> str:

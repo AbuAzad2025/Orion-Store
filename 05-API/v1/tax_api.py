@@ -65,7 +65,7 @@ def create_jurisdiction():
         return jsonify({"jurisdiction": j.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
-    except (KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError, InvalidOperation):
         return jsonify({"error": "Invalid request."}), 400
 
 
@@ -74,8 +74,6 @@ def set_rate(jurisdiction_id: int):
     try:
         require_tenant_admin()
         data = request.get_json(silent=True) or {}
-        from decimal import Decimal
-
         rate_value = Decimal(str(data["rate"]))
         if not rate_value.is_finite() or not (
             Decimal("0") <= rate_value < Decimal("1")
@@ -91,5 +89,5 @@ def set_rate(jurisdiction_id: int):
         return jsonify({"rate": rate.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
-    except (KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError, InvalidOperation):
         return jsonify({"error": "Invalid request."}), 400

@@ -154,6 +154,7 @@ class RmaService:
             raise ValidationError("Return must be approved first.")
 
         items = ReturnItem.query.filter_by(return_id=row.id).all()
+        restocked: list = []
         for item in items:
             if item.restock and item.product_id:
                 from catalog.product import Product
@@ -163,14 +164,16 @@ class RmaService:
                 ).first()
                 if prod:
                     prod.quantity += item.quantity
-        try:
-            from oms_svc.oms_service import OmsService
+                    restocked.append(prod)
+        for prod in restocked:
+            try:
+                from oms_svc.oms_service import OmsService
 
-            OmsService().sync_product_to_warehouse(
-                tenant_id=prod.tenant_id, product_id=prod.id
-            )
-        except Exception:
-            pass
+                OmsService().sync_product_to_warehouse(
+                    tenant_id=prod.tenant_id, product_id=prod.id
+                )
+            except Exception:
+                pass
 
         refund_result = None
         if process_refund and row.return_type == "refund" and row.refund_amount > 0:

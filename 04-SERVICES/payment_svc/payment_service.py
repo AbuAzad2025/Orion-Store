@@ -127,17 +127,13 @@ class PaymentService:
         if refund_amount > Decimal(str(payment.amount)):
             raise ValidationError("Refund amount exceeds payment amount.")
 
-        # Cumulative guard: several partial refunds are legitimate as long as
-        # their sum never exceeds the captured amount.
-        prior_total = sum(
-            (
-                Decimal(str(r.amount))
-                for r in Refund.query.filter_by(payment_id=payment.id)
-                .filter(Refund.status.in_(("pending", "completed")))
-                .all()
-            ),
-            Decimal("0"),
+        # Cumulative guard: partial refunds are allowed while their sum fits.
+        prior = (
+            Refund.query.filter_by(payment_id=payment.id)
+            .filter(Refund.status.in_(("pending", "completed")))
+            .all()
         )
+        prior_total = sum((Decimal(str(r.amount)) for r in prior), Decimal("0"))
         if prior_total + refund_amount > Decimal(str(payment.amount)):
             raise ConflictError("Payment already refunded.")
 

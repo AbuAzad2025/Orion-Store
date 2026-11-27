@@ -62,7 +62,6 @@ def register_store_whatsapp_routes(bp, carts) -> None:
                 customer_name=str(data.get("customer_name") or ""),
                 notes=str(data.get("notes") or ""),
                 currency=tenant.default_currency or "ILS",
-                total=order.total,
             )
             return (
                 jsonify(
@@ -96,7 +95,13 @@ def register_store_whatsapp_routes(bp, carts) -> None:
                 notes=notes,
             )
             message = format_cart_order(
-                tenant.name, items, carts.cart_subtotal(cart), customer_name, notes
+                tenant.name,
+                items,
+                carts.cart_subtotal(cart),
+                customer_name,
+                notes,
+                currency=tenant.default_currency or "ILS",
+                total=order.total,
             )
             return (
                 jsonify(
