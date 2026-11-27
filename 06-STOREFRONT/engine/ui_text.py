@@ -139,7 +139,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "login_store_admin_desc": "إدارة المنتجات والطلبات والإعدادات لهذا المتجر.",
         "login_platform_note": "مدير المنصة؟ استخدم رابط المنصة المخصص:",
         "login_platform_link": "لوحة المنصة",
-        "search_placeholder": "ابحث باسم المنتج…",
+        "search_placeholder": "ابحث عن منتج…",
         "search_results_title": "نتائج البحث",
         "search_results_count": "{n} نتائج",
         "filters_title": "فلاتر",

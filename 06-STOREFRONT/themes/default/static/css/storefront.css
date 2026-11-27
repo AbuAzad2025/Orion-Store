@@ -228,7 +228,17 @@ html[lang^="ar"] .orion-storefront h3 { letter-spacing: 0; }
 
 /* Responsive — driven by available width, no horizontal overflow. */
 @media (min-width: 1100px) {
+  .orion-storefront .orion-brand { flex: 0 0 auto; }
   .orion-storefront .orion-brand-name { white-space: nowrap; }
+  .orion-storefront .orion-search-input { inline-size: 10rem; }
+  .orion-storefront .orion-nav-wa .sf-label { display: none; }
+}
+@media (min-width: 1100px) and (max-width: 1366px) {
+  .orion-storefront .orion-brand-name { font-size: 1.05rem; }
+}
+@media (min-width: 1100px) and (max-width: 1200px) {
+  .orion-storefront [data-store-share] .sf-label { display: none; }
+  .orion-storefront .orion-search-input { inline-size: 8.5rem; }
 }
 @media (max-width: 1100px) {
   .orion-storefront .orion-nav-link { padding-inline: .45rem; font-size: .8rem; }
