@@ -5,7 +5,7 @@
   <a href="/s/{{ tenant.slug }}/product/{{ product.slug }}" class="orion-product-link">
     <div class="orion-product-media">
       {% if product.image_url %}
-      <img src="{{ signed_image_url(product.image_url, store_token) }}" alt="{{ p_name }}">
+      <img src="{{ signed_image_url(product.image_url, store_token) }}" alt="{{ p_name }}" loading="lazy" decoding="async">
       {% else %}
       <span class="orion-product-placeholder">{{ t('no_image') }}</span>
       {% endif %}
@@ -15,7 +15,7 @@
       <h3 class="orion-product-name">{{ p_name }}</h3>
       <p class="orion-muted text-xs orion-csp-zero">{{ t('available') }}: {{ product.quantity }}</p>
       <div class="orion-price-row">
-        <span class="orion-product-price">{{ money(p_price) }} <small>{{ currency }}</small></span>
+        <span class="orion-product-price" dir="ltr">{{ money(p_price) }} <small>{{ currency }}</small></span>
         {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}
         <span class="orion-product-old">{{ money(product_i18n.compare_at_price) }}</span>
         {% endif %}
@@ -27,10 +27,10 @@
     {% set card_share_url = request.host_url.rstrip('/') ~ '/s/' ~ tenant.slug ~ '/product/' ~ product.slug %}
     <a href="https://wa.me/?text={{ (p_name ~ ' — ' ~ card_share_url)|urlencode }}"
        target="_blank" rel="noopener" class="orion-btn orion-btn-ghost"
-       aria-label="{{ t('share') }} {{ p_name }}">{{ t('share') }}</a>
+       aria-label="{{ t('share') }} {{ p_name }}"><svg class="sf-icon" aria-hidden="true"><use href="#sf-i-share"/></svg><span class="sf-label">{{ t('share') }}</span></a>
     {% set wa_order = whatsapp_url(tenant.phone, product_order_text(p_name, money(p_price))) %}
     {% if wa_order %}
-    <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-btn" aria-label="{{ t('order_whatsapp') }} {{ p_name }}">{{ t('whatsapp') }}</a>
+    <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-btn" aria-label="{{ t('order_whatsapp') }} {{ p_name }}"><svg class="sf-icon sf-icon-wa" aria-hidden="true"><use href="#sf-i-whatsapp"/></svg><span class="sf-label">{{ t('whatsapp') }}</span></a>
     {% endif %}
   </div>
 </article>

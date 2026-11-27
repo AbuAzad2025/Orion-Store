@@ -23,25 +23,25 @@
     </section>
 
     <nav aria-label="{{ t('quick_links') }}">
-      <h2 class="orion-footer-col-title"><span aria-hidden="true" class="orion-footer-icon">🔗</span>{{ t('quick_links') }}</h2>
+      <h2 class="orion-footer-col-title"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-link"/></svg>{{ t('quick_links') }}</h2>
       <div class="orion-footer-links">
-        <a href="/s/{{ tenant.slug }}/"><span aria-hidden="true" class="orion-footer-icon">🏠</span>{{ t('home') }}</a>
-        <a href="/cart?store={{ store_token }}"><span aria-hidden="true" class="orion-footer-icon">🛒</span>{{ t('cart') }}</a>
-        <a href="/account?store={{ store_token }}"><span aria-hidden="true" class="orion-footer-icon">👤</span>{{ t('account') }}</a>
+        <a href="/s/{{ tenant.slug }}/"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-home"/></svg>{{ t('home') }}</a>
+        <a href="/cart?store={{ store_token }}"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-cart"/></svg>{{ t('cart') }}</a>
+        <a href="/account?store={{ store_token }}"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-user"/></svg>{{ t('account') }}</a>
       </div>
     </nav>
 
     <section aria-label="{{ t('contact_us') }}">
-      <h2 class="orion-footer-col-title"><span aria-hidden="true" class="orion-footer-icon">📞</span>{{ t('contact_us') }}</h2>
+      <h2 class="orion-footer-col-title"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-phone"/></svg>{{ t('contact_us') }}</h2>
       <div class="orion-footer-links">
-        {% if tenant.phone %}<a href="tel:{{ tenant.phone }}" dir="ltr"><span aria-hidden="true" class="orion-footer-icon">📞</span>{{ tenant.phone }}</a>{% endif %}
-        {% if tenant.email %}<a href="mailto:{{ tenant.email }}" dir="ltr"><span aria-hidden="true" class="orion-footer-icon">✉️</span>{{ tenant.email }}</a>{% endif %}
-        <a href="/consent?store={{ store_token }}"><span aria-hidden="true" class="orion-footer-icon">📜</span>{{ t('legal') }}</a>
+        {% if tenant.phone %}<a href="tel:{{ tenant.phone }}" dir="ltr"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-phone"/></svg>{{ tenant.phone }}</a>{% endif %}
+        {% if tenant.email %}<a href="mailto:{{ tenant.email }}" dir="ltr"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-mail"/></svg>{{ tenant.email }}</a>{% endif %}
+        <a href="/consent?store={{ store_token }}"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-docs"/></svg>{{ t('legal') }}</a>
       </div>
     </section>
 
     <nav aria-label="{{ t('legal') }}">
-      <h2 class="orion-footer-col-title"><span aria-hidden="true" class="orion-footer-icon">📑</span>{{ t('legal') }}</h2>
+      <h2 class="orion-footer-col-title"><svg class="sf-icon orion-footer-icon" aria-hidden="true"><use href="#sf-i-docs"/></svg>{{ t('legal') }}</h2>
       <div class="orion-footer-links">
         {% if policy.privacy %}
         <a href="/s/{{ tenant.slug }}/pages/{{ policy.privacy.slug }}">{{ policy.privacy.title|default(t('privacy_policy')) }}</a>

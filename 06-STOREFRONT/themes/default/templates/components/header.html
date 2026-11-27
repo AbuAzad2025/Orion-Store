@@ -1,21 +1,6 @@
 <header class="orion-navbar">
   {% set keep_q = keep_params|default('') %}
   {% set home_path = '/s/' ~ tenant.slug ~ '/' %}
-  <style nonce="{{ csp_nonce }}">
-    .orion-navbar-inner { flex-wrap: wrap; row-gap: .5rem; }
-    .orion-nav-controls { flex-wrap: wrap; justify-content: flex-end; }
-    .orion-nav-sep { inline-size: 1px; block-size: 1.6rem; background: var(--orion-border); flex: none; }
-    @media (max-width: 860px) {
-      .orion-nav-controls { inline-size: 100%; justify-content: space-between; }
-      .orion-nav-search { order: 3; flex: 1 1 100%; }
-      .orion-brand-name { font-size: .9rem; white-space: nowrap; }
-    }
-    @media (max-width: 640px) {
-      .orion-nav-links { display: flex; order: 4; inline-size: 100%; justify-content: center; }
-      .orion-nav-login { display: inline-block; font-size: .75rem; padding: .35rem .6rem; }
-      .orion-nav-sep { display: none; }
-    }
-  </style>
   <div class="orion-navbar-inner">
     <a href="{{ home_path }}" class="orion-brand" aria-label="{{ tenant.name_for(locale) }} — {{ t('home') }}">
       {% if tenant.logo_url %}<img src="{% if tenant.logo_url.startswith('/store/static/images/products/') %}{{ tenant.logo_url }}{% if '?' in tenant.logo_url %}&{% else %}?{% endif %}store={{ store_token }}{% else %}{{ tenant.logo_url }}{% endif %}" alt="{{ tenant.name_for(locale) }}" class="orion-brand-logo">
@@ -26,15 +11,15 @@
     <nav class="orion-nav-links" aria-label="{{ t('main_navigation') }}">
       <a href="{{ home_path }}" class="orion-nav-link{% if request.path == home_path %} is-active{% endif %}"
          {% if request.path == home_path %}aria-current="page"{% endif %}>
-        <span aria-hidden="true" class="orion-nav-icon">🏠</span>{{ t('home') }}
+        <svg class="sf-icon" aria-hidden="true"><use href="#sf-i-home"/></svg>{{ t('home') }}
       </a>
       <a href="/cart?store={{ store_token }}" class="orion-nav-link{% if request.path.startswith('/cart') %} is-active{% endif %}"
          {% if request.path.startswith('/cart') %}aria-current="page"{% endif %}>
-        <span aria-hidden="true" class="orion-nav-icon">🛒</span>{{ t('cart') }}
+        <svg class="sf-icon" aria-hidden="true"><use href="#sf-i-cart"/></svg>{{ t('cart') }}
       </a>
       <a href="/account?store={{ store_token }}" class="orion-nav-link{% if request.path.startswith('/account') %} is-active{% endif %}"
          {% if request.path.startswith('/account') %}aria-current="page"{% endif %}>
-        <span aria-hidden="true" class="orion-nav-icon">👤</span>{{ t('account') }}
+        <svg class="sf-icon" aria-hidden="true"><use href="#sf-i-user"/></svg>{{ t('account') }}
       </a>
     </nav>
 
@@ -42,14 +27,14 @@
       <form class="orion-nav-search" role="search" action="/search" method="get" aria-label="{{ t('search_placeholder') }}">
         <input type="search" name="q" value="{{ search_q or '' }}" class="orion-search-input"
                placeholder="{{ t('search_placeholder') }}" required>
-        <button type="submit" class="orion-search-btn" aria-label="{{ t('search_placeholder') }}"><span aria-hidden="true">🔍</span></button>
+        <button type="submit" class="orion-search-btn" aria-label="{{ t('search_placeholder') }}"><svg class="sf-icon" aria-hidden="true"><use href="#sf-i-search"/></svg></button>
         <input type="hidden" name="store" value="{{ store_token }}">
       </form>
 
       <button type="button" class="orion-btn orion-btn-ghost" data-store-share
               data-share-url="{{ request.host_url.rstrip('/') }}/s/{{ tenant.slug }}/"
               data-share-title="{{ tenant.name_for(locale) }}"
-              aria-label="{{ t('share_store') }}">{{ t('share_store') }}</button>
+              aria-label="{{ t('share_store') }}"><svg class="sf-icon" aria-hidden="true"><use href="#sf-i-share"/></svg><span class="sf-label">{{ t('share_store') }}</span></button>
 
       <span class="orion-nav-sep" aria-hidden="true"></span>
 
@@ -76,7 +61,7 @@
       {% set wa_link = whatsapp_url(tenant.phone, store_inquiry_text()) %}
       {% if wa_link %}
       <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-nav-wa"
-         aria-label="{{ t('whatsapp') }}"><span aria-hidden="true">💬</span> {{ t('whatsapp') }}</a>
+         aria-label="{{ t('whatsapp') }}"><svg class="sf-icon sf-icon-wa" aria-hidden="true"><use href="#sf-i-whatsapp"/></svg><span class="sf-label">{{ t('whatsapp') }}</span></a>
       {% endif %}
 
       {% set share_link = request.host_url.rstrip('/') ~ '/s/' ~ tenant.slug ~ '/' %}
@@ -86,7 +71,7 @@
         <div class="orion-card p-5 max-w-md w-full orion-share-panel">
           <div class="flex items-center justify-between mb-4">
             <h2 class="orion-title">{{ t('share_store') }}</h2>
-            <button type="button" class="orion-btn" data-store-share-close aria-label="{{ t('close') }}">✕</button>
+            <button type="button" class="orion-btn sf-icon-btn" data-store-share-close aria-label="{{ t('close') }}"><svg class="sf-icon" aria-hidden="true"><use href="#sf-i-arrow"/></svg></button>
           </div>
           <div class="space-y-3">
             <a class="orion-btn orion-btn-ghost w-full" data-share-target="whatsapp" href="https://wa.me/?text={{ share_caption|urlencode }}" target="_blank" rel="noopener">{{ t('share_whatsapp') }}</a>

@@ -41,9 +41,9 @@
   </div>
   <div class="orion-product-grid">
     {% for b in bundles %}
-    <article class="orion-card p-4 orion-csp-bundle-card">
+    <article class="orion-card p-4 orion-csp-bundle-card sf-bundle-card">
       {% if b.image_url %}
-      <img src="{{ signed_image_url(b.image_url, store_token) }}" alt="{{ b.name_en if locale[:2]|lower == "en" and b.name_en else b.name }}" class="orion-csp-banner-img">
+      <img src="{{ signed_image_url(b.image_url, store_token) }}" alt="{{ b.name_en if locale[:2]|lower == "en" and b.name_en else b.name }}" class="orion-csp-banner-img" loading="lazy" decoding="async">
       {% endif %}
       <div class="flex items-start justify-between gap-2">
         <strong class="text-lg">{{ b.name_en if locale[:2]|lower == "en" and b.name_en else b.name }}</strong>
@@ -60,7 +60,7 @@
         <a href="/s/{{ tenant.slug }}/bundle/{{ b.slug }}" class="orion-btn orion-btn-ghost">{{ t('bundle_details') }}</a>
         {% set wa_msg = bundle_order_text((b.name_en if locale[:2]|lower == "en" and b.name_en else b.name), money(b.price)) %}
         {% set wa_link = whatsapp_url(tenant.phone, wa_msg) %}
-        {% if wa_link %}<a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn">💬 {{ t('whatsapp') }}</a>{% endif %}
+        {% if wa_link %}<a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn"><svg class="sf-icon sf-icon-wa" aria-hidden="true"><use href="#sf-i-whatsapp"/></svg>{{ t('whatsapp') }}</a>{% endif %}
         <button type="button" class="orion-btn orion-btn-gold bundle-add"
                 data-slug="{{ b.slug }}" data-token="{{ store_token }}"
                 aria-label="{{ t('bundle_add') }} — {{ b.name }}">{{ t('bundle_add') }}</button>
