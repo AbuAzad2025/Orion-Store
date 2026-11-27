@@ -47,7 +47,9 @@ def tenant_invoices():
         )
         items = []
         for invoice in rows:
-            order = Order.query.get(invoice.order_id)
+            order = Order.query.filter_by(
+                id=invoice.order_id, tenant_id=g.tenant_id
+            ).first()
             items.append(
                 {
                     **invoice.to_dict(),
@@ -81,7 +83,7 @@ def tenant_invoice_pdf(public_id: str):
             raise NotFoundError("Invoice PDF not found.")
         try:
             pdf = get_invoice_storage().get(key)
-        except (KeyError, ValueError) as exc:
+        except (KeyError, ValueError, OSError) as exc:
             raise NotFoundError("Invoice PDF not found.") from exc
         return Response(
             pdf,

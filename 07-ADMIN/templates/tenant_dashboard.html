@@ -65,6 +65,7 @@
           {% if order.status == 'awaiting' %}{{ t('بانتظار التأكيد', 'Awaiting confirmation') }}
           {% elif order.status == 'cancelled' %}{{ t('ملغي', 'Cancelled') }}
           {% elif order.status == 'confirmed' %}{{ t('مؤكد', 'Confirmed') }}
+          {% elif order.status in ('pending', 'awaiting_payment') %}{{ t('معلق', 'Pending') }}
           {% else %}{{ t('مدفوع', 'Paid') }}{% endif %}
         </td>
         <td class="p-2">{{ t('واتساب', 'WhatsApp') if order.shipping_method_code == 'whatsapp' else t('المتجر', 'Store') }}</td>

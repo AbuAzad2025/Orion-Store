@@ -21,6 +21,8 @@ TABLES = ("products", "product_bundles", "categories")
 
 
 def upgrade() -> None:
+    if op.get_bind().dialect.name != "postgresql":
+        return
     bind = op.get_bind()
     for table in TABLES:
         has_column = bind.execute(

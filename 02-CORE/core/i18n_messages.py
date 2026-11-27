@@ -175,10 +175,10 @@ AR: dict[str, str] = {
     "Reconciliation run not found.": "تشغيل المطابقة غير موجود.",
     "Run not found.": "التشغيل غير موجود.",
     "This store is not in the closed beta program.": "هذا المتجر ليس ضمن برنامج التجريب المغلق.",
-    "رقم واتساب غير مُضبط لهذا المتجر.": "No WhatsApp number is configured for this store.",
-    "السلة فارغة.": "The cart is empty.",
-    "رقم الهاتف غير صالح.": "Invalid phone number.",
-    "رابط الصورة يجب أن يبدأ بـ https:// أو /": "Image URL must start with https:// or /",
+    "No WhatsApp number is configured for this store.": "رقم واتساب غير مُضبط لهذا المتجر.",
+    "The cart is empty.": "السلة فارغة.",
+    "Invalid phone number.": "رقم الهاتف غير صالح.",
+    "Image URL must start with https:// or /": "رابط الصورة يجب أن يبدأ بـ https:// أو /",
 }
 
 EN: dict[str, str] = {ar: en for en, ar in AR.items()}
@@ -187,6 +187,10 @@ EN.update(
         "حدث خطأ غير متوقع.": "An unexpected error occurred.",
         "مطلوب تسجيل الدخول.": "Authentication required.",
         "طلب غير صالح.": "Invalid request.",
+        "السلة فارغة.": "The cart is empty.",
+        "رقم واتساب غير مُضبط لهذا المتجر.": "No WhatsApp number is configured for this store.",
+        "رقم الهاتف غير صالح.": "Invalid phone number.",
+        "رابط الصورة يجب أن يبدأ بـ https:// أو /": "Image URL must start with https:// or /",
     }
 )
 

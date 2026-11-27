@@ -65,7 +65,7 @@ def tenant_dashboard_api():
         products = _products.list_for_tenant(g.tenant_id)
         confirmed = [o for o in orders if o.payment_status == "paid"]
         cancelled = sum(1 for o in orders if o.payment_status == "cancelled")
-        pending = sum(1 for o in orders if o.status == "awaiting")
+        pending = sum(1 for o in orders if o.status in ("awaiting", "pending"))
         revenue = sum((o.total for o in confirmed), Decimal("0"))
         stats = {
             "orders_total": len(orders),

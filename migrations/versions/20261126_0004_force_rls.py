@@ -39,6 +39,8 @@ TENANT_TABLES = (
 
 
 def upgrade() -> None:
+    if op.get_bind().dialect.name != "postgresql":
+        return
     # Apply to every table that actually has row security enabled, so the
     # migration stays correct if the baseline table list changes.
     bind = op.get_bind()
@@ -57,5 +59,19 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    for table in TENANT_TABLES:
+    if op.get_bind().dialect.name != "postgresql":
+        return
+    bind = op.get_bind()
+    tables = [
+        (name,)
+        for (name,) in bind.execute(
+            text(
+                "SELECT c.relname FROM pg_class c "
+                "JOIN pg_namespace n ON n.oid = c.relnamespace "
+                "WHERE n.nspname = 'public' AND c.relkind = 'r' "
+                "AND c.relforcerowsecurity"
+            )
+        )
+    ]
+    for (table,) in tables:
         op.execute(f'ALTER TABLE "{table}" NO FORCE ROW LEVEL SECURITY')

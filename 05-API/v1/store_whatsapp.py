@@ -59,8 +59,8 @@ def register_store_whatsapp_routes(bp, carts) -> None:
                 tenant.name,
                 items,
                 carts.cart_subtotal(cart),
-                customer_name=str(data.get("customer_name", "")),
-                notes=str(data.get("notes", "")),
+                customer_name=str(data.get("customer_name") or ""),
+                notes=str(data.get("notes") or ""),
             )
             return (
                 jsonify(
@@ -84,13 +84,13 @@ def register_store_whatsapp_routes(bp, carts) -> None:
             if not items:
                 return jsonify({"error": "السلة فارغة."}), 400
             data = request.get_json(silent=True) or {}
-            customer_name = str(data.get("customer_name", ""))
-            notes = str(data.get("notes", ""))
+            customer_name = str(data.get("customer_name") or "")
+            notes = str(data.get("notes") or "")
             order = orders.create(
                 tenant,
                 items,
                 customer_name=customer_name,
-                customer_email=str(data.get("email", "")),
+                customer_email=str(data.get("email") or ""),
                 notes=notes,
             )
             message = format_cart_order(
@@ -111,6 +111,8 @@ def register_store_whatsapp_routes(bp, carts) -> None:
             )
         except OrionError as exc:
             return jsonify({"error": exc.message}), exc.status_code
+        except (ValueError, TypeError):
+            return jsonify({"error": "Invalid request."}), 400
 
     @bp.post("/product/<int:product_id>/whatsapp-order")
     @limiter.limit("10 per minute")
@@ -129,7 +131,7 @@ def register_store_whatsapp_routes(bp, carts) -> None:
             ).first()
             if product is None or not product.is_published:
                 return jsonify({"error": "المنتج غير متاح."}), 404
-            customer_name = str(data.get("customer_name", ""))
+            customer_name = str(data.get("customer_name") or "")
             order = orders.create(
                 tenant,
                 [
@@ -139,8 +141,8 @@ def register_store_whatsapp_routes(bp, carts) -> None:
                     }
                 ],
                 customer_name=customer_name,
-                customer_email=str(data.get("email", "")),
-                notes=str(data.get("notes", "")),
+                customer_email=str(data.get("email") or ""),
+                notes=str(data.get("notes") or ""),
             )
             message = format_product_order(
                 tenant.name,

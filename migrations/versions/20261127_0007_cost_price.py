@@ -1,7 +1,12 @@
-"""Add product cost price and order-item cost snapshot for profit reports.
+"""Cost columns are owned by the baseline migration (0001).
 
 Revision ID: cost_price_0007
 Revises: strip_store_tokens_0006
+
+This revision is intentionally a no-op: baseline_tables already creates
+products.cost_price and order_items.unit_cost. It exists only to keep the
+revision chain that shipped with the cost/profit feature. Both directions are
+guarded so a downgrade can never drop baseline-owned columns.
 """
 
 from __future__ import annotations
@@ -15,16 +20,8 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.execute(
-        "ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price "
-        "NUMERIC(10, 2) NOT NULL DEFAULT 0"
-    )
-    op.execute(
-        "ALTER TABLE order_items ADD COLUMN IF NOT EXISTS unit_cost "
-        "NUMERIC(10, 2) NOT NULL DEFAULT 0"
-    )
+    return
 
 
 def downgrade() -> None:
-    op.execute("ALTER TABLE order_items DROP COLUMN IF EXISTS unit_cost")
-    op.execute("ALTER TABLE products DROP COLUMN IF EXISTS cost_price")
+    return

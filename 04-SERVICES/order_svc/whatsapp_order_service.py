@@ -6,6 +6,8 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
+from sqlalchemy import update
+
 from catalog.product import Product
 
 from core.exceptions import ValidationError
@@ -50,13 +52,16 @@ class WhatsAppOrderService:
             ).first()
             if product is None or not product.is_published:
                 raise ValidationError("Product not found.")
-            total = Decimal(str(product.price)) * quantity
+            if quantity > (product.quantity or 0):
+                raise ValidationError("Requested quantity is not available.")
+            unit_price = Decimal(str(row.get("unit_price") or product.price))
+            total = unit_price * quantity
             entry = {
                 "product": product,
                 "product_id": product.id,
-                "product_name": product.name,
+                "product_name": str(row.get("product_name") or product.name),
                 "product_sku": product.sku,
-                "unit_price": product.price,
+                "unit_price": unit_price,
                 "unit_cost": product.cost_price or Decimal("0"),
                 "quantity": quantity,
                 "total_price": total,
@@ -72,13 +77,18 @@ class WhatsAppOrderService:
 
         subtotal = sum((row["total_price"] for row in clean), Decimal("0"))
         config = TenantConfig.query.filter_by(tenant_id=tenant.id).first()
-        if config and config.tax_included:
-            from tax_svc.tax_service import TaxService
+        from tax_svc.tax_service import TaxService
 
-            tax_amount = TaxService().compute_tax_inclusive(tenant.id, subtotal, {})
+        address = {"notes": notes, "channel": CHANNEL}
+        if config and config.tax_included:
+            tax_amount = TaxService().compute_tax_inclusive(
+                tenant.id, subtotal, address
+            )
             total = subtotal
         else:
-            tax_amount = Decimal("0")
+            tax_amount = TaxService().compute_tax(
+                tenant.id, subtotal, address, Decimal("0")
+            )
             total = subtotal + tax_amount
         number = f"WA-{tenant.id}-{uuid.uuid4().hex[:8].upper()}"
         order = Order(
@@ -127,21 +137,38 @@ class WhatsAppOrderService:
 
     def confirm(self, tenant_id: int, public_id: str) -> Order:
         order = self._get(tenant_id, public_id)
-        if order.status != PENDING_STATUS:
+        changed = db.session.execute(
+            update(Order)
+            .where(
+                Order.id == order.id,
+                Order.tenant_id == tenant_id,
+                Order.status == PENDING_STATUS,
+            )
+            .values(
+                status="confirmed",
+                payment_status="paid",
+                fulfillment_status="unfulfilled",
+            )
+        ).rowcount
+        if changed != 1:
             raise ValidationError("Order is no longer pending.")
         for item in db.session.query(OrderItem).filter_by(order_id=order.id).all():
-            if item.product_id:
-                db.session.query(Product).filter_by(
-                    id=item.product_id, tenant_id=tenant_id
-                ).update(
-                    {Product.quantity: Product.quantity - item.quantity},
-                    synchronize_session=False,
+            if not item.product_id:
+                continue
+            reserved = db.session.execute(
+                update(Product)
+                .where(
+                    Product.id == item.product_id,
+                    Product.tenant_id == tenant_id,
+                    Product.quantity >= item.quantity,
                 )
-        order.status = "confirmed"
-        order.payment_status = "paid"
-        order.fulfillment_status = "unfulfilled"
-        _commit_keep_loaded()
+                .values(quantity=Product.quantity - item.quantity)
+            ).rowcount
+            if reserved != 1:
+                db.session.rollback()
+                raise ValidationError("Insufficient stock to confirm this order.")
         self._record_payment_and_invoice(order)
+        db.session.refresh(order)
         return order
 
     def _record_payment_and_invoice(self, order: Order) -> None:
@@ -162,7 +189,7 @@ class WhatsAppOrderService:
             currency=currency,
             payment_method="manual",
             payment_provider="whatsapp",
-            status="succeeded",
+            status="completed",
             provider_payment_id=order.order_number,
         )
         db.session.add(payment)
@@ -187,8 +214,8 @@ class WhatsAppOrderService:
 
     def cancel(self, tenant_id: int, public_id: str) -> Order:
         order = self._get(tenant_id, public_id)
-        if order.status not in (PENDING_STATUS, "confirmed"):
-            raise ValidationError("Order cannot be cancelled.")
+        if order.status != PENDING_STATUS:
+            raise ValidationError("Only pending orders can be cancelled.")
         order.status = "cancelled"
         order.payment_status = "cancelled"
         _commit_keep_loaded()

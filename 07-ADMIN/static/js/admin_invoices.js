@@ -16,7 +16,7 @@ const OrionAdminInvoices = {
       }
       rows.forEach((invoice) => {
         const pdf = invoice.public_id
-          ? `/api/v1/tenant/invoices/${invoice.public_id}/pdf`
+          ? `/api/v1/tenant/invoices/${encodeURIComponent(invoice.public_id)}/pdf`
           : "#";
         target.appendChild(SafeDOM.elem("tr", null, [
           SafeDOM.elem("td", { className: "p-2" }, [invoice.invoice_number]),

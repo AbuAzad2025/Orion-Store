@@ -52,12 +52,12 @@ PY
 /srv/scripts/activate.sh orionstore "$SVC" "$REL"
 
 for _ in 1 2 3 4 5; do
-  body="$(curl -fsS --max-time 5 https://orion.azadexa.com/health || true)"
-  if printf '%s' "$body" | grep -q '"status":"ok"'; then
-    echo "HEALTH_OK $body"
+  body="$(curl -fsS --max-time 5 https://orion.azadexa.com/ready || true)"
+  if printf '%s' "$body" | grep -q '"status":"ready"'; then
+    echo "READY_OK $body"
     exit 0
   fi
   sleep 2
 done
-echo "HEALTH_FAILED $body"
+echo "READY_FAILED $body"
 exit 1

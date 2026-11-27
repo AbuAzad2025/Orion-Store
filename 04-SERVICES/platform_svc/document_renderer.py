@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import html
+import re
 import uuid
 from decimal import Decimal
 
@@ -55,7 +57,19 @@ class DocumentRenderer:
                 f'data-immutable="true">{footer_html}</footer>'
             )
             return body_html
-        return body_html.replace("></footer>", f">{footer_html}</footer>", 1)
+        body_html, count = re.subn(
+            r'(<footer[^>]*id="azadexa-platform-footer"[^>]*>).*?(</footer>)',
+            lambda m: m.group(1) + footer_html + m.group(2),
+            body_html,
+            count=1,
+            flags=re.S | re.I,
+        )
+        if not count:
+            body_html += (
+                '<footer id="azadexa-platform-footer" class="azadexa-platform-footer" '
+                f'data-immutable="true">{footer_html}</footer>'
+            )
+        return body_html
 
     def render_invoice_html(
         self,
@@ -66,25 +80,32 @@ class DocumentRenderer:
         footer_html: str,
     ) -> str:
         from core.i18n_messages import localize, request_locale
+        from tenant.tenant_config import TenantConfig
 
         locale = request_locale()
+        config = TenantConfig.query.filter_by(tenant_id=order.tenant_id).first()
+        net = (
+            Decimal(str(order.subtotal)) - Decimal(str(order.tax_amount))
+            if config and config.tax_included
+            else Decimal(str(order.subtotal))
+        )
 
         body = (
             template_row.body_html if template_row else None
-        ) or default_invoice_body(request_locale())
+        ) or default_invoice_body(locale)
         self.validate_template(body)
-        body = body.replace("{{order_number}}", order.order_number)
+        esc = html.escape
+        body = body.replace("{{order_number}}", esc(order.order_number or ""))
         body = body.replace("{{total}}", str(order.total))
-        body = body.replace("{{customer_email}}", order.customer_email)
-        body = body.replace("{{subtotal}}", str(order.subtotal))
+        body = body.replace("{{customer_email}}", esc(order.customer_email or ""))
+        body = body.replace("{{subtotal}}", str(net))
         body = body.replace("{{tax_amount}}", str(order.tax_amount))
         tax_block = (
             "<p class='tax-summary'>"
-            + localize("المجموع قبل الضريبة", "Subtotal")
-            + f": {order.subtotal} · "
-            + localize("الضريبة", "Tax")
-            + f": {order.tax_amount} {payment.currency}"
-            + "</p>"
+            + localize("المجموع قبل الضريبة", "Net of tax", locale)
+            + f": {net} · "
+            + localize("الضريبة", "Tax", locale)
+            + f": {order.tax_amount} {payment.currency}</p>"
         )
         if "</footer>" in body:
             body = body.replace("</footer>", tax_block + "</footer>", 1)
@@ -110,9 +131,20 @@ class DocumentRenderer:
         payment: Payment,
         financial_event: FinancialEvent,
     ) -> Invoice:
-        settings = PlatformSettingsService().get_singleton()
-        footer = settings.footer_html
-        template_row = self.load_active_template(order.tenant_id)
+        existing = Invoice.query.filter_by(
+            tenant_id=order.tenant_id, order_id=order.id
+        ).first()
+        if existing is not None:
+            return existing
+        try:
+            footer = PlatformSettingsService().get_singleton().footer_html
+        except Exception:
+            footer = ""
+        from core.i18n_messages import request_locale
+        from tenant.tenant_config import TenantConfig
+
+        locale = request_locale()
+        template_row = self.load_active_template(order.tenant_id, locale=locale)
         rendered = self.render_invoice_html(
             order=order,
             payment=payment,
@@ -120,9 +152,12 @@ class DocumentRenderer:
             footer_html=footer,
         )
         pdf_bytes = html_to_pdf(rendered)
-        invoice_number = f"INV-{order.tenant_id}-{uuid.uuid4().hex[:8].upper()}"
-        storage_key = self._store_pdf_artifact(
-            order.tenant_id, invoice_number, pdf_bytes
+        invoice_number = f"INV-{order.tenant_id}-{uuid.uuid4().hex.upper()}"
+        config = TenantConfig.query.filter_by(tenant_id=order.tenant_id).first()
+        net = (
+            Decimal(str(order.subtotal)) - Decimal(str(order.tax_amount))
+            if config and config.tax_included
+            else Decimal(str(order.subtotal))
         )
         invoice = Invoice(
             tenant_id=order.tenant_id,
@@ -131,17 +166,21 @@ class DocumentRenderer:
             payment_id=payment.id,
             document_template_id=template_row.id if template_row else None,
             invoice_number=invoice_number,
-            subtotal=order.subtotal,
+            subtotal=net,
             tax_amount=order.tax_amount,
             total_amount=order.total,
             commission_amount=financial_event.commission_amount or Decimal("0"),
             currency=payment.currency,
-            platform_footer_applied=bool(footer),
+            platform_footer_applied=bool(footer and footer in rendered),
             rendered_html=rendered,
-            pdf_artifact_path=storage_key,
-            storage_key=storage_key,
         )
         db.session.add(invoice)
+        db.session.flush()
+        storage_key = self._store_pdf_artifact(
+            order.tenant_id, invoice_number, pdf_bytes
+        )
+        invoice.pdf_artifact_path = storage_key
+        invoice.storage_key = storage_key
         db.session.commit()
         return invoice
 

@@ -45,7 +45,7 @@ class SalesReportService:
             (Decimal(str(item.unit_cost or 0)) * item.quantity for item in items),
             Decimal("0"),
         )
-        net_sales = revenue - tax
+        net_sales = revenue - tax - shipping
         gross_profit = net_sales - cogs
         top: dict[str, dict] = {}
         for item in items:
