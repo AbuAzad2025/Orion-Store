@@ -32,7 +32,7 @@
   </label>
   <label class="orion-filter-field">
     <span class="orion-filter-label">{{ t('sort_label') }}</span>
-    <select name="sort" class="orion-filter-select" aria-label="{{ t('sort_default') }}">
+    <select name="sort" class="orion-filter-select" aria-label="{{ t('sort_label') }}">
       <option value="default"{% if sort in (None, '', 'default') %} selected{% endif %}>{{ t('sort_default') }}</option>
       <option value="price_asc"{% if sort == 'price_asc' %} selected{% endif %}>{{ t('sort_price_asc') }}</option>
       <option value="price_desc"{% if sort == 'price_desc' %} selected{% endif %}>{{ t('sort_price_desc') }}</option>

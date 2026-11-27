@@ -241,16 +241,18 @@ def create_app(config_name: str | None = None) -> Flask:
         except Exception:
             db_ok = False
         redis_url = app.config.get("REDIS_URL")
-        redis_ok = ping_redis(redis_url) if redis_url else True
+        redis_ok = ping_redis(redis_url) if redis_url else False
+        require_redis = bool(redis_url) and app.config.get("ENV") == "production"
+        is_ready = db_ok and (redis_ok or not require_redis)
         return (
             jsonify(
                 {
-                    "status": "ready" if db_ok else "not_ready",
+                    "status": "ready" if is_ready else "not_ready",
                     "database": db_ok,
                     "redis": redis_ok,
                 }
             ),
-            200 if db_ok else 503,
+            200 if is_ready else 503,
         )
 
     @app.after_request
@@ -281,5 +283,20 @@ def create_app(config_name: str | None = None) -> Flask:
     @app.errorhandler(OrionError)
     def handle_orion_error(exc: OrionError):
         return jsonify({"error": exc.message}), exc.status_code
+
+    @app.errorhandler(404)
+    @app.errorhandler(405)
+    @app.errorhandler(413)
+    def handle_expected_http_error(exc):
+        return jsonify({"error": exc.description or exc.name}), exc.code
+
+    @app.errorhandler(Exception)
+    def handle_unexpected_error(exc):
+        from werkzeug.exceptions import HTTPException
+
+        if isinstance(exc, HTTPException):
+            return jsonify({"error": exc.description or exc.name}), exc.code or 500
+        app.logger.exception("Unhandled error %s %s", request.method, request.path)
+        return jsonify({"error": "An unexpected error occurred."}), 500
 
     return app

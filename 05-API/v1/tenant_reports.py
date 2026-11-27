@@ -45,11 +45,20 @@ def tenant_invoices():
             .limit(100)
             .all()
         )
+        order_ids = {inv.order_id for inv in rows}
+        orders = (
+            {
+                o.id: o
+                for o in Order.query.filter(
+                    Order.tenant_id == g.tenant_id, Order.id.in_(order_ids)
+                ).all()
+            }
+            if order_ids
+            else {}
+        )
         items = []
         for invoice in rows:
-            order = Order.query.filter_by(
-                id=invoice.order_id, tenant_id=g.tenant_id
-            ).first()
+            order = orders.get(invoice.order_id)
             items.append(
                 {
                     **invoice.to_dict(),

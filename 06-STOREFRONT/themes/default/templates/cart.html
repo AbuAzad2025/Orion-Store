@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="orion-title text-2xl mb-6">{{ t('shopping_cart') }}</h1>
-<div id="cart-items" class="orion-card mb-6" data-empty="{{ t('empty_cart') }}"><span class="orion-skeleton"></span></div>
+<div id="cart-items" aria-live="polite" class="orion-card mb-6" data-empty="{{ t('empty_cart') }}"><span class="orion-skeleton"></span></div>
 <p id="cart-total" class="orion-muted text-sm mb-4" data-total="{{ t('total_label') }}" role="status" aria-live="polite"></p>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

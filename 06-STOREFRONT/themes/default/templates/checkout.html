@@ -49,7 +49,7 @@
   <p id="checkout-summary" class="text-sm text-gray-600"></p>
   <button type="submit" class="orion-btn orion-btn-gold w-full">{{ t('confirm_pay') }}</button>
 </form>
-<div id="checkout-result" class="mt-4 text-sm"></div>
+<div id="checkout-result" role="status" aria-live="polite" class="mt-4 text-sm"></div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('storefront_assets.static', filename='js/checkout.js') }}"></script>

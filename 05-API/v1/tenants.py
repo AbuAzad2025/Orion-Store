@@ -85,7 +85,15 @@ def update_tenant(tenant_id: int):
         if not tenant:
             return jsonify({"error": "Tenant not found."}), 404
         data = request.get_json(silent=True) or {}
-        for field in ("name", "slug", "email", "domain", "status"):
+        for field in (
+            "name",
+            "name_en",
+            "logo_url",
+            "slug",
+            "email",
+            "domain",
+            "status",
+        ):
             if field in data:
                 setattr(tenant, field, data[field])
         db.session.commit()
@@ -116,6 +124,18 @@ def current_tenant():
     try:
         if not g.tenant:
             return jsonify({"error": "Tenant context required."}), 404
-        return jsonify({"tenant": g.tenant.to_dict()}), 200
+        data = g.tenant.to_dict()
+        if not getattr(g, "user", None):
+            for key in (
+                "id",
+                "public_id",
+                "email",
+                "domain",
+                "custom_domain",
+                "status",
+                "is_active",
+            ):
+                data.pop(key, None)
+        return jsonify({"tenant": data}), 200
     except OrionError as exc:  # pragma: no cover - to_dict cannot raise
         return jsonify({"error": exc.message}), exc.status_code

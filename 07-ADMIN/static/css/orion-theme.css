@@ -67,6 +67,13 @@ body.orion-surface {
   color: var(--orion-muted) !important;
 }
 
+.orion-surface .text-gray-700,.orion-surface .text-slate-700{color:var(--orion-text)!important}
+.orion-surface .text-red-500,.orion-surface .text-red-600,.orion-surface .text-red-700{color:var(--orion-danger)!important}
+.orion-surface .text-green-700,.orion-surface .text-emerald-700{color:var(--orion-success)!important}
+.orion-surface .text-blue-600,.orion-surface .text-blue-700{color:var(--orion-accent)!important}
+.orion-surface .text-purple-600{color:#d6b4ff!important}
+.orion-surface .text-amber-600{color:#f4cd7e!important}
+
 .orion-surface .border-gray-200,
 .orion-surface .border-slate-200,
 .orion-surface .border-gray-300 {
@@ -1398,3 +1405,9 @@ body.orion-surface {
 
 /* CSP-safe replacements for former inline style attributes. */
 .orion-csp-zero{margin:0}.orion-csp-fit{width:fit-content}.orion-csp-nodecor{text-decoration:none}.orion-csp-center{text-align:center}.orion-csp-start{text-align:start}.orion-csp-nowrap{white-space:nowrap}.orion-csp-mt{margin-block-start:.5rem}.orion-csp-mt-auto{margin-block-start:auto}.orion-csp-searchbox{display:block;max-inline-size:26rem;margin-block-end:1rem}.orion-csp-justify-center{justify-content:center}.orion-csp-login-note{margin-block-start:1.25rem;text-align:center}.orion-csp-price-badge{margin:.25rem 0;width:fit-content}.orion-csp-price-gap{margin:.25rem 0}.orion-csp-grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1.5rem}.orion-csp-img-lg{width:100%;border-radius:16px;object-fit:cover}.orion-csp-col{display:flex;flex-direction:column;gap:.75rem}.orion-csp-list{margin:0;padding-inline-start:1.2rem;line-height:1.9}.orion-csp-list-sm{margin:0;padding-inline-start:1.2rem;font-size:.85rem}.orion-csp-bundle-card{display:flex;flex-direction:column;gap:.5rem;border-color:var(--orion-gold)}.orion-csp-banner-img{width:100%;height:150px;object-fit:cover;border-radius:12px}.orion-csp-banner-img-sm{width:100%;height:140px;object-fit:cover;border-radius:12px}.orion-share-panel{max-height:86vh;overflow-y:auto}.orion-share-overlay{align-items:flex-start;padding-top:8vh}
+
+html[dir="rtl"] .orion-section-line { background: linear-gradient(270deg, var(--orion-border), transparent); }
+
+html[dir="rtl"] .orion-footer-brand { border-radius: 14px 0 0 14px; }
+
+html[dir="rtl"] .orion-footer-bottom { background: linear-gradient(270deg, rgba(233,197,121,.04), transparent 50%); }

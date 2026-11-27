@@ -54,7 +54,12 @@ class WhatsAppOrderService:
                 raise ValidationError("Product not found.")
             if quantity > (product.quantity or 0):
                 raise ValidationError("Requested quantity is not available.")
-            unit_price = Decimal(str(row.get("unit_price") or product.price))
+            raw_price = row.get("unit_price")
+            unit_price = (
+                Decimal(str(raw_price))
+                if raw_price is not None
+                else Decimal(str(product.price))
+            )
             total = unit_price * quantity
             entry = {
                 "product": product,
@@ -98,8 +103,9 @@ class WhatsAppOrderService:
             payment_status="pending",
             fulfillment_status="unfulfilled",
             customer_email=(
-                customer_email or f"{number.lower()}@whatsapp.pending"
-            ).lower(),
+                str(customer_email or "").strip().lower()
+                or f"{number.lower()}@whatsapp.pending"
+            ),
             customer_first_name=(customer_name or None),
             is_guest=True,
             shipping_address={"notes": notes, "channel": CHANNEL},

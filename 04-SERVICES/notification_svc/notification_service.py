@@ -46,7 +46,11 @@ class NotificationService:
             tenant_id=order.tenant_id,
             channel="email",
             template="order_confirmation",
-            recipient=order.customer_email,
+            recipient=(
+                ""
+                if (order.customer_email or "").endswith("@whatsapp.pending")
+                else order.customer_email
+            ),
             context={
                 "order_number": order.order_number,
                 "total": str(order.total),

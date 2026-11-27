@@ -93,6 +93,11 @@ CATEGORIES = [
 
 def main() -> None:
     app = create_app(os.environ.get("FLASK_ENV", "development"))
+    if app.config.get("ENV") == "production":
+        raise SystemExit(
+            "Refusing to seed demo data in production: fixed demo passwords "
+            "would create a publicly known superuser."
+        )
     with app.app_context():
         from bopis_svc.bopis_service import BopisService
         from currency_svc.currency_service import CurrencyService

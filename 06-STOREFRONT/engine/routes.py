@@ -112,17 +112,18 @@ def render_store_index():
 
     page, per_page = pagination_params()
     per_page = min(per_page, 12)
-    all_products = _products.query_published(
+    products_q = _products.query_published(
         tenant.id,
         category_id=category_id,
         featured=featured,
         price_min=price_min,
         price_max=price_max,
         sort="featured" if sort == "default" else sort,
-    ).all()
-    total_pages = max(1, ceil(len(all_products) / per_page))
+    )
+    total = products_q.count()
+    total_pages = max(1, ceil(total / per_page))
     page = min(max(page, 1), total_pages)
-    products = all_products[(page - 1) * per_page : page * per_page]
+    products = products_q.offset((page - 1) * per_page).limit(per_page).all()
     products_i18n = [
         {**ts.merge_product(p, locale), "canonical_slug": p.slug} for p in products
     ]

@@ -17,7 +17,7 @@
       {% endfor %}
     </ul>
     <p class="orion-muted text-sm orion-csp-zero">{{ t('bundle_original') }}: {{ money(bundle.original_total) }} {{ currency }}</p>
-    <p class="orion-product-price text-2xl orion-csp-zero">{{ money(bundle.bundle_price) }} {{ currency }}{% if tax_included %} <span class="orion-muted text-xs">{{ t('tax_inclusive') }}</span>{% endif %}</p>
+    <p class="orion-product-price text-2xl orion-csp-zero" dir="ltr">{{ money(bundle.bundle_price) }} {{ currency }}{% if tax_included %} <span class="orion-muted text-xs">{{ t('tax_inclusive') }}</span>{% endif %}</p>
     <p class="orion-badge orion-csp-fit">{{ t('bundle_savings') }}: {{ money(bundle.savings) }} {{ currency }}</p>
     {% if bundle.max_per_order %}<p class="orion-muted text-xs orion-csp-zero">{{ t('bundle_max') }}: {{ bundle.max_per_order }}</p>{% endif %}
     <div class="flex flex-wrap gap-2 orion-csp-mt">

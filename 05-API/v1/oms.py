@@ -58,7 +58,7 @@ def list_inventory():
         query = InventoryLevel.query.filter_by(tenant_id=g.tenant_id)
         if warehouse_id:
             query = query.filter_by(warehouse_id=warehouse_id)
-        rows = query.all()
+        rows = query.limit(100).all()
         names = {p.id: p.name for p in ProductService().list_for_tenant(g.tenant_id)}
         return (
             jsonify(

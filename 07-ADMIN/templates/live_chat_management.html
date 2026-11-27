@@ -7,7 +7,7 @@
   </section>
   <section class="orion-card hidden" id="chat-room">
     <h2 class="orion-title mb-3">{{ t('المحادثة', 'Conversation') }} — <span id="chat-session-id"></span></h2>
-    <div id="chat-messages" class="h-64 overflow-y-auto border rounded p-3 mb-3 bg-gray-50 text-sm space-y-2"></div>
+    <div id="chat-messages" role="log" aria-live="polite" aria-relevant="additions" class="h-64 overflow-y-auto border rounded p-3 mb-3 bg-gray-50 text-sm space-y-2"></div>
     <form id="chat-send-form" class="flex gap-2">
       <input name="message" type="text" placeholder="{{ t('اكتب رسالة...', 'Type a message...') }}" class="flex-1 border rounded px-3 py-2 text-sm" required>
       <button type="submit" class="orion-btn orion-btn-gold">{{ t('إرسال', 'Send') }}</button>

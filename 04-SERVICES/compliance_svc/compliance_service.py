@@ -161,6 +161,10 @@ class ComplianceService:
             tenant_id=tenant_id, email=email, is_active=True, deleted_at=None
         ).first()
         if user is not None:
+            if user.is_admin or user.is_superuser or not user.is_customer:
+                raise AuthenticationError(
+                    "SSO exchange is not permitted for this account."
+                )
             return user
 
         if not provider.auto_provision:

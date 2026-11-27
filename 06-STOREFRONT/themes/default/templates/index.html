@@ -55,7 +55,7 @@
         {% for it in b.bundle_items %}<li>{{ it.name }} × {{ it.quantity }}</li>{% endfor %}
       </ul>
       {% if b.max_per_order %}<p class="orion-muted text-xs orion-csp-zero"> {{ t('bundle_max') }}: {{ b.max_per_order }}</p>{% endif %}
-      <p class="orion-product-price text-2xl orion-badge orion-csp-price-badge">{{ money(b.price) }} {{ currency }}</p>
+      <p class="orion-product-price text-2xl orion-badge orion-csp-price-badge" dir="ltr">{{ money(b.price) }} {{ currency }}</p>
       <div class="flex flex-wrap gap-2 orion-csp-mt-auto">
         <a href="/s/{{ tenant.slug }}/bundle/{{ b.slug }}" class="orion-btn orion-btn-ghost">{{ t('bundle_details') }}</a>
         {% set wa_msg = bundle_order_text((b.name_en if locale[:2]|lower == "en" and b.name_en else b.name), money(b.price)) %}
@@ -92,7 +92,7 @@
   <div class="orion-empty-modern">{{ t('no_products') }}</div>
   {% endif %}
   {% if pagination_pages and pagination_pages > 1 %}
-  <nav class="orion-pagination" aria-label="{{ t('pagination_next') }}">
+  <nav class="orion-pagination" aria-label="{{ t('pagination_label') }}">
     {% if pagination_page > 1 %}
     <a class="orion-page-link" href="{{ page_url(pagination_page - 1) }}">{{ t('pagination_prev') }}</a>
     {% endif %}

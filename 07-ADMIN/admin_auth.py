@@ -63,7 +63,7 @@ def _invalid_credentials():
         render_template(
             "admin_login.html",
             page_title=t("تسجيل الدخول", "Sign in"),
-            error="Invalid credentials",
+            error=t("بيانات الدخول غير صحيحة", "Invalid credentials"),
         ),
         401,
     )
@@ -151,7 +151,7 @@ def admin_sso_exchange():
             render_template(
                 "admin_login.html",
                 page_title=t("تسجيل الدخول", "Sign in"),
-                error="Tenant not found.",
+                error=t("المتجر غير موجود.", "Tenant not found."),
             ),
             404,
         )
@@ -169,7 +169,7 @@ def admin_sso_exchange():
             render_template(
                 "admin_login.html",
                 page_title=t("تسجيل الدخول", "Sign in"),
-                error="Invalid SSO credentials.",
+                error=t("بيانات الدخول الموحّد غير صحيحة.", "Invalid SSO credentials."),
             ),
             401,
         )

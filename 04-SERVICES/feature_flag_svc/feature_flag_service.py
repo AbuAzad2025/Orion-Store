@@ -25,9 +25,21 @@ class FeatureFlagService:
     )
 
     def ensure_seeded(self) -> None:
+        from flask import g
+
+        if getattr(g, "_flags_seeded", False):
+            return
+        codes = [flag_data[0] for flag_data in self.MVP_FLAGS]
+        existing = {
+            code
+            for (code,) in db.session.query(FeatureFlag.code)
+            .filter(FeatureFlag.code.in_(codes))
+            .all()
+        }
+        added = False
         for flag_data in self.MVP_FLAGS:
             code = flag_data[0]
-            if FeatureFlag.query.filter_by(code=code).first():
+            if code in existing:
                 continue
             rollout = flag_data[4] if len(flag_data) > 4 else 100
             db.session.add(
@@ -41,7 +53,10 @@ class FeatureFlagService:
                     rollout_percent=rollout,
                 )
             )
-        db.session.commit()
+            added = True
+        if added:
+            db.session.commit()
+        g._flags_seeded = True
 
     def get_by_code(self, code: str) -> FeatureFlag:
         self.ensure_seeded()

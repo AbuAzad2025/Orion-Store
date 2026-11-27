@@ -368,6 +368,9 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # Baseline indexes/unique constraints are owned by the baseline schema.
+    # Dropping them silently destroys integrity guarantees, so this is a no-op.
+    return
     if op.get_bind().dialect.name != "postgresql":
         return
     bind = op.get_bind()

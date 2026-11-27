@@ -16,8 +16,8 @@
   {% endif %}
 
   <form method="post" action="/s/{{ tenant.slug }}/login" class="space-y-4">
-    <input type="hidden" name="store" value="{{ store_token }}" aria-label="store token">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" aria-label="csrf token">
+    <input type="hidden" name="store" value="{{ store_token }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div>
       <label class="orion-stat-label block" for="login-email">{{ t('email_address') }}</label>
       <input id="login-email" name="email" type="email" required class="orion-input w-full" autocomplete="username" aria-label="{{ t('email_address') }}">

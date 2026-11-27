@@ -2,18 +2,22 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
+
+import redis
+
+_logger = logging.getLogger(__name__)
 
 
 def ping_redis(redis_url: str | None) -> bool:
     if not redis_url:
         return False
     try:
-        import redis
-
         client = redis.from_url(redis_url, socket_connect_timeout=1)
         return bool(client.ping())
     except Exception:
+        _logger.warning("Redis ping failed for %s", redis_url, exc_info=True)
         return False
 
 

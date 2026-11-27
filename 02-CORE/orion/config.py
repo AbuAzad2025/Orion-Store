@@ -35,6 +35,8 @@ def testing_database_uri() -> str:
 
 
 class Config:
+    SEND_FILE_MAX_AGE_DEFAULT = timedelta(minutes=10)
+
     MAX_CONTENT_LENGTH = int(
         os.environ.get("MAX_CONTENT_LENGTH", str(6 * 1024 * 1024))
     )  # uploads: 5MB image + multipart overhead

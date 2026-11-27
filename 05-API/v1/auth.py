@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from compliance_svc.compliance_service import ComplianceService
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, g, jsonify, request, session
 from flask_jwt_extended import (
     create_access_token,
     get_jwt,
@@ -83,6 +83,7 @@ def logout():
     from core.jwt_auth import revoke_current_tokens
 
     revoke_current_tokens()
+    session.clear()
     response = jsonify({"message": "Logged out."})
     unset_access_cookies(response)
     unset_refresh_cookies(response)
@@ -115,15 +116,9 @@ def register_platform_admin():
 def sso_exchange():
     """Exchange a validated SSO provider code for the usual JWT token pair."""
     data = request.get_json(silent=True) or {}
-    tenant_id = _resolve_tenant_id(data.get("tenant_id")) or g.tenant_id
+    tenant_id = g.tenant_id
     if not tenant_id:
         return jsonify({"error": "Tenant context required."}), 400
-    if tenant_id != g.tenant_id:
-        # The tenant was resolved from the payload rather than the request host.
-        g.tenant_id = tenant_id
-        from core.middleware import bind_rls_context
-
-        bind_rls_context()
     try:
         user = _compliance.exchange_sso_code(
             tenant_id=tenant_id,

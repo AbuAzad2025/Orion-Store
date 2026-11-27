@@ -19,7 +19,7 @@
     <span class="orion-eyebrow">{{ tenant.name }}</span>
     <h1 class="orion-detail-title">{{ p_name }}</h1>
     <div class="orion-price-row">
-      <span class="orion-product-price">{{ money(p_price) }} <small>{{ currency }}</small></span>{% if tax_included %} <span class="orion-muted text-xs">{{ t('tax_inclusive') }}</span>{% endif %}
+      <span class="orion-product-price" dir="ltr">{{ money(p_price) }} <small>{{ currency }}</small></span>{% if tax_included %} <span class="orion-muted text-xs">{{ t('tax_inclusive') }}</span>{% endif %}
       {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}
       <span class="orion-product-old">{{ money(product_i18n.compare_at_price) }}</span>
       {% endif %}

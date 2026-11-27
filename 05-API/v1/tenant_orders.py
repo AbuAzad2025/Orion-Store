@@ -31,13 +31,24 @@ def list_manual_orders():
         )
         tenant = db.session.get(Tenant, g.tenant_id)
         currency = (tenant.default_currency if tenant else None) or "ILS"
+        order_ids = [o.id for o in rows]
+        items_by_order: dict[int, list[dict]] = {}
+        if order_ids:
+            for item in (
+                OrderItem.query.filter(OrderItem.order_id.in_(order_ids))
+                .order_by(OrderItem.id)
+                .all()
+            ):
+                items_by_order.setdefault(item.order_id, []).append(item.to_dict())
         out = []
         for order in rows:
-            items = [
-                item.to_dict()
-                for item in OrderItem.query.filter_by(order_id=order.id).all()
-            ]
-            out.append({**order.to_dict(), "currency": currency, "items": items})
+            out.append(
+                {
+                    **order.to_dict(),
+                    "currency": currency,
+                    "items": items_by_order.get(order.id, []),
+                }
+            )
         return jsonify({"orders": out}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

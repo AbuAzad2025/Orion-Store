@@ -71,7 +71,10 @@ def get_registry(slug: str):
     try:
         tenant = require_tenant_context()
         registry = _svc.get_by_slug(slug, tenant.id)
-        return jsonify({"registry": registry.to_dict()}), 200
+        data = registry.to_dict()
+        data.pop("customer_email", None)
+        data.pop("user_id", None)
+        return jsonify({"registry": data}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

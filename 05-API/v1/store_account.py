@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, g, jsonify, request, session
 from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
@@ -106,6 +106,7 @@ def customer_logout():
     from core.jwt_auth import revoke_current_tokens
 
     revoke_current_tokens()
+    session.clear()
     response = jsonify({"ok": True})
     unset_jwt_cookies(response)
     return response, 200

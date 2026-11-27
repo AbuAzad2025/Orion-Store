@@ -13,8 +13,8 @@
   <div class="orion-footer-grid">
     <section class="orion-footer-brand">
       <div class="orion-brand mb-4">
-        {% if tenant.logo_url %}<img src="{% if tenant.logo_url.startswith('/store/static/images/products/') %}{{ tenant.logo_url }}{% if '?' in tenant.logo_url %}&{% else %}?{% endif %}store={{ store_token }}{% else %}{{ tenant.logo_url }}{% endif %}" alt="{{ tenant.name }}" class="orion-brand-logo">{% else %}<span class="orion-brand-mark" aria-hidden="true">{{ tenant.name[:1]|upper }}</span>{% endif %}
-        <span class="orion-brand-name">{{ tenant.name }}</span>
+        {% if tenant.logo_url %}<img src="{% if tenant.logo_url.startswith('/store/static/images/products/') %}{{ tenant.logo_url }}{% if '?' in tenant.logo_url %}&{% else %}?{% endif %}store={{ store_token }}{% else %}{{ tenant.logo_url }}{% endif %}" alt="{{ tenant.name_for(locale) }}" class="orion-brand-logo">{% else %}<span class="orion-brand-mark" aria-hidden="true">{{ tenant.name_for(locale)[:1]|upper }}</span>{% endif %}
+        <span class="orion-brand-name">{{ tenant.name_for(locale) }}</span>
       </div>
       <p class="orion-footer-about">{{ t('footer_about') }}</p>
       {% if wa_footer %}
@@ -57,7 +57,7 @@
 
   <div class="orion-footer-bottom">
     <div class="orion-footer-bottom-inner">
-      <p>© {{ tenant.name }} — {{ t('all_rights') }}</p>
+      <p>© {{ tenant.name_for(locale) }} — {{ t('all_rights') }}</p>
       <p class="orion-fx-note">
         {% if fx_rate_info %}
           {{ t('fx_rate') }} {{ fx_rate_info.pair }}: {{ fx_rate_info.rate }}

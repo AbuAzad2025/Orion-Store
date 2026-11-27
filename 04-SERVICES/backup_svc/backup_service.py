@@ -36,11 +36,17 @@ class BackupService:
         if not SLUG_RE.fullmatch(slug or ""):
             raise BackupError("Invalid store slug.")
         self._run("backup-store", slug)
-        return self.list_store(slug)[0]
+        rows = self.list_store(slug)
+        if not rows:
+            raise BackupError("Backup completed but no archive was found.")
+        return rows[0]
 
     def create_platform(self) -> dict:
         self._run("backup-platform")
-        return self.list_platform()[0]
+        rows = self.list_platform()
+        if not rows:
+            raise BackupError("Backup completed but no archive was found.")
+        return rows[0]
 
     def list_store(self, slug: str) -> list[dict]:
         if not SLUG_RE.fullmatch(slug or ""):

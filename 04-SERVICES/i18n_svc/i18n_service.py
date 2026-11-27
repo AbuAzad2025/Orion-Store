@@ -14,14 +14,24 @@ class I18nService:
     FALLBACK_CHAIN = ("ar", "en")
 
     def ensure_locales_seeded(self) -> None:
+        if getattr(g, "_locales_seeded", False):
+            return
         defaults = [
             ("ar", "العربية", "rtl"),
             ("en", "English", "ltr"),
             ("he", "עברית", "rtl"),
             ("fr", "Français", "ltr"),
         ]
+        codes = [code for code, _, _ in defaults]
+        existing = {
+            code
+            for (code,) in db.session.query(Locale.code)
+            .filter(Locale.code.in_(codes))
+            .all()
+        }
+        added = False
         for code, name, direction in defaults:
-            if Locale.query.filter_by(code=code).first():
+            if code in existing:
                 continue
             db.session.add(
                 Locale(
@@ -31,7 +41,10 @@ class I18nService:
                     is_active=code in ("ar", "en"),
                 )
             )
-        db.session.commit()
+            added = True
+        if added:
+            db.session.commit()
+        g._locales_seeded = True
 
     def list_active_locales(self) -> list[Locale]:
         self.ensure_locales_seeded()

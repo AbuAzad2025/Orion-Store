@@ -138,11 +138,12 @@ const OrionAdminProducts = {
     };
   },
 
-  init() {
+  async init() {
     const form = document.getElementById("product-form");
     if (!form) return;
-    this.loadCategories();
-    this.loadBrands();
+    // Lookup options must exist before Edit can preselect category/brand.
+    await this.loadCategories();
+    await this.loadBrands();
     this.loadProducts();
 
     form.addEventListener("submit", async (event) => {
