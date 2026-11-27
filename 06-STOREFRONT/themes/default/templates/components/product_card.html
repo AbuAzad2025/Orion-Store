@@ -31,7 +31,7 @@
        title="{{ t('share') }} {{ p_name }}" aria-label="{{ t('share') }} {{ p_name }}"><svg class="sf-icon" aria-hidden="true"><use href="#sf-i-share"/></svg><span class="sf-label">{{ t('share') }}</span></a>
     {% set wa_order = whatsapp_url(tenant.phone, product_order_text(p_name, money(p_price))) %}
     {% if wa_order %}
-    <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-btn" title="{{ t('order_whatsapp') }} {{ p_name }}" aria-label="{{ t('order_whatsapp') }} {{ p_name }}"><svg class="sf-icon sf-icon-wa" aria-hidden="true"><use href="#sf-i-whatsapp"/></svg><span class="sf-label">{{ t('whatsapp') }}</span></a>
+    <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-btn" data-wa-product="{{ product.id }}" data-wa-qty="1" title="{{ t('order_whatsapp') }} {{ p_name }}" aria-label="{{ t('order_whatsapp') }} {{ p_name }}"><svg class="sf-icon sf-icon-wa" aria-hidden="true"><use href="#sf-i-whatsapp"/></svg><span class="sf-label">{{ t('whatsapp') }}</span></a>
     {% endif %}
   </div>
 </article>

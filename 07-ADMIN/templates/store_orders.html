@@ -1,0 +1,28 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">{{ t('طلبات واتساب', 'WhatsApp orders') }}</h2>
+    <p class="orion-muted text-sm">{{ t('تظهر هنا الطلبات التي يرسلها الزبون عبر واتساب. أكّد الطلب فقط بعد استلام الدفع فعلياً.', 'Orders sent through WhatsApp appear here. Confirm only after receiving real payment.') }}</p>
+    <p class="orion-muted text-sm mt-1">{{ t('تُلغى الطلبات غير المؤكدة تلقائياً بعد أسبوعين.', 'Unconfirmed orders are auto-cancelled after two weeks.') }}</p>
+    <div class="overflow-x-auto mt-4">
+      <table class="orion-table w-full text-sm">
+        <thead><tr>
+          <th class="p-2 text-start">{{ t('الطلب', 'Order') }}</th>
+          <th class="p-2 text-start">{{ t('الزبون', 'Customer') }}</th>
+          <th class="p-2 text-start">{{ t('المنتجات', 'Items') }}</th>
+          <th class="p-2 text-start">{{ t('الإجمالي', 'Total') }}</th>
+          <th class="p-2 text-start">{{ t('الحالة', 'Status') }}</th>
+          <th class="p-2 text-start">{{ t('إجراء', 'Action') }}</th>
+        </tr></thead>
+        <tbody id="manual-orders-list"><tr><td colspan="6" class="p-3 orion-muted">{{ t('جارٍ التحميل…', 'Loading…') }}</td></tr></tbody>
+      </table>
+    </div>
+    <p id="manual-orders-msg" class="orion-muted text-sm mt-2" role="status" aria-live="polite"></p>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_store_orders.js') }}?v={{ asset_version }}"></script>
+<script nonce="{{ csp_nonce }}">OrionStoreOrders.init();</script>
+{% endblock %}

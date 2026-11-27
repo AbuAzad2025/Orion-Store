@@ -38,6 +38,12 @@ const StoreAPI = {
   whatsappMessage(token, payload) {
     return this.request("POST", `/cart/${token}/whatsapp-message`, payload || {});
   },
+  whatsappOrder(token, payload) {
+    return this.request("POST", `/cart/${token}/whatsapp-order`, payload || {});
+  },
+  productWhatsappOrder(productId, payload) {
+    return this.request("POST", `/product/${productId}/whatsapp-order`, payload || {});
+  },
   checkout(cartToken, customerEmail, shippingAddress, extras) {
     const body = {
       cart_token: cartToken,

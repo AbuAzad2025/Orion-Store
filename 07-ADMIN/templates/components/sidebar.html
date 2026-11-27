@@ -18,7 +18,7 @@
   'metafields': 'marketing', 'documents': 'marketing', 'import_export': 'settings',
   'app_platform': 'settings', 'feature_flags': 'settings', 'fraud': 'settings',
   'compliance': 'settings', 'workflows': 'settings', 'accessibility': 'settings',
-  'dropship': 'settings', 'ui_kit': 'tools'
+  'dropship': 'settings', 'ui_kit': 'tools', 'manual_orders': 'orders'
 } %}
 {% macro nav_link(href, label, key) %}
 <a href="{{ href }}" class="orion-nav-link{% if active_nav == key %} is-active{% endif %}"{% if active_nav == key %} aria-current="page"{% endif %}>{{ label }}</a>
@@ -54,6 +54,7 @@
           {{ nav_link('/admin/store/returns', t('المرتجعات', 'Returns'), 'returns') }}
           {{ nav_link('/admin/store/bopis', t('الاستلام من المتجر', 'Store pickup'), 'bopis') }}
           {{ nav_link('/admin/store/oms', t('المستودعات والتنفيذ', 'Warehouses & fulfillment'), 'oms') }}
+          {{ nav_link('/admin/store/orders', t('طلبات واتساب', 'WhatsApp orders'), 'manual_orders') }}
           {{ nav_link('/admin/store/store-credit', t('رصيد المتجر', 'Store credit'), 'store_credit') }}
           {{ nav_link('/admin/store/b2b', t('B2B — الجملة', 'B2B — Wholesale'), 'b2b') }}
           {{ nav_link('/admin/store/bundles', t('الحزم', 'Bundles'), 'bundles') }}

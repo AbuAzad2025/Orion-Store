@@ -23,6 +23,10 @@ def init_celery(app) -> Celery:
                 "task": "orion.reconciliation.run_nightly",
                 "schedule": 86400.0,  # seconds — once per day
             },
+            "expire-whatsapp-orders-daily": {
+                "task": "orion.expire_whatsapp_orders",
+                "schedule": 86400.0,  # seconds — once per day
+            },
         },
     )
 
@@ -39,6 +43,7 @@ def init_celery(app) -> Celery:
 
     celery_app.Task = ContextTask
     import notification_svc.tasks  # noqa: F401
+    import order_svc.tasks  # noqa: F401
 
     app.extensions["celery"] = celery_app
     return celery_app

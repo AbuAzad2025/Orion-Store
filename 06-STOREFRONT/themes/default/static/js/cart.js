@@ -65,13 +65,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     waBtn.disabled = true;
     try {
-      const result = await StoreAPI.whatsappMessage(token, {
+      const result = await StoreAPI.whatsappOrder(token, {
         customer_name: document.getElementById("wa-customer-name")?.value || "",
         notes: document.getElementById("wa-notes")?.value || "",
       });
       if (!result.url) throw new Error(tr("رقم واتساب غير مُضبط لهذا المتجر.", "No WhatsApp number is configured for this store."));
       window.open(result.url, "_blank", "noopener,noreferrer");
-      if (waMsg) waMsg.textContent = tr("تم تجهيز الطلب — أكمل الإرسال في واتساب.", "Order prepared — finish sending it in WhatsApp.");
+      if (waMsg) waMsg.textContent = tr("تم تسجيل الطلب — أكمل الإرسال في واتساب وسيتم تأكيده من المتجر.", "Order recorded — finish sending in WhatsApp; the store will confirm it.");
     } catch (err) {
       if (waMsg) waMsg.textContent = err.message;
     } finally {

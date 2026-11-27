@@ -50,6 +50,7 @@ from v1.subscriptions import subscriptions_bp
 from v1.tax_api import tax_bp
 from v1.tenant_portal import tenant_portal_bp
 from v1.tenant_reports import tenant_reports_bp
+from v1.tenant_orders import tenant_orders_bp
 from v1.tenant_tax_config import tenant_tax_config_bp
 from v1.tenants import tenant_bp
 from v1.users import users_bp
@@ -88,6 +89,7 @@ API_BLUEPRINTS: list[Blueprint] = [
     oms_bp,
     tenant_portal_bp,
     tenant_reports_bp,
+    tenant_orders_bp,
     tenant_tax_config_bp,
     platform_bp,
     webhooks_bp,
@@ -141,6 +143,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(oms_bp, url_prefix="/api/v1/oms")
     app.register_blueprint(tenant_portal_bp, url_prefix="/api/v1/tenant")
     app.register_blueprint(tenant_reports_bp, url_prefix="/api/v1/tenant")
+    app.register_blueprint(tenant_orders_bp, url_prefix="/api/v1/tenant")
     app.register_blueprint(tenant_tax_config_bp, url_prefix="/api/v1/tenant")
     register_platform_store_routes(platform_bp)
     register_platform_reconciliation_routes(platform_bp)
@@ -186,6 +189,7 @@ def register_ui_blueprints(app: Flask) -> None:
     from platform_admin.routes import platform_admin_bp
     from tenant_admin.routes import tenant_admin_bp
     from tenant_admin.reports_routes import tenant_reports_ui_bp
+    from tenant_admin.orders_routes import tenant_manual_orders_ui_bp
 
     app.register_blueprint(admin_assets_bp)
     # Registered before the catch-all storefront so "/" on the platform domain
@@ -194,6 +198,7 @@ def register_ui_blueprints(app: Flask) -> None:
     app.register_blueprint(admin_auth_bp, url_prefix="/admin")
     app.register_blueprint(tenant_admin_bp, url_prefix="/admin/store")
     app.register_blueprint(tenant_reports_ui_bp, url_prefix="/admin/store")
+    app.register_blueprint(tenant_manual_orders_ui_bp, url_prefix="/admin/store")
     app.register_blueprint(platform_admin_bp, url_prefix="/admin/platform")
     # Specific image route must precede the static catch-all.
     app.register_blueprint(store_image_serving_bp)
