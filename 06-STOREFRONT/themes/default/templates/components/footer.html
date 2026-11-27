@@ -7,7 +7,7 @@
     {% set policy.terms = p %}
   {% endif %}
 {% endfor %}
-{% set wa_footer = whatsapp_url(tenant.phone, t('order_request') ~ tenant.name) %}
+{% set wa_footer = whatsapp_url(tenant.phone, store_inquiry_text()) %}
 
 <footer class="orion-footer">
   <div class="orion-footer-grid">

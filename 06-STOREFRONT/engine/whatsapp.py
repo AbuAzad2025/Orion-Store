@@ -1,4 +1,9 @@
-"""WhatsApp deep-link helpers (no paid API, no external SDK)."""
+"""WhatsApp deep-link helpers (no paid API, no external SDK).
+
+All generated messages use real store/customer data and explicit Unicode
+bidirectional marks so Arabic (RTL) and English (LTR) render correctly next to
+numbers, prices and email addresses.
+"""
 
 from __future__ import annotations
 
@@ -6,6 +11,12 @@ import re
 from urllib.parse import quote
 
 from core.i18n_messages import localize, request_locale
+
+RLM = "\u200f"  # right-to-left mark
+LRM = "\u200e"  # left-to-right mark
+FSI = "\u2068"  # first strong isolate (LTR content inside RTL text)
+PDI = "\u2069"  # pop directional isolate
+RLI = "\u2067"  # right-to-left isolate (RTL content inside LTR text)
 
 
 def normalize_phone(value: str | None) -> str:
@@ -26,6 +37,29 @@ def whatsapp_url(phone: str | None, text: str = "") -> str:
     return url
 
 
+def _is_rtl(locale: str | None) -> bool:
+    return str(locale or "ar").lower().startswith(("ar", "he", "fa", "ur"))
+
+
+def _bidi(value, rtl: bool) -> str:
+    """Isolate a value so mixed Arabic/Latin text keeps its correct direction."""
+    text = str(value or "")
+    if not text:
+        return ""
+    has_arabic = any("\u0600" <= char <= "\u06ff" for char in text)
+    if rtl:
+        if has_arabic:
+            return RLM + text + RLM
+        return FSI + text + PDI
+    if has_arabic:
+        return RLI + text + PDI
+    return text
+
+
+def _wrap(text: str, rtl: bool) -> str:
+    return (RLM if rtl else LRM) + text
+
+
 def format_cart_order(
     store_name: str,
     items: list[dict],
@@ -36,11 +70,15 @@ def format_cart_order(
 ) -> str:
     """Build a tidy, locale-aware order message from server-side cart data."""
     chosen = locale or request_locale()
+    rtl = _is_rtl(chosen)
 
     def tr(arabic: str, english: str) -> str:
         return localize(arabic, english, chosen)
 
-    lines = [f"{tr('طلب جديد', 'New order')} — {store_name}", "────────────────"]
+    lines = [
+        f"{tr('طلب جديد', 'New order')} — {_bidi(store_name, rtl)}",
+        "────────────────",
+    ]
     for index, item in enumerate(items, start=1):
         name = str(
             item.get("product_name") or item.get("product_id") or tr("منتج", "Product")
@@ -48,20 +86,20 @@ def format_cart_order(
         quantity = item.get("quantity", 1)
         unit = item.get("unit_price", "0")
         total = item.get("total_price", "0")
-        lines.append(f"{index}) {name}")
-        lines.append(f"   {quantity} × {unit} = {total} ₪")
+        lines.append(f"{index}) {_bidi(name, rtl)}")
+        lines.append(f"   {_bidi(f'{quantity} × {unit} = {total} ₪', rtl)}")
     lines.append("────────────────")
-    lines.append(f"{tr('الإجمالي', 'Total')}: {subtotal} ₪")
+    lines.append(f"{tr('الإجمالي', 'Total')}: {_bidi(f'{subtotal} ₪', rtl)}")
     if customer_name.strip():
-        lines.append(f"{tr('الاسم', 'Name')}: {customer_name.strip()}")
+        lines.append(f"{tr('الاسم', 'Name')}: {_bidi(customer_name.strip(), rtl)}")
     if notes.strip():
-        lines.append(f"{tr('ملاحظات', 'Notes')}: {notes.strip()}")
+        lines.append(f"{tr('ملاحظات', 'Notes')}: {_bidi(notes.strip(), rtl)}")
     lines.append("────────────────")
     lines.append(tr("أُرسل عبر متجر Azadexa", "Sent via Azadexa store"))
-    return "\n".join(lines)
+    return _wrap("\n".join(lines), rtl)
 
 
-def _customer_lines(customer, tr) -> list[str]:
+def _customer_lines(customer, tr, rtl: bool) -> list[str]:
     """Append signed-in customer details when available."""
     if not customer:
         return []
@@ -79,11 +117,11 @@ def _customer_lines(customer, tr) -> list[str]:
     lines = [
         "",
         f"\U0001f464 {tr('بيانات العميل', 'Customer details')}",
-        f"{tr('الاسم', 'Name')}: {name}",
+        f"{tr('الاسم', 'Name')}: {_bidi(name, rtl)}",
     ]
     email = str(getattr(customer, "email", "") or "").strip()
     if email:
-        lines.append(f"{tr('البريد الإلكتروني', 'Email')}: {email}")
+        lines.append(f"{tr('البريد الإلكتروني', 'Email')}: {_bidi(email, rtl)}")
     return lines
 
 
@@ -98,19 +136,20 @@ def format_product_order(
 ) -> str:
     """Professional, ready-to-send WhatsApp order message for one product."""
     chosen = locale or request_locale()
+    rtl = _is_rtl(chosen)
 
     def tr(arabic: str, english: str) -> str:
         return localize(arabic, english, chosen)
 
     lines = [
-        f"\U0001f6cd️ {tr('طلب جديد من', 'New order from')} {store_name}",
+        f"\U0001f6cd️ {tr('طلب جديد من', 'New order from')} {_bidi(store_name, rtl)}",
         "────────────────",
-        f"\U0001f6d2 {tr('المنتج', 'Product')}: {product_name}",
-        f"\U0001f4b0 {tr('السعر', 'Price')}: {price} {currency}",
-        f"\U0001f501 {tr('الكمية', 'Quantity')}: {quantity}",
+        f"\U0001f6d2 {tr('المنتج', 'Product')}: {_bidi(product_name, rtl)}",
+        f"\U0001f4b0 {tr('السعر', 'Price')}: {_bidi(f'{price} {currency}', rtl)}",
+        f"\U0001f501 {tr('الكمية', 'Quantity')}: {_bidi(quantity, rtl)}",
         "────────────────",
     ]
-    lines.extend(_customer_lines(customer, tr))
+    lines.extend(_customer_lines(customer, tr, rtl))
     lines.extend(
         [
             "",
@@ -121,7 +160,7 @@ def format_product_order(
             ),
         ]
     )
-    return "\n".join(lines)
+    return _wrap("\n".join(lines), rtl)
 
 
 def format_bundle_order(
@@ -141,3 +180,31 @@ def format_bundle_order(
         localize("\U0001f6d2 المنتج", "\U0001f6d2 Product", chosen),
         localize("\U0001f381 الحزمة", "\U0001f381 Bundle", chosen),
     )
+
+
+def format_store_inquiry(
+    store_name: str, customer=None, locale: str | None = None
+) -> str:
+    """Professional general store inquiry used in header/footer buttons."""
+    chosen = locale or request_locale()
+    rtl = _is_rtl(chosen)
+
+    def tr(arabic: str, english: str) -> str:
+        return localize(arabic, english, chosen)
+
+    lines = [
+        f"\U0001f6cd️ {tr('مرحباً', 'Hello')} {_bidi(store_name, rtl)} \U0001f44b",
+        tr(
+            "أود الاستفسار عن منتجاتكم وتفاصيل الطلب والتوصيل.",
+            "I would like to inquire about your products, ordering and delivery.",
+        ),
+        "────────────────",
+    ]
+    lines.extend(_customer_lines(customer, tr, rtl))
+    lines.extend(
+        [
+            "",
+            tr("شكراً لوقتكم 🌿", "Thank you for your time 🌿"),
+        ]
+    )
+    return _wrap("\n".join(lines), rtl)

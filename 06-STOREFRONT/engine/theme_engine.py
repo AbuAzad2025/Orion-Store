@@ -91,7 +91,11 @@ class ThemeEngine:
         # Professional WhatsApp order text with signed-in customer details.
         from flask import g
 
-        from engine.whatsapp import format_bundle_order, format_product_order
+        from engine.whatsapp import (
+            format_bundle_order,
+            format_product_order,
+            format_store_inquiry,
+        )
 
         order_customer = getattr(g, "user", None) if has_request_context() else None
         order_store = tenant.name_for(locale) if tenant is not None else ""
@@ -100,6 +104,9 @@ class ThemeEngine:
         )
         context["bundle_order_text"] = lambda name, price: format_bundle_order(
             order_store, name, price, context["currency"], order_customer, locale
+        )
+        context["store_inquiry_text"] = lambda: format_store_inquiry(
+            order_store, order_customer, locale
         )
         from urllib.parse import urlencode
 

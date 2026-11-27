@@ -73,7 +73,7 @@
 
       <a href="/s/{{ tenant.slug }}/login" class="orion-nav-login"
          aria-label="{{ t('sign_in') }}" {% if request.path.startswith('/login') %}aria-current="page"{% endif %}>{{ t('sign_in') }}</a>
-      {% set wa_link = whatsapp_url(tenant.phone, t('order_request') ~ tenant.name_for(locale)) %}
+      {% set wa_link = whatsapp_url(tenant.phone, store_inquiry_text()) %}
       {% if wa_link %}
       <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-nav-wa"
          aria-label="{{ t('whatsapp') }}"><span aria-hidden="true">💬</span> {{ t('whatsapp') }}</a>
