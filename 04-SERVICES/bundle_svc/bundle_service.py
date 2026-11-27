@@ -20,6 +20,7 @@ class BundleService:
         bundle_price: str | Decimal,
         description: str | None = None,
         image_url: str | None = None,
+        max_per_order: int | None = None,
         is_published: bool = False,
     ) -> ProductBundle:
         b = ProductBundle(
@@ -30,6 +31,7 @@ class BundleService:
             description=description,
             image_url=image_url,
             bundle_price=Decimal(str(bundle_price)),
+            max_per_order=max_per_order,
             is_published=bool(is_published),
         )
         db.session.add(b)

@@ -8,6 +8,7 @@ from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
 from order.order import Order, OrderItem
 from order_svc.whatsapp_order_service import WhatsAppOrderService
+from orion.extensions import db
 
 tenant_orders_bp = Blueprint("tenant_orders", __name__)
 _service = WhatsAppOrderService()
@@ -18,6 +19,8 @@ def list_manual_orders():
     try:
         require_tenant_admin()
         _service.expire_stale()
+        from tenant.tenant import Tenant
+
         rows = (
             Order.query.filter_by(
                 tenant_id=g.tenant_id, shipping_method_code="whatsapp"
@@ -26,13 +29,15 @@ def list_manual_orders():
             .limit(100)
             .all()
         )
+        tenant = db.session.get(Tenant, g.tenant_id)
+        currency = (tenant.default_currency if tenant else None) or "ILS"
         out = []
         for order in rows:
             items = [
                 item.to_dict()
                 for item in OrderItem.query.filter_by(order_id=order.id).all()
             ]
-            out.append({**order.to_dict(), "items": items})
+            out.append({**order.to_dict(), "currency": currency, "items": items})
         return jsonify({"orders": out}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

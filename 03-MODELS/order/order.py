@@ -82,6 +82,8 @@ class Order(db.Model, TimestampMixin, VersionMixin):
             "shipping_method_code": self.shipping_method_code,
             "total": str(self.total),
             "customer_email": self.customer_email,
+            "customer_first_name": self.customer_first_name,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
             "user_id": self.user_id,
             "is_guest": self.is_guest,
         }

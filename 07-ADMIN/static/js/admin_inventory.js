@@ -31,6 +31,20 @@ const OrionAdminInventory = {
     }
   },
 
+  async loadWarehouses() {
+    const select = document.getElementById("inventory-warehouse");
+    if (!select) return;
+    try {
+      const data = await OrionAPI.get("/oms/warehouses");
+      SafeDOM.clear(select);
+      select.appendChild(SafeDOM.elem("option", { value: "" }, [OrionI18n.t("اختر مستودعاً…", "Choose a warehouse…")]));
+      (data.warehouses || []).forEach((w) =>
+        select.appendChild(SafeDOM.elem("option", { value: w.id }, [w.name]))
+      );
+    } catch (err) { /* keep the placeholder */ }
+    this.load();
+  },
+
   async loadProducts() {
     const select = document.getElementById("inventory-product");
     if (!select) return;
@@ -64,7 +78,6 @@ const OrionAdminInventory = {
     }
     document.getElementById("inventory-warehouse")?.addEventListener("change", () => this.load());
     this.loadProducts();
-    // Wait for OMS warehouse options to be populated by tenant_ops.js.
-    setTimeout(() => this.load(), 600);
+    this.loadWarehouses();
   },
 };

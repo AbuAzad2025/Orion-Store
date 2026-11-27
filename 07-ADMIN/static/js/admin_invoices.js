@@ -15,8 +15,8 @@ const OrionAdminInvoices = {
         return;
       }
       rows.forEach((invoice) => {
-        const pdf = invoice.order_public_id
-          ? `/api/v1/store/orders/${invoice.order_public_id}/invoice.pdf`
+        const pdf = invoice.public_id
+          ? `/api/v1/tenant/invoices/${invoice.public_id}/pdf`
           : "#";
         target.appendChild(SafeDOM.elem("tr", null, [
           SafeDOM.elem("td", { className: "p-2" }, [invoice.invoice_number]),

@@ -32,6 +32,9 @@ def create_bundle():
             bundle_price=data["bundle_price"],
             description=data.get("description"),
             image_url=data.get("image_url"),
+            max_per_order=(
+                int(data["max_per_order"]) if data.get("max_per_order") else None
+            ),
             is_published=bool(data.get("is_published", False)),
         )
         return jsonify({"bundle": bundle.to_dict()}), 201
@@ -55,6 +58,7 @@ def update_bundle(bundle_id: int):
         data = request.get_json(silent=True) or {}
         for field in (
             "name",
+            "name_en",
             "slug",
             "description",
             "image_url",

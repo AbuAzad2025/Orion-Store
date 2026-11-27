@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, Response, g, jsonify, request
 
-from core.exceptions import OrionError, ValidationError
+from core.exceptions import NotFoundError, OrionError, ValidationError
 from core.middleware import require_tenant_admin
 from order.order import Order
 from order_svc.sales_report_service import SalesReportService
@@ -55,5 +56,39 @@ def tenant_invoices():
                 }
             )
         return jsonify({"invoices": items}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_reports_bp.get("/invoices/<public_id>/pdf")
+def tenant_invoice_pdf(public_id: str):
+    """Stream an invoice PDF using the admin session (no storefront token)."""
+    try:
+        from platform_svc.pdf_service import get_invoice_storage
+
+        require_tenant_admin()
+        try:
+            public_id = uuid.UUID(str(public_id))
+        except ValueError as exc:
+            raise NotFoundError("Invoice not found.") from exc
+        invoice = Invoice.query.filter_by(
+            public_id=public_id, tenant_id=g.tenant_id
+        ).first()
+        if invoice is None:
+            raise NotFoundError("Invoice not found.")
+        key = invoice.storage_key or invoice.pdf_artifact_path
+        if not key:
+            raise NotFoundError("Invoice PDF not found.")
+        try:
+            pdf = get_invoice_storage().get(key)
+        except (KeyError, ValueError) as exc:
+            raise NotFoundError("Invoice PDF not found.") from exc
+        return Response(
+            pdf,
+            mimetype="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{invoice.invoice_number}.pdf"'
+            },
+        )
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
