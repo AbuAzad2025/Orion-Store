@@ -35,6 +35,21 @@
       <span><span aria-hidden="true">&#10003;</span> {{ t('trust_shipping') }}</span>
       <span><span aria-hidden="true">&#10003;</span> {{ t('trust_returns') }}</span>
     </div>
+    {% set share_url = request.host_url.rstrip('/') ~ '/s/' ~ tenant.slug ~ '/product/' ~ product.slug %}
+    <div class="orion-card p-4 orion-share-box">
+      <p class="orion-stat-label">{{ t('share_product') }}</p>
+      <div class="orion-cta-row mt-2">
+        <a href="https://wa.me/?text={{ (p_name ~ ' — ' ~ share_url)|urlencode }}"
+           target="_blank" rel="noopener" class="orion-btn orion-btn-ghost"
+           aria-label="{{ t('share_whatsapp') }} {{ p_name }}">{{ t('share_whatsapp') }}</a>
+        <button type="button" class="orion-btn orion-btn-ghost"
+                data-copy-share="{{ share_url }}"
+                data-copied-text="{{ t('copied') }}"
+                data-failed-text="{{ t('copy_failed') }}"
+                aria-label="{{ t('copy_link') }} {{ p_name }}">{{ t('copy_link') }}</button>
+      </div>
+      <p class="orion-muted text-xs" data-share-msg role="status" aria-live="polite"></p>
+    </div>
     {% set wa_order = whatsapp_url(tenant.phone, t('order_request') ~ p_name ~ ' - ' ~ money(p_price) ~ ' ' ~ currency) %}
     {% if wa_order %}
     <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-block"
