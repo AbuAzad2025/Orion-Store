@@ -141,7 +141,49 @@ class WhatsAppOrderService:
         order.payment_status = "paid"
         order.fulfillment_status = "unfulfilled"
         _commit_keep_loaded()
+        self._record_payment_and_invoice(order)
         return order
+
+    def _record_payment_and_invoice(self, order: Order) -> None:
+        """Book the manual payment through the same pipeline as gateway payments."""
+        from core.events import publish
+        from payment.payment import Payment
+        from platform_svc.commission_service import CommissionService
+        from platform_svc.document_renderer import DocumentRenderer
+        from platform_svc.financial_events_service import FinancialEventsService
+        from tenant.tenant import Tenant
+
+        tenant = db.session.get(Tenant, order.tenant_id)
+        currency = (tenant.default_currency if tenant else None) or "ILS"
+        payment = Payment(
+            tenant_id=order.tenant_id,
+            order_id=order.id,
+            amount=order.total,
+            currency=currency,
+            payment_method="manual",
+            payment_provider="whatsapp",
+            status="succeeded",
+            provider_payment_id=order.order_number,
+        )
+        db.session.add(payment)
+        db.session.flush()
+        event = FinancialEventsService().record_inbound(
+            tenant_id=order.tenant_id,
+            amount=order.total,
+            event_type="order.payment.whatsapp",
+            source_entity="payment",
+            source_id=payment.id,
+            currency=currency,
+            description=f"Manual WhatsApp payment for {order.order_number}",
+        )
+        payment.financial_event_id = event.id
+        CommissionService().apply_from_event(
+            event, payment_id=payment.id, order_id=order.id
+        )
+        DocumentRenderer().generate_invoice(
+            order=order, payment=payment, financial_event=event
+        )
+        publish("order.paid", order_id=order.id, tenant_id=order.tenant_id)
 
     def cancel(self, tenant_id: int, public_id: str) -> Order:
         order = self._get(tenant_id, public_id)
