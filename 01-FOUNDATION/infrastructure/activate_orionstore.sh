@@ -11,6 +11,16 @@ if [ -z "$REL" ] || [ ! -d "$TARGET" ]; then
   echo "Usage: $0 <existing-release-name>"; exit 1
 fi
 
+# Non-root runtime setup (idempotent) — the service user owns only data dirs.
+id orion >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin orion
+chown -R orion:orion "$ROOT/shared/product-images" 2>/dev/null || true
+chown orion:orion "$ROOT/shared/run" "$ROOT/shared/uploads" \
+      "$ROOT/shared/invoices" "$ROOT/shared/logs" "$ROOT/shared/db" 2>/dev/null || true
+if [ -f "$ROOT/shared/.env" ]; then
+  chgrp orion "$ROOT/shared/.env" 2>/dev/null || true
+  chmod 640 "$ROOT/shared/.env" 2>/dev/null || true
+fi
+
 set -a
 [ -f "$ROOT/shared/.env" ] && . "$ROOT/shared/.env"
 set +a
