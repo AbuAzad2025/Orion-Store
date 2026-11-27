@@ -31,7 +31,7 @@ for part in (
 
 ASSETS = pathlib.Path(
     os.environ.get("PRODUCT_IMAGES_DIR")
-    or (ROOT.parent / "orion-data" / "product-images")
+    or (ROOT / ".local" / "data" / "product-images")
 ).resolve()
 TENANTS = ["outlet", "gulf", "euro", "atlantic", "sterling"]
 

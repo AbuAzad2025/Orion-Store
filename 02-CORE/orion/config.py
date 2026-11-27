@@ -43,16 +43,16 @@ class Config:
         os.environ.get("MAX_IMAGE_BYTES_PER_TENANT", str(200 * 1024 * 1024))
     )
     # Product images live outside the application source tree so they survive
-    # release swaps. Always normalise to an absolute path so every consumer
-    # resolves the same directory (a relative value is anchored to the repo's
-    # parent, never to the process CWD).
-    _DATA_PARENT = Path(__file__).resolve().parents[3]
+    # release swaps. Locally it lives inside the project under the gitignored
+    # .local/ tree; servers override it with PRODUCT_IMAGES_DIR. Always
+    # normalise to an absolute path so every consumer resolves the same folder.
+    _PROJECT_ROOT = Path(__file__).resolve().parents[2]
     _IMAGES_CONFIGURED = Path(
         os.environ.get("PRODUCT_IMAGES_DIR")
-        or (_DATA_PARENT / "orion-data" / "product-images")
+        or (_PROJECT_ROOT / ".local" / "data" / "product-images")
     ).expanduser()
     if not _IMAGES_CONFIGURED.is_absolute():
-        _IMAGES_CONFIGURED = _DATA_PARENT / _IMAGES_CONFIGURED
+        _IMAGES_CONFIGURED = _PROJECT_ROOT / _IMAGES_CONFIGURED
     PRODUCT_IMAGES_DIR = str(_IMAGES_CONFIGURED.resolve())
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-change-me")
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", SECRET_KEY)
