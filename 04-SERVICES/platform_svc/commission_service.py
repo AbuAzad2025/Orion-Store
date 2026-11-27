@@ -46,7 +46,6 @@ class CommissionService:
         event.commission_ledger_id = entry.id
         if commit:
             db.session.commit()
-        db.session.commit()
         return entry
 
     def reverse(self, event: FinancialEvent) -> PlatformCommissionLedger | None:

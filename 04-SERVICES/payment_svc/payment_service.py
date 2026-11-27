@@ -127,14 +127,18 @@ class PaymentService:
         if refund_amount > Decimal(str(payment.amount)):
             raise ValidationError("Refund amount exceeds payment amount.")
 
-        # A payment with an active (completed or pending) refund must never be
-        # sent to the provider a second time. This is the double-refund guard.
-        prior = (
-            Refund.query.filter_by(payment_id=payment.id)
-            .filter(Refund.status.in_(("pending", "completed")))
-            .first()
+        # Cumulative guard: several partial refunds are legitimate as long as
+        # their sum never exceeds the captured amount.
+        prior_total = sum(
+            (
+                Decimal(str(r.amount))
+                for r in Refund.query.filter_by(payment_id=payment.id)
+                .filter(Refund.status.in_(("pending", "completed")))
+                .all()
+            ),
+            Decimal("0"),
         )
-        if prior is not None:
+        if prior_total + refund_amount > Decimal(str(payment.amount)):
             raise ConflictError("Payment already refunded.")
 
         result = self._refund_external_gateway(tenant_id, payment, refund_amount)
@@ -292,7 +296,10 @@ class PaymentService:
         provider = payment.payment_provider
         # Manual/offline payments have no gateway to call back — the merchant
         # already returned the money. Book the refund locally with a stable id.
-        if provider in ("cod", "manual", "whatsapp") or payment.payment_method == "manual":
+        if (
+            provider in ("cod", "manual", "whatsapp")
+            or payment.payment_method == "manual"
+        ):
             return {
                 "success": True,
                 "provider_refund_id": f"manual_refund_{payment.id}",

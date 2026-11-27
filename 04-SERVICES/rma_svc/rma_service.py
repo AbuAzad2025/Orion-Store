@@ -180,9 +180,15 @@ class RmaService:
             if payment:
                 from payment_svc.payment_service import PaymentService
 
+                from decimal import Decimal
+
+                amount = Decimal(str(row.refund_amount))
+                if amount <= 0 or amount > Decimal(str(payment.amount)):
+                    raise ValueError("Invalid RMA refund amount.")
                 refund_result = PaymentService().refund(
                     tenant_id=tenant_id,
                     payment_public_id=str(payment.public_id),
+                    amount=amount,
                     reason=f"RMA {row.return_number}",
                 )
 

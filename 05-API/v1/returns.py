@@ -61,14 +61,7 @@ def create_return():
         )
         if not (_is_order_owner(order) or _verify_order_token(capability, order)):
             return jsonify({"error": "Order not found."}), 404
-        if (
-            order.user_id is not None
-            and current_user_id is not None
-            and order.user_id != current_user_id
-            and not g.is_platform_admin
-            and not (g.user and g.user.is_admin)
-        ):
-            return jsonify({"error": "Order not found."}), 404
+        current_user_id = g.user.id if g.user else None
         row = _rma.create_return(
             tenant_id=tenant.id,
             order_id=order.id,

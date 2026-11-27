@@ -61,6 +61,8 @@ def register_store_whatsapp_routes(bp, carts) -> None:
                 carts.cart_subtotal(cart),
                 customer_name=str(data.get("customer_name") or ""),
                 notes=str(data.get("notes") or ""),
+                currency=tenant.default_currency or "ILS",
+                total=order.total,
             )
             return (
                 jsonify(

@@ -67,10 +67,14 @@ def format_cart_order(
     customer_name: str = "",
     notes: str = "",
     locale: str | None = None,
+    currency: str = "ILS",
+    total=None,
 ) -> str:
     """Build a tidy, locale-aware order message from server-side cart data."""
     chosen = locale or request_locale()
     rtl = _is_rtl(chosen)
+    symbol = currency or "ILS"
+    grand_total = total if total is not None else subtotal
 
     def tr(arabic: str, english: str) -> str:
         return localize(arabic, english, chosen)
@@ -87,9 +91,9 @@ def format_cart_order(
         unit = item.get("unit_price", "0")
         total = item.get("total_price", "0")
         lines.append(f"{index}) {_bidi(name, rtl)}")
-        lines.append(f"   {_bidi(f'{quantity} × {unit} = {total} ₪', rtl)}")
+        lines.append(f"   {_bidi(f'{quantity} × {unit} = {total} {symbol}', rtl)}")
     lines.append("────────────────")
-    lines.append(f"{tr('الإجمالي', 'Total')}: {_bidi(f'{subtotal} ₪', rtl)}")
+    lines.append(f"{tr('الإجمالي', 'Total')}: {_bidi(f'{grand_total} {symbol}', rtl)}")
     if customer_name.strip():
         lines.append(f"{tr('الاسم', 'Name')}: {_bidi(customer_name.strip(), rtl)}")
     if notes.strip():

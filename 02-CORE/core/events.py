@@ -22,9 +22,19 @@ def unsubscribe(event_name: str, handler: EventHandler) -> None:
 
 
 def publish(event_name: str, **payload: Any) -> None:
-    """Dispatch event to all subscribers (sync — wave 0)."""
+    """Dispatch event to all subscribers, isolating handler failures.
+
+    A failing notification/workflow subscriber must never turn an already
+    committed payment into an HTTP 500; log it and continue.
+    """
+    import logging
+
+    log = logging.getLogger(__name__)
     for handler in list(_subscribers[event_name]):
-        handler(**payload)
+        try:
+            handler(**payload)
+        except Exception:
+            log.exception("Event subscriber failed for %s", event_name)
 
 
 def clear_subscribers() -> None:
