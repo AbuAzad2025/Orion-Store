@@ -27,10 +27,12 @@ def register_security_headers(app: Flask) -> None:
         # CSP_ALLOW_UNSAFE_INLINE is a legacy rollback switch only; no inline
         # scripts/styles/style attributes remain in the codebase.
         unsafe = " 'unsafe-inline'" if app.config.get("CSP_ALLOW_UNSAFE_INLINE") else ""
+        # Early 404s can skip the before_request that issues the nonce.
+        nonce_src = f" 'nonce-{nonce}'" if nonce else ""
         csp = (
             "default-src 'self'; "
-            f"script-src 'self' 'nonce-{nonce}'{unsafe}; "
-            f"style-src 'self' 'nonce-{nonce}'{unsafe}; "
+            f"script-src 'self'{nonce_src}{unsafe}; "
+            f"style-src 'self'{nonce_src}{unsafe}; "
             "img-src 'self' data: https:;"
         )
         response.headers.setdefault("Content-Security-Policy", csp)

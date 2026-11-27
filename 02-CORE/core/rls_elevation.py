@@ -26,11 +26,13 @@ def platform_read():
     )
     try:
         db.session.execute(
-            db.text("SELECT set_config('app.is_platform_admin', 'true', true)")
+            db.text("SELECT set_config('app.is_platform_admin', 'true', false)")
         )
         yield
     finally:
+        # Restore at session level (not transaction-local) so middleware's
+        # later bind of the real role is not shadowed by a stale local value.
         db.session.execute(
-            db.text("SELECT set_config('app.is_platform_admin', :v, true)"),
+            db.text("SELECT set_config('app.is_platform_admin', :v, false)"),
             {"v": previous},
         )

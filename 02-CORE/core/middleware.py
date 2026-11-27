@@ -353,6 +353,7 @@ def _resolve_authenticated_user() -> None:
         with platform_read():
             user = User.query.filter_by(id=session["user_id"], is_active=True).first()
         if user:
+            _detach_authenticated_user(user)
             g.user = user
             g.is_platform_admin = user.is_superuser
             g.role = (
@@ -361,6 +362,18 @@ def _resolve_authenticated_user() -> None:
                 else ("tenant_admin" if user.is_admin else "customer")
             )
             return
+
+
+def _detach_authenticated_user(user) -> None:
+    """Load scalar columns then detach so later lazy reads cannot be RLS-blocked."""
+    if user is None:
+        return
+    try:
+        for column in User.__table__.columns:
+            getattr(user, column.name)
+    except Exception:  # pragma: no cover - defensive only
+        return
+    db.session.expunge(user)
 
 
 def _bind_user_to_context(user_public_id: str) -> None:
@@ -376,6 +389,7 @@ def _bind_user_to_context(user_public_id: str) -> None:
         user = User.query.filter_by(public_id=uid, is_active=True).first()
     if not user:
         raise AuthenticationError("Invalid user context.")
+    _detach_authenticated_user(user)
     if user.is_superuser:
         if user.tenant_id is not None:
             raise AuthenticationError("Superuser must not have tenant_id.")
