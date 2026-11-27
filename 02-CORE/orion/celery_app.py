@@ -21,6 +21,10 @@ BEAT_SCHEDULE = {
         "task": "orion.expire_whatsapp_orders",
         "schedule": 86400.0,
     },
+    "celery-heartbeat-30s": {
+        "task": "orion.celery_heartbeat",
+        "schedule": 30.0,
+    },
 }
 
 _default_broker = (
@@ -63,6 +67,28 @@ class ContextTask(celery_app.Task):
 
             bind_task_rls_context()
             return self.run(*args, **kwargs)
+
+
+@celery_app.task(name="orion.celery_heartbeat")
+def celery_heartbeat() -> bool:
+    import time
+
+    import redis
+
+    broker = (
+        os.environ.get("CELERY_BROKER_URL")
+        or os.environ.get("REDIS_URL")
+        or "redis://127.0.0.1:6379/0"
+    )
+    key = os.environ.get("CELERY_HEARTBEAT_KEY", "orion:celery:heartbeat")
+    ttl = int(os.environ.get("CELERY_HEARTBEAT_MAX_AGE_SECONDS", "120"))
+    try:
+        redis.from_url(broker, socket_connect_timeout=1, socket_timeout=1).set(
+            key, str(time.time()), ex=max(ttl, 30)
+        )
+        return True
+    except Exception:
+        return False
 
 
 celery_app.Task = ContextTask

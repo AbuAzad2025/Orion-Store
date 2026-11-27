@@ -89,6 +89,31 @@ class Config:
         "true",
         "yes",
     )
+    METRICS_TOKEN = os.environ.get("METRICS_TOKEN", "")
+    READY_REQUIRE_CELERY = os.environ.get("READY_REQUIRE_CELERY", "false").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    READY_REQUIRE_BACKUP = os.environ.get("READY_REQUIRE_BACKUP", "false").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    BACKUP_HEARTBEAT_FILE = os.environ.get(
+        "BACKUP_HEARTBEAT_FILE",
+        "/srv/apps/orionstore/shared/backups/backup-heartbeat.json",
+    )
+    BACKUP_HEARTBEAT_MAX_AGE_SECONDS = int(
+        os.environ.get("BACKUP_HEARTBEAT_MAX_AGE_SECONDS", "172800")
+    )
+    CELERY_HEARTBEAT_KEY = os.environ.get(
+        "CELERY_HEARTBEAT_KEY", "orion:celery:heartbeat"
+    )
+    CELERY_HEARTBEAT_MAX_AGE_SECONDS = int(
+        os.environ.get("CELERY_HEARTBEAT_MAX_AGE_SECONDS", "120")
+    )
+    CELERY_QUEUE_NAMES = os.environ.get("CELERY_QUEUE_NAMES", "celery")
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
     LOG_JSON = os.environ.get("LOG_JSON", "false").lower() in ("1", "true", "yes")
     CACHE_ENABLED = os.environ.get("CACHE_ENABLED", "true").lower() in (
@@ -156,6 +181,9 @@ class TestingConfig(Config):
     JWT_COOKIE_CSRF_PROTECT = False
     RATELIMIT_ENABLED = False
     PROMETHEUS_ENABLED = False
+    METRICS_TOKEN = ""
+    READY_REQUIRE_CELERY = False
+    READY_REQUIRE_BACKUP = False
     CACHE_ENABLED = False
     CURRENCY_LIVE_RATES = False
     CURRENCY_FX_MARKUP_PERCENT = 0
