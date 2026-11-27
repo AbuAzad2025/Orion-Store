@@ -1,7 +1,6 @@
 /* Orion luxury theme — shared tokens and components.
    Build: copied into both storefront and admin static/css by `npm run build:css`.
    Uses logical properties so the same file works for LTR and RTL. */
-
 :root {
   --orion-bg: #0a0f18;
   --orion-panel: #121a28;
@@ -18,7 +17,6 @@
   --orion-radius: 18px;
   --orion-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
 }
-
 .orion-surface {
   background: var(--orion-bg);
   color: var(--orion-text);
@@ -634,7 +632,6 @@ body.orion-surface {
 .orion-nav-group:not([open]) > summary::after { transform: rotate(-90deg); }
 .orion-nav-group > summary:hover { background: var(--orion-panel-2); opacity: 1; } .orion-nav-group > summary:hover::after { opacity: 1; }
 .orion-nav-group-items { display: grid; gap: 0.1rem; padding-inline-start: 0.25rem; border-inline-start: 1px solid rgba(230, 196, 121, 0.2); margin-inline-start: 0.75rem; } .orion-nav-group-items .orion-nav-link { font-size: 0.82rem; }
-
 
 .orion-sidebar-store-link {
   margin-block-start: 1.25rem;
@@ -1398,3 +1395,6 @@ body.orion-surface {
 .orion-company-banner-link:hover .orion-company-banner { transform: scale(1.015); }
 .orion-company-actions { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; padding: 1.2rem 1rem; }
 @media (max-width: 860px) { .orion-company-actions { flex-direction: column; } }
+
+/* CSP-safe replacements for former inline style attributes. */
+.orion-csp-zero{margin:0}.orion-csp-fit{width:fit-content}.orion-csp-nodecor{text-decoration:none}.orion-csp-center{text-align:center}.orion-csp-start{text-align:start}.orion-csp-nowrap{white-space:nowrap}.orion-csp-mt{margin-block-start:.5rem}.orion-csp-mt-auto{margin-block-start:auto}.orion-csp-searchbox{display:block;max-inline-size:26rem;margin-block-end:1rem}.orion-csp-justify-center{justify-content:center}.orion-csp-login-note{margin-block-start:1.25rem;text-align:center}.orion-csp-price-badge{margin:.25rem 0;width:fit-content}.orion-csp-price-gap{margin:.25rem 0}.orion-csp-grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1.5rem}.orion-csp-img-lg{width:100%;border-radius:16px;object-fit:cover}.orion-csp-col{display:flex;flex-direction:column;gap:.75rem}.orion-csp-list{margin:0;padding-inline-start:1.2rem;line-height:1.9}.orion-csp-list-sm{margin:0;padding-inline-start:1.2rem;font-size:.85rem}.orion-csp-bundle-card{display:flex;flex-direction:column;gap:.5rem;border-color:var(--orion-gold)}.orion-csp-banner-img{width:100%;height:150px;object-fit:cover;border-radius:12px}.orion-csp-banner-img-sm{width:100%;height:140px;object-fit:cover;border-radius:12px}

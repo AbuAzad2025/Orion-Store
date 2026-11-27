@@ -83,6 +83,20 @@ def _normalise_image(raw: bytes, ext: str) -> bytes:
     return clean
 
 
+def _check_quota(folder: Path, incoming: int) -> None:
+    """Bound disk usage per tenant so one store cannot exhaust the volume."""
+    files = [
+        p for p in folder.iterdir() if p.is_file() and not p.name.startswith(".upload-")
+    ]
+    limit = current_app.config.get("MAX_IMAGES_PER_TENANT", 200)
+    if len(files) >= limit:
+        raise ValidationError("Image limit reached for this store.")
+    used = sum(p.stat().st_size for p in files)
+    cap = current_app.config.get("MAX_IMAGE_BYTES_PER_TENANT", 200 * 1024 * 1024)
+    if used + incoming > cap:
+        raise ValidationError("Image storage limit reached for this store.")
+
+
 def _write_atomic(folder: Path, data: bytes, ext: str) -> str:
     """Create the final file 0640 via an atomic rename, never following links."""
     fd, tmp = tempfile.mkstemp(prefix=".upload-", suffix=ext, dir=folder)
@@ -123,6 +137,7 @@ def upload_product_image():
         folder = store_folder(tenant.slug)
         if not images_root().is_dir():
             raise ValidationError("Image storage is unavailable.")
+        _check_quota(folder, len(clean))
         name = _write_atomic(folder, clean, ext)
         # No token is embedded here: the URL is stored in the DB and would
         # expire. Templates/API rendering add a fresh signed token per request.

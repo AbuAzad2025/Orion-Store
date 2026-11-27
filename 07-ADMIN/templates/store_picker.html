@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ lang }}" dir="{{ dir }}">
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang in ['ar','he'] else 'ltr' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,7 @@
 </head>
 <body class="orion-surface">
   <main class="picker">
-    <div style="text-align:center">
+    <div class="orion-csp-center">
       <span class="orion-eyebrow">Azadexa</span>
       <h1 class="orion-title text-2xl">{{ page_title }}</h1>
       <p class="orion-muted text-sm">{{ 'اختر المتجر الذي تريد إدارته' if locale == 'ar' else 'Choose the store you want to manage' }}</p>
@@ -31,7 +31,7 @@
     {% else %}
     <p class="orion-muted">{{ 'لا توجد متاجر نشطة' if locale == 'ar' else 'No active stores' }}</p>
     {% endfor %}
-    <a href="/?locale={{ locale }}" class="orion-btn" style="justify-content:center">← {{ 'الرئيسية' if locale == 'ar' else 'Home' }}</a>
+    <a href="/?locale={{ locale }}" class="orion-btn orion-csp-justify-center">← {{ 'الرئيسية' if locale == 'ar' else 'Home' }}</a>
   </main>
 </body>
 </html>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="orion-login-page max-w-md mx-auto">
-  <header class="mb-6" style="text-align:center">
+  <header class="mb-6 orion-csp-center">
     <p class="orion-eyebrow">{{ tenant.name_for(locale) }}</p>
     <h1 class="orion-title text-2xl">{{ t('sign_in') }}</h1>
     <p class="orion-muted text-sm">
@@ -16,22 +16,22 @@
   {% endif %}
 
   <form method="post" action="/s/{{ tenant.slug }}/login" class="space-y-4">
-    <input type="hidden" name="store" value="{{ store_token }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="store" value="{{ store_token }}" aria-label="store token">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" aria-label="csrf token">
     <div>
       <label class="orion-stat-label block" for="login-email">{{ t('email_address') }}</label>
-      <input id="login-email" name="email" type="email" required class="orion-input w-full" autocomplete="username">
+      <input id="login-email" name="email" type="email" required class="orion-input w-full" autocomplete="username" aria-label="{{ t('email_address') }}">
     </div>
     <div>
       <label class="orion-stat-label block" for="login-password">
         {{ t('password') }}
       </label>
-      <input id="login-password" name="password" type="password" required class="orion-input w-full" autocomplete="current-password">
+      <input id="login-password" name="password" type="password" required class="orion-input w-full" autocomplete="current-password" aria-label="{{ t('password') }}">
     </div>
     <button type="submit" class="orion-btn orion-btn-gold w-full">{{ t('sign_in') }}</button>
   </form>
 
-  <p class="orion-login-note" style="margin-block-start:1.25rem;text-align:center">
+  <p class="orion-login-note orion-csp-login-note">
     <a href="{{ store_admin_login_url }}" class="orion-login-inline">
       {{ t('store_admin_sign_in') }}
     </a>

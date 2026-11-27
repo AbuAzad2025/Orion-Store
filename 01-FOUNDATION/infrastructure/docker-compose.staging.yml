@@ -40,6 +40,7 @@ services:
       DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD:-orion_app_staging}@postgres:5432/azadexa_staging
       MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
       REDIS_URL: redis://redis:6379/0
+      PRODUCT_IMAGES_DIR: ${PRODUCT_IMAGES_DIR:-/srv/orionstore-data/product-images}
       SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env.staging}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env.staging}
@@ -58,6 +59,8 @@ services:
       SMTP_FROM: ${SMTP_FROM:-}
     ports:
       - "5000:5000"
+    volumes:
+      - product_images:/srv/orionstore-data/product-images
     depends_on:
       postgres:
         condition: service_healthy
@@ -109,6 +112,7 @@ services:
       DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD:-orion_app_staging}@postgres:5432/azadexa_staging
       MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
       REDIS_URL: redis://redis:6379/0
+      PRODUCT_IMAGES_DIR: ${PRODUCT_IMAGES_DIR:-/srv/orionstore-data/product-images}
       CELERY_BROKER_URL: redis://redis:6379/1
       SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env.staging}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env.staging}
@@ -117,6 +121,8 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-}
+    volumes:
+      - product_images:/srv/orionstore-data/product-images
     depends_on:
       orion-api:
         condition: service_healthy
@@ -133,12 +139,16 @@ services:
       DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD:-orion_app_staging}@postgres:5432/azadexa_staging
       MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD:-azadexa_staging}@postgres:5432/azadexa_staging
       REDIS_URL: redis://redis:6379/0
+      PRODUCT_IMAGES_DIR: ${PRODUCT_IMAGES_DIR:-/srv/orionstore-data/product-images}
       CELERY_BROKER_URL: redis://redis:6379/1
       SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env.staging}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env.staging}
+    volumes:
+      - product_images:/srv/orionstore-data/product-images
     depends_on:
       redis:
         condition: service_healthy
 
 volumes:
+  product_images:
   staging_postgres:

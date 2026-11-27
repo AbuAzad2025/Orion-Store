@@ -114,12 +114,18 @@ def create_app(config_name: str | None = None) -> Flask:
         "REDIS_URL",
         "PRODUCT_IMAGES_DIR",
         "MAX_CONTENT_LENGTH",
+        "MAX_IMAGES_PER_TENANT",
+        "MAX_IMAGE_BYTES_PER_TENANT",
     ):
         value = os.environ.get(key)
         if value is not None:
             if key == "PRODUCT_IMAGES_DIR":
                 value = str(Path(value).expanduser().resolve())
-            elif key == "MAX_CONTENT_LENGTH":
+            elif key in (
+                "MAX_CONTENT_LENGTH",
+                "MAX_IMAGES_PER_TENANT",
+                "MAX_IMAGE_BYTES_PER_TENANT",
+            ):
                 value = int(value)
             app.config[key] = value
 
@@ -198,7 +204,8 @@ def create_app(config_name: str | None = None) -> Flask:
     register_monitoring(app)
     init_rate_limiter(app)
     app.extensions["redis_cache"] = RedisCache(app.config.get("REDIS_URL"))
-    from core.store_token import issue as issue_store_token, signed_url
+    from core.store_token import issue as issue_store_token
+    from core.store_token import signed_url
     from engine.whatsapp import whatsapp_url
 
     app.jinja_env.globals["whatsapp_url"] = whatsapp_url

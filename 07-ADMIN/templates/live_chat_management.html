@@ -5,7 +5,7 @@
     <h2 class="orion-title mb-3">{{ t('جلسات الدردشة النشطة', 'Active chat sessions') }}</h2>
     <div id="chat-sessions-list" class="orion-muted text-sm mb-4">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
-  <section class="orion-card" id="chat-room" style="display:none;">
+  <section class="orion-card hidden" id="chat-room">
     <h2 class="orion-title mb-3">{{ t('المحادثة', 'Conversation') }} — <span id="chat-session-id"></span></h2>
     <div id="chat-messages" class="h-64 overflow-y-auto border rounded p-3 mb-3 bg-gray-50 text-sm space-y-2"></div>
     <form id="chat-send-form" class="flex gap-2">

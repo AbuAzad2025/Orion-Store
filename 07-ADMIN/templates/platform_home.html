@@ -59,7 +59,7 @@
 } %}
 {% set lang = locale %}
 {% set t = L[locale] %}
-<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang in ['ar','he'] else 'ltr' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -130,27 +130,50 @@
         <span class="orion-section-line" aria-hidden="true"></span>
       </div>
       {% if stores %}
-      <label class="orion-landing-search" for="store-search" style="display:block;max-inline-size:26rem;margin-block-end:1rem">
+      <label class="orion-landing-search orion-csp-searchbox" for="store-search">
         <span class="orion-stat-label">{{ t.find_store }}</span>
         <input id="store-search" type="search" class="orion-input w-full"
                placeholder="{{ t.find_store_ph }}" aria-label="{{ t.find_store }}"
                autocomplete="off">
       </label>
       <p id="store-no-match" class="orion-muted text-sm hidden">{{ t.no_match }}</p>
+      <style nonce="{{ csp_nonce }}">
+      {% for store in stores %}
+      .orion-store-banner[data-slug="{{ store.slug }}"] {
+        background: {{ store.pattern }}, linear-gradient(135deg, {{ store.a }}, {{ store.b }});
+        border-color: {{ store.a }}; min-block-size: 7.5rem;
+      }
+      .orion-store-banner[data-slug="{{ store.slug }}"] .orion-store-banner-mark {
+        background: rgba(255,255,255,.14); color: {{ store.ink }};
+        border: 1px solid {{ store.ink }}55; font-size: 1.5rem;
+      }
+      .orion-store-banner[data-slug="{{ store.slug }}"] strong {
+        color: {{ store.ink }}; font-size: 1.05rem;
+      }
+      .orion-store-banner[data-slug="{{ store.slug }}"] .orion-store-banner-info span {
+        color: {{ store.ink }}; opacity: .8; font-size: .75rem;
+      }
+      .orion-store-banner[data-slug="{{ store.slug }}"] .orion-store-banner-info span[dir="ltr"] {
+        opacity: .65; font-size: .7rem;
+      }
+      .orion-store-banner[data-slug="{{ store.slug }}"] .orion-store-banner-cta {
+        color: {{ store.ink }};
+      }
+      {% endfor %}
+      </style>
       <div class="orion-store-banners" id="store-banners">
         {% for store in stores %}
         <a class="orion-store-banner" href="{{ store.url }}" target="_blank" rel="noopener"
+           data-slug="{{ store.slug }}"
            data-name="{{ (store.name ~ ' ' ~ store.name_en ~ ' ' ~ store.slug)|lower }}"
-           style="background:{{ store.pattern }}, linear-gradient(135deg, {{ store.a }}, {{ store.b }}); border-color:{{ store.a }}; min-block-size:7.5rem"
            aria-label="{{ t.visit }} {{ store.name }}">
-          <span class="orion-store-banner-mark" aria-hidden="true"
-                style="background:rgba(255,255,255,.14); color:{{ store.ink }}; border:1px solid {{ store.ink }}55; font-size:1.5rem">{{ store.mark }}</span>
+          <span class="orion-store-banner-mark" aria-hidden="true">{{ store.mark }}</span>
           <span class="orion-store-banner-info">
-            <strong style="color:{{ store.ink }}; font-size:1.05rem">{{ store.name }}</strong>
-            <span style="color:{{ store.ink }}; opacity:.8; font-size:.75rem">{{ store.tagline_en if locale == "en" and store.tagline_en else store.tagline }}</span>
-            <span dir="ltr" style="color:{{ store.ink }}; opacity:.65; font-size:.7rem">orion.azadexa.com/s/{{ store.slug }}</span>
+            <strong>{{ store.name }}</strong>
+            <span>{{ store.tagline_en if locale == "en" and store.tagline_en else store.tagline }}</span>
+            <span dir="ltr">orion.azadexa.com/s/{{ store.slug }}</span>
           </span>
-          <span class="orion-store-banner-cta" style="color:{{ store.ink }}">{{ t.visit }}</span>
+          <span class="orion-store-banner-cta">{{ t.visit }}</span>
         </a>
         {% endfor %}
       </div>

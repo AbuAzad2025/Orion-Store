@@ -229,6 +229,10 @@ class ProductService:
         description: str | None = None,
         compare_at_price: str | Decimal | None = None,
     ) -> Product:
+        from tenant.tenant import Tenant
+
+        if Tenant.query.get(tenant_id) is None:
+            raise ValidationError("Unknown tenant.")
         if Product.query.filter_by(tenant_id=tenant_id, slug=slug).first():
             raise ValidationError("Product slug already exists.")
         _validate_category_brand(

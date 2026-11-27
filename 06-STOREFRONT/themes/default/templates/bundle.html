@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="orion-card p-5 orion-bundle-detail" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1.5rem">
+<section class="orion-card p-5 orion-bundle-detail orion-csp-grid2">
   <div>
     {% if bundle.image_url %}
-    <img src="{{ signed_image_url(bundle.image_url, store_token) }}" alt="{{ bundle.name }}" style="width:100%;border-radius:16px;object-fit:cover">
+    <img src="{{ signed_image_url(bundle.image_url, store_token) }}" alt="{{ bundle.name }}" class="orion-csp-img-lg">
     {% endif %}
   </div>
-  <div style="display:flex;flex-direction:column;gap:.75rem">
+  <div class="orion-csp-col">
     <span class="orion-eyebrow">{{ t('bundles_eyebrow') }}</span>
     <h1 class="orion-title text-2xl">{{ bundle.name }}</h1>
     {% if bundle.description %}<p class="orion-muted">{{ bundle.description }}</p>{% endif %}
-    <p class="orion-stat-label" style="margin:0">{{ t('bundle_items') }}</p>
-    <ul style="margin:0;padding-inline-start:1.2rem;line-height:1.9">
+    <p class="orion-stat-label orion-csp-zero">{{ t('bundle_items') }}</p>
+    <ul class="orion-csp-list">
       {% for it in bundle['items'] %}
       <li>{{ it.name }} × {{ it.quantity }} — {{ money(it.line_total) }} {{ currency }}</li>
       {% endfor %}
     </ul>
-    <p class="orion-muted text-sm" style="margin:0">{{ t('bundle_original') }}: {{ money(bundle.original_total) }} {{ currency }}</p>
-    <p class="orion-product-price text-2xl" style="margin:0">{{ money(bundle.bundle_price) }} {{ currency }}</p>
-    <p class="orion-badge" style="width:fit-content">{{ t('bundle_savings') }}: {{ money(bundle.savings) }} {{ currency }}</p>
-    {% if bundle.max_per_order %}<p class="orion-muted text-xs" style="margin:0">{{ t('bundle_max') }}: {{ bundle.max_per_order }}</p>{% endif %}
-    <div class="flex flex-wrap gap-2" style="margin-block-start:.5rem">
+    <p class="orion-muted text-sm orion-csp-zero">{{ t('bundle_original') }}: {{ money(bundle.original_total) }} {{ currency }}</p>
+    <p class="orion-product-price text-2xl orion-csp-zero">{{ money(bundle.bundle_price) }} {{ currency }}</p>
+    <p class="orion-badge orion-csp-fit">{{ t('bundle_savings') }}: {{ money(bundle.savings) }} {{ currency }}</p>
+    {% if bundle.max_per_order %}<p class="orion-muted text-xs orion-csp-zero">{{ t('bundle_max') }}: {{ bundle.max_per_order }}</p>{% endif %}
+    <div class="flex flex-wrap gap-2 orion-csp-mt">
       <button type="button" class="orion-btn orion-btn-gold bundle-add" data-slug="{{ bundle.slug }}">{{ t('bundle_add') }}</button>
       {% set wa_msg = t('bundle_order_whatsapp') ~ ' ' ~ bundle.name ~ ' — ' ~ money(bundle.bundle_price) ~ ' ' ~ currency %}
       {% set wa_link = whatsapp_url(tenant.phone, wa_msg) %}

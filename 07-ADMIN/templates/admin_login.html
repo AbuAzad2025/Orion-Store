@@ -13,7 +13,7 @@
 {% endif %}
 {% if page_title is defined and page_title == 'تسجيل الدخول' %}{% set page_title = t('تسجيل الدخول', 'Sign in') %}{% endif %}
 {% macro locale_href(code) %}{{ request.path }}?{% for k, v in request.args.items(multi=True) if k != 'locale' %}{{ k|urlencode }}={{ v|urlencode }}&amp;{% endfor %}locale={{ code }}{% endmacro %}
-<html lang="{{ lang }}" dir="{{ dir }}">
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang in ['ar','he'] else 'ltr' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

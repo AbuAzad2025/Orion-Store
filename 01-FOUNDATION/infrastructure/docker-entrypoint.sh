@@ -11,7 +11,11 @@ fi
 
 # Honour an explicit command (celery worker/beat, shell, one-off jobs).
 # Without one, start the web server as before.
-if [ "$#" -gt 0 ]; then
-  exec "$@"
+if [ "$#" -eq 0 ]; then
+  set -- gunicorn -b 0.0.0.0:5000 -w 2 --timeout 60 orion.wsgi:app
 fi
-exec gunicorn -b 0.0.0.0:5000 -w 2 --timeout 60 orion.wsgi:app
+# Migrations above need DDL rights; runtime does not. Drop privileges here.
+if [ "$(id -u)" = "0" ]; then
+  exec gosu orion "$@"
+fi
+exec "$@"

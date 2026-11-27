@@ -13,7 +13,7 @@
     </div>
     <div class="orion-product-body">
       <h3 class="orion-product-name">{{ p_name }}</h3>
-      <p class="orion-muted text-xs" style="margin:0">{{ t('available') }}: {{ product.quantity }}</p>
+      <p class="orion-muted text-xs orion-csp-zero">{{ t('available') }}: {{ product.quantity }}</p>
       <div class="orion-price-row">
         <span class="orion-product-price">{{ money(p_price) }} <small>{{ currency }}</small></span>
         {% if product_i18n and product_i18n.compare_at_price and (product_i18n.compare_at_price|float > product_i18n.price|float) %}

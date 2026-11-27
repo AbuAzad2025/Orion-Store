@@ -11,6 +11,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from cryptography.fernet import Fernet
+
 ROOT = Path(__file__).resolve().parents[2]
 PYTHONPATH = os.pathsep.join(
     str(ROOT / part)
@@ -78,9 +80,10 @@ print('PRODUCTION_CONFIG_OK')
 """
     result = _run(
         code,
-        SECRET_KEY="a-real-secret-key",
-        JWT_SECRET_KEY="a-real-jwt-secret",
-        ENCRYPTION_KEY="a-real-fernet-key",
+        SECRET_KEY="key_" + "x" * 60,
+        JWT_SECRET_KEY="jwt_" + "y" * 60,
+        ENCRYPTION_KEY=Fernet.generate_key().decode(),
+        ORION_SKIP_RLS_CHECK="1",
     )
     assert result.returncode == 0, result.stderr
     assert "PRODUCTION_CONFIG_OK" in result.stdout

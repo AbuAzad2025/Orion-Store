@@ -38,6 +38,10 @@ class Config:
     MAX_CONTENT_LENGTH = int(
         os.environ.get("MAX_CONTENT_LENGTH", str(6 * 1024 * 1024))
     )  # uploads: 5MB image + multipart overhead
+    MAX_IMAGES_PER_TENANT = int(os.environ.get("MAX_IMAGES_PER_TENANT", "200"))
+    MAX_IMAGE_BYTES_PER_TENANT = int(
+        os.environ.get("MAX_IMAGE_BYTES_PER_TENANT", str(200 * 1024 * 1024))
+    )
     # Product images live outside the application source tree so they survive
     # release swaps. Always normalise to an absolute path so every consumer
     # resolves the same directory (a relative value is anchored to the repo's

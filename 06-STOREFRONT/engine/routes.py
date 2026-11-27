@@ -227,30 +227,12 @@ def store_product(slug: str):
     ts = TranslationService()
     product = ts.get_product_by_localized_slug(tenant.id, slug, locale)
     product_i18n = ts.merge_product(product, locale)
-    from core.store_token import issue as issue_store_token, signed_url
+    from core.store_token import issue as issue_store_token
+    from engine.schema import product_schema
 
-    image_url = (
-        signed_url(product.image_url, issue_store_token(tenant))
-        if product.image_url
-        and product.image_url.startswith("/store/static/images/products/")
-        else product.image_url
+    structured = product_schema(
+        product, product_i18n, tenant, issue_store_token(tenant)
     )
-    structured = {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": product_i18n.get("name") or product.name,
-        "image": ([image_url] if image_url else []),
-        "offers": {
-            "@type": "Offer",
-            "price": str(product_i18n.get("price") or product.price),
-            "priceCurrency": (tenant.default_currency or "ILS"),
-            "availability": (
-                "https://schema.org/InStock"
-                if product.quantity > 0
-                else "https://schema.org/OutOfStock"
-            ),
-        },
-    }
     return _engine.render(
         "product.html",
         store_token=issue_store_token(tenant),

@@ -24,15 +24,13 @@ def register_security_headers(app: Flask) -> None:
             "Referrer-Policy", "strict-origin-when-cross-origin"
         )
         nonce = getattr(g, "csp_nonce", "")
-        # CSP_ALLOW_UNSAFE_INLINE is a migration switch. Turn it off only after
-        # every inline script/style has a matching nonce and event handlers are
-        # gone. style-src-attr stays permissive for legacy style="" attributes.
+        # CSP_ALLOW_UNSAFE_INLINE is a legacy rollback switch only; no inline
+        # scripts/styles/style attributes remain in the codebase.
         unsafe = " 'unsafe-inline'" if app.config.get("CSP_ALLOW_UNSAFE_INLINE") else ""
         csp = (
             "default-src 'self'; "
             f"script-src 'self' 'nonce-{nonce}'{unsafe}; "
             f"style-src 'self' 'nonce-{nonce}'{unsafe}; "
-            "style-src-attr 'unsafe-inline'; "
             "img-src 'self' data: https:;"
         )
         response.headers.setdefault("Content-Security-Policy", csp)

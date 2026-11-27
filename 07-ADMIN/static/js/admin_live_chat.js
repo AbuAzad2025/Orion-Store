@@ -28,7 +28,7 @@ const OrionAdminLiveChat = {
   async openSession(sessionId) {
     OrionAdminLiveChat.currentSessionId = sessionId;
     document.getElementById("chat-session-id").textContent = `#${sessionId}`;
-    document.getElementById("chat-room").style.display = "block";
+    document.getElementById("chat-room")?.classList.remove("hidden");
     await OrionAdminLiveChat.loadMessages(sessionId);
   },
 
@@ -76,7 +76,7 @@ const OrionAdminLiveChat = {
     const closeBtn = document.getElementById("chat-close");
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
-        document.getElementById("chat-room").style.display = "none";
+        document.getElementById("chat-room")?.classList.add("hidden");
         OrionAdminLiveChat.currentSessionId = null;
       });
     }
