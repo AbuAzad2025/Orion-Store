@@ -50,7 +50,7 @@
       </div>
       <p class="orion-muted text-xs" data-share-msg role="status" aria-live="polite"></p>
     </div>
-    {% set wa_order = whatsapp_url(tenant.phone, t('order_request') ~ p_name ~ ' - ' ~ money(p_price) ~ ' ' ~ currency) %}
+    {% set wa_order = whatsapp_url(tenant.phone, product_order_text(p_name, money(p_price))) %}
     {% if wa_order %}
     <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-block"
        aria-label="{{ t('order_whatsapp') }} {{ p_name }}">{{ t('order_whatsapp') }}</a>

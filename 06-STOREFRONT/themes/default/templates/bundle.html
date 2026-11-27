@@ -22,7 +22,7 @@
     {% if bundle.max_per_order %}<p class="orion-muted text-xs orion-csp-zero">{{ t('bundle_max') }}: {{ bundle.max_per_order }}</p>{% endif %}
     <div class="flex flex-wrap gap-2 orion-csp-mt">
       <button type="button" class="orion-btn orion-btn-gold bundle-add" data-slug="{{ bundle.slug }}">{{ t('bundle_add') }}</button>
-      {% set wa_msg = t('bundle_order_whatsapp') ~ ' ' ~ bundle.name ~ ' — ' ~ money(bundle.bundle_price) ~ ' ' ~ currency %}
+      {% set wa_msg = bundle_order_text(bundle.name, money(bundle.bundle_price)) %}
       {% set wa_link = whatsapp_url(tenant.phone, wa_msg) %}
       {% if wa_link %}
       <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost">💬 {{ t('order_whatsapp') }}</a>

@@ -59,3 +59,85 @@ def format_cart_order(
     lines.append("────────────────")
     lines.append(tr("أُرسل عبر متجر Azadexa", "Sent via Azadexa store"))
     return "\n".join(lines)
+
+
+def _customer_lines(customer, tr) -> list[str]:
+    """Append signed-in customer details when available."""
+    if not customer:
+        return []
+    name = (
+        " ".join(
+            part
+            for part in (
+                getattr(customer, "first_name", None),
+                getattr(customer, "last_name", None),
+            )
+            if part and str(part).strip()
+        )
+        or str(getattr(customer, "email", "") or "").strip()
+    )
+    lines = [
+        "",
+        f"\U0001f464 {tr('بيانات العميل', 'Customer details')}",
+        f"{tr('الاسم', 'Name')}: {name}",
+    ]
+    email = str(getattr(customer, "email", "") or "").strip()
+    if email:
+        lines.append(f"{tr('البريد الإلكتروني', 'Email')}: {email}")
+    return lines
+
+
+def format_product_order(
+    store_name: str,
+    product_name: str,
+    price,
+    currency: str,
+    customer=None,
+    locale: str | None = None,
+    quantity: int = 1,
+) -> str:
+    """Professional, ready-to-send WhatsApp order message for one product."""
+    chosen = locale or request_locale()
+
+    def tr(arabic: str, english: str) -> str:
+        return localize(arabic, english, chosen)
+
+    lines = [
+        f"\U0001f6cd️ {tr('طلب جديد من', 'New order from')} {store_name}",
+        "────────────────",
+        f"\U0001f6d2 {tr('المنتج', 'Product')}: {product_name}",
+        f"\U0001f4b0 {tr('السعر', 'Price')}: {price} {currency}",
+        f"\U0001f501 {tr('الكمية', 'Quantity')}: {quantity}",
+        "────────────────",
+    ]
+    lines.extend(_customer_lines(customer, tr))
+    lines.extend(
+        [
+            "",
+            tr(
+                "هل يمكنكم تأكيد التوافر وتفاصيل الدفع والتوصيل؟ شكراً لاختياركم متجرنا 🌿",
+                "Could you confirm availability, payment and delivery details? "
+                "Thank you for choosing our store 🌿",
+            ),
+        ]
+    )
+    return "\n".join(lines)
+
+
+def format_bundle_order(
+    store_name: str,
+    bundle_name: str,
+    price,
+    currency: str,
+    customer=None,
+    locale: str | None = None,
+) -> str:
+    """Professional WhatsApp order message for a product bundle."""
+    chosen = locale or request_locale()
+    message = format_product_order(
+        store_name, bundle_name, price, currency, customer, chosen, 1
+    )
+    return message.replace(
+        localize("\U0001f6d2 المنتج", "\U0001f6d2 Product", chosen),
+        localize("\U0001f381 الحزمة", "\U0001f381 Bundle", chosen),
+    )
