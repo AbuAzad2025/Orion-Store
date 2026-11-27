@@ -39,6 +39,17 @@ def _resolve_customer_group_id(
     return member.customer_group_id if member else None
 
 
+def _commit_keep_loaded() -> None:
+    """Commit while keeping returned ORM instances readable after RLS binds."""
+    session = db.session()
+    previous = session.expire_on_commit
+    session.expire_on_commit = False
+    try:
+        session.commit()
+    finally:
+        session.expire_on_commit = previous
+
+
 class CartService:
     def get_or_create_cart(
         self, *, tenant_id: int, cart_token: str | None = None
@@ -51,7 +62,7 @@ class CartService:
                 return cart
         cart = Cart(tenant_id=tenant_id, cart_token=secrets.token_urlsafe(24))
         db.session.add(cart)
-        db.session.commit()
+        _commit_keep_loaded()
         return cart
 
     def get_cart(self, tenant_id: int, cart_token: str) -> Cart:
@@ -107,7 +118,7 @@ class CartService:
             existing.quantity += quantity
             existing.unit_price = unit
             existing.total_price = unit * existing.quantity
-            db.session.commit()
+            _commit_keep_loaded()
             return existing
         item = CartItem(
             cart_id=cart.id,
@@ -118,7 +129,7 @@ class CartService:
             total_price=total,
         )
         db.session.add(item)
-        db.session.commit()
+        _commit_keep_loaded()
         return item
 
     def list_items(self, cart: Cart) -> list[CartItem]:

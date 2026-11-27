@@ -233,12 +233,16 @@ html[lang^="ar"] .orion-storefront h3 { letter-spacing: 0; }
 @media (max-width: 1100px) {
   .orion-storefront .orion-nav-link { padding-inline: .45rem; font-size: .8rem; }
   .orion-storefront .orion-search-input { inline-size: clamp(7rem, 14vw, 11rem); }
-  .orion-storefront .sf-label { display: none; }
+  .orion-storefront .sf-label { font-size: .72rem; }
 }
 @media (max-width: 900px) {
   .orion-storefront .orion-navbar-inner { flex-wrap: wrap; gap: .4rem; padding: .45rem var(--sf-3); }
   .orion-storefront .orion-brand { flex: 1 1 auto; }
-  .orion-storefront .orion-nav-links { display: none; }
+  .orion-storefront .orion-nav-links {
+    display: flex; order: 5; flex: 1 1 100%; justify-content: space-around;
+    gap: 2px; padding-block-start: .3rem; border-block-start: 1px solid var(--sf-border);
+  }
+  .orion-storefront .orion-nav-link { font-size: .78rem; padding: .3rem .45rem; min-block-size: 32px; }
   .orion-storefront .orion-nav-controls { order: 3; flex: 1 1 100%; flex-wrap: wrap; justify-content: space-between; gap: .3rem; }
   .orion-storefront .orion-nav-search { order: 4; flex: 1 1 100%; }
   .orion-storefront .orion-search-input { inline-size: 100%; }
