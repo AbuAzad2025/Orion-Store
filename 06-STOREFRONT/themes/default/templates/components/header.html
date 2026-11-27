@@ -46,6 +46,11 @@
         <input type="hidden" name="store" value="{{ store_token }}">
       </form>
 
+      <button type="button" class="orion-btn orion-btn-ghost" data-store-share
+              data-share-url="{{ request.host_url.rstrip('/') }}/s/{{ tenant.slug }}/"
+              data-share-title="{{ tenant.name_for(locale) }}"
+              aria-label="{{ t('share_store') }}">{{ t('share_store') }}</button>
+
       <span class="orion-nav-sep" aria-hidden="true"></span>
 
       <div class="orion-locale-switch" role="group" aria-label="{{ t('language') }}">
@@ -73,6 +78,29 @@
       <a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-nav-wa"
          aria-label="{{ t('whatsapp') }}"><span aria-hidden="true">💬</span> {{ t('whatsapp') }}</a>
       {% endif %}
+
+      {% set share_link = request.host_url.rstrip('/') ~ '/s/' ~ tenant.slug ~ '/' %}
+      {% set share_caption = tenant.name_for(locale) ~ ' — ' ~ share_link %}
+      <div class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 orion-share-overlay" data-store-share-panel
+           role="dialog" aria-modal="true" aria-label="{{ t('share_store') }}">
+        <div class="orion-card p-5 max-w-md w-full orion-share-panel">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="orion-title">{{ t('share_store') }}</h2>
+            <button type="button" class="orion-btn" data-store-share-close aria-label="{{ t('close') }}">✕</button>
+          </div>
+          <div class="space-y-3">
+            <a class="orion-btn orion-btn-ghost w-full" data-share-target="whatsapp" href="https://wa.me/?text={{ share_caption|urlencode }}" target="_blank" rel="noopener">{{ t('share_whatsapp') }}</a>
+            <a class="orion-btn orion-btn-ghost w-full" data-share-target="facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ share_link|urlencode }}" target="_blank" rel="noopener">{{ t('share_facebook') }}</a>
+            <a class="orion-btn orion-btn-ghost w-full" data-share-target="x" href="https://twitter.com/intent/tweet?text={{ tenant.name_for(locale)|urlencode }}&url={{ share_link|urlencode }}" target="_blank" rel="noopener">{{ t('share_x') }}</a>
+            <a class="orion-btn orion-btn-ghost w-full" data-share-target="telegram" href="https://t.me/share/url?url={{ share_link|urlencode }}&text={{ tenant.name_for(locale)|urlencode }}" target="_blank" rel="noopener">{{ t('share_telegram') }}</a>
+            <a class="orion-btn orion-btn-ghost w-full" data-share-target="linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url={{ share_link|urlencode }}" target="_blank" rel="noopener">{{ t('share_linkedin') }}</a>
+            <a class="orion-btn orion-btn-ghost w-full" data-share-target="email" href="mailto:?subject={{ tenant.name_for(locale)|urlencode }}&body={{ share_caption|urlencode }}">{{ t('share_email') }}</a>
+            <button type="button" class="orion-btn orion-btn-gold w-full" data-store-copy="{{ share_link }}"
+                    data-copied-text="{{ t('copied') }}" data-failed-text="{{ t('copy_failed') }}">{{ t('copy_link') }}</button>
+            <p class="orion-muted text-xs" data-store-share-msg role="status" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </header>
