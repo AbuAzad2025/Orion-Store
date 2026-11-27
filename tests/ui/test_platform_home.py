@@ -15,16 +15,17 @@ def test_platform_home_arabic_default(client, app) -> None:
     text = resp.get_data(as_text=True)
     assert '<html lang="ar" dir="rtl">' in text
     assert "متجرك الإلكتروني، جاهز للانطلاق" in text
-    assert "دخول المنصة" in text and "دخول المتجر" in text
+    assert "دخول المنصة" in text and "دخول المتجر" not in text
     assert "🧱 أنشئ متجرك الخاص" in text and "❤️ تبرع لنا" in text
-    # Four distinct access portals, each with a different destination.
-    assert text.count('class="orion-access-card"') == 4
-    assert "بوابات الدخول" in text
-    assert "account?store=" in text
-    assert "My Store" in text and "mystore.azadexa.com" in text
+    # One login action only; stores are chosen via search/banner cards.
+    assert 'class="orion-access-card"' not in text
+    assert "بوابات الدخول" not in text
+    assert "account?store=" not in text
+    assert 'id="store-search"' in text
+    assert "My Store" in text and "/s/mystore/" in text
     # Brand logo at the top-right (RTL start) of the header.
-    assert 'class="orion-home-logo"' in text
-    assert "azadexa-header-cropped.png" in text
+    assert 'class="orion-home-brand"' in text
+    assert "azadexa-navbar.png" in text
     # Exactly one language switch, no duplicate login/donate actions.
     assert text.count('class="orion-locale-switch"') == 1
     assert text.count("تبرع لنا") == 1
@@ -32,14 +33,18 @@ def test_platform_home_arabic_default(client, app) -> None:
 
 
 def test_platform_home_english_locale(client, app) -> None:
+    with app.app_context():
+        TenantService().create_tenant(
+            name="English Store", slug="english-store", email="en@store.test"
+        )
     resp = client.get("/?locale=en", headers={"Host": "orion.azadexa.com"})
     assert resp.status_code == 200
     text = resp.get_data(as_text=True)
     assert "Platform admin" in text
     assert "Your online store, ready to launch" in text
-    assert "Platform admin" in text and "Store admin" in text
+    assert "Platform admin" in text and "Store admin" not in text
     assert "Create your store" in text and "Donate to us" in text
-    assert "Browse the store" in text
+    assert 'id="store-search"' in text
     assert "متجرك الإلكتروني" not in text
 
 

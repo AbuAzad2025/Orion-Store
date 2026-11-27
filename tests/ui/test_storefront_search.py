@@ -126,7 +126,11 @@ def test_language_switch_preserves_search_query(client, app) -> None:
     _product(tenant, "Coffee Maker", "coffee-maker")
     resp = client.get("/search?q=coffee", headers=tenant_headers(tenant.slug))
     text = resp.get_data(as_text=True)
-    en_link = re.search(r'href="([^"]*locale=en[^"]*)"', text)
+    en_link = re.search(
+        r'<a[^>]*class="orion-locale-link[^"]*"[^>]*href="([^"]*locale=en[^"]*)"', text
+    ) or re.search(
+        r'<a[^>]*href="([^"]*locale=en[^"]*)"[^>]*class="orion-locale-link', text
+    )
     assert en_link and "q=coffee" in en_link.group(1)
 
 
@@ -137,7 +141,11 @@ def test_language_switch_preserves_all_filters(client, app) -> None:
         headers=tenant_headers(tenant.slug),
     )
     text = resp.get_data(as_text=True)
-    en_link = re.search(r'href="([^"]*locale=en[^"]*)"', text)
+    en_link = re.search(
+        r'<a[^>]*class="orion-locale-link[^"]*"[^>]*href="([^"]*locale=en[^"]*)"', text
+    ) or re.search(
+        r'<a[^>]*href="([^"]*locale=en[^"]*)"[^>]*class="orion-locale-link', text
+    )
     assert en_link
     href = en_link.group(1)
     for value in ("q=coffee", "sort=price_desc", "price_min=10", "category=kitchen"):

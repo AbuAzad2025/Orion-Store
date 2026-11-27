@@ -88,6 +88,17 @@ class ThemeEngine:
         from core.store_token import issue as issue_store_token
 
         context["store_token"] = issue_store_token(tenant) if tenant else ""
+        from urllib.parse import urlencode
+
+        context["keep_q"] = (
+            "".join(
+                "&" + urlencode({key: value})
+                for key, value in request.args.items()
+                if key not in ("locale", "currency", "store")
+            )
+            if has_request_context()
+            else ""
+        )
         context["currencies"] = sorted(SUPPORTED_CURRENCIES)
         if "cookie_settings" not in context and tenant is not None:
             from compliance.compliance import CookieConsentSetting

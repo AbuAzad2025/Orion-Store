@@ -34,17 +34,13 @@ def test_login_page_links_both_destinations(client, app, store) -> None:
 
     # Arabic UI with both choices.
     assert "تسجيل الدخول" in html
-    assert "حسابي (الزبون)" in html
-    assert "لوحة المتجر" in html
-    assert "لوحة المنصة" in html
+    assert 'id="login-email"' in html
+    assert 'id="login-password"' in html
+    assert 'name="csrf_token"' in html
+    assert 'name="store"' in html
 
-    # Customer login keeps the signed store token.
-    assert f"/account?store={token}" in html
-
-    # Store admin is routed to this store's own subdomain (Host-derived), and
-    # the platform admin keeps a separate URL.
+    # Store admin sign-in is offered on the store's own host only.
     assert "https://demo.azadexa.com/admin/login" in html
-    assert "https://orion.azadexa.com/admin/login" in html
 
 
 def test_navbar_has_login_button(client, app, store) -> None:
@@ -59,7 +55,7 @@ def test_navbar_has_login_button(client, app, store) -> None:
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert 'class="orion-nav-login"' in html
-    assert "/login?store=" in html
+    assert "/s/login-store/login" in html
 
 
 def test_login_page_requires_tenant(client, app, monkeypatch) -> None:

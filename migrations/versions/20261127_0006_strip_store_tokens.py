@@ -23,6 +23,16 @@ TABLES = ("products", "product_bundles", "categories")
 def upgrade() -> None:
     bind = op.get_bind()
     for table in TABLES:
+        has_column = bind.execute(
+            text(
+                "SELECT 1 FROM information_schema.columns "
+                "WHERE table_schema = 'public' AND table_name = :t "
+                "AND column_name = 'image_url'"
+            ),
+            {"t": table},
+        ).scalar()
+        if not has_column:
+            continue
         rows = bind.execute(
             text(
                 f"SELECT id, image_url FROM {table} "

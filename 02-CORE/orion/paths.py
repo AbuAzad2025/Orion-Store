@@ -19,7 +19,7 @@ SLUG_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,62}")
 
 def source_root() -> Path:
     """Absolute path of the deployed application source root."""
-    return Path(current_app.root_path).resolve().parents[2]
+    return Path(current_app.root_path).resolve().parents[1]
 
 
 def images_root() -> Path:

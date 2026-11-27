@@ -17,7 +17,7 @@ def test_admin_login_page_is_branded_and_accessible(client, app) -> None:
     )  # tenant resolved from host, no optional field
     assert 'aria-label="البريد الإلكتروني"' in text
     assert 'aria-label="كلمة المرور"' in text
-    assert 'action="/admin/sso/exchange" method="post"' in text
+    assert 'action="/admin/sso/exchange" method="post"' not in text  # SSO UI removed
     assert 'class="orion-btn orion-btn-gold orion-auth-btn"' in text
 
 
