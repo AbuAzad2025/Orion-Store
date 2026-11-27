@@ -53,6 +53,32 @@ def _validate_production_secrets(app: Flask) -> None:
         )
 
 
+def _validate_production_rls(app: Flask) -> None:
+    """Refuse to boot if tenant RLS is not actually enforced.
+
+    The runtime role owns the tenant tables, so RLS is inert until FORCE is
+    applied. This guard prevents a release from starting if a migration was
+    skipped during deployment.
+    """
+    if os.environ.get("ORION_SKIP_RLS_CHECK") == "1":
+        return
+    from orion.extensions import db
+
+    if db.engine.dialect.name != "postgresql":
+        raise RuntimeError("Production requires PostgreSQL with forced RLS.")
+    forced = db.session.execute(
+        db.text(
+            "SELECT relforcerowsecurity FROM pg_class "
+            "WHERE relname = 'users' AND relkind = 'r'"
+        )
+    ).scalar()
+    if not forced:
+        raise RuntimeError(
+            "Production startup blocked — tenant RLS is not forced. "
+            "Run flask db upgrade before activating the release."
+        )
+
+
 def _asset_version() -> str:
     """Hash the committed theme CSS so asset URLs change whenever it changes."""
     css = Path(__file__).resolve().parents[2] / "01-FOUNDATION/assets/orion-theme.css"
@@ -111,6 +137,9 @@ def create_app(config_name: str | None = None) -> Flask:
         _validate_production_secrets(app)
 
     db.init_app(app)
+    if app.config.get("ENV") == "production":
+        with app.app_context():
+            _validate_production_rls(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
     from core.jwt_auth import install_token_blocklist

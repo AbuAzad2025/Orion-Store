@@ -127,6 +127,17 @@ python scripts/verify_deployment_rls.py --check
    - طلب sandbox واحد كامل (طلب → دفع → فاتورة)
 6. سجّل رقم الإصدار/الـ commit ووقت النشر في سجل العمليات.
 
+### النشر الحالي (SFTP + systemd على نطاق واحد)
+- المسار المعتمد محلياً: `.local/deploy_filtered.py --release <ts> --files <list>`.
+- على السيرفر يستدعي `/srv/scripts/activate_orionstore.sh <release>` الذي:
+  1. يحمّل `shared/.env` ويشغّل `flask db upgrade` **بكود الإصدار الجديد**،
+  2. يتحقق من نسخة Alembic و`FORCE ROW LEVEL SECURITY`،
+  3. يستدعي `activate.sh` العام ثم يتحقق من `/health`،
+  4. يفشل النشر إذا فشلت أي خطوة (لا يُفعّل إصدار غير مكتمل).
+- `activate.sh` العام **لا يُعدّل** لأن تطبيقات أخرى تستخدمه.
+- الإقلاع نفسه يرفض العمل في production إذا لم يكن RLS مُفعّلاً بالقوة؛
+  أثناء الـ migration فقط يُستخدم `ORION_SKIP_RLS_CHECK=1`.
+
 ---
 
 ## 6. التراجع عن نشر (Rollback)
