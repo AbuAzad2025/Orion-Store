@@ -10,7 +10,10 @@
 </section>
 
 <div id="tenant-stats" class="orion-muted" aria-live="polite">
-  <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+  <div class="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+    <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>
+    <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>
+    <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>
     <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>
     <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>
     <div class="orion-card orion-stat"><span class="orion-skeleton"></span></div>
@@ -47,13 +50,24 @@
 <div class="orion-card mt-6">
   <h2 class="orion-title text-lg mb-4">{{ t('أحدث الطلبات', 'Recent orders') }}</h2>
   <table class="orion-table w-full text-sm">
-    <thead><tr><th>{{ t('رقم الطلب', 'Order number') }}</th><th>{{ t('الإجمالي', 'Total') }}</th><th>{{ t('الدفع', 'Payment') }}</th></tr></thead>
+    <thead><tr>
+      <th class="p-2 text-start">{{ t('رقم الطلب', 'Order number') }}</th>
+      <th class="p-2 text-start">{{ t('الإجمالي', 'Total') }}</th>
+      <th class="p-2 text-start">{{ t('الحالة', 'Status') }}</th>
+      <th class="p-2 text-start">{{ t('المصدر', 'Source') }}</th>
+    </tr></thead>
     <tbody>
       {% for order in recent_orders %}
       <tr>
-        <td dir="ltr">{{ order.order_number }}</td>
-        <td class="orion-product-price">{{ order.total }}</td>
-        <td>{{ order.payment_status }}</td>
+        <td class="p-2" dir="ltr">{{ order.order_number }}</td>
+        <td class="p-2 orion-product-price" dir="ltr">{{ order.total }}</td>
+        <td class="p-2">
+          {% if order.status == 'awaiting' %}{{ t('بانتظار التأكيد', 'Awaiting confirmation') }}
+          {% elif order.status == 'cancelled' %}{{ t('ملغي', 'Cancelled') }}
+          {% elif order.status == 'confirmed' %}{{ t('مؤكد', 'Confirmed') }}
+          {% else %}{{ t('مدفوع', 'Paid') }}{% endif %}
+        </td>
+        <td class="p-2">{{ t('واتساب', 'WhatsApp') if order.shipping_method_code == 'whatsapp' else t('المتجر', 'Store') }}</td>
       </tr>
       {% endfor %}
     </tbody>

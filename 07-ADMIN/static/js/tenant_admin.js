@@ -6,23 +6,19 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         const s = data.stats;
         SafeDOM.clear(statsEl);
-        statsEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-4" }, [
-          SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
-            SafeDOM.elem("p", { className: "orion-stat-label" }, [OrionI18n.t("الطلبات", "Orders")]),
-            SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.orders_total || 0).toLocaleString("ar")])
-          ]),
-          SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
-            SafeDOM.elem("p", { className: "orion-stat-label" }, [OrionI18n.t("مدفوعة", "Paid")]),
-            SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.orders_paid || 0).toLocaleString("ar")])
-          ]),
-          SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
-            SafeDOM.elem("p", { className: "orion-stat-label" }, [OrionI18n.t("المنتجات", "Products")]),
-            SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.products_total || 0).toLocaleString("ar")])
-          ]),
-          SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
-            SafeDOM.elem("p", { className: "orion-stat-label" }, [OrionI18n.t("منشورة", "Published")]),
-            SafeDOM.elem("p", { className: "orion-stat-value" }, [Number(s.products_published || 0).toLocaleString("ar")])
-          ])
+        const card = (label, value) => SafeDOM.elem("div", { className: "orion-card orion-stat" }, [
+          SafeDOM.elem("p", { className: "orion-stat-label" }, [label]),
+          SafeDOM.elem("p", { className: "orion-stat-value", dir: "ltr" }, [value])
+        ]);
+        const num = (v) => Number(v || 0).toLocaleString("ar");
+        statsEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4" }, [
+          card(OrionI18n.t("إجمالي الطلبات", "All orders"), num(s.orders_total)),
+          card(OrionI18n.t("مبيعات مؤكدة", "Confirmed sales"), `${s.revenue_confirmed || "0.00"} ${s.currency || ""}`),
+          card(OrionI18n.t("طلبات مؤكدة", "Confirmed orders"), num(s.orders_confirmed)),
+          card(OrionI18n.t("بانتظار التأكيد", "Awaiting confirmation"), num(s.orders_pending)),
+          card(OrionI18n.t("طلبات ملغية", "Cancelled orders"), num(s.orders_cancelled)),
+          card(OrionI18n.t("المنتجات", "Products"), num(s.products_total)),
+          card(OrionI18n.t("منشورة", "Published"), num(s.products_published))
         ]));
       })
       .catch((err) => {

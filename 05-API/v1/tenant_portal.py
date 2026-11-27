@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 from flask import Blueprint, g, jsonify, request
 from i18n_svc.translation_service import TranslationService
@@ -61,23 +63,25 @@ def tenant_dashboard_api():
         require_tenant_admin()
         orders = _orders.list_for_tenant(g.tenant_id)
         products = _products.list_for_tenant(g.tenant_id)
-        paid = sum(1 for o in orders if o.payment_status == "paid")
-        return (
-            jsonify(
-                {
-                    "tenant": g.tenant.to_dict(),
-                    "stats": {
-                        "orders_total": len(orders),
-                        "orders_paid": paid,
-                        "products_total": len(products),
-                        "products_published": sum(
-                            1 for p in products if p.is_published
-                        ),
-                    },
-                }
+        confirmed = [o for o in orders if o.payment_status == "paid"]
+        cancelled = sum(1 for o in orders if o.payment_status == "cancelled")
+        pending = sum(1 for o in orders if o.status == "awaiting")
+        revenue = sum((o.total for o in confirmed), Decimal("0"))
+        stats = {
+            "orders_total": len(orders),
+            "orders_paid": len(confirmed),
+            "orders_confirmed": len(confirmed),
+            "orders_cancelled": cancelled,
+            "orders_pending": pending,
+            "orders_whatsapp": sum(
+                1 for o in orders if o.shipping_method_code == "whatsapp"
             ),
-            200,
-        )
+            "revenue_confirmed": f"{revenue:.2f}",
+            "currency": g.tenant.default_currency or "ILS",
+            "products_total": len(products),
+            "products_published": sum(1 for p in products if p.is_published),
+        }
+        return jsonify({"tenant": g.tenant.to_dict(), "stats": stats}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
