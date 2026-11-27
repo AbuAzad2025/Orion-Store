@@ -28,7 +28,7 @@
 
     <div class="orion-cta-row">
       <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold" aria-label="{{ t('add_to_cart') }} {{ p_name }}">{{ t('add_to_cart') }}</button>
-      <a href="/cart" class="orion-btn orion-btn-ghost">{{ t('view_cart') }}</a>
+      <a href="/cart?store={{ store_token }}" class="orion-btn orion-btn-ghost">{{ t('view_cart') }}</a>
     </div>
     <div class="orion-pdp-trust" aria-label="{{ t('support') }}">
       <span><span aria-hidden="true">&#10003;</span> {{ t('trust_secure') }}</span>

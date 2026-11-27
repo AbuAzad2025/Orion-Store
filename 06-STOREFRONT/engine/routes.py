@@ -123,7 +123,9 @@ def render_store_index():
     total_pages = max(1, ceil(len(all_products) / per_page))
     page = min(max(page, 1), total_pages)
     products = all_products[(page - 1) * per_page : page * per_page]
-    products_i18n = [ts.merge_product(p, locale) for p in products]
+    products_i18n = [
+        {**ts.merge_product(p, locale), "canonical_slug": p.slug} for p in products
+    ]
 
     def _page_url(n):
         args = {k: v for k, v in request.args.items() if k != "page"}
@@ -282,7 +284,9 @@ def store_category(slug: str):
             else _parse_sort(request.args.get("sort"))
         ),
     ).all()
-    products_i18n = [ts.merge_product(p, locale) for p in products]
+    products_i18n = [
+        {**ts.merge_product(p, locale), "canonical_slug": p.slug} for p in products
+    ]
     categories = _categories.list_for_tenant(tenant.id)
     counts = _categories.category_product_counts(tenant.id)
     return _engine.render(
@@ -388,7 +392,9 @@ def store_search():
     )
     page, per_page = pagination_params()
     products, meta = paginate_query(products_q, page, per_page)
-    products_i18n = [ts.merge_product(p, locale) for p in products]
+    products_i18n = [
+        {**ts.merge_product(p, locale), "canonical_slug": p.slug} for p in products
+    ]
     categories = _categories.list_for_tenant(tenant.id)
     counts = _categories.category_product_counts(tenant.id)
     from urllib.parse import quote as _quote

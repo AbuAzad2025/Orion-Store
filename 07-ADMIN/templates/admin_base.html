@@ -53,7 +53,7 @@
             </span>
           </div>
           {% if tenant %}
-          <a href="{{ url_for('storefront_ui.store_index', tenant_slug=tenant.slug) }}" target="_blank" class="orion-topbar-link" rel="noopener">{{ t('عرض المتجر ↗', 'View store ↗') }}</a>
+          <a href="{{ url_for('storefront_ui.store_index_clean', slug=tenant.slug) }}" target="_blank" class="orion-topbar-link" rel="noopener">{{ t('عرض المتجر ↗', 'View store ↗') }}</a>
           {% endif %}
           {% block page_actions %}{% endblock %}
         </div>
