@@ -20,5 +20,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_reconciliation.js') }}"></script>
-<script>OrionAdminReconciliation.init();</script>
+<script nonce="{{ csp_nonce }}">OrionAdminReconciliation.init();</script>
 {% endblock %}

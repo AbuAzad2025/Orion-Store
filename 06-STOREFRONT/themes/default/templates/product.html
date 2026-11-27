@@ -69,7 +69,7 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>
-<script>
+<script nonce="{{ csp_nonce }}">
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("stock-notify-form");
   const msg = document.getElementById("stock-notify-msg");

@@ -15,7 +15,6 @@ from flask import current_app
 from core.exceptions import ValidationError
 
 SLUG_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,62}")
-FILE_RE = re.compile(r"[A-Za-z0-9_-]{1,80}\.(png|jpg|jpeg|webp)")
 
 
 def source_root() -> Path:

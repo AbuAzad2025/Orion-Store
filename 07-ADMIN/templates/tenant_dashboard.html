@@ -63,7 +63,7 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/tenant_admin.js') }}"></script>
-<script>
+<script nonce="{{ csp_nonce }}">
 (async function () {
   const h = { "X-Tenant-ID": document.body.dataset.tenantId || "", "X-CSRF-TOKEN": document.cookie.match(/(?:^|; )csrf_access_token=([^;]+)/)?.[1] || "" };
   try {

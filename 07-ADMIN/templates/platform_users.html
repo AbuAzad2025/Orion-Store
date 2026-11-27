@@ -2,7 +2,7 @@
 {% block content %}
 <div class="flex justify-between items-center mb-4">
   <h2 class="text-lg font-semibold">{{ t('المستخدمون', 'Users') }}</h2>
-  <button onclick="OrionAdminPlatform.openUserModal()" class="orion-btn orion-btn-gold text-sm">{{ t('+ مستخدم جديد', '+ New User') }}</button>
+  <button id="btn-new-user" type="button" class="orion-btn orion-btn-gold text-sm">{{ t('+ مستخدم جديد', '+ New User') }}</button>
 </div>
 
 <div class="orion-card">
@@ -43,7 +43,7 @@
         <select name="tenant_id" id="user-tenant-id" class="orion-input w-full"></select>
       </div>
       <div class="flex justify-end gap-2 pt-3">
-        <button type="button" onclick="OrionAdminPlatform.closeUserModal()" class="px-4 py-2 border rounded text-sm">{{ t('إلغاء', 'Cancel') }}</button>
+        <button id="btn-cancel-user-modal" type="button" class="px-4 py-2 border rounded text-sm">{{ t('إلغاء', 'Cancel') }}</button>
         <button type="submit" class="orion-btn orion-btn-gold text-sm">{{ t('حفظ التغييرات', 'Save Changes') }}</button>
       </div>
     </form>
@@ -52,5 +52,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_platform.js') }}"></script>
-<script>OrionAdminPlatform.initUsers();</script>
+<script nonce="{{ csp_nonce }}">OrionAdminPlatform.initUsers();</script>
 {% endblock %}

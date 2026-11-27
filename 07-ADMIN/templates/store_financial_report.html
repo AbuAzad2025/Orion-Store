@@ -1,7 +1,7 @@
 {% extends "admin_base.html" %}
 {% block head_extra %}
   {% if admin_token %}
-  <script>
+  <script nonce="{{ csp_nonce }}">
   {% endif %}
 {% endblock %}
 {% block body_attrs %}data-report-tenant-id="{{ tenant_id }}"{% endblock %}

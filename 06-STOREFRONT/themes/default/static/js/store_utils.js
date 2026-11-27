@@ -22,3 +22,14 @@ const SafeDOM = {
     return this.elem("p", { className: "text-gray-500" }, [text]);
   },
 };
+
+
+// Currency switcher — moved out of an inline onchange handler for CSP strictness.
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("currency-switch");
+  if (!select) return;
+  select.addEventListener("change", () => {
+    const base = select.dataset.currencyBase || "";
+    if (base && select.value) location.href = `${base}&currency=${encodeURIComponent(select.value)}`;
+  });
+});

@@ -35,5 +35,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_app_platform.js') }}"></script>
-<script>OrionAdminAppPlatform.init();</script>
+<script nonce="{{ csp_nonce }}">OrionAdminAppPlatform.init();</script>
 {% endblock %}

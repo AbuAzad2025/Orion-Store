@@ -63,6 +63,8 @@ class Config:
     JWT_ACCESS_CSRF_COOKIE_NAME = "csrf_access_token"
     JWT_REFRESH_CSRF_COOKIE_NAME = "csrf_refresh_token"
     WTF_CSRF_ENABLED = True
+    # Migration switch: remove inline scripts/styles before setting to False.
+    CSP_ALLOW_UNSAFE_INLINE = os.environ.get("CSP_ALLOW_UNSAFE_INLINE", "0") == "1"
     WTF_CSRF_HEADERS = ["X-CSRFToken", "X-CSRF-Token", "X-CSRF-TOKEN"]
     WTF_CSRF_TIME_LIMIT = 3600
     WTF_CSRF_SSL_STRICT = False

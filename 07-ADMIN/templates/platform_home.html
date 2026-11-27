@@ -159,7 +159,7 @@
       {% endif %}
     </section>
 
-    <script>
+    <script nonce="{{ csp_nonce }}">
     (function () {
       const input = document.getElementById("store-search");
       const cards = [...document.querySelectorAll("#store-banners .orion-store-banner")];

@@ -2,7 +2,7 @@
 {% block content %}
 <div class="flex justify-between items-center mb-4">
   <h2 class="text-lg font-semibold">{{ t('المتاجر', 'Stores') }}</h2>
-  <button onclick="OrionAdminPlatform.openTenantModal()" class="orion-btn orion-btn-gold text-sm">{{ t('+ متجر جديد', '+ New Store') }}</button>
+  <button id="btn-new-tenant" type="button" class="orion-btn orion-btn-gold text-sm">{{ t('+ متجر جديد', '+ New Store') }}</button>
 </div>
 
 <div class="orion-card">
@@ -52,7 +52,7 @@
         </select>
       </div>
       <div class="flex justify-end gap-2 pt-3">
-        <button type="button" onclick="OrionAdminPlatform.closeTenantModal()" class="px-4 py-2 border rounded text-sm">{{ t('إلغاء', 'Cancel') }}</button>
+        <button id="btn-cancel-tenant-modal" type="button" class="px-4 py-2 border rounded text-sm">{{ t('إلغاء', 'Cancel') }}</button>
         <button type="submit" class="orion-btn orion-btn-gold text-sm">{{ t('حفظ التغييرات', 'Save Changes') }}</button>
       </div>
     </form>
@@ -61,5 +61,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_platform.js') }}"></script>
-<script>OrionAdminPlatform.initTenants();</script>
+<script nonce="{{ csp_nonce }}">OrionAdminPlatform.initTenants();</script>
 {% endblock %}

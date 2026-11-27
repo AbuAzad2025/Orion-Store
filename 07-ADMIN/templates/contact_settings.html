@@ -19,7 +19,7 @@
 </section>
 {% endblock %}
 {% block scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("contact-form");
   const input = document.getElementById("contact-phone");

@@ -23,5 +23,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/tenant_ops.js') }}"></script>
-<script>OrionTenantOps.initSubscriptions();</script>
+<script nonce="{{ csp_nonce }}">OrionTenantOps.initSubscriptions();</script>
 {% endblock %}

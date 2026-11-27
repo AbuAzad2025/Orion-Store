@@ -19,5 +19,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_schema.js') }}"></script>
-<script>OrionAdminSchema.init();</script>
+<script nonce="{{ csp_nonce }}">OrionAdminSchema.init();</script>
 {% endblock %}

@@ -22,5 +22,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_import_export.js') }}"></script>
-<script>OrionAdminImportExport.init();</script>
+<script nonce="{{ csp_nonce }}">OrionAdminImportExport.init();</script>
 {% endblock %}

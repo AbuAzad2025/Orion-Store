@@ -9,7 +9,7 @@
   <link rel="canonical" href="{{ canonical_url }}">
   <link rel="alternate" hreflang="ar" href="{{ canonical_url }}{% if '?' in canonical_url %}&amp;{% else %}?{% endif %}locale=ar">
   <link rel="alternate" hreflang="en" href="{{ canonical_url }}{% if '?' in canonical_url %}&amp;{% else %}?{% endif %}locale=en">
-  <script type="application/ld+json">{{ structured_data|tojson }}</script>
+  <script nonce="{{ csp_nonce }}" type="application/ld+json">{{ structured_data|tojson }}</script>
   {% endif %}
   <link rel="icon" type="image/svg+xml" href="{{ url_for('storefront_assets.static', filename='favicon.svg') }}">
   <link rel="stylesheet" href="{{ url_for('storefront_assets.static', filename='css/fonts.css') }}?v={{ asset_version }}">

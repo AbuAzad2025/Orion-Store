@@ -1,11 +1,21 @@
-"""Security response headers (§0.5)."""
+"""Security response headers with a per-request CSP nonce (§0.5)."""
 
 from __future__ import annotations
 
-from flask import Flask, Response
+import secrets
+
+from flask import Flask, Response, g
 
 
 def register_security_headers(app: Flask) -> None:
+    @app.before_request
+    def _issue_csp_nonce() -> None:
+        g.csp_nonce = secrets.token_urlsafe(18)
+
+    @app.context_processor
+    def _inject_csp_nonce() -> dict[str, str]:
+        return {"csp_nonce": getattr(g, "csp_nonce", "")}
+
     @app.after_request
     def add_security_headers(response: Response) -> Response:
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
@@ -13,13 +23,19 @@ def register_security_headers(app: Flask) -> None:
         response.headers.setdefault(
             "Referrer-Policy", "strict-origin-when-cross-origin"
         )
-        response.headers.setdefault(
-            "Content-Security-Policy",
-            (
-                "default-src 'self'; script-src 'self' 'unsafe-inline'; "
-                "style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;"
-            ),
+        nonce = getattr(g, "csp_nonce", "")
+        # CSP_ALLOW_UNSAFE_INLINE is a migration switch. Turn it off only after
+        # every inline script/style has a matching nonce and event handlers are
+        # gone. style-src-attr stays permissive for legacy style="" attributes.
+        unsafe = " 'unsafe-inline'" if app.config.get("CSP_ALLOW_UNSAFE_INLINE") else ""
+        csp = (
+            "default-src 'self'; "
+            f"script-src 'self' 'nonce-{nonce}'{unsafe}; "
+            f"style-src 'self' 'nonce-{nonce}'{unsafe}; "
+            "style-src-attr 'unsafe-inline'; "
+            "img-src 'self' data: https:;"
         )
+        response.headers.setdefault("Content-Security-Policy", csp)
         if app.config.get("ENFORCE_HSTS"):
             response.headers.setdefault(
                 "Strict-Transport-Security", "max-age=31536000; includeSubDomains"

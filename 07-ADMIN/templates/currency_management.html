@@ -26,5 +26,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_currency.js') }}"></script>
-<script>OrionAdminCurrency.init();</script>
+<script nonce="{{ csp_nonce }}">OrionAdminCurrency.init();</script>
 {% endblock %}

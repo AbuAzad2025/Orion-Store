@@ -20,7 +20,7 @@
 </section>
 {% endblock %}
 {% block scripts %}
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
   var section = document.getElementById("cookie-consent");
   var status = document.getElementById("consent-status");

@@ -35,5 +35,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/admin_dropship.js') }}"></script>
-<script>OrionAdminDropship.init();</script>
+<script nonce="{{ csp_nonce }}">OrionAdminDropship.init();</script>
 {% endblock %}

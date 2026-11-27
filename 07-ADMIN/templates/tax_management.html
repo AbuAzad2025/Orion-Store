@@ -16,5 +16,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/tenant_ops.js') }}"></script>
-<script>OrionTenantOps.initTax();</script>
+<script nonce="{{ csp_nonce }}">OrionTenantOps.initTax();</script>
 {% endblock %}

@@ -1,7 +1,7 @@
 <header class="orion-navbar">
   {% set keep_q = keep_params|default('') %}
   {% set home_path = '/s/' ~ tenant.slug ~ '/' %}
-  <style>
+  <style nonce="{{ csp_nonce }}">
     .orion-navbar-inner { flex-wrap: wrap; row-gap: .5rem; }
     .orion-nav-controls { flex-wrap: wrap; justify-content: flex-end; }
     .orion-nav-sep { inline-size: 1px; block-size: 1.6rem; background: var(--orion-border); flex: none; }
@@ -57,7 +57,7 @@
 
       <label class="orion-currency-control" aria-label="{{ t('currency') }}">
         <select id="currency-switch" aria-label="{{ t('currency') }}"
-                onchange="if(this.value) location.href='{{ request.path }}?locale={{ locale }}&currency='+this.value+'{{ keep_q }}&store={{ store_token }}'">
+                data-currency-base="{{ request.path }}?locale={{ locale }}{{ keep_q }}&store={{ store_token }}">
           {% for code in currencies %}
           <option value="{{ code }}"{% if code == currency %} selected{% endif %}>{{ code }}</option>
           {% endfor %}

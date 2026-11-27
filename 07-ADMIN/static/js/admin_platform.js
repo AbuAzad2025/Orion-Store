@@ -25,6 +25,8 @@ const OrionAdminPlatform = {
 
   async initTenants() {
     await this.loadTenants();
+    document.getElementById("btn-new-tenant")?.addEventListener("click", () => this.openTenantModal());
+    document.getElementById("btn-cancel-tenant-modal")?.addEventListener("click", () => this.closeTenantModal());
     const form = document.getElementById("tenant-form");
     if (form) {
       form.addEventListener("submit", async (e) => {
@@ -133,6 +135,8 @@ const OrionAdminPlatform = {
   },
 
   async initUsers() {
+    document.getElementById("btn-new-user")?.addEventListener("click", () => this.openUserModal());
+    document.getElementById("btn-cancel-user-modal")?.addEventListener("click", () => this.closeUserModal());
     await this.loadTenantsSelect();
     await this.loadUsers();
     const form = document.getElementById("user-form");
