@@ -21,10 +21,14 @@
         <label class="orion-stat-label" for="p-slug">{{ t('الرابط (slug)', 'URL (slug)') }}</label>
         <input id="p-slug" class="orion-input" dir="ltr" required aria-label="{{ t('رابط المنتج', 'Product URL') }}">
       </div>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-2">
         <div>
           <label class="orion-stat-label" for="p-price">{{ t('السعر', 'Price') }}</label>
           <input id="p-price" type="number" step="0.01" min="0" class="orion-input" required aria-label="{{ t('السعر', 'Price') }}">
+        </div>
+        <div>
+          <label class="orion-stat-label" for="p-cost">{{ t('سعر التكلفة', 'Cost price') }}</label>
+          <input id="p-cost" type="number" step="0.01" min="0" value="0" class="orion-input" aria-label="{{ t('سعر التكلفة', 'Cost price') }}">
         </div>
         <div>
           <label class="orion-stat-label" for="p-quantity">{{ t('الكمية', 'Quantity') }}</label>

@@ -6,7 +6,9 @@ from flask import Blueprint, g, jsonify, request
 
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
+from catalog_svc.product_service import ProductService
 from oms.fulfillment import FulfillmentItem
+from oms.warehouse import InventoryLevel
 from oms_svc.oms_service import OmsService
 from order_svc.order_service import OrderService
 
@@ -39,6 +41,31 @@ def list_products_for_selection():
                     "products": [
                         {"id": p.id, "name": p.name, "sku": getattr(p, "sku", None)}
                         for p in products
+                    ]
+                }
+            ),
+            200,
+        )
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@oms_bp.get("/inventory")
+def list_inventory():
+    try:
+        require_tenant_admin()
+        warehouse_id = request.args.get("warehouse_id", type=int)
+        query = InventoryLevel.query.filter_by(tenant_id=g.tenant_id)
+        if warehouse_id:
+            query = query.filter_by(warehouse_id=warehouse_id)
+        rows = query.all()
+        names = {p.id: p.name for p in ProductService().list_for_tenant(g.tenant_id)}
+        return (
+            jsonify(
+                {
+                    "inventory": [
+                        {**row.to_dict(), "product_name": names.get(row.product_id, "")}
+                        for row in rows
                     ]
                 }
             ),

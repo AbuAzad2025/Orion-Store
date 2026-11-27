@@ -1,0 +1,39 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">{{ t('تقرير المبيعات والأرباح', 'Sales & profit report') }}</h2>
+    <form id="sales-report-form" class="flex flex-wrap items-end gap-3 text-sm">
+      <label class="orion-stat-label">{{ t('من', 'From') }}
+        <input type="date" name="from" class="orion-input mt-1" aria-label="{{ t('من تاريخ', 'From date') }}">
+      </label>
+      <label class="orion-stat-label">{{ t('إلى', 'To') }}
+        <input type="date" name="to" class="orion-input mt-1" aria-label="{{ t('إلى تاريخ', 'To date') }}">
+      </label>
+      <button type="submit" class="orion-btn orion-btn-gold">{{ t('عرض التقرير', 'Show report') }}</button>
+      <button type="button" id="sales-clear" class="orion-btn">{{ t('كل الفترات', 'All time') }}</button>
+    </form>
+    <p id="sales-msg" class="orion-muted text-sm mt-2" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="sales-summary" class="grid grid-cols-2 md:grid-cols-4 gap-3"></section>
+
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">{{ t('الأكثر مبيعاً', 'Top products') }}</h2>
+    <div class="overflow-x-auto">
+      <table class="orion-table w-full text-sm">
+        <thead><tr>
+          <th class="p-2 text-start">{{ t('المنتج', 'Product') }}</th>
+          <th class="p-2 text-start">{{ t('الكمية', 'Quantity') }}</th>
+          <th class="p-2 text-start">{{ t('المبيعات', 'Revenue') }}</th>
+        </tr></thead>
+        <tbody id="sales-top"><tr><td colspan="3" class="p-3 orion-muted">{{ t('جارٍ التحميل…', 'Loading…') }}</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_reports.js') }}?v={{ asset_version }}"></script>
+<script nonce="{{ csp_nonce }}">OrionAdminReports.init();</script>
+{% endblock %}

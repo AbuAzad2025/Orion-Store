@@ -88,6 +88,10 @@ class ThemeEngine:
         from core.store_token import issue as issue_store_token
 
         context["store_token"] = issue_store_token(tenant) if tenant else ""
+        tenant_config = getattr(tenant, "config", None) if tenant is not None else None
+        context["tax_included"] = bool(
+            tenant_config and getattr(tenant_config, "tax_included", False)
+        )
         # Professional WhatsApp order text with signed-in customer details.
         from flask import g
 

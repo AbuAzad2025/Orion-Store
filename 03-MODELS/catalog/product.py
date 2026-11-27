@@ -50,6 +50,9 @@ class Product(db.Model, TimestampMixin, SoftDeleteMixin, VersionMixin):
     short_description: Mapped[str | None] = mapped_column(String(500), nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    cost_price: Mapped[Decimal] = mapped_column(
+        Numeric(10, 2), nullable=False, default=Decimal("0")
+    )
     compare_at_price: Mapped[Decimal | None] = mapped_column(
         Numeric(10, 2), nullable=True
     )
@@ -73,6 +76,7 @@ class Product(db.Model, TimestampMixin, SoftDeleteMixin, VersionMixin):
             "short_description": self.short_description,
             "description": self.description,
             "price": str(self.price),
+            "cost_price": str(self.cost_price),
             "compare_at_price": (
                 str(self.compare_at_price) if self.compare_at_price else None
             ),

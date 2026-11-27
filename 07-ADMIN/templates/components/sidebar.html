@@ -12,7 +12,7 @@
   'dashboard': 'home', 'products': 'home', 'pages': 'home', 'contact': 'home',
   'gateways': 'orders', 'draft_orders': 'orders', 'returns': 'orders', 'bopis': 'orders',
   'oms': 'orders', 'store_credit': 'orders', 'b2b': 'orders', 'bundles': 'orders',
-  'subscriptions': 'finance', 'tax': 'finance', 'reconciliation': 'finance', 'vouchers': 'finance',
+  'subscriptions': 'finance', 'tax': 'finance', 'reconciliation': 'finance', 'vouchers': 'finance', 'sales_report': 'finance', 'invoices': 'finance',
   'affiliates': 'marketing', 'gift_registries': 'marketing',
   'search': 'marketing', 'schema_markup': 'marketing', 'live_chat': 'marketing',
   'metafields': 'marketing', 'documents': 'marketing', 'import_export': 'settings',
@@ -67,6 +67,8 @@
           {{ nav_link('/admin/store/vouchers', t('قسائم الخصم', 'Discount coupons'), 'vouchers') }}
           {{ nav_link('/admin/store/tax', t('الضرائب', 'Taxes'), 'tax') }}
           {{ nav_link('/admin/store/reconciliation', t('التسوية المالية', 'Financial reconciliation'), 'reconciliation') }}
+          {{ nav_link('/admin/store/reports/sales', t('المبيعات والأرباح', 'Sales & profit'), 'sales_report') }}
+          {{ nav_link('/admin/store/invoices', t('الفواتير', 'Invoices'), 'invoices') }}
         </div>
       </details>
 

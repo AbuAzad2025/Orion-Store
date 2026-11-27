@@ -1,0 +1,27 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="space-y-6">
+  <section class="orion-card">
+    <h2 class="orion-title mb-3">{{ t('الفواتير الضريبية', 'Tax invoices') }}</h2>
+    <p class="orion-muted text-sm">{{ t('الفواتير تُصدر تلقائياً عند استلام الدفع، ويمكن تنزيل نسخة PDF هنا.', 'Invoices are issued automatically when payment is received; download the PDF here.') }}</p>
+    <div class="overflow-x-auto mt-4">
+      <table class="orion-table w-full text-sm">
+        <thead><tr>
+          <th class="p-2 text-start">{{ t('رقم الفاتورة', 'Invoice') }}</th>
+          <th class="p-2 text-start">{{ t('الطلب', 'Order') }}</th>
+          <th class="p-2 text-start">{{ t('الضريبة', 'Tax') }}</th>
+          <th class="p-2 text-start">{{ t('الإجمالي', 'Total') }}</th>
+          <th class="p-2 text-start">{{ t('التاريخ', 'Date') }}</th>
+          <th class="p-2 text-start">{{ t('PDF', 'PDF') }}</th>
+        </tr></thead>
+        <tbody id="invoices-list"><tr><td colspan="6" class="p-3 orion-muted">{{ t('جارٍ التحميل…', 'Loading…') }}</td></tr></tbody>
+      </table>
+    </div>
+    <p id="invoices-msg" class="orion-muted text-sm mt-2" role="status" aria-live="polite"></p>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('admin_assets.static', filename='js/admin_invoices.js') }}?v={{ asset_version }}"></script>
+<script nonce="{{ csp_nonce }}">OrionAdminInvoices.init();</script>
+{% endblock %}

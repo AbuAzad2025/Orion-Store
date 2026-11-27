@@ -15,6 +15,32 @@
     <div id="oms-warehouses-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
   <section class="orion-card">
+    <h2 class="orion-title mb-3">{{ t('المخزون حسب المستودع', 'Inventory by warehouse') }}</h2>
+    <form id="inventory-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <select name="warehouse_id" id="inventory-warehouse" class="orion-input" required aria-label="{{ t('المستودع', 'Warehouse') }}">
+        <option value="">{{ t('اختر مستودعاً…', 'Choose a warehouse…') }}</option>
+      </select>
+      <select name="product_id" id="inventory-product" class="orion-input" required aria-label="{{ t('المنتج', 'Product') }}">
+        <option value="">{{ t('اختر منتجاً…', 'Choose a product…') }}</option>
+      </select>
+      <input name="quantity" type="number" min="0" value="0" class="orion-input" aria-label="{{ t('الكمية', 'Quantity') }}">
+      <button type="submit" class="orion-btn w-fit">{{ t('تحديث الكمية', 'Update quantity') }}</button>
+      <p id="inventory-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
+    </form>
+    <div class="overflow-x-auto">
+      <table class="orion-table w-full text-sm">
+        <thead><tr>
+          <th class="p-2 text-start">{{ t('المنتج', 'Product') }}</th>
+          <th class="p-2 text-start">{{ t('المستودع', 'Warehouse') }}</th>
+          <th class="p-2 text-start">{{ t('الكمية', 'Quantity') }}</th>
+          <th class="p-2 text-start">{{ t('المحجوز', 'Reserved') }}</th>
+          <th class="p-2 text-start">{{ t('المتاح', 'Available') }}</th>
+        </tr></thead>
+        <tbody id="inventory-list"><tr><td colspan="5" class="p-3 orion-muted">{{ t('جارٍ التحميل…', 'Loading…') }}</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+  <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('تحويلات المخزون', 'Stock Transfers') }}</h2>
     <form id="oms-transfer-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <select name="from_warehouse_id" class="orion-input" required aria-label="{{ t('من مستودع', 'From warehouse') }}">
@@ -40,5 +66,6 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/tenant_ops.js') }}"></script>
-<script nonce="{{ csp_nonce }}">OrionTenantOps.initOms();</script>
+<script src="{{ url_for('admin_assets.static', filename='js/admin_inventory.js') }}?v={{ asset_version }}"></script>
+<script nonce="{{ csp_nonce }}">OrionTenantOps.initOms(); OrionAdminInventory.init();</script>
 {% endblock %}

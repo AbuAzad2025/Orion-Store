@@ -2,6 +2,20 @@
 {% block content %}
 <div class="space-y-6">
   <section class="orion-card">
+    <h2 class="orion-title mb-3">{{ t('إعدادات الضريبة', 'Tax settings') }}</h2>
+    <form id="tax-config-form" class="grid gap-2 max-w-md text-sm">
+      <label class="orion-stat-label">{{ t('نسبة الضريبة %', 'Tax rate %') }}
+        <input name="tax_rate" type="number" step="0.01" min="0" max="100" class="orion-input mt-1" aria-label="{{ t('نسبة الضريبة', 'Tax rate') }}">
+      </label>
+      <label class="flex items-center gap-2 text-sm">
+        <input name="tax_included" type="checkbox" aria-label="{{ t('الأسعار شاملة للضريبة', 'Prices include tax') }}">
+        {{ t('الأسعار المعروضة شاملة للضريبة', 'Displayed prices include tax') }}
+      </label>
+      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('حفظ إعدادات الضريبة', 'Save tax settings') }}</button>
+      <p id="tax-config-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+  <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('المناطق الضريبية', 'Tax regions') }}</h2>
     <form id="tax-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input name="name" type="text" placeholder="{{ t('اسم المنطقة (مثال: إسرائيل)', 'Region name (e.g. Israel)') }}" required>
@@ -16,5 +30,6 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('admin_assets.static', filename='js/tenant_ops.js') }}"></script>
-<script nonce="{{ csp_nonce }}">OrionTenantOps.initTax();</script>
+<script src="{{ url_for('admin_assets.static', filename='js/admin_tax_config.js') }}?v={{ asset_version }}"></script>
+<script nonce="{{ csp_nonce }}">OrionTenantOps.initTax(); OrionAdminTaxConfig.init();</script>
 {% endblock %}

@@ -57,21 +57,8 @@ class TaxService:
         db.session.commit()
         return tr
 
-    def compute_tax(
-        self,
-        tenant_id: int,
-        subtotal: Decimal,
-        shipping_address: dict | None = None,
-        shipping_cost: Decimal | str | None = None,
-    ) -> Decimal:
-        """Resolve tax from the shipping address, not a global tenant rate.
-
-        The most specific matching jurisdiction wins (country + region beats
-        country only). Within that jurisdiction the first rate by priority —
-        highest rate on a tie — is applied to the taxable amount. An address
-        with no matching jurisdiction is tax-free, which keeps checkout safe
-        for tenants that have not configured tax regions yet.
-        """
+    def resolve_rate(self, tenant_id: int, shipping_address: dict | None) -> Decimal:
+        """Most specific jurisdiction rate, or the tenant fallback rate."""
         address = shipping_address or {}
         country = (
             str(address.get("country_code") or address.get("country") or "")
@@ -89,9 +76,6 @@ class TaxService:
             .strip()
             .lower()
         )
-        if not country and not region:
-            return Decimal("0.00")
-
         best_rate = None
         best_specificity = 0
         for j in TaxJurisdiction.query.filter_by(
@@ -101,9 +85,7 @@ class TaxService:
             j_region = (j.region or "").strip().lower()
             country_match = bool(j_country and country and j_country == country)
             region_match = bool(j_region and region and j_region == region)
-
             if j_country and j_region:
-                # A jurisdiction scoped to both fields must match both.
                 if not (country_match and region_match):
                     continue
                 specificity = 2
@@ -117,7 +99,6 @@ class TaxService:
                 specificity = 1
             else:
                 continue
-
             rate = (
                 TaxRate.query.filter_by(jurisdiction_id=j.id)
                 .order_by(TaxRate.priority.asc(), TaxRate.rate.desc())
@@ -130,11 +111,34 @@ class TaxService:
                 and rate.rate > (best_rate.rate if best_rate else Decimal("0"))
             ):
                 best_rate, best_specificity = rate, specificity
+        if best_rate is not None:
+            return Decimal(str(best_rate.rate))
+        from tenant.tenant_config import TenantConfig
 
-        if best_rate is None:
-            return Decimal("0.00")
+        config = TenantConfig.query.filter_by(tenant_id=tenant_id).first()
+        return Decimal(str(config.tax_rate or 0)) if config else Decimal("0")
 
+    def compute_tax(
+        self,
+        tenant_id: int,
+        subtotal: Decimal,
+        shipping_address: dict | None = None,
+        shipping_cost: Decimal | str | None = None,
+    ) -> Decimal:
+        """Tax added on top of a tax-exclusive subtotal."""
+        rate = self.resolve_rate(tenant_id, shipping_address)
         taxable = Decimal(str(subtotal))
         if shipping_cost is not None:
             taxable += Decimal(str(shipping_cost))
-        return (taxable * best_rate.rate).quantize(Decimal("0.01"))
+        return (taxable * rate).quantize(Decimal("0.01"))
+
+    def compute_tax_inclusive(
+        self, tenant_id: int, subtotal: Decimal, shipping_address: dict | None = None
+    ) -> Decimal:
+        """Tax already contained in a gross (tax-inclusive) product price."""
+        rate = self.resolve_rate(tenant_id, shipping_address)
+        if rate <= 0:
+            return Decimal("0.00")
+        gross = Decimal(str(subtotal))
+        net = gross / (Decimal("1") + rate)
+        return (gross - net).quantize(Decimal("0.01"))

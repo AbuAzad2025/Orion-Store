@@ -372,47 +372,6 @@ const OrionTenantOps = {
     } catch (err) { /* keep empty */ }
   },
 
-  initBundles() {
-    const form = document.getElementById("bundle-form");
-    if (form) {
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const fd = new FormData(form);
-        await OrionAPI.post("/bundles", {
-          name: fd.get("name"), name_en: fd.get("name_en") || undefined, slug: fd.get("slug"),
-          bundle_price: String(fd.get("bundle_price") || "0"),
-          description: fd.get("description") || undefined,
-          image_url: fd.get("image_url") || undefined,
-          max_per_order: fd.get("max_per_order") ? Number(fd.get("max_per_order")) : null,
-          is_published: fd.get("is_published") === "on",
-        });
-        form.reset();
-        OrionTenantOps.loadBundles();
-      });
-    }
-    const itemForm = document.getElementById("bundle-item-form");
-    if (itemForm) {
-      itemForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const fd = new FormData(itemForm);
-        const msg = document.getElementById("bundle-item-msg");
-        try {
-          await OrionAPI.post(`/bundles/${fd.get("bundle_id")}/items`, {
-            product_id: Number(fd.get("product_id")),
-            quantity: Number(fd.get("quantity") || 1),
-            discount_percent: String(fd.get("discount_percent") || "0"),
-          });
-          if (msg) msg.textContent = OrionI18n.t("تمت إضافة الصنف", "Item added");
-          itemForm.reset();
-        } catch (err) {
-          if (msg) msg.textContent = err.message;
-        }
-      });
-    }
-    OrionTenantOps.loadBundleProducts();
-    OrionTenantOps.loadBundles();
-  },
-
   initStoreCredit() {
     const lookupBtn = document.getElementById("lookup-credit");
     const emailInput = document.getElementById("credit-customer-email");

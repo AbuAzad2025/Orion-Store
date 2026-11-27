@@ -82,6 +82,8 @@ class Invoice(db.Model):
         return {
             "public_id": str(self.public_id),
             "invoice_number": self.invoice_number,
+            "subtotal": str(self.subtotal),
+            "tax_amount": str(self.tax_amount),
             "total_amount": str(self.total_amount),
             "commission_amount": str(self.commission_amount),
             "currency": self.currency,
@@ -89,4 +91,5 @@ class Invoice(db.Model):
             "pdf_artifact_path": self.pdf_artifact_path,
             "storage_key": self.storage_key,
             "has_rendered_html": bool(self.rendered_html),
+            "issued_at": self.issued_at.isoformat() if self.issued_at else None,
         }

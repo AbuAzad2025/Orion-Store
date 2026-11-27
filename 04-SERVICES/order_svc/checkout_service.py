@@ -81,13 +81,25 @@ class CheckoutService:
                 free_shipping=free_shipping,
             )
 
-        tax_amount = TaxService().compute_tax(
-            tenant_id=cart.tenant_id,
-            subtotal=subtotal,
-            shipping_address=shipping_address,
-            shipping_cost=shipping_cost,
-        )
-        total = subtotal - discount_amount + shipping_cost + tax_amount
+        from tenant.tenant_config import TenantConfig
+
+        config = TenantConfig.query.filter_by(tenant_id=cart.tenant_id).first()
+        if config and config.tax_included:
+            # Product prices already contain tax: extract it, never add it again.
+            tax_amount = TaxService().compute_tax_inclusive(
+                tenant_id=cart.tenant_id,
+                subtotal=subtotal,
+                shipping_address=shipping_address,
+            )
+            total = subtotal - discount_amount + shipping_cost
+        else:
+            tax_amount = TaxService().compute_tax(
+                tenant_id=cart.tenant_id,
+                subtotal=subtotal,
+                shipping_address=shipping_address,
+                shipping_cost=shipping_cost,
+            )
+            total = subtotal - discount_amount + shipping_cost + tax_amount
         if total < Decimal("0"):
             total = Decimal("0")
 
@@ -167,6 +179,7 @@ class CheckoutService:
                     product_name=prod.name,
                     product_sku=prod.sku,
                     unit_price=item.unit_price,
+                    unit_cost=prod.cost_price,
                     quantity=item.quantity,
                     total_price=item.total_price,
                 )

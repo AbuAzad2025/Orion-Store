@@ -97,6 +97,7 @@ const OrionAdminProducts = {
     document.getElementById("p-name").value = product.name || "";
     document.getElementById("p-slug").value = product.slug || "";
     document.getElementById("p-price").value = product.price || "";
+    document.getElementById("p-cost").value = product.cost_price || "0";
     document.getElementById("p-quantity").value = product.quantity ?? 0;
     document.getElementById("p-sku").value = product.sku || "";
     document.getElementById("p-category").value = product.category_id || "";
@@ -114,6 +115,8 @@ const OrionAdminProducts = {
     document.getElementById("product-edit-id").value = "";
     document.getElementById("form-title").textContent = OrionI18n.t('إضافة منتج', 'Add product');
     document.getElementById("p-quantity").value = "0";
+    const cost = document.getElementById("p-cost");
+    if (cost) cost.value = "0";
   },
 
   payload() {
@@ -121,6 +124,7 @@ const OrionAdminProducts = {
       name: document.getElementById("p-name").value.trim(),
       slug: document.getElementById("p-slug").value.trim(),
       price: document.getElementById("p-price").value,
+      cost_price: document.getElementById("p-cost").value || "0",
       quantity: parseInt(document.getElementById("p-quantity").value || "0", 10),
       sku: document.getElementById("p-sku").value.trim() || null,
       category_id: document.getElementById("p-category").value || null,

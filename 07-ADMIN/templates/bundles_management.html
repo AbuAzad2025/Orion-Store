@@ -4,6 +4,7 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('الحزم', 'Bundles') }}</h2>
     <form id="bundle-form" class="grid gap-2 max-w-md mb-4 text-sm">
+      <input type="hidden" id="bundle-edit-id">
       <input name="name" type="text" placeholder="{{ t('اسم الحزمة', 'Bundle name') }}" required>
       <input name="name_en" type="text" dir="ltr" placeholder="{{ t('اسم الحزمة بالإنجليزي', 'Bundle name in English') }}">
       <input name="slug" type="text" placeholder="{{ t('رمز الحزمة في الرابط', 'Bundle URL slug') }}" required dir="ltr">
@@ -15,7 +16,11 @@
         <input name="is_published" type="checkbox" aria-label="{{ t('منشورة في المتجر', 'Published in store') }}">
         {{ t('منشورة في المتجر', 'Published in store') }}
       </label>
-      <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة حزمة', 'Add bundle') }}</button>
+      <div class="flex gap-2">
+        <button type="submit" id="bundle-submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة حزمة', 'Add bundle') }}</button>
+        <button type="button" id="bundle-cancel-edit" class="orion-btn w-fit hidden">{{ t('إلغاء التعديل', 'Cancel edit') }}</button>
+      </div>
+      <p id="bundle-form-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
     </form>
     <div id="bundles-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
   </section>
@@ -37,6 +42,6 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('admin_assets.static', filename='js/tenant_ops.js') }}"></script>
-<script nonce="{{ csp_nonce }}">OrionTenantOps.initBundles();</script>
+<script src="{{ url_for('admin_assets.static', filename='js/admin_bundles.js') }}?v={{ asset_version }}"></script>
+<script nonce="{{ csp_nonce }}">OrionAdminBundles.init();</script>
 {% endblock %}

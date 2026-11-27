@@ -65,7 +65,9 @@ class DocumentRenderer:
         template_row: TenantDocumentTemplate | None,
         footer_html: str,
     ) -> str:
-        from core.i18n_messages import request_locale
+        from core.i18n_messages import localize, request_locale
+
+        locale = request_locale()
 
         body = (
             template_row.body_html if template_row else None
@@ -74,6 +76,20 @@ class DocumentRenderer:
         body = body.replace("{{order_number}}", order.order_number)
         body = body.replace("{{total}}", str(order.total))
         body = body.replace("{{customer_email}}", order.customer_email)
+        body = body.replace("{{subtotal}}", str(order.subtotal))
+        body = body.replace("{{tax_amount}}", str(order.tax_amount))
+        tax_block = (
+            "<p class='tax-summary'>"
+            + localize("المجموع قبل الضريبة", "Subtotal")
+            + f": {order.subtotal} · "
+            + localize("الضريبة", "Tax")
+            + f": {order.tax_amount} {payment.currency}"
+            + "</p>"
+        )
+        if "</footer>" in body:
+            body = body.replace("</footer>", tax_block + "</footer>", 1)
+        else:
+            body += tax_block
         return self.inject_platform_footer(body, footer_html)
 
     def _store_pdf_artifact(
