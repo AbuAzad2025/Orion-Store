@@ -227,12 +227,14 @@ def store_product(slug: str):
     ts = TranslationService()
     product = ts.get_product_by_localized_slug(tenant.id, slug, locale)
     product_i18n = ts.merge_product(product, locale)
-    from core.store_token import issue as issue_store_token
+    from core.store_token import issue as issue_store_token, signed_url
 
-    image_url = product.image_url
-    if image_url and image_url.startswith("/store/static/images/products/"):
-        separator = "&" if "?" in image_url else "?"
-        image_url = f"{image_url}{separator}store={issue_store_token(tenant)}"
+    image_url = (
+        signed_url(product.image_url, issue_store_token(tenant))
+        if product.image_url
+        and product.image_url.startswith("/store/static/images/products/")
+        else product.image_url
+    )
     structured = {
         "@context": "https://schema.org",
         "@type": "Product",

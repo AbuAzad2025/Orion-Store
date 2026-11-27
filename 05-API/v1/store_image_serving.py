@@ -40,6 +40,8 @@ def serve_store_image(slug: str, filename: str):
     if not allowed and g.user is not None and getattr(g.user, "tenant_id", None):
         user_tenant = Tenant.query.get(g.user.tenant_id)
         allowed = bool(user_tenant and user_tenant.slug == slug)
+    if not allowed and bool(getattr(g, "is_platform_admin", False)):
+        allowed = True
     if not allowed:
         abort(404)
     root = images_root()

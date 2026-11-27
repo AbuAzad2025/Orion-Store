@@ -19,7 +19,6 @@ from flask import Blueprint, current_app, g, jsonify, request
 from core.exceptions import OrionError, ValidationError
 from core.middleware import require_tenant_admin
 from core.rate_limit import limiter
-from core.store_token import issue as issue_store_token
 from orion.paths import images_root, store_folder
 from tenant.tenant import Tenant
 
@@ -125,16 +124,8 @@ def upload_product_image():
         if not images_root().is_dir():
             raise ValidationError("Image storage is unavailable.")
         name = _write_atomic(folder, clean, ext)
-        return (
-            jsonify(
-                {
-                    "url": (
-                        f"{URL_PREFIX}{tenant.slug}/{name}"
-                        f"?store={issue_store_token(tenant)}"
-                    )
-                }
-            ),
-            201,
-        )
+        # No token is embedded here: the URL is stored in the DB and would
+        # expire. Templates/API rendering add a fresh signed token per request.
+        return jsonify({"url": f"{URL_PREFIX}{tenant.slug}/{name}"}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

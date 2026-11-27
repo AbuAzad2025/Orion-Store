@@ -3,7 +3,7 @@
 <section class="orion-card p-5 orion-bundle-detail" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1.5rem">
   <div>
     {% if bundle.image_url %}
-    <img src="{{ bundle.image_url }}{% if store_token %}?store={{ store_token }}{% endif %}" alt="{{ bundle.name }}" style="width:100%;border-radius:16px;object-fit:cover">
+    <img src="{{ signed_image_url(bundle.image_url, store_token) }}" alt="{{ bundle.name }}" style="width:100%;border-radius:16px;object-fit:cover">
     {% endif %}
   </div>
   <div style="display:flex;flex-direction:column;gap:.75rem">

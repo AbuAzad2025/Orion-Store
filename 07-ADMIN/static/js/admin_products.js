@@ -1,4 +1,11 @@
 /** Full product management for tenant admins — SafeDOM + OrionAPI. */
+function orionSignedImageUrl(url) {
+  if (!url) return "";
+  const base = String(url).split("?")[0];
+  const token = document.body.dataset.storeToken || "";
+  return token ? `${base}?store=${encodeURIComponent(token)}` : base;
+}
+
 const OrionAdminProducts = {
   async loadCategories() {
     const select = document.getElementById("p-category");
@@ -48,7 +55,7 @@ const OrionAdminProducts = {
       for (const product of products) {
         const thumb = product.image_url
           ? SafeDOM.elem("img", {
-              src: product.image_url,
+              src: orionSignedImageUrl(product.image_url),
               alt: product.name,
               className: "w-12 h-12 object-cover rounded border border-slate-700",
             })

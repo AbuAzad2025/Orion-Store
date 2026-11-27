@@ -198,13 +198,14 @@ def create_app(config_name: str | None = None) -> Flask:
     register_monitoring(app)
     init_rate_limiter(app)
     app.extensions["redis_cache"] = RedisCache(app.config.get("REDIS_URL"))
-    from core.store_token import issue as issue_store_token
+    from core.store_token import issue as issue_store_token, signed_url
     from engine.whatsapp import whatsapp_url
 
     app.jinja_env.globals["whatsapp_url"] = whatsapp_url
     app.jinja_env.globals["store_token_for"] = lambda tenant: (
         issue_store_token(tenant) if tenant else ""
     )
+    app.jinja_env.globals["signed_image_url"] = signed_url
 
     from orion.celery_app import init_celery
 
