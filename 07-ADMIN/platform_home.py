@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from admin_locale import get_admin_locale, remember_admin_locale
-
 from flask import (
     Blueprint,
     g,
@@ -88,25 +87,45 @@ def sitemap_xml():
         .all()
     )
     base = request.host_url.rstrip("/")
+    from i18n.cms_page import CmsPage
+
     from catalog.category import Category
     from catalog.product import Product
 
+    tenant_ids = [store.id for store in rows]
+    products_by_tenant: dict[int, list[Product]] = {}
+    categories_by_tenant: dict[int, list[Category]] = {}
+    pages_by_tenant: dict[int, list[CmsPage]] = {}
+    if tenant_ids:
+        for product in (
+            Product.query.filter_by(is_published=True, deleted_at=None)
+            .filter(Product.tenant_id.in_(tenant_ids))
+            .order_by(Product.tenant_id, Product.id)
+            .all()
+        ):
+            products_by_tenant.setdefault(product.tenant_id, []).append(product)
+        for category in (
+            Category.query.filter(Category.tenant_id.in_(tenant_ids))
+            .order_by(Category.tenant_id, Category.id)
+            .all()
+        ):
+            categories_by_tenant.setdefault(category.tenant_id, []).append(category)
+        for page in (
+            CmsPage.query.filter_by(is_published=True)
+            .filter(CmsPage.tenant_id.in_(tenant_ids))
+            .order_by(CmsPage.tenant_id, CmsPage.id)
+            .all()
+        ):
+            pages_by_tenant.setdefault(page.tenant_id, []).append(page)
     urls = [(f"{base}/", "daily", "1.0"), (f"{base}/?locale=en", "weekly", "0.8")]
     for store in rows:
         home = f"{base}/s/{store.slug}/"
         urls.append((home, "daily", "0.9"))
-        products = Product.query.filter_by(
-            tenant_id=store.id, is_published=True, deleted_at=None
-        ).all()
-        for product in products:
+        for product in products_by_tenant.get(store.id, ()):
             urls.append((f"{home}product/{product.slug}", "weekly", "0.8"))
-        categories = Category.query.filter_by(tenant_id=store.id).all()
-        for category in categories:
+        for category in categories_by_tenant.get(store.id, ()):
             urls.append((f"{home}category/{category.slug}", "weekly", "0.6"))
-        from i18n.cms_page import CmsPage
-
-        pages = CmsPage.query.filter_by(tenant_id=store.id, is_published=True).all()
-        for page in pages:
+        for page in pages_by_tenant.get(store.id, ()):
             urls.append((f"{home}pages/{page.slug}", "monthly", "0.4"))
     body = [
         '<?xml version="1.0" encoding="UTF-8"?>',

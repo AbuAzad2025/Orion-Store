@@ -127,10 +127,18 @@ class OmsService:
         db.session.flush()
 
         order_items = OrderItem.query.filter_by(order_id=order.id).all()
+        product_ids = list(
+            {oi.product_id for oi in order_items if oi.product_id is not None}
+        )
+        levels = {}
+        if product_ids:
+            for level in InventoryLevel.query.filter(
+                InventoryLevel.warehouse_id == wh_id,
+                InventoryLevel.product_id.in_(product_ids),
+            ).all():
+                levels[level.product_id] = level
         for oi in order_items:
-            level = InventoryLevel.query.filter_by(
-                warehouse_id=wh_id, product_id=oi.product_id
-            ).first()
+            level = levels.get(oi.product_id)
             if level:
                 available = level.quantity - level.reserved_quantity
                 if available < oi.quantity:
@@ -166,13 +174,26 @@ class OmsService:
             raise ValidationError("Fulfillment cannot be shipped.")
 
         items = FulfillmentItem.query.filter_by(fulfillment_id=row.id).all()
+        order_item_ids = list({fi.order_item_id for fi in items})
+        order_items = {}
+        product_ids = set()
+        if order_item_ids:
+            for oi in OrderItem.query.filter(OrderItem.id.in_(order_item_ids)).all():
+                order_items[oi.id] = oi
+                if oi.product_id is not None:
+                    product_ids.add(oi.product_id)
+        levels = {}
+        if product_ids:
+            for level in InventoryLevel.query.filter(
+                InventoryLevel.warehouse_id == row.warehouse_id,
+                InventoryLevel.product_id.in_(list(product_ids)),
+            ).all():
+                levels[level.product_id] = level
         for fi in items:
-            oi = OrderItem.query.get(fi.order_item_id)
+            oi = order_items.get(fi.order_item_id)
             if not oi:  # pragma: no cover - FK RESTRICT makes this unreachable
                 continue
-            level = InventoryLevel.query.filter_by(
-                warehouse_id=row.warehouse_id, product_id=oi.product_id
-            ).first()
+            level = levels.get(oi.product_id)
             if level:
                 level.quantity = max(0, level.quantity - fi.quantity)
                 level.reserved_quantity = max(0, level.reserved_quantity - fi.quantity)

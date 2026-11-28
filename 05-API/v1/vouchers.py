@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from discount_svc.voucher_service import VoucherService
 from flask import Blueprint, g, jsonify, request
@@ -80,6 +80,8 @@ def validate_voucher(code: str):
         subtotal = Decimal(str(request.args.get("subtotal", "0")))
         preview = _vouchers.validate(tenant.id, code, subtotal)
         return jsonify({"voucher": preview.to_dict()}), 200
+    except (InvalidOperation, ValueError, TypeError):
+        return jsonify({"error": "Invalid subtotal."}), 400
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -92,5 +94,7 @@ def apply_voucher(code: str):
         subtotal = Decimal(str(data.get("subtotal", "0")))
         preview = _vouchers.validate(tenant.id, code, subtotal)
         return jsonify({"applied": preview.to_dict()}), 200
+    except (InvalidOperation, ValueError, TypeError):
+        return jsonify({"error": "Invalid subtotal."}), 400
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

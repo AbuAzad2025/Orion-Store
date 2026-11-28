@@ -53,5 +53,7 @@ def remember_admin_locale(response):
             current,
             max_age=60 * 60 * 24 * 365,
             samesite="Lax",
+            secure=True,
+            httponly=True,
         )
     return response

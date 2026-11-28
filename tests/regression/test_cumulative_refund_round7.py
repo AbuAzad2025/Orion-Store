@@ -7,7 +7,6 @@ from decimal import Decimal
 import pytest
 
 from catalog_svc.product_service import ProductService
-
 from core.exceptions import ValidationError
 from order_svc.cart_service import CartService
 from order_svc.checkout_service import CheckoutService

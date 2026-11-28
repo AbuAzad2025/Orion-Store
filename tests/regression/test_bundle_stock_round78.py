@@ -5,7 +5,6 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
-
 from bundle.bundle import BundleItem, ProductBundle
 
 from catalog_svc.product_service import ProductService

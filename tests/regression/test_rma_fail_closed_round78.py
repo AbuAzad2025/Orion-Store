@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 
 from catalog_svc.product_service import ProductService
-
 from core.exceptions import ValidationError
 from order.order import OrderItem
 from order_svc.cart_service import CartService

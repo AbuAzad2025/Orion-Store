@@ -53,7 +53,14 @@ def signed_url(url: str | None, token: str) -> str:
         return ""
     parts = urlsplit(str(url))
     query = [(k, v) for k, v in parse_qsl(parts.query) if k != "store"]
-    if token:
+    # Never leak the signed token to an external origin: only local product
+    # images are served through the token-gated route.
+    local = (
+        not parts.scheme
+        and not parts.netloc
+        and parts.path.startswith("/store/static/images/products/")
+    )
+    if token and local:
         query.append(("store", token))
     return urlunsplit(
         (parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment)

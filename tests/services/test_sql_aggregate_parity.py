@@ -11,9 +11,9 @@ from datetime import timedelta
 from decimal import Decimal
 
 from catalog.product import Product
-from orion.extensions import db
 from order.order import Order, OrderItem
 from order_svc.sales_report_service import SalesReportService
+from orion.extensions import db
 from tenant_svc.tenant_service import TenantService
 
 

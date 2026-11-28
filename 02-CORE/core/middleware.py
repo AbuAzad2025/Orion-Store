@@ -181,6 +181,8 @@ def register_middleware(app: Flask) -> None:
                 g.locale,
                 max_age=90 * 24 * 3600,
                 samesite="Lax",
+                secure=True,
+                httponly=True,
             )
         return response
 

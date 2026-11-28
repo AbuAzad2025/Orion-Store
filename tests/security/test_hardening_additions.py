@@ -28,8 +28,17 @@ class _Product:
 
 
 def test_signed_url_replaces_only_store_param() -> None:
-    url = "/img/a.jpg?store=old&x=1"
-    assert signed_url(url, "new") == "/img/a.jpg?x=1&store=new"
+    url = "/store/static/images/products/demo/a.jpg?store=old&x=1"
+    assert (
+        signed_url(url, "new")
+        == "/store/static/images/products/demo/a.jpg?x=1&store=new"
+    )
+    # Never leak the token to an external origin or a non-image local path.
+    assert (
+        signed_url("https://cdn.example.com/a.jpg", "new")
+        == "https://cdn.example.com/a.jpg"
+    )
+    assert signed_url("/img/a.jpg", "new") == "/img/a.jpg"
     assert signed_url(None, "new") == ""
 
 

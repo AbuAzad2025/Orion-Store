@@ -10,11 +10,11 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from feature_flag_svc.feature_flag_service import FeatureFlagService
+from support.http import tenant_headers
 
 from catalog_svc.product_service import ProductService
-from feature_flag_svc.feature_flag_service import FeatureFlagService
 from orion.extensions import db
-from support.http import tenant_headers
 from tenant.tenant import Tenant
 from tenant_svc.tenant_service import TenantService
 
@@ -94,7 +94,10 @@ def _find(html, tag=None, **matching):
 
 def _add_buttons(html, product):
     return [
-        a for a in _find(html, "button") if a.get("data-add-cart") == str(product if isinstance(product, int) else product.id)
+        a
+        for a in _find(html, "button")
+        if a.get("data-add-cart")
+        == str(product if isinstance(product, int) else product.id)
     ]
 
 

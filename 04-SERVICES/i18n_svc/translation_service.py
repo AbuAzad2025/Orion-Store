@@ -103,6 +103,8 @@ class TranslationService:
 
     def merge_product(self, product: Product, locale: str) -> dict:
         data = product.to_dict()
+        # Internal cost is never part of a public storefront payload.
+        data.pop("cost_price", None)
         trans = ProductTranslation.query.filter_by(
             tenant_id=product.tenant_id, product_id=product.id, locale=locale
         ).first()
