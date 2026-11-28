@@ -29,6 +29,7 @@ for part in (
 
 FAILURES: list[str] = []
 CHECKS = 0
+CHECK_RESULTS: dict[str, list[bool]] = {}
 
 # A fully refunded payment is still a captured sale: its row flips to
 # "refunded" while its inbound event and commission entry remain booked.
@@ -36,9 +37,16 @@ PAID_STATUSES = ("completed", "refunded")
 COMPLETED_REFUND_STATUS = "completed"
 
 
-def check(name: str, ok: bool, detail: str = "") -> None:
+def _label(name: str) -> str:
+    tokens = ("#" if x.isdigit() or x.count("-") == 4 else x for x in name.split())
+    return " ".join(tokens)
+
+
+def check(name: str, ok: bool, detail: str = "", group: str | None = None) -> None:
     global CHECKS
     CHECKS += 1
+    ok = bool(ok)
+    CHECK_RESULTS.setdefault(group or _label(name), []).append(ok)
     if not ok:
         FAILURES.append(f"{name}: {detail}")
         print(f"FAIL  {name} — {detail}")
@@ -68,6 +76,13 @@ def main() -> None:
         from platform_models.invoice import Invoice
         from tenant.tenant import Tenant
 
+        # source_entity is polymorphic: resolve it explicitly, no DB FK exists.
+        source_models = {
+            "payment": Payment,
+            "refund": Refund,
+            "order": Order,
+            "commission_ledger": PlatformCommissionLedger,
+        }
         tenants = Tenant.query.filter_by(deleted_at=None).all()
         totals = {
             "payments": Decimal(0),
@@ -231,6 +246,96 @@ def main() -> None:
                     f"levels={total} product={product.quantity}",
                 )
 
+            events = FinancialEvent.query.filter_by(tenant_id=tid).all()
+            events_by_id = {e.id: e for e in events}
+            payments_by_id = {p.id: p for p in payments}
+
+            # payment/refund -> event: forward id must resolve and backlink.
+            for p in payments:
+                if p.status in PAID_STATUSES:
+                    event = events_by_id.get(p.financial_event_id)
+                    check(
+                        f"{slug} payment {p.public_id} event link",
+                        event is not None
+                        and event.source_entity == "payment"
+                        and event.source_id == p.id,
+                        f"event={p.financial_event_id}",
+                        group="payment->event",
+                    )
+            for r in Refund.query.filter_by(tenant_id=tid).all():
+                if r.status == COMPLETED_REFUND_STATUS:
+                    event = events_by_id.get(r.financial_event_id)
+                    check(
+                        f"{slug} refund {r.id} event link",
+                        event is not None
+                        and event.source_entity == "refund"
+                        and event.source_id == r.id,
+                        f"event={r.financial_event_id}",
+                        group="refund->event",
+                    )
+
+            # event <-> ledger: both sides of the soft link must agree.
+            for e in events:
+                if e.commission_ledger_id:
+                    row = by_id.get(e.commission_ledger_id)
+                    check(
+                        f"{slug} event {e.id} ledger link",
+                        row is not None and row.financial_event_id == e.id,
+                        group="event->ledger",
+                    )
+            for row in ledger:
+                event = events_by_id.get(row.financial_event_id)
+                if event:
+                    check(
+                        f"{slug} ledger {row.id} event backlink",
+                        event.commission_ledger_id == row.id,
+                        group="ledger->event",
+                    )
+
+            # reversal -> original must resolve to a commission entry.
+            for row in ledger:
+                if "reversal" in (row.entry_type or ""):
+                    original = by_id.get(row.reverses_ledger_id)
+                    check(
+                        f"{slug} reversal {row.id} original",
+                        original is not None and original.entry_type == "commission",
+                        group="reversal->original",
+                    )
+
+            # Polymorphic source must resolve inside the same tenant.
+            for e in events:
+                model = source_models.get(e.source_entity)
+                if model is not None:
+                    source = model.query.filter_by(
+                        tenant_id=tid, id=e.source_id
+                    ).first()
+                    check(
+                        f"{slug} event {e.id} source resolves",
+                        source is not None,
+                        f"{e.source_entity}#{e.source_id}",
+                        group="event source resolves",
+                    )
+
+            # Invoice references must exist and agree with the payment event.
+            for inv in Invoice.query.filter_by(tenant_id=tid).all():
+                payment = payments_by_id.get(inv.payment_id)
+                event = events_by_id.get(inv.financial_event_id)
+                check(
+                    f"{slug} invoice {inv.invoice_number} refs exist",
+                    inv.order_id in orders
+                    and (inv.payment_id is None or payment is not None)
+                    and (inv.financial_event_id is None or event is not None),
+                    group="invoice refs exist",
+                )
+                if event is not None and payment is not None:
+                    check(
+                        f"{slug} invoice {inv.invoice_number} links agree",
+                        event.source_entity == "payment"
+                        and event.source_id == payment.id
+                        and payment.order_id == inv.order_id,
+                        group="invoice links agree",
+                    )
+
         markup = Decimal(str(app.config.get("CURRENCY_FX_MARKUP_PERCENT", 0)))
         fx = CurrencyService()
         for row in CurrencyRate.query.all():
@@ -280,6 +385,11 @@ def main() -> None:
         print(f"REFUNDS: {totals['refunds']}")
         print(f"NET REVENUE: {net_revenue}")
         print(f"COMMISSIONS: {totals['commission']}  REVERSALS: {totals['reversals']}")
+        if CHECK_RESULTS:
+            print("\nPER-CHECK SUMMARY (passed/total):")
+            for label in sorted(CHECK_RESULTS):
+                results = CHECK_RESULTS[label]
+                print(f"  {label}: {sum(results)}/{len(results)}")
         if FAILURES:
             for f in FAILURES:
                 print(" -", f)
