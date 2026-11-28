@@ -17,6 +17,7 @@ from core.beta_gate import (
 from core.exceptions import AuthenticationError, AuthorizationError, NotFoundError
 from orion.extensions import db
 from tenant.tenant import Tenant
+from tenant.tenant_config import TenantConfig
 
 _BLOCKED_TENANT_STATUSES = frozenset({"suspended", "cancelled"})
 _LIFECYCLE_SAFE_PATHS = frozenset(
@@ -50,6 +51,13 @@ def register_middleware(app: Flask) -> None:
         # Users table is itself RLS-protected: bind context BEFORE querying it,
         # otherwise non-superuser runtime roles cannot authenticate at all.
         bind_rls_context()
+
+        # tenant_configs is RLS-protected too: the joined load above ran before
+        # binding, so reload it now or tax_included stays None for the request.
+        if g.tenant is not None and getattr(g.tenant, "config", None) is None:
+            g.tenant.config = TenantConfig.query.filter_by(
+                tenant_id=g.tenant.id
+            ).first()
 
         _resolve_authenticated_user()
 

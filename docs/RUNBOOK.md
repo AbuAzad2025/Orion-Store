@@ -49,7 +49,7 @@ $env:PYTHONPATH="02-CORE;03-MODELS;04-SERVICES;05-API;06-STOREFRONT;07-ADMIN"
 $env:FLASK_APP="orion.wsgi:app"; $env:FLASK_ENV="development"
 python scripts/verify_backup_restore.py --pg-bin "C:\Program Files\PostgreSQL\18\bin"
 ```
-**النتيجة المتوقعة:** `BACKUP_RESTORE_OK` وتطابق `(عدد الجداول, السياسات, الصفوف, إصدار Alembic)`.
+**النتيجة المتوقعة:** `BACKUP_RESTORE_OK` وتطابق `(عدد الجداول, السياسات, المستأجرون, إصدار Alembic)`.
 يُنشئ السكربت قاعدتين مؤقتتين (`orion_drill_src` / `orion_drill_restored`) ويحذفهما تلقائياً.
 
 ---

@@ -5,8 +5,8 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
-from bundle.bundle import BundleItem, ProductBundle
 
+from bundle.bundle import BundleItem, ProductBundle
 from catalog_svc.product_service import ProductService
 from core.exceptions import ValidationError
 from order.order import OrderItem

@@ -7,6 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
     "Flask==3.1.3",
     "Flask-SQLAlchemy==3.1.1",
+    "SQLAlchemy==2.0.52",
     "Flask-Migrate==4.0.7",
     "psycopg2-binary==2.9.12",
     "redis==5.0.3",
@@ -15,22 +16,22 @@ dependencies = [
     "sentry-sdk==2.19.2",
     "celery[redis]==5.4.0",
     "python-dotenv==1.2.2",
-    "cryptography==48.0.1",
+    "cryptography==50.0.0",
     "requests==2.33.0",
     "Flask-JWT-Extended==4.7.1",
     "Flask-WTF==1.2.2",
     "bcrypt==4.1.2",
-    "fpdf2==2.8.3",
+    "fpdf2==2.8.8",
     "Pillow==13.0.0",
     "uharfbuzz==0.57.0",
-    "pypdf==6.19.0",
+    "pypdf==6.21.4",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest==9.0.3",
     "pytest-flask==1.3.0",
-    "black==26.3.1",
+    "black==26.10.1",
     "flake8==7.0.0",
     "isort==5.13.2",
     "pre-commit==3.6.0",
@@ -40,6 +41,7 @@ dev = [
     "pyyaml==6.0.3",
     "vcrpy==8.2.1",
     "pip-audit==2.7.0",
+    "bandit==1.7.9",
     "playwright==1.62.0",
 ]
 
@@ -50,7 +52,7 @@ target-version = ["py311"]
 [tool.isort]
 profile = "black"
 line_length = 88
-known_first_party = ["orion", "core", "base", "v1", "auth", "tenant", "tenant_svc", "user", "integrations", "catalog", "catalog_svc", "platform_models", "platform_svc", "order", "order_svc", "payment", "payment_svc", "tenant_gateway_svc", "bnpl", "bnpl_svc", "returns", "rma_svc", "b2b", "b2b_svc", "oms", "oms_svc", "notification_svc", "backup_svc", "engine", "tenant_admin", "platform_admin", "admin_assets"]
+known_first_party = ["orion", "core", "base", "v1", "auth", "tenant", "tenant_svc", "user", "integrations", "catalog", "catalog_svc", "platform_models", "platform_svc", "order", "order_svc", "payment", "payment_svc", "tenant_gateway_svc", "bnpl", "bnpl_svc", "bundle", "returns", "rma_svc", "b2b", "b2b_svc", "oms", "oms_svc", "notification_svc", "backup_svc", "engine", "tenant_admin", "platform_admin", "admin_assets"]
 
 [tool.coverage.run]
 source = ["02-CORE", "03-MODELS", "04-SERVICES", "05-API"]

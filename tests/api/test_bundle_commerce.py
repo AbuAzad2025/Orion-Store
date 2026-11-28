@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from bundle.bundle import BundleItem, ProductBundle
 from support.http import tenant_headers
 
+from bundle.bundle import BundleItem, ProductBundle
 from catalog_svc.product_service import ProductService
 from orion.extensions import db
 from tenant.tenant import Tenant

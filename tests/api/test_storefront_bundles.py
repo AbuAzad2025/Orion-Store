@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from bundle.bundle import BundleItem, ProductBundle
 from support.http import tenant_headers
 
 from auth.auth_service import AuthService
+from bundle.bundle import BundleItem, ProductBundle
 from catalog_svc.product_service import ProductService
 from tenant_svc.tenant_service import TenantService
 

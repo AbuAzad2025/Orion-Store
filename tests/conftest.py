@@ -138,6 +138,35 @@ def _isolated_event_bus() -> Generator[None, None, None]:
     clear_subscribers()
 
 
+_CONFIG_SENTINEL = object()
+_MUTATED_CONFIG_KEYS = (
+    "TESTING",
+    "BETA_MODE",
+    "BETA_TENANT_SLUGS",
+    "MAX_IMAGES_PER_TENANT",
+    "MAX_IMAGE_BYTES_PER_TENANT",
+    "PRODUCT_IMAGES_DIR",
+    "WEBHOOK_SECRET",
+)
+
+
+@pytest.fixture(autouse=True)
+def restore_mutated_app_config(app: Flask) -> Generator[None, None, None]:
+    """Undo direct ``app.config[...] = ...`` writes by any test.
+
+    The ``app`` fixture is session-scoped; tests that assign config directly
+    otherwise leak values into every later test and make the suite order-
+    dependent. Tests using ``monkeypatch.setitem`` are unaffected.
+    """
+    saved = {key: app.config.get(key, _CONFIG_SENTINEL) for key in _MUTATED_CONFIG_KEYS}
+    yield
+    for key, value in saved.items():
+        if value is _CONFIG_SENTINEL:
+            app.config.pop(key, None)
+        else:
+            app.config[key] = value
+
+
 @pytest.fixture(autouse=True)
 def database_tables(app: Flask) -> Generator[None, None, None]:
     """Fresh schema per test; explicit drop_all teardown prevents state pollution."""

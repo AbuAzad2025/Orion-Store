@@ -157,8 +157,9 @@ class CheckoutService:
             from catalog.product import Product
 
             if item.bundle_id is not None:
-                from bundle.bundle import ProductBundle
                 from bundle_svc.bundle_service import BundleService
+
+                from bundle.bundle import ProductBundle
 
                 bundle = ProductBundle.query.filter_by(
                     id=item.bundle_id, tenant_id=cart.tenant_id

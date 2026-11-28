@@ -518,7 +518,6 @@ def test_read_through_json_uses_fake_cache(app, monkeypatch):
 
 def test_model_to_dict_helpers(app):
     from affiliate.affiliate import AffiliateCommission, AffiliateLink
-    from bundle.bundle import BundleItem
     from dropship.dropship import DropshipOrder
     from feature_flag.feature_flag import TenantFeatureFlagOverride
     from i18n.category_translation import CategoryTranslation
@@ -532,6 +531,7 @@ def test_model_to_dict_helpers(app):
     from tax.tax import TaxNexusRule
 
     from base.base_model import BaseModel
+    from bundle.bundle import BundleItem
     from order.order import OrderItem
     from platform_models.audit_log import AuditLog
     from platform_models.impersonation_session import ImpersonationSession

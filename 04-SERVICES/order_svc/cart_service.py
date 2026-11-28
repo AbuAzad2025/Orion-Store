@@ -136,8 +136,9 @@ class CartService:
         """Add a published bundle as one line at its advertised price."""
         if quantity < 1:
             raise ValidationError("Quantity must be at least 1.")
-        from bundle.bundle import ProductBundle
         from bundle_svc.bundle_service import BundleService
+
+        from bundle.bundle import ProductBundle
 
         bundle = ProductBundle.query.filter_by(
             id=bundle_id, tenant_id=cart.tenant_id, is_published=True

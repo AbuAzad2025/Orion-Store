@@ -13,9 +13,9 @@ from order_svc.whatsapp_order_service import WhatsAppOrderService
 
 def cart_items_with_names(carts, cart) -> list[dict]:
     """Cart items + localized names for products and bundles (tenant-scoped)."""
-    from bundle.bundle import ProductBundle
     from i18n.product_translation import ProductTranslation
 
+    from bundle.bundle import ProductBundle
     from catalog.product import Product
     from core.context import get_locale
 

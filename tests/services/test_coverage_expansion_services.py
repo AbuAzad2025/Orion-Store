@@ -16,7 +16,6 @@ from affiliate.affiliate import AffiliateCommission, AffiliateLink
 from affiliate_svc.affiliate_service import AffiliateService
 from bopis.bopis import PickupLocation, PickupSlot
 from bopis_svc.bopis_service import BopisService
-from bundle.bundle import BundleItem
 from bundle_svc.bundle_service import BundleService
 from feature_flag.feature_flag import FeatureFlag, TenantFeatureFlagOverride
 from feature_flag_svc.feature_flag_service import FeatureFlagService
@@ -33,6 +32,7 @@ from subscription.subscription import (
 )
 from subscription_svc.subscription_service import SubscriptionService
 
+from bundle.bundle import BundleItem
 from catalog.product import Product
 from core.exceptions import ConflictError, NotFoundError, ValidationError
 from core.utils import utc_now

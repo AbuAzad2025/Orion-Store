@@ -5,9 +5,9 @@ from __future__ import annotations
 from sqlalchemy import text
 
 from core.middleware import bind_task_rls_context
+from order_svc.whatsapp_order_service import WhatsAppOrderService
 from orion.celery_app import celery_app
 from orion.extensions import db
-from order_svc.whatsapp_order_service import WhatsAppOrderService
 
 
 @celery_app.task(name="orion.expire_whatsapp_orders")

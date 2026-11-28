@@ -36,8 +36,8 @@
         <label class="block text-sm mb-1">{{ t('نوع الحساب', 'Account Type') }}</label>
         <select name="user_type" id="user-type" class="orion-input w-full" aria-label="{{ t('نوع الحساب', 'Account type') }}">
           <option value="tenant_admin">{{ t('مدير متجر', 'Store Admin') }}</option>
-          <p class="text-xs text-gray-500">{{ t('مديرو المنصة يُنشأون عبر scripts/bootstrap_cli.py فقط.', 'Platform admins are created only via scripts/bootstrap_cli.py.') }}</p>
         </select>
+        <p class="text-xs text-gray-500">{{ t('مديرو المنصة يُنشأون عبر scripts/bootstrap_cli.py فقط.', 'Platform admins are created only via scripts/bootstrap_cli.py.') }}</p>
       </div>
       <div id="user-tenant-wrap">
         <label class="block text-sm mb-1">{{ t('المتجر', 'Store') }}</label>

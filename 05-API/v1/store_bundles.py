@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from bundle.bundle import BundleItem
 from bundle_svc.bundle_service import BundleService
 from flask import g, jsonify
 from i18n.product_translation import ProductTranslation
 
+from bundle.bundle import BundleItem
 from catalog.product import Product
 from catalog_svc.product_service import ProductService
 from core.exceptions import NotFoundError, OrionError

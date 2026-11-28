@@ -20,20 +20,20 @@ def test_beta_disabled_allows_all(app):
         assert is_tenant_beta_allowed("any-store") is True
 
 
-def test_beta_allowlist_enforced(app):
-    app.config["TESTING"] = False
-    app.config["BETA_MODE"] = True
-    app.config["BETA_TENANT_SLUGS"] = "beta-ramallah,beta-amman"
+def test_beta_allowlist_enforced(app, monkeypatch):
+    monkeypatch.setitem(app.config, "TESTING", False)
+    monkeypatch.setitem(app.config, "BETA_MODE", True)
+    monkeypatch.setitem(app.config, "BETA_TENANT_SLUGS", "beta-ramallah,beta-amman")
     with app.app_context():
         assert is_tenant_beta_allowed("beta-ramallah") is True
         assert is_tenant_beta_allowed("other-store") is False
         assert beta_allowlist() == {"beta-ramallah", "beta-amman"}
 
 
-def test_enforce_beta_raises_for_blocked_slug(app):
-    app.config["TESTING"] = False
-    app.config["BETA_MODE"] = True
-    app.config["BETA_TENANT_SLUGS"] = "beta-amman"
+def test_enforce_beta_raises_for_blocked_slug(app, monkeypatch):
+    monkeypatch.setitem(app.config, "TESTING", False)
+    monkeypatch.setitem(app.config, "BETA_MODE", True)
+    monkeypatch.setitem(app.config, "BETA_TENANT_SLUGS", "beta-amman")
     with app.app_context():
         with pytest.raises(AuthorizationError):
             enforce_beta_tenant_access("blocked-store")
