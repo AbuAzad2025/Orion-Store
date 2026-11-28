@@ -1,0 +1,47 @@
+# Alertmanager — staging example, NO SECRETS.
+# Copy to alertmanager.yml at deploy time and mount into Alertmanager.
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: 'smtp.example.com:587'
+  smtp_from: 'orion-alerts@example.com'
+  smtp_auth_username: 'orion-alerts@example.com'
+  smtp_auth_password_file: /run/secrets/alertmanager_smtp_password
+  smtp_require_tls: true
+
+route:
+  receiver: orion-ops
+  group_by: ['alertname', 'job', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - matchers:
+        - severity="critical"
+      receiver: orion-critical
+      repeat_interval: 1h
+
+receivers:
+  - name: orion-ops
+    webhook_configs:
+      - url: 'https://hooks.example.com/orion-ops'
+        http_config:
+          authorization:
+            type: Bearer
+            credentials_file: /run/secrets/alertmanager_webhook_token
+        send_resolved: true
+    email_configs:
+      - to: 'ops@example.com'
+        send_resolved: true
+  - name: orion-critical
+    webhook_configs:
+      - url: 'https://hooks.example.com/orion-critical'
+        http_config:
+          authorization:
+            type: Bearer
+            credentials_file: /run/secrets/alertmanager_webhook_token
+        send_resolved: true
+
+inhibit_rules:
+  - source_matchers: [severity="critical"]
+    target_matchers: [severity="warning"]
+    equal: ['alertname', 'job']

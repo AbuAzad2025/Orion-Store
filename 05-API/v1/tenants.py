@@ -85,6 +85,8 @@ def update_tenant(tenant_id: int):
         if not tenant:
             return jsonify({"error": "Tenant not found."}), 404
         data = request.get_json(silent=True) or {}
+        previous_status = tenant.status
+        status_changed = False
         for field in (
             "name",
             "name_en",
@@ -95,8 +97,27 @@ def update_tenant(tenant_id: int):
             "status",
         ):
             if field in data:
+                if field == "status":
+                    _tenants.validate_status_transition(previous_status, data[field])
+                    if data[field] != previous_status:
+                        status_changed = True
+                        if data[field] == "active":
+                            tenant.suspended_until = None
+                            tenant.suspended_reason = None
                 setattr(tenant, field, data[field])
+        if status_changed:
+            tenant.version += 1
         db.session.commit()
+        if status_changed:
+            from core.audit_log import audit_log
+
+            audit_log(
+                action="tenant.status_changed",
+                resource_type="tenant",
+                resource_id=str(tenant.id),
+                tenant_id=tenant.id,
+                details={"from": previous_status, "to": tenant.status},
+            )
         return jsonify({"tenant": tenant.to_dict()}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
@@ -115,6 +136,26 @@ def delete_tenant(tenant_id: int):
         tenant.deleted_at = db.func.now()
         db.session.commit()
         return jsonify({"message": "Tenant deleted."}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_bp.post("/<int:tenant_id>/restore")
+def restore_tenant(tenant_id: int):
+    try:
+        require_platform_admin()
+        tenant = _tenants.restore(tenant_id)
+        return jsonify({"tenant": tenant.to_dict()}), 200
+    except OrionError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
+
+
+@tenant_bp.post("/<int:tenant_id>/reactivate")
+def reactivate_tenant(tenant_id: int):
+    try:
+        require_platform_admin()
+        tenant = _tenants.reactivate(tenant_id)
+        return jsonify({"tenant": tenant.to_dict()}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 

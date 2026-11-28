@@ -233,7 +233,7 @@ HTTP Request
 - بوابات الدفع مُنفّذة فعلياً لكن **لم تُختبر بحسابات تاجر حقيقية** (sandbox فقط).
 - لم يُنشر على staging/production؛ TLS وDNS وsubdomains لم تُختبر.
 - CI يستخدم Python 3.11 بينما التحقق المحلي كان على 3.14.
-- لا يوجد تنبيه لطول طابور Celery (لا مقياس مُصدَّر بعد).
+- سُدّت فجوة تنبيه Celery: `orion_celery_worker_up` و`orion_celery_queue_depth` مع قواعد `OrionCeleryWorkerDown` / `OrionCeleryQueueDepthHigh`؛ وأُضيف `OrionBackupStale` لعمر نبض النسخ.
 - التدقيق البصري آلي/لقات، لا تدقيق human WCAG كامل.
 
 ---

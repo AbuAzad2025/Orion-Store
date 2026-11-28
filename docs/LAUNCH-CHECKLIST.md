@@ -35,7 +35,7 @@
 - [ ] `/health` و`/ready` و`/metrics` تستجيب
 - [ ] Sentry مُهيّأ بـ `SENTRY_DSN` و`SENTRY_ENVIRONMENT=production`
 - [ ] `LOG_JSON=true`
-- [ ] لوحة Grafana وقواعد التنبيه مُحمّلة في staging
+- [ ] لوحة Grafana وقواعد التنبيه الستّة مُحمّلة في staging (منها Celery worker/queue وOrionBackupStale)
 - [ ] `RUNBOOK.md` مُراجَع من قبل الشخص المناوب
 
 ## 6. الواجهات

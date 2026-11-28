@@ -23,6 +23,7 @@ _REGISTRY: Any = None
 _CELERY_UP: Any = None
 _CELERY_AGE: Any = None
 _CELERY_QUEUE: Any = None
+_BACKUP_AGE: Any = None
 
 
 def _cfg(name: str, default: Any) -> Any:
@@ -122,6 +123,18 @@ def backup_freshness(path: str, max_age: int) -> tuple[bool, dict]:
     return ok, info
 
 
+def update_backup_gauge() -> None:
+    """Export latest platform-backup age; fail closed on unusable heartbeat."""
+    if _BACKUP_AGE is None:
+        return
+    path = str(_cfg("BACKUP_HEARTBEAT_FILE", "") or "")
+    max_age = int(_cfg("BACKUP_HEARTBEAT_MAX_AGE_SECONDS", 172800))
+    _, info = backup_freshness(path, max_age)
+    kind = str(info.get("backup_kind") or "unknown")
+    age = info.get("backup_age_seconds")
+    _BACKUP_AGE.labels(kind).set(float(age) if age is not None else float("inf"))
+
+
 def readiness_dependencies() -> tuple[dict, bool]:
     extra: dict = {}
     failed = False
@@ -160,7 +173,7 @@ def init_sentry(app: Flask) -> None:
 
 
 def init_prometheus(app: Flask) -> None:
-    global _REQUEST_COUNT, _REQUEST_LATENCY, _REGISTRY, _CELERY_UP, _CELERY_AGE, _CELERY_QUEUE
+    global _REQUEST_COUNT, _REQUEST_LATENCY, _REGISTRY, _CELERY_UP, _CELERY_AGE, _CELERY_QUEUE, _BACKUP_AGE
     if app.config.get("TESTING") or not app.config.get("PROMETHEUS_ENABLED", True):
         return
 
@@ -199,6 +212,12 @@ def init_prometheus(app: Flask) -> None:
     _CELERY_QUEUE = Gauge(
         "orion_celery_queue_depth", "Pending Celery tasks", ["queue"], registry=registry
     )
+    _BACKUP_AGE = Gauge(
+        "orion_backup_age_seconds",
+        "Age in seconds of the most recent backup heartbeat",
+        ["kind"],
+        registry=registry,
+    )
 
     @app.before_request
     def _prometheus_before() -> None:
@@ -220,6 +239,7 @@ def init_prometheus(app: Flask) -> None:
         _authorize_metrics()
         if _REGISTRY is not None:
             update_celery_gauges()
+            update_backup_gauge()
         return Response(
             generate_latest(_REGISTRY),
             mimetype="text/plain; version=0.0.4; charset=utf-8",

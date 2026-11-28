@@ -11,9 +11,24 @@ const OrionTenantOps = {
         return;
       }
       SafeDOM.clear(el);
+      const statusLabels = {
+        requested: OrionI18n.t("مطلوب", "Requested"),
+        approved: OrionI18n.t("موافق عليه", "Approved"),
+        received: OrionI18n.t("مستلم", "Received"),
+        refunded: OrionI18n.t("مسترد", "Refunded"),
+        closed: OrionI18n.t("مغلق", "Closed"),
+        cancelled: OrionI18n.t("ملغي", "Cancelled"),
+      };
+      const typeLabels = {
+        refund: OrionI18n.t("استرداد", "Refund"),
+        exchange: OrionI18n.t("تبديل", "Exchange"),
+        store_credit: OrionI18n.t("رصيد متجر", "Store credit"),
+      };
       for (const r of rows) {
         const row = SafeDOM.elem("div", { className: "border-b py-2 flex justify-between items-center gap-2" });
-        row.appendChild(SafeDOM.elem("span", null, [`#${r.id} — ${r.status} — ${r.return_type || ""}`]));
+        const status = statusLabels[r.status] || r.status;
+        const type = typeLabels[r.return_type] || OrionI18n.t("غير محدد", "Unspecified");
+        row.appendChild(SafeDOM.elem("span", null, [`#${r.id} — ${status} — ${type}`]));
         if (r.status === "requested") {
           row.appendChild(SafeDOM.elem("button", { "data-approve": r.id, className: "text-emerald-700 text-xs" }, [OrionI18n.t("موافقة", "Approve")]));
         }

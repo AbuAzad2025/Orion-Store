@@ -17,6 +17,17 @@ from core.beta_gate import (
 from core.exceptions import AuthenticationError, AuthorizationError, NotFoundError
 from orion.extensions import db
 from tenant.tenant import Tenant
+
+_BLOCKED_TENANT_STATUSES = frozenset({"suspended", "cancelled"})
+_LIFECYCLE_SAFE_PATHS = frozenset(
+    {"/health", "/ready", "/favicon.ico", "/api/v1/tenants/me"}
+)
+_LIFECYCLE_SAFE_PREFIXES = (
+    "/api/v1/auth/",
+    "/admin/static",
+    "/static/",
+    "/store/static/",
+)
 from user.user import User
 
 
@@ -221,6 +232,23 @@ def register_middleware(app: Flask) -> None:
             ):
                 return ("Forbidden", 403)
         return None
+
+    @app.before_request
+    def guard_tenant_lifecycle():
+        tenant = getattr(g, "tenant", None)
+        if (
+            tenant is None
+            or getattr(tenant, "status", None) not in _BLOCKED_TENANT_STATUSES
+        ):
+            return None
+        if getattr(g, "is_platform_admin", False):
+            return None
+        path = request.path or ""
+        if path in _LIFECYCLE_SAFE_PATHS or path.startswith(_LIFECYCLE_SAFE_PREFIXES):
+            return None
+        if path.startswith("/api/") or path.startswith("/admin/"):
+            return jsonify({"error": "Store is unavailable."}), 403
+        return ("Not found", 404)
 
 
 def bind_rls_context() -> None:

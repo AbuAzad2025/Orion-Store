@@ -36,3 +36,34 @@ groups:
         annotations:
           summary: Orion API p95 latency above 500ms
           description: 95th percentile request latency exceeded 500ms for 10 minutes.
+
+  - name: orion-infra
+    rules:
+      - alert: OrionCeleryWorkerDown
+        expr: orion_celery_worker_up{job="orion-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Celery worker heartbeat is stale
+          description: orion_celery_worker_up has been 0 for 2 minutes.
+
+      - alert: OrionCeleryQueueDepthHigh
+        expr: orion_celery_queue_depth{job="orion-api"} > 100
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Celery queue depth above 100
+          description: Queue has held more than 100 pending tasks for 10 minutes.
+
+      - alert: OrionBackupStale
+        expr: |
+          orion_backup_age_seconds{kind="platform"} > 172800
+          or absent(orion_backup_age_seconds{kind="platform"})
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Platform backup heartbeat older than 48h (or missing)
+          description: No fresh platform backup heartbeat for 48 hours.

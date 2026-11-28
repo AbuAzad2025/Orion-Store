@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 from flask import current_app
+from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from base.types import TenantStatus
@@ -16,6 +17,15 @@ from tenant.tenant import Tenant
 from tenant.tenant_config import TenantConfig
 
 logger = logging.getLogger(__name__)
+
+ALLOWED_STATUS_TRANSITIONS: dict[str, frozenset[str]] = {
+    "pending": frozenset({"trial", "active", "cancelled"}),
+    "trial": frozenset({"active", "suspended", "cancelled"}),
+    "active": frozenset({"suspended", "cancelled"}),
+    "suspended": frozenset({"active", "cancelled"}),
+    "cancelled": frozenset(),
+}
+_VALID_STATUSES = frozenset(s.value for s in TenantStatus)
 
 
 class TenantService:
@@ -49,9 +59,10 @@ class TenantService:
         status: str | None = None,
     ) -> Tenant:
         if status is not None:
-            allowed = {s.value for s in TenantStatus}
-            if status not in allowed:
+            if status not in _VALID_STATUSES:
                 raise ValidationError("Invalid tenant status.")
+            if status == "cancelled":
+                raise ValidationError("New tenants cannot be created as cancelled.")
         if Tenant.query.filter_by(slug=slug).first():
             raise ValidationError("Slug already exists.")
         tenant = Tenant(
@@ -167,3 +178,108 @@ class TenantService:
         from user.user import User
 
         return User.query.filter_by(tenant_id=tenant_id, deleted_at=None).all()
+
+    @staticmethod
+    def validate_status_transition(
+        current: str, target: str, *, allow_restore: bool = False
+    ) -> None:
+        if target not in _VALID_STATUSES:
+            raise ValidationError("Invalid tenant status.")
+        if target == current:
+            return
+        if target in ALLOWED_STATUS_TRANSITIONS.get(current, frozenset()):
+            return
+        if allow_restore and current == "cancelled" and target == "active":
+            return
+        raise ValidationError(
+            f"Invalid tenant status transition: {current} -> {target}."
+        )
+
+    @staticmethod
+    def _get_by_id(tenant_id: int, *, include_deleted: bool = False) -> Tenant:
+        query = Tenant.query.options(joinedload(Tenant.config))
+        if not include_deleted:
+            query = query.filter(Tenant.deleted_at.is_(None))
+        tenant = query.filter_by(id=tenant_id).first()
+        if not tenant:
+            raise NotFoundError("Tenant not found.")
+        return tenant
+
+    @staticmethod
+    def _assert_identity_available(tenant: Tenant) -> None:
+        values = [v for v in (tenant.slug, tenant.domain, tenant.custom_domain) if v]
+        clash = (
+            Tenant.query.filter(Tenant.id != tenant.id)
+            .filter(
+                or_(
+                    Tenant.slug.in_(values),
+                    Tenant.domain.in_(values),
+                    Tenant.custom_domain.in_(values),
+                )
+            )
+            .first()
+        )
+        if clash:
+            raise ValidationError(
+                "Cannot restore tenant: slug or domain is already in use."
+            )
+
+    def restore(self, tenant_id: int) -> Tenant:
+        from core.audit_log import audit_log
+
+        tenant = self._get_by_id(tenant_id, include_deleted=True)
+        previous = tenant.status
+        was_deleted = tenant.deleted_at is not None
+        if not (was_deleted or previous in ("cancelled", "suspended")):
+            raise ValidationError(
+                "Only cancelled, suspended, or deleted tenants can be restored."
+            )
+        self.validate_status_transition(previous, "active", allow_restore=True)
+        self._assert_identity_available(tenant)
+        tenant.deleted_at = None
+        tenant.is_active = True
+        tenant.status = "active"
+        tenant.suspended_until = None
+        tenant.suspended_reason = None
+        tenant.version += 1
+        db.session.commit()
+        audit_log(
+            action="tenant.restored",
+            resource_type="tenant",
+            resource_id=str(tenant.id),
+            tenant_id=tenant.id,
+            details={
+                "from_status": previous,
+                "to_status": "active",
+                "slug": tenant.slug,
+                "undeleted": was_deleted,
+            },
+        )
+        return tenant
+
+    def reactivate(self, tenant_id: int) -> Tenant:
+        from core.audit_log import audit_log
+
+        tenant = self._get_by_id(tenant_id)
+        if tenant.status != "suspended":
+            raise ValidationError("Only suspended tenants can be reactivated.")
+        self.validate_status_transition(tenant.status, "active")
+        self._assert_identity_available(tenant)
+        tenant.status = "active"
+        tenant.suspended_until = None
+        tenant.suspended_reason = None
+        tenant.is_active = True
+        tenant.version += 1
+        db.session.commit()
+        audit_log(
+            action="tenant.reactivated",
+            resource_type="tenant",
+            resource_id=str(tenant.id),
+            tenant_id=tenant.id,
+            details={
+                "from_status": "suspended",
+                "to_status": "active",
+                "slug": tenant.slug,
+            },
+        )
+        return tenant

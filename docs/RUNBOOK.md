@@ -228,5 +228,6 @@ python scripts/verify_deployment_rls.py --check
 ## 8. المراقبة
 
 - Grafana: لوحة `Orion API Overview` (معدل الطلبات، نسبة 5xx، p95).
-- Prometheus: قواعد `alerts/alert_rules.yml` → `OrionApiDown`, `OrionHigh5xxRate`, `OrionSlowP95`.
+- Prometheus: قواعد `alerts/alert_rules.yml` → `OrionApiDown`, `OrionHigh5xxRate`, `OrionSlowP95`, `OrionCeleryWorkerDown`, `OrionCeleryQueueDepthHigh`, `OrionBackupStale`.
+- Alertmanager: ابدأ من `alerts/alertmanager.yml.example` بلا أسرار؛ الأسرار من ملفات mounted وقت النشر.
 - Sentry: `SENTRY_DSN` + `SENTRY_ENVIRONMENT=production` + `LOG_JSON=true`.

@@ -6,6 +6,11 @@ import secrets
 
 from flask import Flask, Response, g
 
+PERMISSIONS_POLICY = (
+    "accelerometer=(), camera=(), geolocation=(), gyroscope=(), "
+    "magnetometer=(), microphone=(), midi=(), payment=(), usb=()"
+)
+
 
 def register_security_headers(app: Flask) -> None:
     @app.before_request
@@ -23,6 +28,7 @@ def register_security_headers(app: Flask) -> None:
         response.headers.setdefault(
             "Referrer-Policy", "strict-origin-when-cross-origin"
         )
+        response.headers.setdefault("Permissions-Policy", PERMISSIONS_POLICY)
         nonce = getattr(g, "csp_nonce", "")
         # CSP_ALLOW_UNSAFE_INLINE is a legacy rollback switch only; no inline
         # scripts/styles/style attributes remain in the codebase.
@@ -33,7 +39,11 @@ def register_security_headers(app: Flask) -> None:
             "default-src 'self'; "
             f"script-src 'self'{nonce_src}{unsafe}; "
             f"style-src 'self'{nonce_src}{unsafe}; "
-            "img-src 'self' data: https:;"
+            "img-src 'self' data: https:; "
+            "frame-ancestors 'none'; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self';"
         )
         response.headers.setdefault("Content-Security-Policy", csp)
         if app.config.get("ENFORCE_HSTS"):
