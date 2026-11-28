@@ -132,6 +132,51 @@ class CartService:
         _commit_keep_loaded()
         return item
 
+    def add_bundle(self, *, cart: Cart, bundle_id: int, quantity: int = 1) -> CartItem:
+        """Add a published bundle as one line at its advertised price."""
+        if quantity < 1:
+            raise ValidationError("Quantity must be at least 1.")
+        from bundle.bundle import ProductBundle
+        from bundle_svc.bundle_service import BundleService
+
+        bundle = ProductBundle.query.filter_by(
+            id=bundle_id, tenant_id=cart.tenant_id, is_published=True
+        ).first()
+        if bundle is None:
+            raise NotFoundError("Bundle not found.")
+        existing = CartItem.query.filter_by(
+            cart_id=cart.id, bundle_id=bundle.id
+        ).first()
+        required = existing.quantity + quantity if existing else quantity
+        if bundle.max_per_order is not None and required > bundle.max_per_order:
+            raise ValidationError("Bundle limit per order exceeded.")
+        for item in BundleService().items_for(bundle.id):
+            product = Product.query.filter_by(
+                id=item.product_id, tenant_id=cart.tenant_id, deleted_at=None
+            ).first()
+            if product is None:
+                raise NotFoundError("Product not found.")
+            if (product.quantity or 0) < item.quantity * required:
+                raise ValidationError("Insufficient stock.")
+        unit = Decimal(str(bundle.bundle_price))
+        if existing:
+            existing.quantity = required
+            existing.unit_price = unit
+            existing.total_price = unit * required
+            _commit_keep_loaded()
+            return existing
+        item = CartItem(
+            cart_id=cart.id,
+            tenant_id=cart.tenant_id,
+            bundle_id=bundle.id,
+            quantity=quantity,
+            unit_price=unit,
+            total_price=unit * quantity,
+        )
+        db.session.add(item)
+        _commit_keep_loaded()
+        return item
+
     def list_items(self, cart: Cart) -> list[CartItem]:
         return CartItem.query.filter_by(cart_id=cart.id).all()
 

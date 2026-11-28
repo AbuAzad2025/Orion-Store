@@ -9,10 +9,9 @@ from decimal import Decimal
 from sqlalchemy import update
 
 from catalog.product import Product
-
 from core.exceptions import ValidationError
-from orion.extensions import db
 from order.order import Order, OrderItem
+from orion.extensions import db
 from tenant.tenant_config import TenantConfig
 
 CHANNEL = "whatsapp"
@@ -41,41 +40,70 @@ class WhatsAppOrderService:
     ) -> Order:
         """Create an unconfirmed order without touching stock or payments."""
         clean: list[dict] = []
-        seen: dict[int, dict] = {}
+        seen: dict[tuple[str, int], dict] = {}
         for row in items:
-            product_id = int(row.get("product_id"))
             quantity = int(row.get("quantity") or 1)
             if quantity < 1:
                 raise ValidationError("Quantity must be at least 1.")
-            product = Product.query.filter_by(
-                id=product_id, tenant_id=tenant.id, deleted_at=None
-            ).first()
-            if product is None or not product.is_published:
-                raise ValidationError("Product not found.")
-            if quantity > (product.quantity or 0):
-                raise ValidationError("Requested quantity is not available.")
-            raw_price = row.get("unit_price")
-            unit_price = (
-                Decimal(str(raw_price))
-                if raw_price is not None
-                else Decimal(str(product.price))
-            )
-            total = unit_price * quantity
-            entry = {
-                "product": product,
-                "product_id": product.id,
-                "product_name": str(row.get("product_name") or product.name),
-                "product_sku": product.sku,
-                "unit_price": unit_price,
-                "unit_cost": product.cost_price or Decimal("0"),
-                "quantity": quantity,
-                "total_price": total,
-            }
-            if product_id in seen:
-                seen[product_id]["quantity"] += quantity
-                seen[product_id]["total_price"] += total
+            if row.get("bundle_id") is not None:
+                from bundle.bundle import ProductBundle
+
+                bundle = ProductBundle.query.filter_by(
+                    id=int(row["bundle_id"]), tenant_id=tenant.id, is_published=True
+                ).first()
+                if bundle is None:
+                    raise ValidationError("Bundle not found.")
+                advertised = Decimal(str(bundle.bundle_price))
+                raw_price = row.get("unit_price")
+                unit_price = (
+                    Decimal(str(raw_price)) if raw_price is not None else advertised
+                )
+                if unit_price != advertised:
+                    raise ValidationError("Invalid bundle price.")
+                total = unit_price * quantity
+                entry = {
+                    "product": None,
+                    "product_id": None,
+                    "product_name": str(row.get("product_name") or bundle.name),
+                    "product_sku": None,
+                    "unit_price": unit_price,
+                    "unit_cost": Decimal("0"),
+                    "quantity": quantity,
+                    "total_price": total,
+                }
+                key = ("bundle", bundle.id)
             else:
-                seen[product_id] = entry
+                product_id = int(row.get("product_id"))
+                product = Product.query.filter_by(
+                    id=product_id, tenant_id=tenant.id, deleted_at=None
+                ).first()
+                if product is None or not product.is_published:
+                    raise ValidationError("Product not found.")
+                if quantity > (product.quantity or 0):
+                    raise ValidationError("Requested quantity is not available.")
+                raw_price = row.get("unit_price")
+                unit_price = (
+                    Decimal(str(raw_price))
+                    if raw_price is not None
+                    else Decimal(str(product.price))
+                )
+                total = unit_price * quantity
+                entry = {
+                    "product": product,
+                    "product_id": product.id,
+                    "product_name": str(row.get("product_name") or product.name),
+                    "product_sku": product.sku,
+                    "unit_price": unit_price,
+                    "unit_cost": product.cost_price or Decimal("0"),
+                    "quantity": quantity,
+                    "total_price": total,
+                }
+                key = ("product", product_id)
+            if key in seen:
+                seen[key]["quantity"] += quantity
+                seen[key]["total_price"] += total
+            else:
+                seen[key] = entry
                 clean.append(entry)
         if not clean:
             raise ValidationError("No order items.")

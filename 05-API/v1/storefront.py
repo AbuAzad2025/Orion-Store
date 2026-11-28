@@ -342,7 +342,6 @@ def download_order_invoice_pdf(public_id: str):
         ).first()
         if not invoice:
             raise NotFoundError("Invoice not found.")
-
         user = getattr(g, "user", None)
         if user is None:
             raise AuthenticationError("Authentication required.")
@@ -355,7 +354,6 @@ def download_order_invoice_pdf(public_id: str):
         ).lower() == (getattr(user, "email", None) or "").lower()
         if not is_admin and not is_owner:
             raise AuthorizationError("Permission denied.")
-
         key = invoice.storage_key or invoice.pdf_artifact_path
         if not key:
             raise NotFoundError("Invoice PDF not found.")

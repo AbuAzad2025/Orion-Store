@@ -35,6 +35,12 @@ const StoreAPI = {
       quantity: quantity || 1,
     });
   },
+  addBundle(token, bundleId, quantity) {
+    return this.request("POST", `/cart/${token}/bundle`, {
+      bundle_id: bundleId,
+      quantity: quantity || 1,
+    });
+  },
   whatsappMessage(token, payload) {
     return this.request("POST", `/cart/${token}/whatsapp-message`, payload || {});
   },

@@ -59,7 +59,14 @@ def _on_payment_refunded(
                 id=refund.payment_id, tenant_id=tenant_id
             ).first()
             total = Decimal(str(payment.amount)) if payment else Decimal("0")
-            is_full_refund = bool(total and Decimal(str(refund.amount)) >= total)
+            # Cumulative partial refunds can equal the full capture.
+            completed = Refund.query.filter_by(
+                payment_id=refund.payment_id, status="completed"
+            ).all()
+            total_refunded = sum(
+                (Decimal(str(r.amount)) for r in completed), Decimal("0")
+            )
+            is_full_refund = bool(total and total_refunded >= total)
     if not order_id:
         return
     order = Order.query.filter_by(id=order_id, tenant_id=tenant_id).first()

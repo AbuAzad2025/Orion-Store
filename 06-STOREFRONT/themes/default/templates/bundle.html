@@ -50,9 +50,7 @@ document.addEventListener("click", async (event) => {
       token = (await StoreAPI.createCart()).cart.cart_token;
       StoreAPI.setCartToken(token);
     }
-    for (const item of data.bundle.items) {
-      await StoreAPI.addItem(token, item.product_id, item.quantity);
-    }
+    await StoreAPI.addBundle(token, data.bundle.id, 1);
     const msg = document.getElementById("bundle-msg");
     if (msg) msg.textContent = "{{ t('bundle_added') }}";
     button.disabled = false;

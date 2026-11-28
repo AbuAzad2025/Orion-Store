@@ -54,7 +54,7 @@ def update_tax_config():
                 rate = Decimal(str(data["tax_rate"]))
             except (InvalidOperation, ValueError, TypeError) as exc:
                 raise ValidationError("Invalid tax rate.") from exc
-            if rate < 0 or rate > 100:
+            if not rate.is_finite() or rate < 0 or rate > 100:
                 raise ValidationError("Tax rate must be between 0 and 100.")
             config.tax_rate = rate / Decimal("100")
         if "tax_included" in data:

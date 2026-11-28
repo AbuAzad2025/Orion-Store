@@ -172,6 +172,7 @@ def create_app(config_name: str | None = None) -> Flask:
     import base.base_model  # noqa: F401
     import bnpl.bnpl_provider  # noqa: F401
     import bnpl.bnpl_transaction  # noqa: F401
+    import bundle.bundle  # noqa: F401
     import catalog.brand  # noqa: F401
     import catalog.category  # noqa: F401
     import catalog.product  # noqa: F401

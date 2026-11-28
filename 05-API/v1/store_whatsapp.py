@@ -12,35 +12,79 @@ from order_svc.whatsapp_order_service import WhatsAppOrderService
 
 
 def cart_items_with_names(carts, cart) -> list[dict]:
-    """Cart items + product names in the language of the current request."""
+    """Cart items + localized names for products and bundles (tenant-scoped)."""
+    from bundle.bundle import ProductBundle
     from i18n_svc.translation_service import TranslationService
 
     from catalog.product import Product
     from core.context import get_locale
 
     items = [item.to_dict() for item in carts.list_items(cart)]
-    ids = [item["product_id"] for item in items]
-    if ids:
-        products = {
+    locale = get_locale()
+    translate = TranslationService()
+    product_ids = [item["product_id"] for item in items if item.get("product_id")]
+    products = (
+        {
             p.id: p
             for p in Product.query.filter(
-                Product.tenant_id == cart.tenant_id, Product.id.in_(ids)
+                Product.tenant_id == cart.tenant_id, Product.id.in_(product_ids)
             ).all()
         }
-        locale = get_locale()
-        translate = TranslationService()
-        for item in items:
-            product = products.get(item["product_id"])
-            if product is None:
-                item["product_name"] = str(item["product_id"])
-                continue
-            merged = translate.merge_product(product, locale)
-            item["product_name"] = merged.get("name") or product.name
+        if product_ids
+        else {}
+    )
+    bundle_ids = [item["bundle_id"] for item in items if item.get("bundle_id")]
+    bundles = (
+        {
+            b.id: b
+            for b in ProductBundle.query.filter(
+                ProductBundle.tenant_id == cart.tenant_id,
+                ProductBundle.id.in_(bundle_ids),
+            ).all()
+        }
+        if bundle_ids
+        else {}
+    )
+    for item in items:
+        if item.get("bundle_id") is not None:
+            bundle = bundles.get(item["bundle_id"])
+            if bundle is None:
+                item["product_name"] = str(item["bundle_id"])
+            elif locale.split("_")[0].lower().startswith("en") and bundle.name_en:
+                item["product_name"] = bundle.name_en
+            else:
+                item["product_name"] = bundle.name
+            continue
+        product = products.get(item.get("product_id"))
+        if product is None:
+            item["product_name"] = str(item.get("product_id"))
+            continue
+        merged = translate.merge_product(product, locale)
+        item["product_name"] = merged.get("name") or product.name
     return items
 
 
 def register_store_whatsapp_routes(bp, carts) -> None:
     orders = WhatsAppOrderService()
+
+    @bp.post("/cart/<cart_token>/bundle")
+    @limiter.limit("60 per minute")
+    def add_cart_bundle(cart_token: str):
+        """Add a published bundle as one cart line at its advertised price."""
+        try:
+            tenant = require_tenant_context()
+            cart = carts.get_cart(tenant.id, cart_token)
+            data = request.get_json(silent=True) or {}
+            item = carts.add_bundle(
+                cart=cart,
+                bundle_id=int(data["bundle_id"]),
+                quantity=int(data.get("quantity", 1)),
+            )
+            return jsonify({"item": item.to_dict()}), 201
+        except OrionError as exc:
+            return jsonify({"error": exc.message}), exc.status_code
+        except (KeyError, TypeError, ValueError):
+            return jsonify({"error": "Invalid request."}), 400
 
     @bp.post("/cart/<cart_token>/whatsapp-message")
     @limiter.limit("10 per minute")

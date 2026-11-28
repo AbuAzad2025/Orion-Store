@@ -153,6 +153,29 @@ class CheckoutService:
         for item in self._carts.list_items(cart):
             from catalog.product import Product
 
+            if item.bundle_id is not None:
+                from bundle.bundle import ProductBundle
+
+                bundle = ProductBundle.query.filter_by(
+                    id=item.bundle_id, tenant_id=cart.tenant_id
+                ).first()
+                if not bundle:
+                    db.session.rollback()
+                    raise ValidationError("Bundle not found.")
+                db.session.add(
+                    OrderItem(
+                        order_id=order.id,
+                        tenant_id=cart.tenant_id,
+                        product_id=None,
+                        product_name=bundle.name,
+                        product_sku=None,
+                        unit_price=item.unit_price,
+                        unit_cost=Decimal("0"),
+                        quantity=item.quantity,
+                        total_price=item.total_price,
+                    )
+                )
+                continue
             prod = Product.query.filter_by(
                 id=item.product_id, tenant_id=cart.tenant_id
             ).first()
@@ -243,6 +266,8 @@ class CheckoutService:
 
             oms = OmsService()
             for item in self._carts.list_items(cart):
+                if item.product_id is None:
+                    continue
                 oms.sync_product_to_warehouse(
                     tenant_id=cart.tenant_id, product_id=item.product_id
                 )

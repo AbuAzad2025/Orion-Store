@@ -171,6 +171,7 @@ AR: dict[str, str] = {
     "Program not found.": "البرنامج غير موجود.",
     "Affiliate not found.": "الشريك غير موجود.",
     "Bundle not found.": "الحزمة غير موجودة.",
+    "Bundle limit per order exceeded.": "تم بلوغ الحد الأقصى للحزمة في الطلب.",
     "Job not found.": "المهمة غير موجودة.",
     "Reconciliation run not found.": "تشغيل المطابقة غير موجود.",
     "Run not found.": "التشغيل غير موجود.",

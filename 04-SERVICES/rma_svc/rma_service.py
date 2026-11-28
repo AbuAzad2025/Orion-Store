@@ -5,6 +5,8 @@ from __future__ import annotations
 import uuid
 from decimal import Decimal
 
+from sqlalchemy import func
+
 from core.exceptions import NotFoundError, ValidationError
 from core.utils import utc_now
 from order.order import Order, OrderItem
@@ -90,7 +92,19 @@ class RmaService:
             if not oi:
                 raise NotFoundError("Order item not found.")
             qty = int(raw.get("quantity", 1))
-            if qty < 1 or qty > oi.quantity:
+            # Earlier non-cancelled returns consume part of the order line;
+            # without this guard a second RMA restocks/refunds the same units.
+            prior = (
+                db.session.query(func.coalesce(func.sum(ReturnItem.quantity), 0))
+                .join(MerchandiseReturn, ReturnItem.return_id == MerchandiseReturn.id)
+                .filter(
+                    ReturnItem.order_item_id == oi.id,
+                    MerchandiseReturn.tenant_id == tenant_id,
+                    MerchandiseReturn.status != "cancelled",
+                )
+                .scalar()
+            )
+            if qty < 1 or qty + int(prior or 0) > oi.quantity:
                 raise ValidationError("Invalid return quantity.")
             line_refund = (oi.unit_price * qty).quantize(Decimal("0.01"))
             refund_total += line_refund
@@ -154,6 +168,30 @@ class RmaService:
             raise ValidationError("Return must be approved first.")
 
         items = ReturnItem.query.filter_by(return_id=row.id).all()
+
+        # Refund FIRST. Restocking before the refund commits free inventory if
+        # the refund is rejected by the cumulative guard or a gateway failure.
+        refund_result = None
+        if process_refund and row.return_type == "refund" and row.refund_amount > 0:
+            payment = Payment.query.filter_by(
+                tenant_id=tenant_id, order_id=row.order_id, status="completed"
+            ).first()
+            if payment:
+                from decimal import Decimal
+
+                from payment_svc.payment_service import PaymentService
+
+                amount = Decimal(str(row.refund_amount))
+                if amount <= 0 or amount > Decimal(str(payment.amount)):
+                    raise ValueError("Invalid RMA refund amount.")
+                refund_result = PaymentService().refund(
+                    tenant_id=tenant_id,
+                    payment_public_id=str(payment.public_id),
+                    amount=amount,
+                    reason=f"RMA {row.return_number}",
+                )
+
+        # Only restock after the refund pipeline has not raised.
         restocked: list = []
         for item in items:
             if item.restock and item.product_id:
@@ -174,26 +212,6 @@ class RmaService:
                 )
             except Exception:
                 pass
-
-        refund_result = None
-        if process_refund and row.return_type == "refund" and row.refund_amount > 0:
-            payment = Payment.query.filter_by(
-                tenant_id=tenant_id, order_id=row.order_id, status="completed"
-            ).first()
-            if payment:
-                from payment_svc.payment_service import PaymentService
-
-                from decimal import Decimal
-
-                amount = Decimal(str(row.refund_amount))
-                if amount <= 0 or amount > Decimal(str(payment.amount)):
-                    raise ValueError("Invalid RMA refund amount.")
-                refund_result = PaymentService().refund(
-                    tenant_id=tenant_id,
-                    payment_public_id=str(payment.public_id),
-                    amount=amount,
-                    reason=f"RMA {row.return_number}",
-                )
 
         row.status = "refunded" if row.return_type == "refund" else "closed"
         row.completed_at = utc_now()

@@ -105,9 +105,11 @@ class I18nService:
         )
         multi = True
         if tenant:
-            from feature_flag_svc.feature_flag_evaluator import FeatureFlagEvaluator
+            from feature_flag_svc.feature_flag_service import FeatureFlagService
 
-            multi = FeatureFlagEvaluator().is_enabled(tenant.id, "multi_language")
+            multi = FeatureFlagService().is_enabled(
+                tenant_id=tenant.id, code="multi_language"
+            )
         g.locale = self.resolve_locale(
             tenant, requested=requested, multi_language_enabled=multi
         )

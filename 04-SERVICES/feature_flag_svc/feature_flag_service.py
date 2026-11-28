@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import hashlib
+from datetime import UTC, datetime
 
 from feature_flag.feature_flag import FeatureFlag, TenantFeatureFlagOverride
 from feature_flag.feature_flag_override import FeatureFlagOverride
 
 from core.exceptions import NotFoundError
+from core.utils import utc_now
 from orion.extensions import db
 
 
@@ -108,9 +110,40 @@ class FeatureFlagService:
         override = TenantFeatureFlagOverride.query.filter_by(
             flag_id=flag.id, tenant_id=tenant_id
         ).first()
-        if override:
+        return self._resolve_value(flag, tenant_id, override)
+
+    def _resolve_value(
+        self,
+        flag: FeatureFlag,
+        tenant_id: int,
+        override: TenantFeatureFlagOverride | None,
+    ) -> bool:
+        """Single evaluator path: new override -> live legacy -> rollout."""
+        if override is not None:
             return override.enabled
+        legacy = self._active_legacy_override(flag, tenant_id)
+        if legacy is not None:
+            return legacy.value
         return self._evaluate_rollout(flag, tenant_id)
+
+    @classmethod
+    def _active_legacy_override(
+        cls, flag: FeatureFlag, tenant_id: int
+    ) -> FeatureFlagOverride | None:
+        row = FeatureFlagOverride.query.filter_by(
+            feature_flag_id=flag.id, tenant_id=tenant_id
+        ).first()
+        if row is not None and cls._legacy_override_is_live(row.expires_at):
+            return row
+        return None
+
+    @staticmethod
+    def _legacy_override_is_live(expires_at: datetime | None) -> bool:
+        if expires_at is None:
+            return True
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=UTC)
+        return expires_at > utc_now()
 
     def set_tenant_override(
         self,

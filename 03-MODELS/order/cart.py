@@ -54,8 +54,14 @@ class CartItem(db.Model, TimestampMixin):
         nullable=False,
         index=True,
     )
-    product_id: Mapped[int] = mapped_column(
-        PrimaryKeyType, ForeignKey("products.id", ondelete="CASCADE"), nullable=False
+    product_id: Mapped[int | None] = mapped_column(
+        PrimaryKeyType, ForeignKey("products.id", ondelete="CASCADE"), nullable=True
+    )
+    bundle_id: Mapped[int | None] = mapped_column(
+        PrimaryKeyType,
+        ForeignKey("product_bundles.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
     )
     quantity: Mapped[int] = mapped_column(Integer, default=1)
     unit_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
@@ -64,6 +70,7 @@ class CartItem(db.Model, TimestampMixin):
     def to_dict(self) -> dict:
         return {
             "product_id": self.product_id,
+            "bundle_id": self.bundle_id,
             "quantity": self.quantity,
             "unit_price": str(self.unit_price),
             "total_price": str(self.total_price),

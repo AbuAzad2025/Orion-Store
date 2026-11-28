@@ -33,6 +33,7 @@ BNPL_GATEWAY_PREFIX = "bnpl_"
 
 
 class PaymentService:
+
     def __init__(self) -> None:
         self._orders = OrderService()
         self._gateways = GatewayService()
@@ -113,7 +114,6 @@ class PaymentService:
             raise NotFoundError("Payment not found.")
         if payment.status != "completed":
             raise ValidationError("Only completed payments can be refunded.")
-
         try:
             refund_amount = (
                 Decimal(str(payment.amount)) if amount is None else Decimal(str(amount))
@@ -126,7 +126,6 @@ class PaymentService:
             raise ValidationError("Refund amount must be positive.")
         if refund_amount > Decimal(str(payment.amount)):
             raise ValidationError("Refund amount exceeds payment amount.")
-
         # Cumulative guard: partial refunds are allowed while their sum fits.
         prior = (
             Refund.query.filter_by(payment_id=payment.id)
@@ -136,7 +135,6 @@ class PaymentService:
         prior_total = sum((Decimal(str(r.amount)) for r in prior), Decimal("0"))
         if prior_total + refund_amount > Decimal(str(payment.amount)):
             raise ConflictError("Payment already refunded.")
-
         result = self._refund_external_gateway(tenant_id, payment, refund_amount)
         if not result.get("success"):
             if result.get("uncertain"):
@@ -155,7 +153,6 @@ class PaymentService:
                 db.session.commit()
                 raise ConflictError("Refund result uncertain; reconcile before retry.")
             raise ValidationError(result.get("error", "Refund failed."))
-
         refund_row = Refund(
             tenant_id=tenant_id,
             payment_id=payment.id,
@@ -181,10 +178,16 @@ class PaymentService:
         refund_row.financial_event_id = outbound.id
         # A refund reverses the original commission; it must not create a new one.
         ledger = None
-        # A full refund closes the payment; a partial one keeps it completed while
-        # the active Refund row still blocks any second refund attempt.
-        if refund_amount >= Decimal(str(payment.amount)):
+        # Partial refunds can total a full capture; close payment and order.
+        total_refunded = sum(
+            (Decimal(str(r.amount)) for r in prior if r.status == "completed"),
+            refund_amount,
+        )
+        if total_refunded >= Decimal(str(payment.amount)):
             payment.status = "refunded"
+            order = db.session.get(Order, payment.order_id)
+            if order:
+                order.payment_status = "refunded"
         db.session.commit()
         publish(
             "payment.refunded",

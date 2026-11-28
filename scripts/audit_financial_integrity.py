@@ -30,6 +30,11 @@ for part in (
 FAILURES: list[str] = []
 CHECKS = 0
 
+# A fully refunded payment is still a captured sale: its row flips to
+# "refunded" while its inbound event and commission entry remain booked.
+PAID_STATUSES = ("completed", "refunded")
+COMPLETED_REFUND_STATUS = "completed"
+
 
 def check(name: str, ok: bool, detail: str = "") -> None:
     global CHECKS
@@ -79,19 +84,21 @@ def main() -> None:
 
             for p in payments:
                 order = orders.get(p.order_id)
-                if p.status == "completed" and order:
+                if p.status in PAID_STATUSES and order:
                     check(
                         f"{slug} payment {p.public_id} matches order total",
                         money(p.amount) == money(order.total),
                         f"{p.amount} vs {order.total}",
                     )
 
-            paid = [p for p in payments if p.status == "completed"]
+            paid = [p for p in payments if p.status in PAID_STATUSES]
             totals["payments"] += sum((money(p.amount) for p in paid), Decimal(0))
             paid_ids = {p.id for p in paid}
 
             for r in Refund.query.filter_by(tenant_id=tid).all():
                 payment = next((p for p in payments if p.id == r.payment_id), None)
+                if r.status != COMPLETED_REFUND_STATUS:
+                    continue  # pending markers do not move money yet
                 totals["refunds"] += money(r.amount)
                 check(
                     f"{slug} refund {r.id} has provider id", bool(r.provider_refund_id)
@@ -158,7 +165,9 @@ def main() -> None:
                     )
                     if original:
                         refund = Refund.query.filter_by(
-                            tenant_id=tid, payment_id=original.payment_id
+                            tenant_id=tid,
+                            payment_id=original.payment_id,
+                            status=COMPLETED_REFUND_STATUS,
                         ).first()
                         payment = next(
                             (p for p in payments if p.id == original.payment_id), None
@@ -254,11 +263,22 @@ def main() -> None:
             totals["refunds"] <= totals["payments"],
             f"{totals['refunds']} vs {totals['payments']}",
         )
+        net_revenue = totals["payments"] - totals["refunds"]
+        net_commission = totals["commission"] + totals["reversals"]
+        check(
+            "net commission is 1% of net revenue",
+            abs(
+                net_commission
+                - (net_revenue * Decimal("0.01")).quantize(Decimal("0.01"))
+            )
+            < Decimal("1"),
+            f"net_commission={net_commission} net_revenue={net_revenue}",
+        )
 
         print(f"\nCHECKS: {CHECKS}  FAILURES: {len(FAILURES)}")
         print(f"GROSS PAYMENTS: {totals['payments']}")
         print(f"REFUNDS: {totals['refunds']}")
-        print(f"NET REVENUE: {totals['payments'] - totals['refunds']}")
+        print(f"NET REVENUE: {net_revenue}")
         print(f"COMMISSIONS: {totals['commission']}  REVERSALS: {totals['reversals']}")
         if FAILURES:
             for f in FAILURES:
