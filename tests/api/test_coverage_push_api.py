@@ -540,7 +540,7 @@ def test_i18n_and_users(client, env, platform_admin_headers, app):
                 "is_superuser": True,
             },
         ).status_code
-        == 201
+        == 400  # platform admins are CLI-only (RBAC one-time invariant)
     )
     _bad(
         client,

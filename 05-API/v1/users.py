@@ -44,22 +44,33 @@ def create_user():
         password = data.get("password", "")
         tenant_id = data.get("tenant_id")
         is_admin = data.get("is_admin", True)
-        is_superuser = data.get("is_superuser", False)
+        if any(
+            data.get(field)
+            for field in ("is_superuser", "is_platform_admin", "is_owner", "role")
+        ):
+            return (
+                jsonify(
+                    {
+                        "error": (
+                            "Platform admins cannot be created through the API; "
+                            "use scripts/bootstrap_cli.py."
+                        )
+                    }
+                ),
+                400,
+            )
 
         if not email or not password:
             return jsonify({"error": "Email and password required."}), 400
 
-        if is_superuser:
-            user = _auth.register_super_admin(email=email, password=password)
-        else:
-            if not tenant_id:
-                return jsonify({"error": "tenant_id required for tenant user."}), 400
-            user = _auth.register_tenant_user(
-                tenant_id=tenant_id,
-                email=email,
-                password=password,
-                is_admin=is_admin,
-            )
+        if not tenant_id:
+            return jsonify({"error": "tenant_id required for tenant user."}), 400
+        user = _auth.register_tenant_user(
+            tenant_id=tenant_id,
+            email=email,
+            password=password,
+            is_admin=is_admin,
+        )
         return jsonify({"user": user.to_dict()}), 201
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

@@ -34,14 +34,14 @@ const OrionAdminCurrency = {
     const btn = document.getElementById("btn-convert");
     if (btn) {
       btn.addEventListener("click", async () => {
-        const amount = document.getElementById("conv-amount").value;
-        const from = document.getElementById("conv-from").value;
-        const to = document.getElementById("conv-to").value;
+        const amount = OrionUI.val("conv-amount");
+        const from = OrionUI.val("conv-from");
+        const to = OrionUI.val("conv-to");
         try {
           const data = await OrionAPI.get(`/currency/convert?amount=${amount}&from=${from}&to=${to}`);
           OrionUI.set("conv-result", `${data.result} ${to}`, "textContent");
         } catch (err) {
-          document.getElementById("conv-result").textContent = OrionI18n.t('تعذّر التحويل. تحقّق من المبلغ والعملات.', 'Conversion failed. Check the amount and currencies.');
+          OrionUI.set("conv-result", OrionI18n.t('تعذّر التحويل. تحقّق من المبلغ والعملات.', 'Conversion failed. Check the amount and currencies.'), "textContent");
         }
       });
     }

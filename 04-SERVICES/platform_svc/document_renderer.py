@@ -107,8 +107,17 @@ class DocumentRenderer:
             + localize("الضريبة", "Tax", locale)
             + f": {order.tax_amount} {payment.currency}</p>"
         )
-        if "</footer>" in body:
-            body = body.replace("</footer>", tax_block + "</footer>", 1)
+        # Place the tax summary BEFORE the footer: inject_platform_footer
+        # rewrites the whole footer span, so a block inserted inside it would
+        # be silently removed from the rendered invoice.
+        if re.search(r"<footer\b", body, re.I):
+            body = re.sub(
+                r"<footer\b",
+                lambda m: tax_block + m.group(0),
+                body,
+                count=1,
+                flags=re.I,
+            )
         else:
             body += tax_block
         return self.inject_platform_footer(body, footer_html)

@@ -38,18 +38,18 @@ const OrionAdminVouchers = {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const msg = document.getElementById("voucher-msg");
-      const start = document.getElementById("v-start").value;
-      const end = document.getElementById("v-end").value;
+      const start = OrionUI.val("v-start");
+      const end = OrionUI.val("v-end");
       try {
         await OrionUI.withLoading(form, () => OrionAPI.post("/vouchers/", {
-          code: document.getElementById("v-code").value.trim(),
-          name: document.getElementById("v-name").value.trim(),
-          type: document.getElementById("v-type").value,
-          value: document.getElementById("v-value").value,
-          usage_limit: document.getElementById("v-limit").value || null,
+          code: OrionUI.val("v-code").trim(),
+          name: OrionUI.val("v-name").trim(),
+          type: OrionUI.val("v-type"),
+          value: OrionUI.val("v-value"),
+          usage_limit: OrionUI.val("v-limit") || null,
           start_date: start ? `${start}T00:00:00Z` : null,
           end_date: end ? `${end}T23:59:59Z` : null,
-          is_free_shipping: document.getElementById("v-free-shipping").checked,
+          is_free_shipping: OrionUI.checked("v-free-shipping"),
         }));
         form.reset();
         msg.textContent = OrionI18n.t('تم حفظ القسيمة', 'Voucher saved');

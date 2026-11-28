@@ -297,9 +297,21 @@ def test_impersonation_authorization_and_target_guards(
             target_user_id=999999,
             tenant_id=tenant.id,
         )
-        other_admin = AuthService().register_super_admin(
-            email=f"other-{uuid.uuid4().hex[:8]}@test.com", password="password123"
+        # One-time bootstrap invariant: create a second platform admin row
+        # directly (the service now refuses to mint a second one).
+        from orion.extensions import db
+        from user.user import User
+
+        other_admin = User(
+            email=f"other-{uuid.uuid4().hex[:8]}@test.com",
+            password_hash=AuthService().hash_password("password123"),
+            is_superuser=True,
+            is_admin=True,
+            is_customer=False,
+            tenant_id=None,
         )
+        db.session.add(other_admin)
+        db.session.commit()
         # A platform admin cannot be a tenant-scoped target. Passing tenant_id
         # None reaches the defensive check (superusers have tenant_id=NULL).
         _fails(

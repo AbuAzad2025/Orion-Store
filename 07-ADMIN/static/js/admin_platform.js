@@ -31,7 +31,7 @@ const OrionAdminPlatform = {
     if (form) {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const id = document.getElementById("tenant-id").value;
+        const id = OrionUI.val("tenant-id");
         const payload = {
           name: form.querySelector("[name='name']").value,
           name_en: form.querySelector("[name='name_en']").value || null,
@@ -97,10 +97,10 @@ const OrionAdminPlatform = {
   },
 
   openTenantModal() {
-    document.getElementById("tenant-id").value = "";
-    document.getElementById("tenant-form").reset();
-    document.getElementById("tenant-modal-title").textContent = OrionI18n.t("إضافة متجر", "Add store");
-    document.getElementById("tenant-modal").classList.remove("hidden");
+    OrionUI.set("tenant-id", "");
+    document.getElementById("tenant-form")?.reset();
+    OrionUI.set("tenant-modal-title", OrionI18n.t("إضافة متجر", "Add store"), "textContent");
+    document.getElementById("tenant-modal")?.classList.remove("hidden");
     OrionDialog.trap(document.getElementById("tenant-modal"), {
       onEscape: () => this.closeTenantModal()
     });
@@ -108,23 +108,23 @@ const OrionAdminPlatform = {
 
   closeTenantModal() {
     OrionDialog.release(document.getElementById("tenant-modal"));
-    document.getElementById("tenant-modal").classList.add("hidden");
+    document.getElementById("tenant-modal")?.classList.add("hidden");
   },
 
   async editTenant(id) {
     try {
       const data = await OrionAPI.get(`/tenants/${id}`);
       const t = data.tenant;
-      document.getElementById("tenant-id").value = t.id;
-      document.getElementById("tenant-name").value = t.name;
-      document.getElementById("tenant-name-en").value = t.name_en || "";
-      document.getElementById("tenant-logo").value = t.logo_url || "";
-      document.getElementById("tenant-slug").value = t.slug;
-      document.getElementById("tenant-email").value = t.email;
-      document.getElementById("tenant-domain").value = t.domain || "";
-      document.getElementById("tenant-status").value = t.status;
-      document.getElementById("tenant-modal-title").textContent = OrionI18n.t("تعديل متجر", "Edit store");
-      document.getElementById("tenant-modal").classList.remove("hidden");
+      OrionUI.set("tenant-id", t.id);
+      OrionUI.set("tenant-name", t.name);
+      OrionUI.set("tenant-name-en", t.name_en || "");
+      OrionUI.set("tenant-logo", t.logo_url || "");
+      OrionUI.set("tenant-slug", t.slug);
+      OrionUI.set("tenant-email", t.email);
+      OrionUI.set("tenant-domain", t.domain || "");
+      OrionUI.set("tenant-status", t.status);
+      OrionUI.set("tenant-modal-title", OrionI18n.t("تعديل متجر", "Edit store"), "textContent");
+      document.getElementById("tenant-modal")?.classList.remove("hidden");
       OrionDialog.trap(document.getElementById("tenant-modal"), {
         onEscape: () => this.closeTenantModal()
       });
@@ -152,12 +152,11 @@ const OrionAdminPlatform = {
     if (form) {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const type = form.querySelector("[name='user_type']").value;
         const payload = {
           email: form.querySelector("[name='email']").value,
           password: form.querySelector("[name='password']").value,
-          is_superuser: type === "platform_admin",
-          tenant_id: type === "tenant_admin" ? parseInt(form.querySelector("[name='tenant_id']").value) : null,
+          is_admin: true,
+          tenant_id: parseInt(form.querySelector("[name='tenant_id']").value, 10),
         };
         try {
           await OrionAPI.post("/users/", payload);
@@ -171,7 +170,7 @@ const OrionAdminPlatform = {
     const typeSelect = document.getElementById("user-type");
     if (typeSelect) {
       typeSelect.addEventListener("change", () => {
-        document.getElementById("user-tenant-wrap").classList.toggle("hidden", typeSelect.value === "platform_admin");
+        document.getElementById("user-tenant-wrap")?.classList.toggle("hidden", typeSelect.value === "platform_admin");
       });
     }
   },

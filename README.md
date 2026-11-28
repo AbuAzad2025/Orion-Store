@@ -5,8 +5,8 @@ Multi-tenant e-commerce SaaS — **Waves 0–15 complete** ✅ + **Full-stack co
 **Current status:** production-ready technical core; remaining work is deployment/ops (secrets, TLS, merchant accounts, load test).
 **Repository:** [github.com/AbuAzad2025/Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
 
-> **أرقام مُتحقَّق منها من الكود (2026-11-21):** 112 صنف `db.Model`، 113 جدولاً في
-> الهجرات، 101 جدولاً محمياً بـ RLS، ~100 نقطة API، 575 اختباراً ناجحاً. الأرقام الأكبر الواردة
+> **أرقام مُتحقَّق منها من الكود (2026-11-28):** 113 صنف `db.Model`، 113 جدولاً في
+> الهجرات، 101 جدولاً محمياً بـ RLS، 265 مُزيّن route، 843 معرّف اختبار مُجمَّع. الأرقام الأكبر الواردة
 > في `ORION-Project-Plan-Report.md` هي أهداف تخطيطية وليست حالة الكود. انظر
 > `PRODUCTION-READINESS-PLAN.md` و `ADR/0001-source-of-truth.md`.
 

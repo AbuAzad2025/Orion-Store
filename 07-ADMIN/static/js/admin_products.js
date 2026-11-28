@@ -92,49 +92,49 @@ const OrionAdminProducts = {
   },
 
   fillForm(product) {
-    document.getElementById("product-edit-id").value = product.public_id || "";
-    document.getElementById("form-title").textContent = OrionI18n.t('تعديل المنتج', 'Edit product');
-    document.getElementById("p-name").value = product.name || "";
-    document.getElementById("p-slug").value = product.slug || "";
-    document.getElementById("p-price").value = product.price || "";
-    document.getElementById("p-cost").value = product.cost_price || "0";
-    document.getElementById("p-quantity").value = product.quantity ?? 0;
-    document.getElementById("p-sku").value = product.sku || "";
-    document.getElementById("p-category").value = product.category_id || "";
-    document.getElementById("p-brand").value = product.brand_id || "";
-    document.getElementById("p-compare").value = product.compare_at_price || "";
-    document.getElementById("p-description").value = product.description || "";
-    document.getElementById("p-image").value = product.image_url || "";
-    document.getElementById("p-short").value = product.short_description || "";
-    document.getElementById("p-published").checked = Boolean(product.is_published);
-    document.getElementById("p-featured").checked = Boolean(product.is_featured);
+    OrionUI.set("product-edit-id", product.public_id || "");
+    OrionUI.set("form-title", OrionI18n.t('تعديل المنتج', 'Edit product'), "textContent");
+    OrionUI.set("p-name", product.name || "");
+    OrionUI.set("p-slug", product.slug || "");
+    OrionUI.set("p-price", product.price || "");
+    OrionUI.set("p-cost", product.cost_price || "0");
+    OrionUI.set("p-quantity", product.quantity ?? 0);
+    OrionUI.set("p-sku", product.sku || "");
+    OrionUI.set("p-category", product.category_id || "");
+    OrionUI.set("p-brand", product.brand_id || "");
+    OrionUI.set("p-compare", product.compare_at_price || "");
+    OrionUI.set("p-description", product.description || "");
+    OrionUI.set("p-image", product.image_url || "");
+    OrionUI.set("p-short", product.short_description || "");
+    OrionUI.set("p-published", Boolean(product.is_published), "checked");
+    OrionUI.set("p-featured", Boolean(product.is_featured), "checked");
   },
 
   clearForm() {
     document.getElementById("product-form")?.reset();
-    document.getElementById("product-edit-id").value = "";
-    document.getElementById("form-title").textContent = OrionI18n.t('إضافة منتج', 'Add product');
-    document.getElementById("p-quantity").value = "0";
+    OrionUI.set("product-edit-id", "");
+    OrionUI.set("form-title", OrionI18n.t('إضافة منتج', 'Add product'), "textContent");
+    OrionUI.set("p-quantity", "0");
     const cost = document.getElementById("p-cost");
     if (cost) cost.value = "0";
   },
 
   payload() {
     return {
-      name: document.getElementById("p-name").value.trim(),
-      slug: document.getElementById("p-slug").value.trim(),
-      price: document.getElementById("p-price").value,
-      cost_price: document.getElementById("p-cost").value || "0",
-      quantity: parseInt(document.getElementById("p-quantity").value || "0", 10),
-      sku: document.getElementById("p-sku").value.trim() || null,
-      category_id: document.getElementById("p-category").value || null,
-      brand_id: document.getElementById("p-brand").value || null,
-      compare_at_price: document.getElementById("p-compare").value || null,
-      description: document.getElementById("p-description").value.trim() || null,
-      image_url: document.getElementById("p-image").value.trim() || null,
-      short_description: document.getElementById("p-short").value.trim() || null,
-      is_published: document.getElementById("p-published").checked,
-      is_featured: document.getElementById("p-featured").checked,
+      name: OrionUI.val("p-name").trim(),
+      slug: OrionUI.val("p-slug").trim(),
+      price: OrionUI.val("p-price"),
+      cost_price: OrionUI.val("p-cost") || "0",
+      quantity: parseInt(OrionUI.val("p-quantity") || "0", 10),
+      sku: OrionUI.val("p-sku").trim() || null,
+      category_id: OrionUI.val("p-category") || null,
+      brand_id: OrionUI.val("p-brand") || null,
+      compare_at_price: OrionUI.val("p-compare") || null,
+      description: OrionUI.val("p-description").trim() || null,
+      image_url: OrionUI.val("p-image").trim() || null,
+      short_description: OrionUI.val("p-short").trim() || null,
+      is_published: OrionUI.checked("p-published"),
+      is_featured: OrionUI.checked("p-featured"),
     };
   },
 
@@ -149,7 +149,7 @@ const OrionAdminProducts = {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const msg = document.getElementById("product-msg");
-      const editId = document.getElementById("product-edit-id").value;
+      const editId = OrionUI.val("product-edit-id");
       if (!(await orionUploadProductImage())) return;
       const body = this.payload();
       try {

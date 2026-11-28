@@ -43,35 +43,35 @@ const OrionAdminPages = {
   },
 
   fillForm(page) {
-    document.getElementById("page-edit-id").value = page.id || "";
-    document.getElementById("form-title").textContent = OrionI18n.t('تعديل الصفحة', 'Edit page');
-    document.getElementById("p-title").value = page.title || "";
-    document.getElementById("p-slug").value = page.slug || "";
-    document.getElementById("p-published").checked = Boolean(page.is_published);
-    document.getElementById("p-trans-title").value = "";
-    document.getElementById("p-trans-body").value = "";
+    OrionUI.set("page-edit-id", page.id || "");
+    OrionUI.set("form-title", OrionI18n.t('تعديل الصفحة', 'Edit page'), "textContent");
+    OrionUI.set("p-title", page.title || "");
+    OrionUI.set("p-slug", page.slug || "");
+    OrionUI.set("p-published", Boolean(page.is_published), "checked");
+    OrionUI.set("p-trans-title", "");
+    OrionUI.set("p-trans-body", "");
   },
 
   clearForm() {
     document.getElementById("page-form")?.reset();
-    document.getElementById("page-edit-id").value = "";
-    document.getElementById("form-title").textContent = OrionI18n.t('إضافة صفحة', 'Add page');
+    OrionUI.set("page-edit-id", "");
+    OrionUI.set("form-title", OrionI18n.t('إضافة صفحة', 'Add page'), "textContent");
   },
 
   payload() {
     return {
-      title: document.getElementById("p-title").value.trim(),
-      slug: document.getElementById("p-slug").value.trim(),
-      is_published: document.getElementById("p-published").checked,
+      title: OrionUI.val("p-title").trim(),
+      slug: OrionUI.val("p-slug").trim(),
+      is_published: OrionUI.checked("p-published"),
     };
   },
 
   translationPayload(pageTitle) {
-    const title = document.getElementById("p-trans-title").value.trim();
-    const body = document.getElementById("p-trans-body").value.trim();
+    const title = OrionUI.val("p-trans-title").trim();
+    const body = OrionUI.val("p-trans-body").trim();
     if (!title && !body) return null;
     return {
-      locale: document.getElementById("p-locale").value,
+      locale: OrionUI.val("p-locale"),
       title: title || pageTitle,
       body: body || null,
     };
@@ -85,7 +85,7 @@ const OrionAdminPages = {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const msg = document.getElementById("page-msg");
-      const editId = document.getElementById("page-edit-id").value;
+      const editId = OrionUI.val("page-edit-id");
       const body = this.payload();
       const translation = this.translationPayload(body.title);
       try {

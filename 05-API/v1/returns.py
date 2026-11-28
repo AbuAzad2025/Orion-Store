@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 from flask import Blueprint, g, jsonify, request
-from v1.order_access import is_order_owner as _is_order_owner
-from v1.order_access import verify_order_access_token as _verify_order_token
 from flask_jwt_extended import jwt_required
 
 from core.exceptions import OrionError
@@ -14,6 +12,8 @@ from core.rate_limit import limiter
 from order_svc.order_service import OrderService
 from returns.merchandise_return import ReturnItem
 from rma_svc.rma_service import RmaService
+from v1.order_access import is_order_owner as _is_order_owner
+from v1.order_access import verify_order_access_token as _verify_order_token
 
 returns_bp = Blueprint("returns", __name__)
 _rma = RmaService()

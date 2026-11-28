@@ -27,7 +27,7 @@ const OrionAdminLiveChat = {
 
   async openSession(sessionId) {
     OrionAdminLiveChat.currentSessionId = sessionId;
-    document.getElementById("chat-session-id").textContent = `#${sessionId}`;
+    OrionUI.set("chat-session-id", `#${sessionId}`, "textContent");
     document.getElementById("chat-room")?.classList.remove("hidden");
     await OrionAdminLiveChat.loadMessages(sessionId);
   },

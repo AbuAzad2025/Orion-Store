@@ -32,6 +32,12 @@ class AuthService:
     ) -> User:
         if User.query.filter_by(email=email, tenant_id=None).first():
             raise ValidationError("Super admin already exists.")
+        if User.query.filter(
+            User.is_superuser.is_(True), User.tenant_id.is_(None)
+        ).first():
+            raise ValidationError(
+                "Super admin already exists. Platform admin bootstrap is one-time only."
+            )
         user = User(
             email=email,
             password_hash=self.hash_password(password),

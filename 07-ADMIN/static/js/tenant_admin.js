@@ -86,9 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const paypalBtn = document.getElementById("connect-paypal");
   if (paypalBtn) {
     paypalBtn.addEventListener("click", () => {
-      const clientId = document.getElementById("paypal-client-id").value.trim();
-      const clientSecret = document.getElementById("paypal-client-secret").value.trim();
-      const isSandbox = document.getElementById("paypal-sandbox").checked;
+      const clientId = OrionUI.val("paypal-client-id").trim();
+      const clientSecret = OrionUI.val("paypal-client-secret").trim();
+      const isSandbox = OrionUI.checked("paypal-sandbox");
       OrionAPI.post("/tenant/gateways/paypal", {
         client_id: clientId,
         client_secret: clientSecret,
@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveBtn = document.getElementById("save-invoice-template");
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
-      const body = document.getElementById("invoice-body").value;
+      const body = OrionUI.val("invoice-body");
       const msg = document.getElementById("invoice-msg");
       try {
         await OrionUI.withLoading(saveBtn, () =>

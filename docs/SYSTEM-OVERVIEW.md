@@ -44,12 +44,12 @@ HTTP Request
 |---|---|---|
 | `02-CORE/core` | أمان، JWT، CSRF، RLS middleware، rate limit، مراقبة، تسجيل، crypto | 21 ملفًا |
 | `02-CORE/orion` | app factory، config، extensions، celery، wsgi | 6 ملفات |
-| `03-MODELS` | 112 صنف `db.Model` | 99 ملفًا |
+| `03-MODELS` | 113 صنف `db.Model` | 100 ملف |
 | `04-SERVICES` | منطق الأعمال (96 ملفًا) | auth/tenant/catalog/order/payment/… |
-| `05-API` | ~100 نقطة API عبر blueprint | 50 ملفًا |
-| `06-STOREFRONT` | 13 قالبًا + JS + ثيم | متجر العميل |
-| `07-ADMIN` | 45 قالبًا + 27 JS | لوحتا المستأجر والمنصة |
-| `migrations/versions` | 3 هجرات baseline | جداول/فهارس/RLS |
+| `05-API` | 265 مُزيّن route عبر 63 blueprint | 61 ملفًا في v1 |
+| `06-STOREFRONT` | 17 قالبًا + 11 JS + ثيم | متجر العميل |
+| `07-ADMIN` | 52 قالبًا + 35 JS | لوحتا المستأجر والمنصة |
+| `migrations/versions` | 9 هجرات (3 baseline + 6 لاحقة) | جداول/فهارس/RLS/تكافؤ/أداء |
 
 قاعدة البيانات: **113 جدولاً** بعد التهجير (منها `alembic_version`)، و**101 جدولاً**
 لديها سياسة RLS.
@@ -219,7 +219,7 @@ HTTP Request
 
 ## 10. الجودة والاختبارات
 
-- **575 اختباراً** على PostgreSQL حقيقي (وظيفة E2E تستخدم SQLite معزولاً) + 4 اختبارات E2E، تغطية ≥99% مفروضة.
+- **843 معرّف اختبار مُجمَّع** (`.pytest_cache/v/cache/nodeids` 2026-11-28) على PostgreSQL حقيقي، تغطية ≥99% مفروضة.
 - **pre-commit/CI**: black، isort، flake8، YAML، طول الملفات، pip-audit، Bandit،
   gitleaks، تدقيق RLS، تدقيق schema/FK، تدقيق a11y/RTL، تدقيق مراجع API/الواجهة،
   تدقيق تباين الألوان.

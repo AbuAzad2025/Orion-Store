@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from flask import Blueprint, g, jsonify, request
 
+from catalog_svc.product_service import ProductService
 from core.exceptions import OrionError
 from core.middleware import require_tenant_admin
-from catalog_svc.product_service import ProductService
 from oms.fulfillment import FulfillmentItem
 from oms.warehouse import InventoryLevel
 from oms_svc.oms_service import OmsService

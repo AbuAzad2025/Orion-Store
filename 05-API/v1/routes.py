@@ -29,8 +29,8 @@ from v1.metafields import metafields_bp
 from v1.oms import oms_bp
 from v1.oms_extensions import oms_ext_bp
 from v1.payments import payments_bp
-from v1.platform_reconciliation import register_platform_reconciliation_routes
 from v1.platform_backup import platform_backup_bp
+from v1.platform_reconciliation import register_platform_reconciliation_routes
 from v1.platform_settings import platform_settings_bp
 from v1.platform_stores import register_platform_store_routes
 from v1.product_images import product_images_bp
@@ -49,10 +49,10 @@ from v1.storefront_pickup import storefront_pickup_bp
 from v1.storefront_search import storefront_search_bp
 from v1.subscriptions import subscriptions_bp
 from v1.tax_api import tax_bp
+from v1.tenant_backup import tenant_backup_bp
+from v1.tenant_orders import tenant_orders_bp
 from v1.tenant_portal import tenant_portal_bp
 from v1.tenant_reports import tenant_reports_bp
-from v1.tenant_orders import tenant_orders_bp
-from v1.tenant_backup import tenant_backup_bp
 from v1.tenant_tax_config import tenant_tax_config_bp
 from v1.tenants import tenant_bp
 from v1.users import users_bp
@@ -193,9 +193,9 @@ def register_ui_blueprints(app: Flask) -> None:
     from engine.routes import storefront_ui_bp
     from engine.storefront_assets import storefront_assets_bp
     from platform_admin.routes import platform_admin_bp
-    from tenant_admin.routes import tenant_admin_bp
-    from tenant_admin.reports_routes import tenant_reports_ui_bp
     from tenant_admin.orders_routes import tenant_manual_orders_ui_bp
+    from tenant_admin.reports_routes import tenant_reports_ui_bp
+    from tenant_admin.routes import tenant_admin_bp
 
     app.register_blueprint(admin_assets_bp)
     # Registered before the catch-all storefront so "/" on the platform domain

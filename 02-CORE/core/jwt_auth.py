@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from datetime import datetime, timezone
 from typing import Any
 
@@ -42,6 +43,20 @@ def set_jwt_cookies(response: Response, tokens: dict[str, str]) -> Response:
     return response
 
 
+def _canonical_identity(identity: str | None) -> str | None:
+    """Persist only a canonical UUID; fail closed to NULL for anything else.
+
+    Compensating control for ADR 0003 (NEVER-APPLY of the FK from
+    revoked_tokens.user_public_id to users.public_id).
+    """
+    if not identity:
+        return None
+    try:
+        return str(uuid.UUID(str(identity)))
+    except (ValueError, TypeError, AttributeError):
+        return None
+
+
 def _revoke(jti: str, token_type: str, expires_at, identity: str | None) -> None:
     from platform_models.revoked_token import RevokedToken
 
@@ -55,7 +70,7 @@ def _revoke(jti: str, token_type: str, expires_at, identity: str | None) -> None
         RevokedToken(
             jti=jti,
             token_type=token_type,
-            user_public_id=identity,
+            user_public_id=_canonical_identity(identity),
             expires_at=expires_at,
         )
     )

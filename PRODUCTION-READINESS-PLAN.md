@@ -1,6 +1,7 @@
 # خطة الجاهزية الإنتاجية — Orion / Azadexa
 
 > **تاريخ كتابة الخطة:** 2026-11-19
+> **آخر مزامنة مع الكود:** 2026-11-28 — HEAD `74f40f0` (الجولة 13 / release `20261128-round13fix`)
 > **مصدر الخطة:** فحص مباشر للكود (لا مستندات). كل رقم أدناه مُستخرج من ملف فعلي،
 > مصحوب بمسار الملف عند الحاجة. أي تعارض مع `README.md` أو `ORION-Project-Plan-Report.md`
 > يُحسم لمصلحة الكود.
@@ -26,7 +27,7 @@
 ثم ظهرت 4 فشل إضافية في `tests/services/test_v2_services.py` (نفس نمط المعرّفات
 الثابتة: `product_id=42`، `order_id=1`، `financial_event_id=1`، `user_id=1`) — كلها
 سابقة على تعديلاتنا، وتم استبدالها بكيانات حقيقية، والملف الآن 26/26 ناجح.
-**النتيجة النهائية بعد جولات التدقيق: `532 passed, 0 failed`**
+**النتيجة التاريخية بعد جولات التدقيق الأولى: `532 passed, 0 failed`**
 مع استبعاد E2E وexternal (E2E 4/4 منفردة). بوابات الجودة كلها خضراء.
 تحذير Sentry عند إنهاء العملية (pending events) غير مؤثر — `pytest` يخرج برقم 0.
 
@@ -80,7 +81,7 @@
 - أُضيف `docs/RUNBOOK.md` (فحص، نسخ/استعادة، فشل دفع، Celery، تدقيق، تراجع، أسرار).
 - أُضيف `PAYMENT_STUB_ALLOWED=false` و`PAYMENT_LIVE_CALLS_ENABLED=true` صراحةً في
   `docker-compose.prod.yml`.
-- **فجوة معروفة:** لا يوجد تنبيه لطول طابور Celery لأن الخدمة لا تُصدّر مقياساً له بعد؛
+- **فجوة مغلقة في الجولة 13:** الخدمة تُصدّر `orion_celery_queue_depth` مع قواعد `OrionCeleryWorkerDown`/`OrionCeleryQueueDepthHigh`؛
   موثّقة بدل اختراع تنبيه وهمي.
 
 ---
@@ -109,7 +110,7 @@
   مراقبة، واجهات، نشر) مع توقيعات Tech Lead وOps.
 - النشر الفعلي (staging → canary → production) **لا يمكن تنفيذه محلياً**؛ التوثيق جاهز
   ويُنفَّذ من قبل Ops في البيئة المستهدفة فقط.
-- الاختبار الكامل النهائي: **532 passed / 0 failed** + E2E 4/4 + pre-commit أخضر
+- الاختبار الكامل النهائي وقت كتابة القسم: **532 passed / 0 failed** (سجل تاريخي) + E2E 4/4 + pre-commit أخضر
   + RLS 101/101 + schema 0 مشاكل + a11y 0 مشاكل + backup/restore OK.
 
 ---
@@ -160,13 +161,13 @@ client_secret/token حقيقي، object storage للفواتير + عملات م
 
 | العنصر | العدد الفعلي | الدليل |
 |---|---|---|
-| ملفات Python | 387 | `Get-ChildItem -Recurse -Filter *.py` |
-| نماذج `db.Model` | 112 | `03-MODELS/**/*.py` |
+| ملفات Python | 501 | `Get-ChildItem -Recurse -Filter *.py` |
+| نماذج `db.Model` | 113 في 100 ملف | `03-MODELS/**/*.py` |
 | `create_table(` في الهجرات | 113 | `migrations/versions/*.py` |
 | عبارات RLS (POLICY / ENABLE) | 43 | `migrations/versions/*.py` |
-| نقاط API (decorators) | 100 | `05-API/v1/*.py` |
-| Blueprints مسجّلة | 42 | `05-API/v1/routes.py:106-154` |
-| ملفات اختبار | 68 | `tests/**/test_*.py` |
+| نقاط API (decorators) | 265 | `05-API/v1/*.py` |
+| Blueprints مسجّلة | 63 | `05-API/v1/routes.py` |
+| ملفات اختبار | 138 / 843 معرّف | `tests/**/test_*.py` + `.pytest_cache` |
 | قوالب أدمن / JS أدمن | 45 / 26 | `07-ADMIN/templates`, `07-ADMIN/static/js` |
 | قوالب متجر / JS متجر | 10 / 6 | `06-STOREFRONT/themes/default` |
 | استخدامات `SafeDOM` / `innerHTML` | 256 / 2 | `06-STOREFRONT`, `07-ADMIN` |
