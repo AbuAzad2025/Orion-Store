@@ -9,10 +9,10 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('إضافة بند للمطابقة', 'Add reconciliation item') }}</h2>
     <form id="reconciliation-item-form" class="grid gap-2 max-w-md text-sm">
-      <input name="run_id" type="number" placeholder="{{ t('معرف التشغيل', 'Run ID') }}" required>
-      <input name="financial_event_id" type="number" placeholder="{{ t('معرف الحدث المالي', 'Financial event ID') }}" required>
-      <input name="expected_amount" type="number" step="0.01" placeholder="{{ t('المبلغ المتوقع', 'Expected amount') }}" required>
-      <input name="actual_amount" type="number" step="0.01" placeholder="{{ t('المبلغ الفعلي', 'Actual amount') }}" required>
+      <input name="run_id" type="number" placeholder="{{ t('معرف التشغيل', 'Run ID') }}" aria-label="{{ t('معرف التشغيل', 'Run ID') }}" required>
+      <input name="financial_event_id" type="number" placeholder="{{ t('معرف الحدث المالي', 'Financial event ID') }}" aria-label="{{ t('معرف الحدث المالي', 'Financial event ID') }}" required>
+      <input name="expected_amount" type="number" step="0.01" placeholder="{{ t('المبلغ المتوقع', 'Expected amount') }}" aria-label="{{ t('المبلغ المتوقع', 'Expected amount') }}" required>
+      <input name="actual_amount" type="number" step="0.01" placeholder="{{ t('المبلغ الفعلي', 'Actual amount') }}" aria-label="{{ t('المبلغ الفعلي', 'Actual amount') }}" required>
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة بند', 'Add item') }}</button>
     </form>
   </section>

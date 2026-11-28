@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 from alembic import command
 from alembic.config import Config
+from alembic.script import ScriptDirectory
 from sqlalchemy import inspect
 
 from orion.extensions import db
@@ -73,4 +74,4 @@ def test_upgrade_is_idempotent(app):
         after = snapshot()
 
         assert after == before
-        assert after[0] == "baseline_0003"
+        assert after[0] == ScriptDirectory.from_config(cfg).get_current_head()

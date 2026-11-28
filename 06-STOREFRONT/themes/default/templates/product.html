@@ -3,6 +3,7 @@
 {% set p_name = (product_i18n.name or product.name) if product_i18n else product.name %}
 {% set p_price = (product_i18n.price or product.price) if product_i18n else product.price %}
 {% set desc = (product_i18n.description or product_i18n.short_description) if product_i18n else product.short_description %}
+{% set sold_out = not product.quantity or product.quantity <= 0 %}
 
 <div class="orion-pdp">
 <section class="orion-product-detail">
@@ -27,7 +28,7 @@
     {% if desc %}<p class="orion-detail-desc">{{ desc }}</p>{% endif %}
 
     <div class="orion-cta-row">
-      <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold" aria-label="{{ t('add_to_cart') }} {{ p_name }}">{{ t('add_to_cart') }}</button>
+      <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold" aria-label="{{ t('sold_out') if sold_out else t('add_to_cart') }} {{ p_name }}"{% if sold_out %} disabled{% endif %}>{{ t('sold_out') if sold_out else t('add_to_cart') }}</button>
       <a href="/cart?store={{ store_token }}" class="orion-btn orion-btn-ghost">{{ t('view_cart') }}</a>
     </div>
     <div class="orion-pdp-trust" aria-label="{{ t('support') }}">
@@ -41,17 +42,17 @@
       <div class="orion-cta-row mt-2">
         <a href="https://wa.me/?text={{ (p_name ~ ' — ' ~ share_url)|urlencode }}"
            target="_blank" rel="noopener" class="orion-btn orion-btn-ghost"
-           aria-label="{{ t('share_whatsapp') }} {{ p_name }}">{{ t('share_whatsapp') }}</a>
+           aria-label="{{ t('share_whatsapp') }} {{ p_name }}"><svg class="sf-icon sf-icon-wa" aria-hidden="true"><use href="#sf-i-whatsapp"/></svg>{{ t('share_whatsapp') }}</a>
         <button type="button" class="orion-btn orion-btn-ghost"
                 data-copy-share="{{ share_url }}"
                 data-copied-text="{{ t('copied') }}"
                 data-failed-text="{{ t('copy_failed') }}"
-                aria-label="{{ t('copy_link') }} {{ p_name }}">{{ t('copy_link') }}</button>
+                aria-label="{{ t('copy_link') }} {{ p_name }}"><svg class="sf-icon" aria-hidden="true"><use href="#sf-i-link"/></svg>{{ t('copy_link') }}</button>
       </div>
       <p class="orion-muted text-xs" data-share-msg role="status" aria-live="polite"></p>
     </div>
     {% set wa_order = whatsapp_url(tenant.phone, product_order_text(p_name, money(p_price))) %}
-    {% if wa_order %}
+    {% if wa_order and not sold_out %}
     <a href="{{ wa_order }}" target="_blank" rel="noopener" class="orion-btn orion-btn-ghost orion-wa-block"
        data-wa-product="{{ product.id }}" data-wa-qty="1"
        aria-label="{{ t('order_whatsapp') }} {{ p_name }}">{{ t('order_whatsapp') }}</a>
@@ -76,9 +77,9 @@
     {% if product.image_url %}<img src="{{ signed_image_url(product.image_url, store_token) }}" alt="" aria-hidden="true">{% endif %}
     <div class="orion-sticky-buy-info">
       <strong>{{ p_name }}</strong>
-      <span>{{ money(p_price) }} {{ currency }}</span>
+      <span dir="ltr">{{ money(p_price) }} {{ currency }}</span>
     </div>
-    <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold orion-sticky-add" aria-label="{{ t('add_to_cart') }} {{ p_name }}">{{ t('add_to_cart') }}</button>
+    <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold orion-sticky-add" aria-label="{{ t('sold_out') if sold_out else t('add_to_cart') }} {{ p_name }}"{% if sold_out %} disabled{% endif %}>{{ t('sold_out') if sold_out else t('add_to_cart') }}</button>
   </div>
 </div>
 </div>

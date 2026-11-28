@@ -4,9 +4,9 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('تدقيق إمكانية الوصول', 'Accessibility Audit') }}</h2>
     <form id="audit-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="page_url" type="url" placeholder="{{ t('رابط الصفحة', 'Page URL') }}" required>
-      <input name="score" type="number" placeholder="{{ t('الدرجة (0-100)', 'Score (0-100)') }}" required>
-      <textarea name="issues" rows="2" placeholder="{{ t('المشاكل (JSON)', 'Issues (JSON)') }}" class="orion-input font-mono text-xs" dir="ltr"></textarea>
+      <input name="page_url" type="url" placeholder="{{ t('رابط الصفحة', 'Page URL') }}" aria-label="{{ t('رابط الصفحة', 'Page URL') }}" required>
+      <input name="score" type="number" placeholder="{{ t('الدرجة (0-100)', 'Score (0-100)') }}" aria-label="{{ t('الدرجة (0-100)', 'Score (0-100)') }}" required>
+      <textarea name="issues" rows="2" placeholder="{{ t('المشاكل (JSON)', 'Issues (JSON)') }}" aria-label="{{ t('المشاكل (JSON)', 'Issues (JSON)') }}" class="orion-input font-mono text-xs" dir="ltr"></textarea>
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('تسجيل تدقيق', 'Record audit') }}</button>
     </form>
     <div id="accessibility-audits-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>

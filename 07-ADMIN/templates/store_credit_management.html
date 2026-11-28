@@ -4,15 +4,15 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('رصيد المتجر', 'Store Credit') }}</h2>
     <div class="grid gap-2 max-w-md mb-4 text-sm">
-      <input id="credit-customer-email" type="email" placeholder="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}">
+      <input id="credit-customer-email" type="email" placeholder="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}" aria-label="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}">
       <button id="lookup-credit" class="orion-btn orion-btn-gold w-fit">{{ t('بحث', 'Look up') }}</button>
     </div>
     <div id="credit-balance" class="hidden text-sm mb-4">
       <p>{{ t('الرصيد:', 'Balance:') }} <strong id="credit-amount">0.00</strong></p>
     </div>
     <form id="credit-add-form" class="grid gap-2 max-w-md text-sm hidden">
-      <input name="amount" type="number" step="0.01" placeholder="{{ t('المبلغ', 'Amount') }}" required>
-      <input name="reason" type="text" placeholder="{{ t('السبب', 'Reason') }}">
+      <input name="amount" type="number" step="0.01" placeholder="{{ t('المبلغ', 'Amount') }}" aria-label="{{ t('المبلغ', 'Amount') }}" required>
+      <input name="reason" type="text" placeholder="{{ t('السبب', 'Reason') }}" aria-label="{{ t('السبب', 'Reason') }}">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة رصيد للعميل', 'Add credit to customer') }}</button>
     </form>
   </section>

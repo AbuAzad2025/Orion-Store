@@ -4,15 +4,15 @@
 <section id="account-guest" class="orion-card max-w-md space-y-3">
   <h2 class="font-semibold">{{ t('sign_in') }}</h2>
   <form id="login-form" class="grid gap-2 text-sm">
-    <input name="email" type="email" placeholder="{{ t('your_email') }}" class="orion-input w-full" required>
-    <input name="password" type="password" placeholder="{{ t('password') }}" class="orion-input w-full" required>
+    <input name="email" type="email" placeholder="{{ t('your_email') }}" aria-label="{{ t('your_email') }}" class="orion-input w-full" required>
+    <input name="password" type="password" placeholder="{{ t('password') }}" aria-label="{{ t('password') }}" class="orion-input w-full" required>
     <button type="submit" class="orion-btn orion-btn-gold w-full">{{ t('sign_in') }}</button>
   </form>
   <h2 class="font-semibold pt-4">{{ t('create_account') }}</h2>
   <form id="register-form" class="grid gap-2 text-sm">
-    <input name="first_name" type="text" placeholder="{{ t('your_name') }}" class="orion-input w-full">
-    <input name="email" type="email" placeholder="{{ t('your_email') }}" class="orion-input w-full" required>
-    <input name="password" type="password" placeholder="{{ t('password') }}" class="orion-input w-full" required>
+    <input name="first_name" type="text" placeholder="{{ t('your_name') }}" aria-label="{{ t('your_name') }}" class="orion-input w-full">
+    <input name="email" type="email" placeholder="{{ t('your_email') }}" aria-label="{{ t('your_email') }}" class="orion-input w-full" required>
+    <input name="password" type="password" placeholder="{{ t('password') }}" aria-label="{{ t('password') }}" class="orion-input w-full" required>
     <button type="submit" class="orion-btn w-full">{{ t('create_account_short') }}</button>
   </form>
   <p id="account-error" role="alert" class="text-red-600 text-sm hidden"></p>

@@ -21,6 +21,20 @@
 {% else %}
 <div class="orion-empty-modern">{{ t('no_category_products') }}</div>
 {% endif %}
+{% if pagination_pages and pagination_pages > 1 %}
+<nav class="orion-pagination mt-6" aria-label="{{ t('pagination_label') }}">
+  {% if pagination_page > 1 %}
+  <a class="orion-page-link" href="{{ page_url(pagination_page - 1) }}" rel="prev">{{ t('pagination_prev') }}</a>
+  {% endif %}
+  {% for n in range(1, pagination_pages + 1) %}
+  <a class="orion-page-link{% if n == pagination_page %} orion-page-current{% endif %}"
+     href="{{ page_url(n) }}"{% if n == pagination_page %} aria-current="page"{% endif %}>{{ n }}</a>
+  {% endfor %}
+  {% if pagination_page < pagination_pages %}
+  <a class="orion-page-link" href="{{ page_url(pagination_page + 1) }}" rel="next">{{ t('pagination_next') }}</a>
+  {% endif %}
+</nav>
+{% endif %}
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>

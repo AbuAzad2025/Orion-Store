@@ -17,7 +17,7 @@
       window.location.reload();
     } catch (e) {
       console.error("Exit impersonation error:", e);
-      alert(OrionI18n.t('حدث خطأ غير متوقع', 'An unexpected error occurred'));
+      OrionUI.toast(OrionI18n.t('حدث خطأ غير متوقع', 'An unexpected error occurred'), "error");
     } finally {
       exiting = false;
       exitBtn.disabled = false;

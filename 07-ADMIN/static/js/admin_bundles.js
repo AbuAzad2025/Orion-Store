@@ -54,14 +54,16 @@ const OrionAdminBundles = {
           b.is_published ? OrionI18n.t("إلغاء النشر", "Unpublish") : OrionI18n.t("نشر", "Publish"),
           "orion-btn text-xs",
           async () => {
-            await OrionAPI.put(`/bundles/${b.id}`, { is_published: !b.is_published });
-            OrionAdminBundles.loadBundles();
+            try {
+              await OrionAPI.put(`/bundles/${b.id}`, { is_published: !b.is_published });
+              OrionAdminBundles.loadBundles();
+            } catch (err) { OrionUI.toast(err.message, "error"); }
           }
         );
         el.appendChild(SafeDOM.elem("div", { className: "border-b py-2 flex items-center justify-between gap-2 flex-wrap" }, [
           SafeDOM.elem("span", null, [
             SafeDOM.elem("strong", null, [b.name]),
-            ` (${b.slug}) — ${b.bundle_price} ${b.currency || ""}`
+            ` (${b.slug}) — ${OrionUI.money(b.bundle_price, b.currency || "")}`
           ]),
           SafeDOM.elem("div", { className: "flex gap-2" }, [editBtn, pubBtn])
         ]));

@@ -65,7 +65,7 @@ class WhatsAppOrderService:
                     "product": None,
                     "product_id": None,
                     "product_name": str(row.get("product_name") or bundle.name),
-                    "product_sku": None,
+                    "product_sku": f"bundle:{bundle.id}",
                     "unit_price": unit_price,
                     "unit_cost": Decimal("0"),
                     "quantity": quantity,
@@ -188,6 +188,29 @@ class WhatsAppOrderService:
             raise ValidationError("Order is no longer pending.")
         product_ids: list[int] = []
         for item in db.session.query(OrderItem).filter_by(order_id=order.id).all():
+            sku = str(item.product_sku or "")
+            if sku.startswith("bundle:"):
+                from bundle_svc.bundle_service import BundleService
+
+                bundle_id = int(sku.split(":", 1)[1])
+                for component in BundleService().items_for(bundle_id):
+                    product_ids.append(component.product_id)
+                    needed = component.quantity * item.quantity
+                    reserved = db.session.execute(
+                        update(Product)
+                        .where(
+                            Product.id == component.product_id,
+                            Product.tenant_id == tenant_id,
+                            Product.quantity >= needed,
+                        )
+                        .values(quantity=Product.quantity - needed)
+                    )
+                    if reserved.rowcount != 1:
+                        db.session.rollback()
+                        raise ValidationError(
+                            "Insufficient stock to confirm this order."
+                        )
+                continue
             if not item.product_id:
                 continue
             product_ids.append(item.product_id)

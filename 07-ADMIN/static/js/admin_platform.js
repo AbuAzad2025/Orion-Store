@@ -11,7 +11,7 @@ const OrionAdminPlatform = {
     };
     const show = (key, value) => {
       const el = document.getElementById(ids[key]);
-      if (el) el.textContent = Number(value || 0).toLocaleString(document.documentElement.lang || "ar");
+      if (el) el.textContent = OrionUI.number(value);
     };
     try {
       const data = await OrionAPI.get("/platform/stats");
@@ -50,7 +50,7 @@ const OrionAdminPlatform = {
           this.closeTenantModal();
           await this.loadTenants();
         } catch (err) {
-          alert(err.message || OrionI18n.t("فشل الحفظ", "Save failed"));
+          OrionUI.toast(err.message || OrionI18n.t("فشل الحفظ", "Save failed"), "error");
         }
       });
     }
@@ -101,9 +101,13 @@ const OrionAdminPlatform = {
     document.getElementById("tenant-form").reset();
     document.getElementById("tenant-modal-title").textContent = OrionI18n.t("إضافة متجر", "Add store");
     document.getElementById("tenant-modal").classList.remove("hidden");
+    OrionDialog.trap(document.getElementById("tenant-modal"), {
+      onEscape: () => this.closeTenantModal()
+    });
   },
 
   closeTenantModal() {
+    OrionDialog.release(document.getElementById("tenant-modal"));
     document.getElementById("tenant-modal").classList.add("hidden");
   },
 
@@ -121,8 +125,11 @@ const OrionAdminPlatform = {
       document.getElementById("tenant-status").value = t.status;
       document.getElementById("tenant-modal-title").textContent = OrionI18n.t("تعديل متجر", "Edit store");
       document.getElementById("tenant-modal").classList.remove("hidden");
+      OrionDialog.trap(document.getElementById("tenant-modal"), {
+        onEscape: () => this.closeTenantModal()
+      });
     } catch (err) {
-      alert(err.message);
+      OrionUI.toast(err.message, "error");
     }
   },
 
@@ -132,7 +139,7 @@ const OrionAdminPlatform = {
       await OrionAPI.delete(`/tenants/${id}`);
       await this.loadTenants();
     } catch (err) {
-      alert(err.message);
+      OrionUI.toast(err.message, "error");
     }
   },
 
@@ -157,7 +164,7 @@ const OrionAdminPlatform = {
           this.closeUserModal();
           await this.loadUsers();
         } catch (err) {
-          alert(err.message || OrionI18n.t("فشل الحفظ", "Save failed"));
+          OrionUI.toast(err.message || OrionI18n.t("فشل الحفظ", "Save failed"), "error");
         }
       });
     }
@@ -220,9 +227,13 @@ const OrionAdminPlatform = {
   openUserModal() {
     document.getElementById("user-form")?.reset();
     document.getElementById("user-modal")?.classList.remove("hidden");
+    OrionDialog.trap(document.getElementById("user-modal"), {
+      onEscape: () => this.closeUserModal()
+    });
   },
 
   closeUserModal() {
+    OrionDialog.release(document.getElementById("user-modal"));
     document.getElementById("user-modal")?.classList.add("hidden");
   },
 
@@ -232,7 +243,7 @@ const OrionAdminPlatform = {
       await OrionAPI.delete(`/users/${id}`);
       await this.loadUsers();
     } catch (err) {
-      alert(err.message);
+      OrionUI.toast(err.message, "error");
     }
   },
 
@@ -259,31 +270,36 @@ const OrionAdminPlatform = {
   async initSettings() {
     const form = document.getElementById("settings-form");
     if (!form) return;
+    const setField = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.value = value || "";
+    };
     try {
       const data = await OrionAPI.get("/platform/settings");
       const s = data.settings || {};
-      document.getElementById("setting-platform-name").value = s.platform_name || "";
-      document.getElementById("setting-owner-name").value = s.owner_name || "";
-      document.getElementById("setting-support-email").value = s.support_email || "";
-      document.getElementById("setting-default-currency").value = s.default_currency || "";
-      document.getElementById("setting-default-language").value = s.default_language || "";
+      setField("setting-platform-name", s.platform_name);
+      setField("setting-owner-name", s.owner_name);
+      setField("setting-support-email", s.support_email);
+      setField("setting-default-currency", s.default_currency);
+      setField("setting-default-language", s.default_language);
     } catch (err) {
-      console.error("settings", err);
+      OrionUI.toast(err.message || OrionI18n.t("تعذّر تحميل الإعدادات", "Failed to load settings"), "error");
     }
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      const val = (name) => form.querySelector(`[name='${name}']`)?.value ?? "";
       const payload = {
-        platform_name: form.querySelector("[name='platform_name']").value,
-        owner_name: form.querySelector("[name='owner_name']").value,
-        support_email: form.querySelector("[name='support_email']").value,
-        default_currency: form.querySelector("[name='default_currency']").value,
-        default_language: form.querySelector("[name='default_language']").value,
+        platform_name: val("platform_name"),
+        owner_name: val("owner_name"),
+        support_email: val("support_email"),
+        default_currency: val("default_currency"),
+        default_language: val("default_language"),
       };
       try {
         await OrionAPI.put("/platform/settings", payload);
-        alert(OrionI18n.t("تم الحفظ", "Saved"));
+        OrionUI.toast(OrionI18n.t("تم الحفظ", "Saved"), "success");
       } catch (err) {
-        alert(err.message || OrionI18n.t("فشل الحفظ", "Save failed"));
+        OrionUI.toast(err.message || OrionI18n.t("فشل الحفظ", "Save failed"), "error");
       }
     });
   },

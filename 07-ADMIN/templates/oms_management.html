@@ -4,8 +4,8 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('المستودعات', 'Warehouses') }}</h2>
     <form id="oms-warehouse-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="{{ t('اسم المستودع', 'Warehouse name') }}" class="orion-input" required>
-      <input name="code" type="text" placeholder="{{ t('رمز', 'Code') }}" class="orion-input" required>
+      <input name="name" type="text" placeholder="{{ t('اسم المستودع', 'Warehouse name') }}" aria-label="{{ t('اسم المستودع', 'Warehouse name') }}" class="orion-input" required>
+      <input name="code" type="text" placeholder="{{ t('رمز', 'Code') }}" aria-label="{{ t('رمز', 'Code') }}" class="orion-input" required>
       <label class="inline-flex items-center gap-2">
         <input name="is_default" type="checkbox" aria-label="{{ t('افتراضي', 'Default') }}">
         {{ t('افتراضي', 'Default') }}
@@ -49,15 +49,15 @@
       <select name="to_warehouse_id" class="orion-input" required aria-label="{{ t('إلى مستودع', 'To warehouse') }}">
         <option value="">{{ t('إلى مستودع...', 'To warehouse...') }}</option>
       </select>
-      <input name="notes" type="text" placeholder="{{ t('ملاحظات (اختياري)', 'Notes (optional)') }}" class="orion-input">
+      <input name="notes" type="text" placeholder="{{ t('ملاحظات (اختياري)', 'Notes (optional)') }}" aria-label="{{ t('ملاحظات (اختياري)', 'Notes (optional)') }}" class="orion-input">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء تحويل', 'Create transfer') }}</button>
     </form>
     <form id="oms-transfer-item-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="transfer_id" type="number" min="1" placeholder="{{ t('رقم التحويل', 'Transfer number') }}" class="orion-input" required>
+      <input name="transfer_id" type="number" min="1" placeholder="{{ t('رقم التحويل', 'Transfer number') }}" aria-label="{{ t('رقم التحويل', 'Transfer number') }}" class="orion-input" required>
       <select name="product_id" class="orion-input" required aria-label="{{ t('اختر المنتج', 'Select product') }}">
         <option value="">{{ t('اختر منتجاً...', 'Select a product...') }}</option>
       </select>
-      <input name="quantity" type="number" min="1" value="1" placeholder="{{ t('الكمية', 'Quantity') }}" class="orion-input" required>
+      <input name="quantity" type="number" min="1" value="1" placeholder="{{ t('الكمية', 'Quantity') }}" aria-label="{{ t('الكمية', 'Quantity') }}" class="orion-input" required>
       <button type="submit" class="orion-btn w-fit">{{ t('إضافة صنف', 'Add item') }}</button>
     </form>
     <div id="oms-transfers-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>

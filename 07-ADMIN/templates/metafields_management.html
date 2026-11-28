@@ -4,10 +4,10 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('تعريفات البيانات الوصفية', 'Metafield Definitions') }}</h2>
     <form id="metafield-def-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="owner_type" type="text" placeholder="{{ t('نوع المالك (مثال: product)', 'Owner type (e.g. product)') }}" required>
-      <input name="key" type="text" placeholder="{{ t('المفتاح', 'Key') }}" required>
-      <input name="label" type="text" placeholder="{{ t('العنوان', 'Label') }}" required>
-      <select name="field_type" class="orion-input">
+      <input name="owner_type" type="text" placeholder="{{ t('نوع المالك (مثال: product)', 'Owner type (e.g. product)') }}" aria-label="{{ t('نوع المالك (مثال: product)', 'Owner type (e.g. product)') }}" required>
+      <input name="key" type="text" placeholder="{{ t('المفتاح', 'Key') }}" aria-label="{{ t('المفتاح', 'Key') }}" required>
+      <input name="label" type="text" placeholder="{{ t('العنوان', 'Label') }}" aria-label="{{ t('العنوان', 'Label') }}" required>
+      <select name="field_type" class="orion-input" aria-label="{{ t('نوع الحقل', 'Field type') }}">
         <option value="string">{{ t('نص', 'Text') }}</option>
         <option value="integer">{{ t('رقم صحيح', 'Integer') }}</option>
         <option value="decimal">{{ t('رقم عشري', 'Decimal') }}</option>
@@ -24,9 +24,9 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('قيم البيانات الوصفية', 'Metafield Values') }}</h2>
     <form id="metafield-value-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="definition_id" type="number" placeholder="{{ t('معرف التعريف', 'Definition ID') }}" required>
-      <input name="owner_id" type="number" placeholder="{{ t('معرف المالك', 'Owner ID') }}" required>
-      <input name="value" type="text" placeholder="{{ t('القيمة', 'Value') }}">
+      <input name="definition_id" type="number" placeholder="{{ t('معرف التعريف', 'Definition ID') }}" aria-label="{{ t('معرف التعريف', 'Definition ID') }}" required>
+      <input name="owner_id" type="number" placeholder="{{ t('معرف المالك', 'Owner ID') }}" aria-label="{{ t('معرف المالك', 'Owner ID') }}" required>
+      <input name="value" type="text" placeholder="{{ t('القيمة', 'Value') }}" aria-label="{{ t('القيمة', 'Value') }}">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('حفظ قيمة', 'Save value') }}</button>
     </form>
   </section>

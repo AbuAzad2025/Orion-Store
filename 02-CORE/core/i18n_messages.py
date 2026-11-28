@@ -180,6 +180,13 @@ AR: dict[str, str] = {
     "The cart is empty.": "السلة فارغة.",
     "Invalid phone number.": "رقم الهاتف غير صالح.",
     "Image URL must start with https:// or /": "رابط الصورة يجب أن يبدأ بـ https:// أو /",
+    "Product not available.": "المنتج غير متاح.",
+    "Invalid bundle price.": "سعر الحزمة غير صالح.",
+    "Requested quantity is not available.": "الكمية المطلوبة غير متوفرة.",
+    "No order items.": "لا توجد منتجات في الطلب.",
+    "Order is no longer pending.": "لم يعد الطلب قيد الانتظار.",
+    "Insufficient stock to confirm this order.": "المخزون غير كافٍ لتأكيد هذا الطلب.",
+    "Only pending orders can be cancelled.": "يمكن إلغاء الطلبات قيد الانتظار فقط.",
 }
 
 EN: dict[str, str] = {ar: en for en, ar in AR.items()}
@@ -192,6 +199,7 @@ EN.update(
         "رقم واتساب غير مُضبط لهذا المتجر.": "No WhatsApp number is configured for this store.",
         "رقم الهاتف غير صالح.": "Invalid phone number.",
         "رابط الصورة يجب أن يبدأ بـ https:// أو /": "Image URL must start with https:// or /",
+        "المنتج غير متاح.": "Product not available.",
     }
 )
 

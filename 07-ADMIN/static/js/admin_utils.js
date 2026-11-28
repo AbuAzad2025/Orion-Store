@@ -43,6 +43,24 @@ const OrionUI = {
     return toast;
   },
 
+  number(value) {
+    const num = Number(value);
+    return Number.isFinite(num)
+      ? num.toLocaleString(document.documentElement.lang || "ar")
+      : "—";
+  },
+
+  money(value, currency) {
+    const num = Number(value);
+    const text = Number.isFinite(num)
+      ? num.toLocaleString(document.documentElement.lang || "ar", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      : "—";
+    return currency ? `${text} ${currency}` : text;
+  },
+
   confirmDanger(message) {
     return window.confirm(message);
   },

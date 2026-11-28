@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hmac
 import json
+import math
 import os
 import time
 from pathlib import Path
@@ -91,22 +92,44 @@ def update_celery_gauges() -> dict:
     return state
 
 
+def backup_freshness(path: str, max_age: int) -> tuple[bool, dict]:
+    """Fail-closed platform-backup freshness from the JSON heartbeat.
+
+    A store backup must never satisfy the platform gate: the payload's
+    ``kind`` must be exactly ``platform``. Only non-secret metadata is read.
+    """
+    info: dict = {"backup": False}
+    if not path:
+        return False, info
+    try:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            return False, info
+        kind = str(payload.get("kind", "") or "")
+        st = str(payload.get("stamp", "") or "")
+        updated = float(payload.get("updated_at", 0) or 0)
+    except (OSError, UnicodeError, ValueError, TypeError):
+        return False, info
+    if not math.isfinite(updated) or updated <= 0:
+        return False, info
+    info["backup_kind"] = kind
+    if st:
+        info["backup_stamp"] = st
+    age = max(0.0, time.time() - updated)
+    info["backup_age_seconds"] = int(age)
+    ok = kind == "platform" and bool(st) and age <= max_age
+    info["backup"] = ok
+    return ok, info
+
+
 def readiness_dependencies() -> tuple[dict, bool]:
     extra: dict = {}
     failed = False
     if _cfg("READY_REQUIRE_BACKUP", False):
         path = str(_cfg("BACKUP_HEARTBEAT_FILE", "") or "")
         max_age = int(_cfg("BACKUP_HEARTBEAT_MAX_AGE_SECONDS", 172800))
-        age = None
-        if path:
-            try:
-                age = max(0.0, time.time() - Path(path).stat().st_mtime)
-            except OSError:
-                age = None
-        ok = age is not None and age <= max_age
-        extra["backup"] = ok
-        if age is not None:
-            extra["backup_age_seconds"] = int(age)
+        ok, info = backup_freshness(path, max_age)
+        extra.update(info)
         failed = failed or not ok
     if _cfg("READY_REQUIRE_CELERY", False):
         state = update_celery_gauges()

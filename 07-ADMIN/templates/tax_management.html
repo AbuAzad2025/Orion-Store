@@ -18,10 +18,10 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('المناطق الضريبية', 'Tax regions') }}</h2>
     <form id="tax-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="{{ t('اسم المنطقة (مثال: إسرائيل)', 'Region name (e.g. Israel)') }}" required>
-      <input name="code" type="text" placeholder="{{ t('رمز المنطقة (مثال: IL)', 'Region code (e.g. IL)') }}" required>
-      <input name="country" type="text" placeholder="{{ t('الدولة', 'Country') }}" value="IL">
-      <input name="region" type="text" placeholder="{{ t('المنطقة (اختياري)', 'Region (optional)') }}">
+      <input name="name" type="text" placeholder="{{ t('اسم المنطقة (مثال: إسرائيل)', 'Region name (e.g. Israel)') }}" aria-label="{{ t('اسم المنطقة (مثال: إسرائيل)', 'Region name (e.g. Israel)') }}" required>
+      <input name="code" type="text" placeholder="{{ t('رمز المنطقة (مثال: IL)', 'Region code (e.g. IL)') }}" aria-label="{{ t('رمز المنطقة (مثال: IL)', 'Region code (e.g. IL)') }}" required>
+      <input name="country" type="text" placeholder="{{ t('الدولة', 'Country') }}" aria-label="{{ t('الدولة', 'Country') }}" value="IL">
+      <input name="region" type="text" placeholder="{{ t('المنطقة (اختياري)', 'Region (optional)') }}" aria-label="{{ t('المنطقة (اختياري)', 'Region (optional)') }}">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة منطقة', 'Add region') }}</button>
     </form>
     <div id="tax-jurisdictions-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>

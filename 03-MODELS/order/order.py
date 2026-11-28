@@ -17,6 +17,7 @@ from sqlalchemy import (
     UniqueConstraint,
     Uuid,
     func,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -114,7 +115,10 @@ class OrderItem(db.Model):
     product_sku: Mapped[str | None] = mapped_column(String(100), nullable=True)
     unit_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     unit_cost: Mapped[Decimal] = mapped_column(
-        Numeric(10, 2), nullable=False, default=Decimal("0")
+        Numeric(10, 2),
+        nullable=False,
+        default=Decimal("0"),
+        server_default=text("0"),
     )
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
     total_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)

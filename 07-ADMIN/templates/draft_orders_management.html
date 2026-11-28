@@ -4,8 +4,8 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('الطلبات المسودة', 'Draft Orders') }}</h2>
     <form id="draft-order-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="customer_email" type="email" placeholder="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}" required>
-      <input name="notes" type="text" placeholder="{{ t('ملاحظات', 'Notes') }}">
+      <input name="customer_email" type="email" placeholder="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}" aria-label="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}" required>
+      <input name="notes" type="text" placeholder="{{ t('ملاحظات', 'Notes') }}" aria-label="{{ t('ملاحظات', 'Notes') }}">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء مسودة', 'Create draft') }}</button>
     </form>
     <div id="draft-orders-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>

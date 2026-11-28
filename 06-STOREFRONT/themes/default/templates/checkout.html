@@ -22,7 +22,7 @@
   </div>
   <div>
     <label class="orion-stat-label block" for="shipping-method">{{ t('shipping_method') }}</label>
-    <select id="shipping-method" class="orion-input w-full">
+    <select id="shipping-method" class="orion-input w-full" aria-label="{{ t('shipping_method') }}">
       <option value="">{{ t('loading') }}</option>
     </select>
   </div>
@@ -38,7 +38,7 @@
   </div>
   <div>
     <label class="orion-stat-label block" for="payment-method">{{ t('payment_method') }}</label>
-    <select id="payment-method" class="orion-input w-full">
+    <select id="payment-method" class="orion-input w-full" aria-label="{{ t('payment_method') }}">
       <option value="">{{ t('loading') }}</option>
     </select>
     <p id="payment-instructions" class="orion-muted text-sm mt-2 hidden" role="status"></p>

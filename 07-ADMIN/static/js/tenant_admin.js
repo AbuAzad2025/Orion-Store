@@ -10,10 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
           SafeDOM.elem("p", { className: "orion-stat-label" }, [label]),
           SafeDOM.elem("p", { className: "orion-stat-value", dir: "ltr" }, [value])
         ]);
-        const num = (v) => Number(v || 0).toLocaleString("ar");
+        const num = (v) => OrionUI.number(v);
         statsEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4" }, [
           card(OrionI18n.t("إجمالي الطلبات", "All orders"), num(s.orders_total)),
-          card(OrionI18n.t("مبيعات مؤكدة", "Confirmed sales"), `${s.revenue_confirmed || "0.00"} ${s.currency || ""}`),
+          card(OrionI18n.t("مبيعات مؤكدة", "Confirmed sales"), OrionUI.money(s.revenue_confirmed || 0, s.currency || "")),
           card(OrionI18n.t("طلبات مؤكدة", "Confirmed orders"), num(s.orders_confirmed)),
           card(OrionI18n.t("بانتظار التأكيد", "Awaiting confirmation"), num(s.orders_pending)),
           card(OrionI18n.t("طلبات ملغية", "Cancelled orders"), num(s.orders_cancelled)),
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }).then(() => {
               btn.textContent = OrionI18n.t("تم الحفظ", "Saved");
               setTimeout(() => { btn.textContent = OrionI18n.t("حفظ", "Save"); }, 1500);
-            }).catch((err) => alert(err.message));
+            }).catch((err) => OrionUI.toast(err.message, "error"));
           });
         });
       })
@@ -96,10 +96,10 @@ document.addEventListener("DOMContentLoaded", () => {
         is_enabled: true,
       })
         .then(() => {
-          alert(OrionI18n.t("تم ربط PayPal", "PayPal connected"));
+          OrionUI.toast(OrionI18n.t("تم ربط PayPal", "PayPal connected"), "success");
           location.reload();
         })
-        .catch((err) => alert(err.message));
+        .catch((err) => OrionUI.toast(err.message, "error"));
     });
   }
 
@@ -137,10 +137,10 @@ document.addEventListener("DOMContentLoaded", () => {
               is_sandbox: wrap.querySelector(".bnpl-sandbox").checked,
             })
               .then(() => {
-                alert(OrionI18n.t("تم الحفظ", "Saved"));
+                OrionUI.toast(OrionI18n.t("تم الحفظ", "Saved"), "success");
                 location.reload();
               })
-              .catch((err) => alert(err.message));
+              .catch((err) => OrionUI.toast(err.message, "error"));
           });
         });
       })
@@ -268,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const reason = container.querySelector(".reason-input").value.trim() || null;
             OrionAPI.put(`/tenant/feature-flags/${code}`, { value: checkbox.checked, reason })
               .then(() => location.reload())
-              .catch((err) => alert(err.message));
+              .catch((err) => OrionUI.toast(err.message, "error"));
           });
         });
         flagsEl.querySelectorAll(".remove-override").forEach((btn) => {
@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!confirm(OrionI18n.t("إزالة التخصيص لهذه الميزة؟", "Remove the override for this feature?"))) return;
             OrionAPI.put(`/tenant/feature-flags/${code}`, { value: null })
               .then(() => location.reload())
-              .catch((err) => alert(err.message));
+              .catch((err) => OrionUI.toast(err.message, "error"));
           });
         });
       })

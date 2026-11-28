@@ -150,11 +150,13 @@ class CheckoutService:
                     return existing
             raise
 
+        synced_product_ids: set[int] = set()
         for item in self._carts.list_items(cart):
             from catalog.product import Product
 
             if item.bundle_id is not None:
                 from bundle.bundle import ProductBundle
+                from bundle_svc.bundle_service import BundleService
 
                 bundle = ProductBundle.query.filter_by(
                     id=item.bundle_id, tenant_id=cart.tenant_id
@@ -162,6 +164,25 @@ class CheckoutService:
                 if not bundle:
                     db.session.rollback()
                     raise ValidationError("Bundle not found.")
+                # A bundle consumes each constituent product; without this the
+                # advertised-price line would sell stock that never decreases.
+                for component in BundleService().items_for(bundle.id):
+                    needed = component.quantity * item.quantity
+                    reserved = db.session.execute(
+                        update(Product)
+                        .where(
+                            Product.id == component.product_id,
+                            Product.tenant_id == cart.tenant_id,
+                            Product.quantity >= needed,
+                        )
+                        .values(quantity=Product.quantity - needed)
+                    )
+                    if reserved.rowcount != 1:
+                        db.session.rollback()
+                        raise ValidationError(
+                            f"Insufficient stock for bundle {bundle.name}."
+                        )
+                    synced_product_ids.add(component.product_id)
                 db.session.add(
                     OrderItem(
                         order_id=order.id,
@@ -194,6 +215,7 @@ class CheckoutService:
             if result.rowcount != 1:
                 db.session.rollback()
                 raise ValidationError(f"Insufficient stock for {prod.name}.")
+            synced_product_ids.add(prod.id)
             db.session.add(
                 OrderItem(
                     order_id=order.id,
@@ -265,12 +287,8 @@ class CheckoutService:
             from oms_svc.oms_service import OmsService
 
             oms = OmsService()
-            for item in self._carts.list_items(cart):
-                if item.product_id is None:
-                    continue
-                oms.sync_product_to_warehouse(
-                    tenant_id=cart.tenant_id, product_id=item.product_id
-                )
+            for pid in synced_product_ids:
+                oms.sync_product_to_warehouse(tenant_id=cart.tenant_id, product_id=pid)
         except Exception as exc:
             import logging
 

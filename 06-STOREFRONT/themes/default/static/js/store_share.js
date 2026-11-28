@@ -19,6 +19,7 @@
     if (copy) copy.dataset.storeCopy = url;
   }
   function close(panel) {
+    if (typeof OrionDialog !== "undefined") OrionDialog.release(panel);
     panel.classList.add("hidden");
     panel.classList.remove("flex");
   }
@@ -32,11 +33,19 @@
       if (navigator.share) {
         navigator.share({ title: title, text: title, url: url }).catch(function (err) {
           if (err && err.name === "AbortError") return;
-          if (panel) { setLinks(panel, url, title); panel.classList.remove("hidden"); panel.classList.add("flex"); }
+          if (panel) { setLinks(panel, url, title); panel.classList.remove("hidden"); panel.classList.add("flex");
+          if (typeof OrionDialog !== "undefined") {
+            OrionDialog.trap(panel, { onEscape: function () { close(panel); } });
+          }
+        }
         });
         return;
       }
-      if (panel) { setLinks(panel, url, title); panel.classList.remove("hidden"); panel.classList.add("flex"); }
+      if (panel) { setLinks(panel, url, title); panel.classList.remove("hidden"); panel.classList.add("flex");
+          if (typeof OrionDialog !== "undefined") {
+            OrionDialog.trap(panel, { onEscape: function () { close(panel); } });
+          }
+        }
       return;
     }
     if (event.target.closest("[data-store-share-close]")) {

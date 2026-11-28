@@ -176,6 +176,10 @@ class RmaService:
             payment = Payment.query.filter_by(
                 tenant_id=tenant_id, order_id=row.order_id, status="completed"
             ).first()
+            if payment is None:
+                # Store-credit orders have no captured Payment: never restock
+                # for free or mark the return as refunded. Manual handling only.
+                raise ValidationError("No completed payment available for this return.")
             if payment:
                 from decimal import Decimal
 
@@ -213,7 +217,7 @@ class RmaService:
             except Exception:
                 pass
 
-        row.status = "refunded" if row.return_type == "refund" else "closed"
+        row.status = "refunded" if refund_result is not None else "closed"
         row.completed_at = utc_now()
         db.session.commit()
         return {"return": row.to_dict(), "refund": refund_result}

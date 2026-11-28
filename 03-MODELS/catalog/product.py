@@ -15,6 +15,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     Uuid,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -51,7 +52,10 @@ class Product(db.Model, TimestampMixin, SoftDeleteMixin, VersionMixin):
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     cost_price: Mapped[Decimal] = mapped_column(
-        Numeric(10, 2), nullable=False, default=Decimal("0")
+        Numeric(10, 2),
+        nullable=False,
+        default=Decimal("0"),
+        server_default=text("0"),
     )
     compare_at_price: Mapped[Decimal | None] = mapped_column(
         Numeric(10, 2), nullable=True

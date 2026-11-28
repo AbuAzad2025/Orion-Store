@@ -5,13 +5,13 @@
     <h2 class="orion-title mb-3">{{ t('الحزم', 'Bundles') }}</h2>
     <form id="bundle-form" class="grid gap-2 max-w-md mb-4 text-sm">
       <input type="hidden" id="bundle-edit-id">
-      <input name="name" type="text" placeholder="{{ t('اسم الحزمة', 'Bundle name') }}" required>
-      <input name="name_en" type="text" dir="ltr" placeholder="{{ t('اسم الحزمة بالإنجليزي', 'Bundle name in English') }}">
-      <input name="slug" type="text" placeholder="{{ t('رمز الحزمة في الرابط', 'Bundle URL slug') }}" required dir="ltr">
-      <input name="bundle_price" type="number" step="0.01" placeholder="{{ t('سعر الحزمة', 'Bundle price') }}" required>
-      <input name="description" type="text" placeholder="{{ t('وصف الحزمة (اختياري)', 'Bundle description (optional)') }}">
-      <input name="image_url" type="text" dir="ltr" placeholder="{{ t('رابط صورة الحزمة (اختياري)', 'Bundle image URL (optional)') }}">
-      <input name="max_per_order" type="number" min="1" placeholder="{{ t('الحد الأقصى لكل طلب (اختياري)', 'Max per order (optional)') }}">
+      <input name="name" type="text" placeholder="{{ t('اسم الحزمة', 'Bundle name') }}" aria-label="{{ t('اسم الحزمة', 'Bundle name') }}" required>
+      <input name="name_en" type="text" dir="ltr" placeholder="{{ t('اسم الحزمة بالإنجليزي', 'Bundle name in English') }}" aria-label="{{ t('اسم الحزمة بالإنجليزي', 'Bundle name in English') }}">
+      <input name="slug" type="text" placeholder="{{ t('رمز الحزمة في الرابط', 'Bundle URL slug') }}" aria-label="{{ t('رمز الحزمة في الرابط', 'Bundle URL slug') }}" required dir="ltr">
+      <input name="bundle_price" type="number" step="0.01" placeholder="{{ t('سعر الحزمة', 'Bundle price') }}" aria-label="{{ t('سعر الحزمة', 'Bundle price') }}" required>
+      <input name="description" type="text" placeholder="{{ t('وصف الحزمة (اختياري)', 'Bundle description (optional)') }}" aria-label="{{ t('وصف الحزمة (اختياري)', 'Bundle description (optional)') }}">
+      <input name="image_url" type="text" dir="ltr" placeholder="{{ t('رابط صورة الحزمة (اختياري)', 'Bundle image URL (optional)') }}" aria-label="{{ t('رابط صورة الحزمة (اختياري)', 'Bundle image URL (optional)') }}">
+      <input name="max_per_order" type="number" min="1" placeholder="{{ t('الحد الأقصى لكل طلب (اختياري)', 'Max per order (optional)') }}" aria-label="{{ t('الحد الأقصى لكل طلب (اختياري)', 'Max per order (optional)') }}">
       <label class="flex items-center gap-2 text-sm">
         <input name="is_published" type="checkbox" aria-label="{{ t('منشورة في المتجر', 'Published in store') }}">
         {{ t('منشورة في المتجر', 'Published in store') }}
@@ -35,8 +35,8 @@
       <select name="product_id" id="bundle-item-product" class="orion-input" required aria-label="{{ t('المنتج', 'Product') }}">
         <option value="">{{ t('اختر منتجاً…', 'Choose a product…') }}</option>
       </select>
-      <input name="quantity" type="number" min="1" value="1" placeholder="{{ t('الكمية', 'Quantity') }}" class="orion-input" required>
-      <input name="discount_percent" type="number" min="0" max="100" step="0.01" value="0" placeholder="{{ t('خصم %', 'Discount %') }}" class="orion-input">
+      <input name="quantity" type="number" min="1" value="1" placeholder="{{ t('الكمية', 'Quantity') }}" aria-label="{{ t('الكمية', 'Quantity') }}" class="orion-input" required>
+      <input name="discount_percent" type="number" min="0" max="100" step="0.01" value="0" placeholder="{{ t('خصم %', 'Discount %') }}" aria-label="{{ t('خصم %', 'Discount %') }}" class="orion-input">
       <button type="submit" class="orion-btn w-fit">{{ t('إضافة صنف', 'Add item') }}</button>
       <p id="bundle-item-msg" class="orion-muted text-sm" role="status" aria-live="polite"></p>
     </form>

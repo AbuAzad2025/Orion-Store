@@ -4,9 +4,9 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('تطبيقات OAuth', 'OAuth apps') }}</h2>
     <form id="app-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="{{ t('اسم التطبيق', 'App name') }}" required>
-      <input name="redirect_uris" type="text" placeholder="{{ t('روابط إعادة التوجيه (مفصولة بفواصل)', 'Redirect URIs (comma-separated)') }}">
-      <input name="scopes" type="text" placeholder="{{ t('الصلاحيات', 'Scopes') }}">
+      <input name="name" type="text" placeholder="{{ t('اسم التطبيق', 'App name') }}" aria-label="{{ t('اسم التطبيق', 'App name') }}" required>
+      <input name="redirect_uris" type="text" placeholder="{{ t('روابط إعادة التوجيه (مفصولة بفواصل)', 'Redirect URIs (comma-separated)') }}" aria-label="{{ t('روابط إعادة التوجيه (مفصولة بفواصل)', 'Redirect URIs (comma-separated)') }}">
+      <input name="scopes" type="text" placeholder="{{ t('الصلاحيات', 'Scopes') }}" aria-label="{{ t('الصلاحيات', 'Scopes') }}">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('تسجيل تطبيق', 'Register app') }}</button>
     </form>
     <div id="apps-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>
@@ -24,8 +24,8 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('متاجر تجريبية', 'Sandbox stores') }}</h2>
     <form id="sandbox-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="slug" type="text" placeholder="{{ t('المعرف', 'Slug') }}" required>
-      <input name="name" type="text" placeholder="{{ t('الاسم', 'Name') }}" required>
+      <input name="slug" type="text" placeholder="{{ t('المعرف', 'Slug') }}" aria-label="{{ t('المعرف', 'Slug') }}" required>
+      <input name="name" type="text" placeholder="{{ t('الاسم', 'Name') }}" aria-label="{{ t('الاسم', 'Name') }}" required>
       <input name="expires_at" type="datetime-local" placeholder="{{ t('تاريخ الانتهاء', 'Expiration date') }}" class="orion-input" required aria-label="{{ t('تاريخ انتهاء المتجر التجريبي', 'Sandbox store expiration date') }}">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء متجر تجريبي', 'Create sandbox store') }}</button>
     </form>

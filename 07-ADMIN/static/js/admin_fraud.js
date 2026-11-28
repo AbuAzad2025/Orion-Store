@@ -23,12 +23,14 @@ const OrionAdminFraud = {
       ruleForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(ruleForm);
-        await OrionAPI.post("/fraud/rules", {
-          name: fd.get("name"), rule_type: fd.get("rule_type"), operator: fd.get("operator"),
-          threshold_value: fd.get("threshold_value"), action: fd.get("action"),
-        });
-        ruleForm.reset();
-        OrionAdminFraud.loadRules();
+        try {
+          await OrionAPI.post("/fraud/rules", {
+            name: fd.get("name"), rule_type: fd.get("rule_type"), operator: fd.get("operator"),
+            threshold_value: fd.get("threshold_value"), action: fd.get("action"),
+          });
+          ruleForm.reset();
+          OrionAdminFraud.loadRules();
+        } catch (err) { OrionUI.toast(err.message, "error"); }
       });
     }
     const reviewForm = document.getElementById("fraud-review-form");
@@ -36,11 +38,13 @@ const OrionAdminFraud = {
       reviewForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(reviewForm);
-        await OrionAPI.post("/fraud/reviews", {
-          order_id: parseInt(fd.get("order_id")), risk_score: parseInt(fd.get("risk_score") || "0"),
-        });
-        reviewForm.reset();
-        alert(OrionI18n.t('تمت المراجعة', 'Reviewed'));
+        try {
+          await OrionAPI.post("/fraud/reviews", {
+            order_id: parseInt(fd.get("order_id")), risk_score: parseInt(fd.get("risk_score") || "0"),
+          });
+          reviewForm.reset();
+          OrionUI.toast(OrionI18n.t('تمت المراجعة', 'Reviewed'), "success");
+        } catch (err) { OrionUI.toast(err.message, "error"); }
       });
     }
     OrionAdminFraud.loadRules();

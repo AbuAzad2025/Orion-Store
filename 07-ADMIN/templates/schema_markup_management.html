@@ -4,13 +4,13 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('بيانات المنتجات المنظّمة (Schema)', 'Product Structured Data (Schema)') }}</h2>
     <form id="schema-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="product_id" type="number" placeholder="{{ t('معرف المنتج', 'Product ID') }}" required>
-      <select name="schema_type" class="orion-input">
+      <input name="product_id" type="number" placeholder="{{ t('معرف المنتج', 'Product ID') }}" aria-label="{{ t('معرف المنتج', 'Product ID') }}" required>
+      <select name="schema_type" class="orion-input" aria-label="{{ t('نوع المخطط', 'Schema type') }}">
         <option value="Product" dir="ltr">{{ t('Product', 'Product') }}</option>
         <option value="Offer" dir="ltr">{{ t('Offer', 'Offer') }}</option>
         <option value="Organization" dir="ltr">{{ t('Organization', 'Organization') }}</option>
       </select>
-      <textarea name="json_ld" rows="4" placeholder="{{ t('JSON-LD', 'JSON-LD') }}" class="orion-input font-mono text-xs" dir="ltr"></textarea>
+      <textarea name="json_ld" rows="4" placeholder="{{ t('JSON-LD', 'JSON-LD') }}" aria-label="{{ t('JSON-LD', 'JSON-LD') }}" class="orion-input font-mono text-xs" dir="ltr"></textarea>
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('حفظ البيانات المنظّمة', 'Save structured data') }}</button>
     </form>
     <div id="schema-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>

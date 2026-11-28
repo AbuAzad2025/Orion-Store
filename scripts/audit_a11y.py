@@ -21,15 +21,17 @@ TEMPLATE_DIRS = (
     ROOT / "07-ADMIN" / "templates",
 )
 
-# Language → text direction. Storefront templates may compute these
-# dynamically from `locale`, so the audit renders the <html> tag with
-# representative locales instead of forcing the literal `ar`/`rtl`.
 RTL_LOCALES = frozenset({"ar", "he"})
 LTR_LOCALES = frozenset({"en", "fr"})
 PROBE_LOCALES = ("ar", "en", "he", "fr")
 
 _HTML_TAG_RE = re.compile(r"<html\b[^>]*>", re.I)
 _HTML_ATTR_RE = re.compile(r"""\b(lang|dir)\s*=\s*["']([^"']*)["']""", re.I)
+_FORM_CONTROL_RE = re.compile(r"<(input|select|textarea)\b[^>]*>", re.I)
+_SKIPPED_INPUT_RE = re.compile(
+    r"""\btype\s*=\s*["'](hidden|submit|button|reset|image)["']""", re.I
+)
+_ACCESSIBLE_NAME_RE = re.compile(r"\b(aria-label|aria-labelledby)\s*=", re.I)
 
 
 def _expected_direction(lang: str) -> str:
@@ -78,6 +80,17 @@ def _audit_html_tag(source: str, rel: str, issues: list[str]) -> None:
     issues.extend(dict.fromkeys(local_issues))
 
 
+def _audit_form_controls(source: str, rel: str, issues: list[str]) -> None:
+    """Every interactive form control needs an explicit accessible name."""
+    for match in _FORM_CONTROL_RE.finditer(source):
+        tag = match.group(0)
+        kind = match.group(1).lower()
+        if kind == "input" and _SKIPPED_INPUT_RE.search(tag):
+            continue
+        if not _ACCESSIBLE_NAME_RE.search(tag):
+            issues.append(f"{rel}: <{kind}> without aria-label/aria-labelledby")
+
+
 def _templates():
     for directory in TEMPLATE_DIRS:
         if directory.is_dir():
@@ -91,6 +104,7 @@ def audit() -> list[str]:
         source = path.read_text(encoding="utf-8")
 
         _audit_html_tag(source, rel, issues)
+        _audit_form_controls(source, rel, issues)
 
         for match in re.finditer(r"<img\b[^>]*>", source, re.I):
             if not re.search(r"\balt\s*=", match.group(0), re.I):
@@ -102,15 +116,6 @@ def audit() -> list[str]:
                 text = re.sub(r"<[^>]+>", "", body).strip()
                 if not text:
                     issues.append(f"{rel}: <button> without accessible name")
-
-        for match in re.finditer(r"<input\b[^>]*>", source, re.I):
-            tag = match.group(0)
-            if re.search(r'\btype\s*=\s*["\'](hidden|submit|button)', tag, re.I):
-                continue
-            if not re.search(
-                r"\b(aria-label|aria-labelledby|placeholder)\s*=", tag, re.I
-            ):
-                issues.append(f"{rel}: <input> without label/aria-label/placeholder")
 
     for directory in TEMPLATE_DIRS:
         if not directory.is_dir():

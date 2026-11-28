@@ -21,8 +21,10 @@ const OrionTenantOps = {
       }
       el.querySelectorAll("[data-approve]").forEach((btn) => {
         btn.addEventListener("click", async () => {
-          await OrionAPI.put(`/returns/${btn.dataset.approve}/approve`);
-          OrionTenantOps.loadReturns();
+          try {
+            await OrionAPI.put(`/returns/${btn.dataset.approve}/approve`);
+            OrionTenantOps.loadReturns();
+          } catch (err) { OrionUI.toast(err.message, "error"); }
         });
       });
     } catch (err) {
@@ -205,7 +207,7 @@ const OrionTenantOps = {
       if (!rows.length) { el.textContent = OrionI18n.t("لا توجد خطط بعد.", "No plans yet."); return; }
       SafeDOM.clear(el);
       for (const p of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${p.name} (${p.code}) — ${p.price} ${p.currency} / ${p.billing_period_days} ${OrionI18n.t("يوم", "days")}${p.trial_period_days ? ` + ${p.trial_period_days} ${OrionI18n.t("يوم تجريبي", "trial days")}` : ""}`]));
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${p.name} (${p.code}) — ${OrionUI.money(p.price, p.currency)} / ${p.billing_period_days} ${OrionI18n.t("يوم", "days")}${p.trial_period_days ? ` + ${p.trial_period_days} ${OrionI18n.t("يوم تجريبي", "trial days")}` : ""}`]));
       }
     } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
@@ -384,7 +386,7 @@ const OrionTenantOps = {
           const balanceEl = document.getElementById("credit-balance");
           const amountEl = document.getElementById("credit-amount");
           balanceEl.classList.remove("hidden");
-          amountEl.textContent = data.balance || "0.00";
+          amountEl.textContent = OrionUI.money(data.balance || 0);
 
           const addForm = document.getElementById("credit-add-form");
           addForm.classList.remove("hidden");
@@ -404,10 +406,10 @@ const OrionTenantOps = {
           if (!txRows.length) { txEl.textContent = OrionI18n.t("لا توجد حركات.", "No transactions."); return; }
           SafeDOM.clear(txEl);
           for (const t of txRows) {
-            txEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 text-sm" }, [`${t.type} — ${t.amount} — ${t.reason || ""} (${new Date(t.created_at).toLocaleDateString("ar")})`]));
+            txEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 text-sm" }, [`${t.type} — ${OrionUI.money(t.amount)} — ${t.reason || ""} (${new Date(t.created_at).toLocaleDateString("ar")})`]));
           }
         } catch (err) {
-          alert(err.message || OrionI18n.t("تعذّر تحميل الرصيد", "Failed to load balance"));
+          OrionUI.toast(err.message || OrionI18n.t("تعذّر تحميل الرصيد", "Failed to load balance"), "error");
         }
       });
     }

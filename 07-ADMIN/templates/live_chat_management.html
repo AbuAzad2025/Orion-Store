@@ -9,7 +9,7 @@
     <h2 class="orion-title mb-3">{{ t('المحادثة', 'Conversation') }} — <span id="chat-session-id"></span></h2>
     <div id="chat-messages" role="log" aria-live="polite" aria-relevant="additions" class="h-64 overflow-y-auto border rounded p-3 mb-3 bg-gray-50 text-sm space-y-2"></div>
     <form id="chat-send-form" class="flex gap-2">
-      <input name="message" type="text" placeholder="{{ t('اكتب رسالة...', 'Type a message...') }}" class="flex-1 border rounded px-3 py-2 text-sm" required>
+      <input name="message" type="text" placeholder="{{ t('اكتب رسالة...', 'Type a message...') }}" aria-label="{{ t('اكتب رسالة...', 'Type a message...') }}" class="flex-1 border rounded px-3 py-2 text-sm" required>
       <button type="submit" class="orion-btn orion-btn-gold">{{ t('إرسال', 'Send') }}</button>
     </form>
     <button id="chat-close" class="mt-2 text-xs text-red-500">{{ t('إنهاء المحادثة', 'End conversation') }}</button>
@@ -17,7 +17,7 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('بدء محادثة', 'Start a conversation') }}</h2>
     <form id="chat-create-form" class="grid gap-2 max-w-md text-sm">
-      <input name="customer_email" type="email" placeholder="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}">
+      <input name="customer_email" type="email" placeholder="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}" aria-label="{{ t('البريد الإلكتروني للعميل', 'Customer email') }}">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء جلسة', 'Create session') }}</button>
     </form>
   </section>

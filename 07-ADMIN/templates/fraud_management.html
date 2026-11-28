@@ -4,19 +4,19 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('قواعد الاحتيال', 'Fraud rules') }}</h2>
     <form id="fraud-rule-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="{{ t('اسم القاعدة', 'Rule name') }}" required>
-      <select name="rule_type" class="orion-input">
+      <input name="name" type="text" placeholder="{{ t('اسم القاعدة', 'Rule name') }}" aria-label="{{ t('اسم القاعدة', 'Rule name') }}" required>
+      <select name="rule_type" class="orion-input" aria-label="{{ t('نوع القاعدة', 'Rule type') }}">
         <option value="amount">{{ t('قيمة الطلب', 'Order amount') }}</option>
         <option value="velocity">{{ t('عدد المرات', 'Velocity') }}</option>
         <option value="ip">{{ t('عنوان IP', 'IP address') }}</option>
       </select>
-      <select name="operator" class="orion-input">
+      <select name="operator" class="orion-input" aria-label="{{ t('المعامل', 'Operator') }}">
         <option value=">">{{ t('أكبر من', 'Greater than') }}</option>
         <option value="<">{{ t('أصغر من', 'Less than') }}</option>
         <option value="==">{{ t('يساوي', 'Equals') }}</option>
       </select>
-      <input name="threshold_value" type="text" placeholder="{{ t('الحد', 'Threshold') }}" required>
-      <select name="action" class="orion-input">
+      <input name="threshold_value" type="text" placeholder="{{ t('الحد', 'Threshold') }}" aria-label="{{ t('الحد', 'Threshold') }}" required>
+      <select name="action" class="orion-input" aria-label="{{ t('الإجراء', 'Action') }}">
         <option value="review">{{ t('مراجعة', 'Review') }}</option>
         <option value="block">{{ t('حظر', 'Block') }}</option>
         <option value="allow">{{ t('سماح', 'Allow') }}</option>
@@ -28,8 +28,8 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('مراجعة طلب مشبوه', 'Review suspicious order') }}</h2>
     <form id="fraud-review-form" class="grid gap-2 max-w-md text-sm">
-      <input name="order_id" type="number" placeholder="{{ t('معرف الطلب', 'Order ID') }}" required>
-      <input name="risk_score" type="number" placeholder="{{ t('درجة الخطورة (0-100)', 'Risk score (0-100)') }}">
+      <input name="order_id" type="number" placeholder="{{ t('معرف الطلب', 'Order ID') }}" aria-label="{{ t('معرف الطلب', 'Order ID') }}" required>
+      <input name="risk_score" type="number" placeholder="{{ t('درجة الخطورة (0-100)', 'Risk score (0-100)') }}" aria-label="{{ t('درجة الخطورة (0-100)', 'Risk score (0-100)') }}">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('مراجعة', 'Review') }}</button>
     </form>
   </section>

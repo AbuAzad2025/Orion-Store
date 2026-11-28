@@ -106,12 +106,8 @@ def render_store_index():
     sort = _parse_sort(request.args.get("sort"))
     price_min = _parse_decimal(request.args.get("price_min"))
     price_max = _parse_decimal(request.args.get("price_max"))
-    from math import ceil
+    from engine.catalog_pagination import paginate_catalog
 
-    from core.pagination import pagination_params
-
-    page, per_page = pagination_params()
-    per_page = min(per_page, 12)
     products_q = _products.query_published(
         tenant.id,
         category_id=category_id,
@@ -120,18 +116,14 @@ def render_store_index():
         price_max=price_max,
         sort="featured" if sort == "default" else sort,
     )
-    total = products_q.count()
-    total_pages = max(1, ceil(total / per_page))
-    page = min(max(page, 1), total_pages)
-    products = products_q.offset((page - 1) * per_page).limit(per_page).all()
+    products, page, total_pages, page_url = paginate_catalog(
+        products_q,
+        endpoint="storefront_ui.store_index_clean",
+        url_values={"slug": tenant.slug},
+    )
     products_i18n = [
         {**ts.merge_product(p, locale), "canonical_slug": p.slug} for p in products
     ]
-
-    def _page_url(n):
-        args = {k: v for k, v in request.args.items() if k != "page"}
-        args["page"] = str(n)
-        return url_for("storefront_ui.store_index", **args)
 
     categories = _categories.list_for_tenant(tenant.id)
     counts = _categories.category_product_counts(tenant.id)
@@ -158,7 +150,7 @@ def render_store_index():
         price_max=price_max,
         pagination_page=page,
         pagination_pages=total_pages,
-        page_url=_page_url,
+        page_url=page_url,
     )
 
 
@@ -257,7 +249,9 @@ def store_category(slug: str):
     ts = TranslationService()
     category = ts.get_category_by_localized_slug(tenant.id, slug, locale)
     category_i18n = ts.merge_category(category, locale)
-    products = _products.query_published(
+    from engine.catalog_pagination import paginate_catalog
+
+    products_q = _products.query_published(
         tenant.id,
         category_id=category.id,
         featured=_parse_featured(request.args.get("featured")),
@@ -268,7 +262,12 @@ def store_category(slug: str):
             if _parse_sort(request.args.get("sort")) == "default"
             else _parse_sort(request.args.get("sort"))
         ),
-    ).all()
+    )
+    products, page, pages, page_url = paginate_catalog(
+        products_q,
+        endpoint="storefront_ui.store_category_clean",
+        url_values={"slug": tenant.slug, "category_slug": slug},
+    )
     products_i18n = [
         {**ts.merge_product(p, locale), "canonical_slug": p.slug} for p in products
     ]
@@ -289,6 +288,9 @@ def store_category(slug: str):
         sort=_parse_sort(request.args.get("sort")),
         price_min=_parse_decimal(request.args.get("price_min")),
         price_max=_parse_decimal(request.args.get("price_max")),
+        pagination_page=page,
+        pagination_pages=pages,
+        page_url=page_url,
     )
 
 

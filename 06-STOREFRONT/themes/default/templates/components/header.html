@@ -26,7 +26,7 @@
     <div class="orion-nav-controls">
       <form class="orion-nav-search" role="search" action="/search" method="get" aria-label="{{ t('search_placeholder') }}">
         <input type="search" name="q" value="{{ search_q or '' }}" class="orion-search-input"
-               placeholder="{{ t('search_placeholder') }}" required>
+               placeholder="{{ t('search_placeholder') }}" aria-label="{{ t('search_placeholder') }}" required>
         <button type="submit" class="orion-search-btn" aria-label="{{ t('search_placeholder') }}"><svg class="sf-icon" aria-hidden="true"><use href="#sf-i-search"/></svg></button>
         <input type="hidden" name="store" value="{{ store_token }}">
       </form>

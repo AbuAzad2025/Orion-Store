@@ -18,7 +18,8 @@
   </table>
 </div>
 
-<div id="tenant-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+<div id="tenant-modal" role="dialog" aria-modal="true" aria-labelledby="tenant-modal-title"
+     class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
   <div class="orion-card w-full max-w-md space-y-3">
     <h3 id="tenant-modal-title" class="font-semibold text-lg">{{ t('إضافة متجر', 'Add Store') }}</h3>
     <form id="tenant-form" class="space-y-3">
@@ -45,7 +46,7 @@
       </div>
       <div>
         <label class="block text-sm mb-1">{{ t('الحالة', 'Status') }}</label>
-        <select name="status" id="tenant-status" class="orion-input w-full">
+        <select name="status" id="tenant-status" class="orion-input w-full" aria-label="{{ t('الحالة', 'Status') }}">
           <option value="trial">{{ t('تجريبي', 'Trial') }}</option>
           <option value="active">{{ t('نشط', 'Active') }}</option>
           <option value="suspended">{{ t('معلق', 'Suspended') }}</option>

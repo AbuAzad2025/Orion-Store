@@ -4,16 +4,16 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('مهام الاستيراد والتصدير', 'Import and export jobs') }}</h2>
     <form id="import-export-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <select name="job_type" class="orion-input" required>
+      <select name="job_type" class="orion-input" required aria-label="{{ t('نوع المهمة', 'Job type') }}">
         <option value="export">{{ t('تصدير', 'Export') }}</option>
         <option value="import">{{ t('استيراد', 'Import') }}</option>
       </select>
-      <select name="entity_type" class="orion-input" required>
+      <select name="entity_type" class="orion-input" required aria-label="{{ t('نوع الكيان', 'Entity type') }}">
         <option value="products">{{ t('منتجات', 'Products') }}</option>
         <option value="orders">{{ t('طلبات', 'Orders') }}</option>
         <option value="customers">{{ t('عملاء', 'Customers') }}</option>
       </select>
-      <input name="file_url" type="url" placeholder="{{ t('رابط الملف (للاستيراد)', 'File URL (for import)') }}" class="hidden" id="ie-file-url">
+      <input name="file_url" type="url" placeholder="{{ t('رابط الملف (للاستيراد)', 'File URL (for import)') }}" aria-label="{{ t('رابط الملف (للاستيراد)', 'File URL (for import)') }}" class="hidden" id="ie-file-url">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إنشاء مهمة', 'Create job') }}</button>
     </form>
     <div id="import-export-jobs-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>

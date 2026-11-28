@@ -33,11 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const cards = [
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
             SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('إجمالي الوارد', 'Total inbound')]),
-            SafeDOM.elem("p", { className: "text-xl font-bold" }, [s.total_inbound])
+            SafeDOM.elem("p", { className: "text-xl font-bold" }, [OrionUI.money(s.total_inbound)])
           ]),
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
             SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('العمولة', 'Commission')]),
-            SafeDOM.elem("p", { className: "text-xl font-bold" }, [s.total_commission])
+            SafeDOM.elem("p", { className: "text-xl font-bold" }, [OrionUI.money(s.total_commission)])
           ]),
           SafeDOM.elem("div", { className: "rounded bg-white p-4 shadow" }, [
             SafeDOM.elem("p", { className: "text-sm text-gray-500" }, [OrionI18n.t('طلبات مدفوعة', 'Paid orders')]),
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
         reportEl.appendChild(SafeDOM.elem("div", { className: "grid grid-cols-2 gap-4 md:grid-cols-3 mb-6" }, cards));
         reportEl.appendChild(SafeDOM.elem("h3", { className: "font-semibold mb-2" }, [OrionI18n.t('أحداث مالية حديثة', 'Recent financial events')]));
-        const events = data.recent_events.map((e) => SafeDOM.elem("li", null, [`${e.event_type}: ${e.amount} ${e.currency}`]));
+        const events = data.recent_events.map((e) => SafeDOM.elem("li", null, [`${e.event_type}: ${OrionUI.money(e.amount, e.currency)}`]));
         reportEl.appendChild(SafeDOM.elem("ul", { className: "space-y-1 text-sm" }, events));
       })
       .catch((err) => {
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     runBtn.addEventListener("click", () => {
       OrionAPI.post("/platform/reconciliation/run", {})
         .then(() => location.reload())
-        .catch((err) => alert(err.message));
+        .catch((err) => OrionUI.toast(err.message, "error"));
     });
   }
 });

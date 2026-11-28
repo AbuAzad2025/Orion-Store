@@ -33,8 +33,10 @@ const OrionAdminReconciliation = {
     const createBtn = document.getElementById("btn-create-run");
     if (createBtn) {
       createBtn.addEventListener("click", async () => {
-        await OrionAPI.post("/reconciliation/runs");
-        OrionAdminReconciliation.loadRuns();
+        try {
+          await OrionAPI.post("/reconciliation/runs");
+          OrionAdminReconciliation.loadRuns();
+        } catch (err) { OrionUI.toast(err.message, "error"); }
       });
     }
     const itemForm = document.getElementById("reconciliation-item-form");
@@ -42,12 +44,14 @@ const OrionAdminReconciliation = {
       itemForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(itemForm);
-        await OrionAPI.post(`/reconciliation/runs/${fd.get("run_id")}/items`, {
-          financial_event_id: parseInt(fd.get("financial_event_id")),
-          expected_amount: fd.get("expected_amount"), actual_amount: fd.get("actual_amount"),
-        });
-        itemForm.reset();
-        alert(OrionI18n.t('تم إضافة البند', 'Item added'));
+        try {
+          await OrionAPI.post(`/reconciliation/runs/${fd.get("run_id")}/items`, {
+            financial_event_id: parseInt(fd.get("financial_event_id")),
+            expected_amount: fd.get("expected_amount"), actual_amount: fd.get("actual_amount"),
+          });
+          itemForm.reset();
+          OrionUI.toast(OrionI18n.t('تم إضافة البند', 'Item added'), "success");
+        } catch (err) { OrionUI.toast(err.message, "error"); }
       });
     }
     OrionAdminReconciliation.loadRuns();

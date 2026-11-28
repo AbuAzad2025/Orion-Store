@@ -27,12 +27,14 @@ const OrionAdminMetafields = {
       defForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(defForm);
-        await OrionAPI.post("/metafields/definitions", {
-          owner_type: fd.get("owner_type"), key: fd.get("key"), label: fd.get("label"),
-          field_type: fd.get("field_type"), is_required: fd.get("is_required") === "on",
-        });
-        defForm.reset();
-        OrionAdminMetafields.loadDefinitions();
+        try {
+          await OrionAPI.post("/metafields/definitions", {
+            owner_type: fd.get("owner_type"), key: fd.get("key"), label: fd.get("label"),
+            field_type: fd.get("field_type"), is_required: fd.get("is_required") === "on",
+          });
+          defForm.reset();
+          OrionAdminMetafields.loadDefinitions();
+        } catch (err) { OrionUI.toast(err.message, "error"); }
       });
     }
     const valForm = document.getElementById("metafield-value-form");
@@ -40,12 +42,14 @@ const OrionAdminMetafields = {
       valForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(valForm);
-        await OrionAPI.post("/metafields/values", {
-          definition_id: parseInt(fd.get("definition_id")), owner_id: parseInt(fd.get("owner_id")),
-          value: fd.get("value") || undefined,
-        });
-        valForm.reset();
-        alert(OrionI18n.t('تم الحفظ', 'Saved'));
+        try {
+          await OrionAPI.post("/metafields/values", {
+            definition_id: parseInt(fd.get("definition_id")), owner_id: parseInt(fd.get("owner_id")),
+            value: fd.get("value") || undefined,
+          });
+          valForm.reset();
+          OrionUI.toast(OrionI18n.t('تم الحفظ', 'Saved'), "success");
+        } catch (err) { OrionUI.toast(err.message, "error"); }
       });
     }
     OrionAdminMetafields.loadDefinitions();

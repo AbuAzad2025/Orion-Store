@@ -85,12 +85,14 @@ def _schema_diffs(connection, metadata) -> list[str]:
 
 
 def _baseline_model_diffs(metadata) -> list[str]:
-    """Compare model tables/columns with the baseline migration's CREATE TABLEs.
+    """Compare model columns with baseline CREATE TABLE DDL.
 
-    Reading the actual migration file is what makes this a real gate: comparing
-    a metadata-built database back to the same metadata is always a no-op.
+    Reads the actual migration file (not a metadata-built DB) so width and
+    server-default drifts are caught, not just missing column names.
     """
     import re
+
+    from sqlalchemy.dialects import postgresql
 
     baseline = ROOT / "migrations/versions/20261119_0001_baseline_tables.py"
     if not baseline.exists():
@@ -102,6 +104,38 @@ def _baseline_model_diffs(metadata) -> list[str]:
     ):
         created[table_name] = ddl
 
+    dialect = postgresql.dialect()
+    serial_alias = {
+        "BIGSERIAL": "BIGINT",
+        "SERIAL": "INTEGER",
+        "SMALLSERIAL": "SMALLINT",
+    }
+    separator = r",\s*\\n\\t"
+
+    def normalise(value: object) -> str:
+        raw = str(value).replace("\\n", " ").replace("\\t", " ").upper()
+        for serial, integer in serial_alias.items():
+            raw = re.sub(rf"\b{serial}\b", integer, raw)
+        return " ".join(raw.split())
+
+    def model_type(column) -> str:
+        sqltype = column.type
+        rendered = (
+            sqltype.compile(dialect=dialect)
+            if hasattr(sqltype, "compile")
+            else str(sqltype)
+        )
+        return normalise(rendered)
+
+    def model_default(column) -> str:
+        server_default = column.server_default
+        if server_default is None:
+            return ""
+        arg = getattr(server_default, "arg", server_default)
+        if isinstance(arg, str):
+            return normalise(arg)
+        return normalise(arg.compile(dialect=dialect))
+
     diffs: list[str] = []
     for table_name, table in metadata.tables.items():
         ddl = created.get(table_name)
@@ -109,14 +143,41 @@ def _baseline_model_diffs(metadata) -> list[str]:
             diffs.append(f"table {table_name}: missing from baseline migration")
             continue
         for column in table.columns:
-            # Migration DDL has literal \t escapes, so use the type after the
-            # column name as the anchor instead of a word boundary.
-            if not re.search(
-                rf"{re.escape(column.name)}\s+(?:BIGSERIAL|SERIAL|BIGINT|SMALLINT|VARCHAR|CHAR|TEXT|NUMERIC|DECIMAL|BOOLEAN|UUID|INTEGER|DATE|TIMESTAMP|DATETIME|JSON)",
+            match = re.search(
+                rf"\\n\\t{re.escape(column.name)}\s+(.+?)(?={separator}|$)",
                 ddl,
-            ):
+                re.DOTALL,
+            )
+            if match is None:
                 diffs.append(
                     f"table {table_name}: column {column.name} missing from baseline"
+                )
+                continue
+            segment = match.group(1)
+            if model_type(column) not in normalise(segment):
+                diffs.append(
+                    f"table {table_name}: column {column.name} type drift "
+                    f"(model {model_type(column)}, baseline {normalise(segment)})"
+                )
+            default_match = re.search(
+                r"DEFAULT\s+(.+?)(?:\s+NOT NULL|\s+NULL|$)", segment
+            )
+            baseline_default = (
+                normalise(default_match.group(1)) if default_match else ""
+            )
+            expected_default = model_default(column)
+            if expected_default:
+                if baseline_default != expected_default and not (
+                    baseline_default and expected_default in baseline_default
+                ):
+                    diffs.append(
+                        f"table {table_name}: column {column.name} default drift "
+                        f"(model DEFAULT {expected_default}, baseline DEFAULT {baseline_default or 'none'})"
+                    )
+            elif baseline_default:
+                diffs.append(
+                    f"table {table_name}: column {column.name} missing server "
+                    f"default in model (baseline DEFAULT {baseline_default})"
                 )
     return diffs
 

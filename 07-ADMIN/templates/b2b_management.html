@@ -4,9 +4,9 @@
   <section class="orion-card">
     <h2 class="orion-title mb-3">{{ t('مجموعات العملاء', 'Customer Groups') }}</h2>
     <form id="b2b-group-form" class="grid gap-2 max-w-md mb-4 text-sm">
-      <input name="name" type="text" placeholder="{{ t('اسم المجموعة', 'Group name') }}" class="orion-input" required>
-      <input name="code" type="text" placeholder="{{ t('رمز', 'Code') }}" class="orion-input" required>
-      <input name="discount_percent" type="number" min="0" max="100" placeholder="{{ t('خصم %', 'Discount %') }}" class="orion-input" value="0">
+      <input name="name" type="text" placeholder="{{ t('اسم المجموعة', 'Group name') }}" aria-label="{{ t('اسم المجموعة', 'Group name') }}" class="orion-input" required>
+      <input name="code" type="text" placeholder="{{ t('رمز', 'Code') }}" aria-label="{{ t('رمز', 'Code') }}" class="orion-input" required>
+      <input name="discount_percent" type="number" min="0" max="100" placeholder="{{ t('خصم %', 'Discount %') }}" aria-label="{{ t('خصم %', 'Discount %') }}" class="orion-input" value="0">
       <button type="submit" class="orion-btn orion-btn-gold w-fit">{{ t('إضافة مجموعة', 'Add group') }}</button>
     </form>
     <div id="b2b-groups-list" class="orion-muted text-sm">{{ t('جارٍ التحميل…', 'Loading…') }}</div>

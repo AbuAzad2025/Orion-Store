@@ -181,7 +181,7 @@ def register_store_whatsapp_routes(bp, carts) -> None:
                 id=product_id, tenant_id=tenant.id, deleted_at=None
             ).first()
             if product is None or not product.is_published:
-                return jsonify({"error": "المنتج غير متاح."}), 404
+                return jsonify({"error": "Product not available."}), 404
             customer_name = str(data.get("customer_name") or "")
             order = orders.create(
                 tenant,
