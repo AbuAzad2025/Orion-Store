@@ -110,7 +110,7 @@ def test_a11y_audit_matches_direction_to_language() -> None:
         '<html lang="fr" dir="ltr">',
         # Dynamic form used by base.html — validated for every probe locale.
         "<html lang=\"{{ locale|default('ar') }}\" "
-        "dir=\"{{ 'rtl' if locale[:2]|lower in ['ar','he'] else 'ltr' }}\">",
+        "dir=\"{{ 'rtl' if locale[:2]|lower in ['ar','he','fa','ur'] else 'ltr' }}\">",
     )
     for tag in accepted:
         issues: list[str] = []

@@ -40,7 +40,7 @@
     <div class="orion-card p-4 orion-share-box">
       <p class="orion-stat-label">{{ t('share_product') }}</p>
       <div class="orion-cta-row mt-2">
-        <a href="https://wa.me/?text={{ (p_name ~ ' — ' ~ share_url)|urlencode }}"
+        <a href="https://wa.me/?text={{ (p_name ~ ' — ' ~ '\u2068' ~ share_url ~ '\u2069')|urlencode }}"
            target="_blank" rel="noopener" class="orion-btn orion-btn-ghost"
            aria-label="{{ t('share_whatsapp') }} {{ p_name }}"><svg class="sf-icon sf-icon-wa" aria-hidden="true"><use href="#sf-i-whatsapp"/></svg>{{ t('share_whatsapp') }}</a>
         <button type="button" class="orion-btn orion-btn-ghost"

@@ -301,7 +301,7 @@ class PaymentService:
         ):
             return {
                 "success": True,
-                "provider_refund_id": f"manual_refund_{payment.id}",
+                "provider_refund_id": f"manual_refund_{payment.id}_{uuid.uuid4().hex[:12]}",
                 "uncertain": False,
             }
         gateway_fn = {

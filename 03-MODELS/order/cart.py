@@ -46,7 +46,10 @@ class CartItem(db.Model, TimestampMixin):
         PrimaryKeyType, primary_key=True, autoincrement=True
     )
     cart_id: Mapped[int] = mapped_column(
-        PrimaryKeyType, ForeignKey("carts.id", ondelete="CASCADE"), nullable=False
+        PrimaryKeyType,
+        ForeignKey("carts.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     tenant_id: Mapped[int] = mapped_column(
         PrimaryKeyType,

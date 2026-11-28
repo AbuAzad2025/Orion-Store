@@ -23,7 +23,7 @@ const SafeDOM = {
     return this.elem("p", { className: "text-gray-500" }, [text]);
   },
   actionBtn(label, className, onClick) {
-    const btn = this.elem("button", { className }, [label]);
+    const btn = this.elem("button", { type: "button", className }, [label]);
     if (onClick) btn.addEventListener("click", onClick);
     return btn;
   },
@@ -32,6 +32,13 @@ const SafeDOM = {
 /** Shared UI feedback layer — toasts, danger confirmation, loading states. */
 const OrionUI = {
   toast(message, kind = "info") {
+    const key = `${kind}:${message}`;
+    const now = Date.now();
+    if (this._lastToastKey === key && now - (this._lastToastAt || 0) < 400) {
+      return null;
+    }
+    this._lastToastKey = key;
+    this._lastToastAt = now;
     let host = document.querySelector(".orion-toast-host");
     if (!host) {
       host = SafeDOM.elem("div", { className: "orion-toast-host", role: "status", "aria-live": "polite" });
@@ -43,17 +50,21 @@ const OrionUI = {
     return toast;
   },
 
+  locale() {
+    return document.documentElement.lang || "ar";
+  },
+
   number(value) {
     const num = Number(value);
     return Number.isFinite(num)
-      ? num.toLocaleString(document.documentElement.lang || "ar")
+      ? num.toLocaleString(OrionUI.locale())
       : "—";
   },
 
   money(value, currency) {
     const num = Number(value);
     const text = Number.isFinite(num)
-      ? num.toLocaleString(document.documentElement.lang || "ar", {
+      ? num.toLocaleString(OrionUI.locale(), {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })

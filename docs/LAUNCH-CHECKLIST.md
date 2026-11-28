@@ -21,7 +21,7 @@
 - [ ] webhook موقّع يُقبل ومزوّر يُرفض — `pytest tests/unit/test_webhook*`
 
 ## 3. قاعدة البيانات
-- [ ] بناء المخطط من الصفر: `flask db upgrade` على قاعدة فارغة → `baseline_0003`
+- [ ] بناء المخطط من الصفر: `flask db upgrade` على قاعدة فارغة → `schema_drift_parity_0009` (أحدث هجرة / head)
 - [ ] كل هجرة قابلة للتراجع خطوة بخطوة — `pytest tests/integration/test_migration_downgrades.py`
 - [ ] النسخ والاستعادة مُختبرة — `python scripts/verify_backup_restore.py`
 - [ ] لا يوجد `.env` أو secret مُلتزم في git

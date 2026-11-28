@@ -377,8 +377,18 @@ def store_search():
         price_max=price_max,
         sort=sort,
     )
-    page, per_page = pagination_params()
-    products, meta = paginate_query(products_q, page, per_page)
+    from engine.catalog_pagination import paginate_catalog
+
+    products, page, pages, page_url = paginate_catalog(
+        products_q,
+        endpoint=(
+            "storefront_ui.store_search_clean"
+            if request.path.startswith("/s/")
+            else "storefront_ui.store_search"
+        ),
+        url_values={"slug": tenant.slug} if request.path.startswith("/s/") else None,
+    )
+    search_total = products_q.count()
     products_i18n = [
         {**ts.merge_product(p, locale), "canonical_slug": p.slug} for p in products
     ]
@@ -391,11 +401,6 @@ def store_search():
         for key in ("q", "category", "featured", "price_min", "price_max", "sort")
         if request.args.get(key)
     )
-
-    def _page_url(n: int) -> str:
-        params = {k: v for k, v in request.args.items()}
-        params["page"] = str(n)
-        return url_for("storefront_ui.store_search", **params)
 
     from bundle_svc.bundle_service import BundleService
 
@@ -425,9 +430,10 @@ def store_search():
         sort=sort,
         price_min=price_min,
         price_max=price_max,
-        pagination_meta=meta,
-        prev_url=_page_url(page - 1) if page > 1 else None,
-        next_url=_page_url(page + 1) if page < meta["pages"] else None,
+        pagination_page=page,
+        pagination_pages=pages,
+        page_url=page_url,
+        search_total=search_total,
         keep_params=keep_params,
     )
 

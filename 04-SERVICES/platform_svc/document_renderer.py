@@ -85,7 +85,7 @@ class DocumentRenderer:
         locale = request_locale()
         config = TenantConfig.query.filter_by(tenant_id=order.tenant_id).first()
         net = (
-            Decimal(str(order.subtotal)) - Decimal(str(order.tax_amount))
+            Decimal(str(order.total)) - Decimal(str(order.tax_amount))
             if config and config.tax_included
             else Decimal(str(order.subtotal))
         )
@@ -156,7 +156,7 @@ class DocumentRenderer:
         invoice_number = f"INV-{order.tenant_id}-{uuid.uuid4().hex.upper()}"
         config = TenantConfig.query.filter_by(tenant_id=order.tenant_id).first()
         net = (
-            Decimal(str(order.subtotal)) - Decimal(str(order.tax_amount))
+            Decimal(str(order.total)) - Decimal(str(order.tax_amount))
             if config and config.tax_included
             else Decimal(str(order.subtotal))
         )

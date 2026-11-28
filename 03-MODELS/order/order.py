@@ -100,7 +100,10 @@ class OrderItem(db.Model):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     order_id: Mapped[int] = mapped_column(
-        PrimaryKeyType, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False
+        PrimaryKeyType,
+        ForeignKey("orders.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     tenant_id: Mapped[int] = mapped_column(
         PrimaryKeyType,

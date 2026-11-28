@@ -65,7 +65,7 @@
       {% endif %}
 
       {% set share_link = request.host_url.rstrip('/') ~ '/s/' ~ tenant.slug ~ '/' %}
-      {% set share_caption = tenant.name_for(locale) ~ ' — ' ~ share_link %}
+      {% set share_caption = tenant.name_for(locale) ~ ' — ' ~ '\u2068' ~ share_link ~ '\u2069' %}
       <div class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50 orion-share-overlay" data-store-share-panel
            role="dialog" aria-modal="true" title="{{ t('share_store') }}" aria-label="{{ t('share_store') }}">
         <div class="orion-card p-5 max-w-md w-full orion-share-panel">

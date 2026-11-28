@@ -2,7 +2,8 @@
 (function () {
   function setLinks(panel, url, title) {
     const e = encodeURIComponent;
-    const text = title + " — " + url;
+    const FSI = "\u2068", PDI = "\u2069";
+    const text = title + " — " + FSI + url + PDI;
     const targets = {
       whatsapp: "https://wa.me/?text=" + e(text),
       facebook: "https://www.facebook.com/sharer/sharer.php?u=" + e(url),

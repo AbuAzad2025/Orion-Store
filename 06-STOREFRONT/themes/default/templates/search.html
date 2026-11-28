@@ -4,7 +4,7 @@
   <h1 class="orion-title text-2xl mb-1">{{ t('search_results_title') }}</h1>
   {% if search_q %}
   <p class="orion-muted text-sm mb-6">
-    {{ t('search_results_count').format(n=pagination_meta.total) }}
+    {{ t('search_results_count').format(n=search_total) }}
   </p>
   {% else %}
   <p class="orion-muted text-sm mb-6">{{ t('search_placeholder') }}</p>
@@ -17,17 +17,20 @@
     <h2 class="orion-title text-lg mb-3">{{ t('search_bundles_title') }}</h2>
     <div class="orion-product-grid">
       {% for b in bundles %}
-      <article class="orion-card p-4 orion-csp-bundle-card">
-        {% if b.image_url %}<img src="{{ signed_image_url(b.image_url, store_token) }}" alt="{{ b.name_en if locale[:2]|lower == "en" and b.name_en else b.name }}" class="orion-csp-banner-img-sm" loading="lazy" decoding="async">{% endif %}
-        <strong class="text-lg">{{ b.name_en if locale[:2]|lower == "en" and b.name_en else b.name }}</strong>
+      {% set b_name = b.name_en if locale[:2]|lower == "en" and b.name_en else b.name %}
+      <article class="orion-card p-4 orion-csp-bundle-card sf-bundle-card">
+        {% if b.image_url %}<img src="{{ signed_image_url(b.image_url, store_token) }}" alt="{{ b_name }}" class="orion-csp-banner-img-sm" loading="lazy" decoding="async">{% endif %}
+        <strong class="text-lg">{{ b_name }}</strong>
         {% if b.description %}<p class="orion-muted text-sm orion-csp-zero">{{ b.description }}</p>{% endif %}
-        <p class="orion-product-price text-xl orion-badge orion-csp-price-badge" dir="ltr">{{ money(b.price) }} {{ currency }}</p>
+        <p class="orion-stat-label orion-csp-zero">{{ t('bundle_items') }}</p>
+        <ul class="orion-csp-list-sm">{% for it in b['items'] %}<li>{{ it.name }} × {{ it.quantity }}</li>{% endfor %}</ul>
+        <p class="orion-product-price text-xl orion-badge orion-csp-price-badge" dir="ltr">{{ money(b.bundle_price) }} {{ currency }}</p>
         <div class="flex flex-wrap gap-2">
           <a href="/s/{{ tenant.slug }}/bundle/{{ b.slug }}" class="orion-btn orion-btn-ghost">{{ t('bundle_details') }}</a>
-          {% set wa_msg = bundle_order_text((b.name_en if locale[:2]|lower == "en" and b.name_en else b.name), money(b.price)) %}
+          {% set wa_msg = bundle_order_text(b_name, money(b.bundle_price)) %}
           {% set wa_link = whatsapp_url(tenant.phone, wa_msg) %}
           {% if wa_link %}<a href="{{ wa_link }}" target="_blank" rel="noopener" class="orion-btn"><svg class="sf-icon sf-icon-wa" aria-hidden="true"><use href="#sf-i-whatsapp"/></svg>{{ t('whatsapp') }}</a>{% endif %}
-          <a href="/s/{{ tenant.slug }}/#bundles" class="orion-btn orion-btn-gold">{{ t('bundle_details') }}</a>
+          <button type="button" class="orion-btn orion-btn-gold bundle-add" data-slug="{{ b.slug }}" aria-label="{{ t('bundle_add') }} — {{ b_name }}">{{ t('bundle_add') }}</button>
         </div>
       </article>
       {% endfor %}
@@ -47,14 +50,16 @@
   <div class="orion-empty-modern">{{ t('search_empty') }}</div>
   {% endif %}
 
-  {% if pagination_meta.pages > 1 %}
-  <nav class="orion-pagination" aria-label="{{ t('search_results_title') }}">
-    {% if pagination_meta.page > 1 %}
-    <a class="orion-page-link" href="{{ prev_url }}">{{ t('pagination_prev') }}</a>
+  {% if pagination_pages and pagination_pages > 1 %}
+  <nav class="orion-pagination mt-6" aria-label="{{ t('pagination_label') }}">
+    {% if pagination_page > 1 %}
+    <a class="orion-page-link" href="{{ page_url(pagination_page - 1) }}" rel="prev">{{ t('pagination_prev') }}</a>
     {% endif %}
-    <span class="orion-page-link orion-page-current">{{ pagination_meta.page }} / {{ pagination_meta.pages }}</span>
-    {% if pagination_meta.page < pagination_meta.pages %}
-    <a class="orion-page-link" href="{{ next_url }}">{{ t('pagination_label') }}</a>
+    {% for n in range(1, pagination_pages + 1) %}
+    <a class="orion-page-link{% if n == pagination_page %} orion-page-current{% endif %}" href="{{ page_url(n) }}"{% if n == pagination_page %} aria-current="page"{% endif %}>{{ n }}</a>
+    {% endfor %}
+    {% if pagination_page < pagination_pages %}
+    <a class="orion-page-link" href="{{ page_url(pagination_page + 1) }}" rel="next">{{ t('pagination_next') }}</a>
     {% endif %}
   </nav>
   {% endif %}
@@ -62,4 +67,30 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('storefront_assets.static', filename='js/cart.js') }}"></script>
+<script nonce="{{ csp_nonce }}">
+document.addEventListener("click", async (event) => {
+  const button = event.target.closest("#search-bundles .bundle-add");
+  if (!button) return;
+  button.disabled = true;
+  try {
+    const res = await fetch("/api/v1/store/bundles/" + encodeURIComponent(button.dataset.slug), {
+      headers: { "X-Tenant-ID": document.body.dataset.tenantId || "", "X-Locale": document.documentElement.lang || "ar" }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    let token = StoreAPI.getCartToken();
+    if (!token) {
+      token = (await StoreAPI.createCart()).cart.cart_token;
+      StoreAPI.setCartToken(token);
+    }
+    await StoreAPI.addBundle(token, data.bundle.id, 1);
+    const original = button.textContent;
+    button.textContent = "{{ t('bundle_added') }}";
+    setTimeout(() => { button.textContent = original; button.disabled = false; }, 1800);
+  } catch (err) {
+    button.disabled = false;
+    window.alert(err.message);
+  }
+});
+</script>
 {% endblock %}

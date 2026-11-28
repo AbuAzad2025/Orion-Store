@@ -208,7 +208,8 @@ const OrionAdminBundles = {
           if (msg) msg.textContent = OrionI18n.t("تمت إضافة الصنف", "Item added");
           const bundleId = fd.get("bundle_id");
           itemForm.reset();
-          if (bundleSelect) bundleSelect.value = bundleId;
+          const select = document.getElementById("bundle-item-bundle");
+          if (select) select.value = bundleId;
           OrionAdminBundles.loadBundleItems(bundleId);
         } catch (err) {
           if (msg) msg.textContent = err.message;

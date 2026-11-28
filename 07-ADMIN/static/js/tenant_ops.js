@@ -221,7 +221,7 @@ const OrionTenantOps = {
       if (!rows.length) { el.textContent = OrionI18n.t("لا توجد اشتراكات حالية.", "No active subscriptions."); return; }
       SafeDOM.clear(el);
       for (const s of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${s.customer_email} — ${s.status} (${OrionI18n.t("تنتهي", "Expires")}: ${new Date(s.current_period_end).toLocaleDateString("ar")})`]));
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${s.customer_email} — ${s.status} (${OrionI18n.t("تنتهي", "Expires")}: ${new Date(s.current_period_end).toLocaleDateString(OrionUI.locale())})`]));
       }
     } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
@@ -406,7 +406,7 @@ const OrionTenantOps = {
           if (!txRows.length) { txEl.textContent = OrionI18n.t("لا توجد حركات.", "No transactions."); return; }
           SafeDOM.clear(txEl);
           for (const t of txRows) {
-            txEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 text-sm" }, [`${t.type} — ${OrionUI.money(t.amount)} — ${t.reason || ""} (${new Date(t.created_at).toLocaleDateString("ar")})`]));
+            txEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 text-sm" }, [`${t.type} — ${OrionUI.money(t.amount)} — ${t.reason || ""} (${new Date(t.created_at).toLocaleDateString(OrionUI.locale())})`]));
           }
         } catch (err) {
           OrionUI.toast(err.message || OrionI18n.t("تعذّر تحميل الرصيد", "Failed to load balance"), "error");

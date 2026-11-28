@@ -85,13 +85,15 @@ class CheckoutService:
 
         config = TenantConfig.query.filter_by(tenant_id=cart.tenant_id).first()
         if config and config.tax_included:
-            # Product prices already contain tax: extract it, never add it again.
+            # Product prices contain tax: extract it from the charged amount so
+            # the invoice's net + VAT always equals the order total.
+            charged = subtotal - discount_amount
             tax_amount = TaxService().compute_tax_inclusive(
                 tenant_id=cart.tenant_id,
-                subtotal=subtotal,
+                subtotal=charged,
                 shipping_address=shipping_address,
             )
-            total = subtotal - discount_amount + shipping_cost
+            total = charged + shipping_cost
         else:
             tax_amount = TaxService().compute_tax(
                 tenant_id=cart.tenant_id,
@@ -166,7 +168,13 @@ class CheckoutService:
                     raise ValidationError("Bundle not found.")
                 # A bundle consumes each constituent product; without this the
                 # advertised-price line would sell stock that never decreases.
+                bundle_cost = Decimal("0")
                 for component in BundleService().items_for(bundle.id):
+                    component_product = db.session.get(Product, component.product_id)
+                    if component_product is not None:
+                        bundle_cost += (
+                            component_product.cost_price or Decimal("0")
+                        ) * component.quantity
                     needed = component.quantity * item.quantity
                     reserved = db.session.execute(
                         update(Product)
@@ -191,7 +199,7 @@ class CheckoutService:
                         product_name=bundle.name,
                         product_sku=None,
                         unit_price=item.unit_price,
-                        unit_cost=Decimal("0"),
+                        unit_cost=bundle_cost,
                         quantity=item.quantity,
                         total_price=item.total_price,
                     )

@@ -35,14 +35,23 @@ def calculate_tax():
         tenant = require_tenant_context()
         data = request.get_json(silent=True) or {}
         shipping_cost = data.get("shipping_cost")
-        tax = _svc.compute_tax(
-            tenant_id=tenant.id,
-            subtotal=Decimal(str(data.get("subtotal", "0"))),
-            shipping_address=data.get("shipping_address") or {},
-            shipping_cost=(
-                Decimal(str(shipping_cost)) if shipping_cost is not None else None
-            ),
-        )
+        subtotal = Decimal(str(data.get("subtotal", "0")))
+        shipping = Decimal(str(shipping_cost)) if shipping_cost is not None else None
+        address = data.get("shipping_address") or {}
+        from tenant.tenant_config import TenantConfig
+
+        config = TenantConfig.query.filter_by(tenant_id=tenant.id).first()
+        if config and config.tax_included:
+            tax = _svc.compute_tax_inclusive(
+                tenant_id=tenant.id, subtotal=subtotal, shipping_address=address
+            )
+        else:
+            tax = _svc.compute_tax(
+                tenant_id=tenant.id,
+                subtotal=subtotal,
+                shipping_address=address,
+                shipping_cost=shipping,
+            )
         return jsonify({"tax_amount": str(tax)}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code

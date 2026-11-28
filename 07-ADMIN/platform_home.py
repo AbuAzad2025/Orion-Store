@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from admin_locale import get_admin_locale, remember_admin_locale
+
 from flask import (
     Blueprint,
     g,
@@ -33,6 +35,11 @@ def inject_platform_settings():
     except Exception:
         settings = None
     return {"platform_settings": settings, "viewer_user": getattr(g, "user", None)}
+
+
+@platform_home_bp.after_request
+def remember_locale(response):
+    return remember_admin_locale(response)
 
 
 @platform_home_bp.get("/s/<slug>")
@@ -131,9 +138,7 @@ def platform_home():
 
         return render_store_index()
 
-    locale = (request.args.get("locale") or "ar").strip().lower()
-    if locale not in ("ar", "en"):
-        locale = "ar"
+    locale = get_admin_locale()
     rows = (
         Tenant.query.filter_by(is_active=True, deleted_at=None)
         .order_by(Tenant.id)

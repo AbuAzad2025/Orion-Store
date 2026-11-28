@@ -26,7 +26,7 @@
   <div class="orion-product-actions">
     <button data-add-cart="{{ product.id }}" class="orion-btn orion-btn-gold orion-add-btn" aria-label="{{ t('add_to_cart') }} {{ p_name }}">{{ t('add_to_cart') }}</button>
     {% set card_share_url = request.host_url.rstrip('/') ~ '/s/' ~ tenant.slug ~ '/product/' ~ product.slug %}
-    <a href="https://wa.me/?text={{ (p_name ~ ' — ' ~ card_share_url)|urlencode }}"
+    <a href="https://wa.me/?text={{ (p_name ~ ' — ' ~ '\u2068' ~ card_share_url ~ '\u2069')|urlencode }}"
        target="_blank" rel="noopener" class="orion-btn orion-btn-ghost"
        title="{{ t('share') }} {{ p_name }}" aria-label="{{ t('share') }} {{ p_name }}"><svg class="sf-icon" aria-hidden="true"><use href="#sf-i-share"/></svg><span class="sf-label">{{ t('share') }}</span></a>
     {% set wa_order = whatsapp_url(tenant.phone, product_order_text(p_name, money(p_price))) %}

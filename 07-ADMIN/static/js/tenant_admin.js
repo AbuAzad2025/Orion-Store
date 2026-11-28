@@ -255,9 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const code = input.getAttribute("data-flag-code");
             const container = document.querySelector(`[data-flag="${code}"]`);
             const reasonField = container.querySelector(".reason-field");
-            if (input.checked !== (container.querySelector(".save-override") !== null)) {
-              reasonField.classList.remove("hidden");
-            }
+            reasonField.classList.remove("hidden");
           });
         });
         flagsEl.querySelectorAll(".save-override").forEach((btn) => {

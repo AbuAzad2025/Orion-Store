@@ -54,6 +54,17 @@ class WhatsAppOrderService:
                 if bundle is None:
                     raise ValidationError("Bundle not found.")
                 advertised = Decimal(str(bundle.bundle_price))
+                from bundle_svc.bundle_service import BundleService
+
+                unit_cost = Decimal("0")
+                for component in BundleService().items_for(bundle.id):
+                    cproduct = Product.query.filter_by(
+                        id=component.product_id, tenant_id=tenant.id
+                    ).first()
+                    if cproduct is not None:
+                        unit_cost += (
+                            cproduct.cost_price or Decimal("0")
+                        ) * component.quantity
                 raw_price = row.get("unit_price")
                 unit_price = (
                     Decimal(str(raw_price)) if raw_price is not None else advertised
@@ -67,7 +78,7 @@ class WhatsAppOrderService:
                     "product_name": str(row.get("product_name") or bundle.name),
                     "product_sku": f"bundle:{bundle.id}",
                     "unit_price": unit_price,
-                    "unit_cost": Decimal("0"),
+                    "unit_cost": unit_cost,
                     "quantity": quantity,
                     "total_price": total,
                 }
@@ -304,14 +315,15 @@ class WhatsAppOrderService:
     def expire_stale(self) -> int:
         """Auto-cancel WhatsApp orders left undecided for over two weeks."""
         cutoff = datetime.now(timezone.utc) - timedelta(days=EXPIRE_DAYS)
-        rows = Order.query.filter(
-            Order.shipping_method_code == CHANNEL,
-            Order.status == PENDING_STATUS,
-            Order.created_at < cutoff,
-        ).all()
-        for order in rows:
-            order.status = "cancelled"
-            order.payment_status = "cancelled"
-        if rows:
-            _commit_keep_loaded()
-        return len(rows)
+        changed = db.session.execute(
+            update(Order)
+            .where(
+                Order.shipping_method_code == CHANNEL,
+                Order.status == PENDING_STATUS,
+                Order.created_at < cutoff,
+            )
+            .values(status="cancelled", payment_status="cancelled")
+        ).rowcount
+        if changed:
+            db.session.commit()
+        return changed
