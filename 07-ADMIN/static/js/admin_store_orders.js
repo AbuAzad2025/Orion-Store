@@ -4,7 +4,11 @@ const OrionStoreOrders = {
     const target = document.getElementById("manual-orders-list");
     if (!target) return;
     try {
-      const data = await OrionAPI.get("/tenant/orders");
+      const [data, store] = await Promise.all([
+        OrionAPI.get("/tenant/orders"),
+        OrionAPI.get("/tenants/me").catch(() => ({})),
+      ]);
+      const phone = String((store.tenant || {}).phone || "").replace(/[^0-9]/g, "");
       SafeDOM.clear(target);
       const rows = data.orders || [];
       if (!rows.length) {
@@ -16,10 +20,22 @@ const OrionStoreOrders = {
       rows.forEach((order) => {
         const items = (order.items || []).map(i => `${i.product_name} × ${i.quantity}`).join("، ");
         const pending = order.status === "awaiting";
+        const waText = OrionI18n.t("طلب واتساب جديد", "New WhatsApp order")
+          + " " + order.order_number + " — " + (order.customer_first_name || "")
+          + " — " + items + " — " + order.total + " " + (order.currency || "");
+        const waActions = phone ? [
+          SafeDOM.elem("a", {
+            href: "https://wa.me/" + phone + "?text=" + encodeURIComponent(waText),
+            target: "_blank", rel: "noopener",
+            className: "orion-btn text-xs",
+            "aria-label": OrionI18n.t("مراسلة الزبون عبر واتساب المتجر", "Message via store WhatsApp"),
+          }, [OrionI18n.t("واتساب", "WhatsApp")]),
+        ] : [];
         const actions = pending ? [
+          ...waActions,
           SafeDOM.actionBtn(OrionI18n.t("تأكيد", "Confirm"), "orion-btn orion-btn-gold text-xs", () => this.update(order.public_id, "confirm")),
           SafeDOM.actionBtn(OrionI18n.t("إلغاء", "Cancel"), "orion-btn text-xs", () => this.update(order.public_id, "cancel")),
-        ] : [SafeDOM.elem("span", { className: "orion-muted" }, [order.status])];
+        ] : [...waActions, SafeDOM.elem("span", { className: "orion-muted" }, [order.status])];
         target.appendChild(SafeDOM.elem("tr", null, [
           SafeDOM.elem("td", { className: "p-2" }, [order.order_number]),
           SafeDOM.elem("td", { className: "p-2" }, [order.customer_first_name || order.customer_email]),

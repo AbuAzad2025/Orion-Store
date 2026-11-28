@@ -31,6 +31,8 @@ class NotificationService:
     def _dispatch_email(self, payload: dict) -> None:
         if not smtp_configured():
             return
+        if not str(payload.get("recipient") or "").strip():
+            return  # WhatsApp orders without a real email must not bounce SMTP
         from flask import current_app
 
         from notification_svc.tasks import send_email_task
