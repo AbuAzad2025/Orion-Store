@@ -39,7 +39,7 @@ const OrionAdminCurrency = {
         const to = document.getElementById("conv-to").value;
         try {
           const data = await OrionAPI.get(`/currency/convert?amount=${amount}&from=${from}&to=${to}`);
-          document.getElementById("conv-result").textContent = `${data.result} ${to}`;
+          OrionUI.set("conv-result", `${data.result} ${to}`, "textContent");
         } catch (err) {
           document.getElementById("conv-result").textContent = OrionI18n.t('تعذّر التحويل. تحقّق من المبلغ والعملات.', 'Conversion failed. Check the amount and currencies.');
         }

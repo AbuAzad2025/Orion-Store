@@ -62,20 +62,6 @@ def upgrade() -> None:
 def downgrade() -> None:
     if op.get_bind().dialect.name != "postgresql":
         return
-    bind = op.get_bind()
-    for table, column in URL_COLUMNS:
-        if _catalog_value("character_maximum_length", table, column) != 512:
-            continue
-        overlong = bind.execute(
-            text(f"SELECT 1 FROM {table} WHERE length({column}) > 500 LIMIT 1")
-        ).scalar()
-        if overlong is not None:
-            continue  # Never narrow a column that holds longer values.
-        op.alter_column(
-            table,
-            column,
-            existing_type=sa.String(length=512),
-            type_=sa.String(length=500),
-            existing_nullable=True,
-        )
-    # DEFAULT 0 is baseline-owned and declared by the models; never drop it.
+    # URL widths and DEFAULT 0 are baseline-owned (0001 now creates 512 and
+    # DEFAULT 0). Narrowing here would break parity with a fresh DB and could
+    # truncate stored values, so the downgrade is intentionally a no-op.

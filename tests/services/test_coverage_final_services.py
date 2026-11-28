@@ -957,7 +957,7 @@ def test_tenant_service_paths(app, tenant):
     svc = TenantService()
     assert any(t.id == tenant.id for t in svc.list_tenants())
     assert svc.get_by_public_id(tenant.public_id).id == tenant.id
-    _fails(NotFoundError, svc.get_by_public_id, str(uuid.uuid4()))
+    _fails(NotFoundError, svc.get_by_public_id, uuid.uuid4())
     assert svc.list_users_for_tenant(tenant.id) == []
 
 

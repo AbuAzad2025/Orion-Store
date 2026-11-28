@@ -5,8 +5,12 @@ const OrionAdminTaxConfig = {
     if (!form) return;
     try {
       const data = await OrionAPI.get("/tenant/tax-config");
-      form.querySelector('[name="tax_rate"]').value = data.tax_config.tax_rate;
-      form.querySelector('[name="tax_included"]').checked = data.tax_config.tax_included;
+      const cfg = data.tax_config;
+      if (!cfg) return;
+      const rate = form.querySelector('[name="tax_rate"]');
+      if (rate) rate.value = cfg.tax_rate ?? "";
+      const included = form.querySelector('[name="tax_included"]');
+      if (included) included.checked = Boolean(cfg.tax_included);
     } catch (err) { /* keep defaults */ }
   },
   init() {

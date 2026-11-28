@@ -64,13 +64,15 @@ def storefront_search():
         )
         from bundle_svc.bundle_service import BundleService
 
-        from v1.store_bundles import bundle_matches
+        from v1.store_bundles import bundle_matches, preload_bundle_data
 
         query = request.args.get("q", "").strip()
+        rows = BundleService().list_published(tenant.id)
+        loaded = preload_bundle_data(rows, tenant.id, locale)
         bundles = [
-            bundle_matches(b, query, locale)
-            for b in BundleService().list_published(tenant.id)
-            if bundle_matches(b, query, locale) is not None
+            match
+            for b in rows
+            if (match := bundle_matches(b, query, locale, loaded)) is not None
         ]
         return (
             jsonify(

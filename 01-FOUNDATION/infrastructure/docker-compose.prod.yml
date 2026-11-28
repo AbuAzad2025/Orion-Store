@@ -8,13 +8,13 @@ services:
     environment:
       POSTGRES_USER: orion_admin
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
-      POSTGRES_DB: azadexa_prod
+      POSTGRES_DB: ${POSTGRES_DB:-orionstore_db}
       POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:?set POSTGRES_APP_PASSWORD}
     volumes:
       - prod_postgres:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U orion_admin -d azadexa_prod"]
+      test: ["CMD-SHELL", "pg_isready -U orion_admin -d ${POSTGRES_DB:-orionstore_db}"]
       interval: 10s
       timeout: 5s
       retries: 8
@@ -35,8 +35,8 @@ services:
     restart: unless-stopped
     environment:
       FLASK_ENV: production
-      DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD}@postgres:5432/azadexa_prod
-      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD}@postgres:5432/azadexa_prod
+      DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD}@postgres:5432/${POSTGRES_DB:-orionstore_db}
+      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-orionstore_db}
       REDIS_URL: redis://redis:6379/0
       PRODUCT_IMAGES_DIR: ${PRODUCT_IMAGES_DIR:-/srv/orionstore-data/product-images}
       CELERY_BROKER_URL: redis://redis:6379/1
@@ -82,8 +82,8 @@ services:
     environment:
       FLASK_ENV: production
       RUN_MIGRATIONS: "false"
-      DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD}@postgres:5432/azadexa_prod
-      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD}@postgres:5432/azadexa_prod
+      DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD}@postgres:5432/${POSTGRES_DB:-orionstore_db}
+      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-orionstore_db}
       REDIS_URL: redis://redis:6379/0
       PRODUCT_IMAGES_DIR: ${PRODUCT_IMAGES_DIR:-/srv/orionstore-data/product-images}
       CELERY_BROKER_URL: redis://redis:6379/1
@@ -109,8 +109,8 @@ services:
     environment:
       FLASK_ENV: production
       RUN_MIGRATIONS: "false"
-      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD}@postgres:5432/azadexa_prod
-      DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD}@postgres:5432/azadexa_prod
+      MIGRATION_DATABASE_URL: postgresql://orion_admin:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-orionstore_db}
+      DATABASE_URL: postgresql://orion_app:${POSTGRES_APP_PASSWORD}@postgres:5432/${POSTGRES_DB:-orionstore_db}
       REDIS_URL: redis://redis:6379/0
       PRODUCT_IMAGES_DIR: ${PRODUCT_IMAGES_DIR:-/srv/orionstore-data/product-images}
       CELERY_BROKER_URL: redis://redis:6379/1

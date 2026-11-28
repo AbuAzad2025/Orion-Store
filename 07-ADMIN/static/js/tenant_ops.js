@@ -221,7 +221,7 @@ const OrionTenantOps = {
       if (!rows.length) { el.textContent = OrionI18n.t("لا توجد اشتراكات حالية.", "No active subscriptions."); return; }
       SafeDOM.clear(el);
       for (const s of rows) {
-        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${s.customer_email} — ${s.status} (${OrionI18n.t("تنتهي", "Expires")}: ${new Date(s.current_period_end).toLocaleDateString(OrionUI.locale())})`]));
+        el.appendChild(SafeDOM.elem("div", { className: "border-b py-2" }, [`${s.customer_email} — ${s.status} (${OrionI18n.t("تنتهي", "Expires")}: ${OrionUI.date(s.current_period_end)})`]));
       }
     } catch (err) { el.textContent = err.message || OrionI18n.t("تعذّر التحميل", "Failed to load"); }
   },
@@ -385,11 +385,12 @@ const OrionTenantOps = {
           const data = await OrionAPI.get(`/store-credit/balance?customer_email=${encodeURIComponent(email)}`);
           const balanceEl = document.getElementById("credit-balance");
           const amountEl = document.getElementById("credit-amount");
-          balanceEl.classList.remove("hidden");
-          amountEl.textContent = OrionUI.money(data.balance || 0);
+          if (balanceEl) balanceEl.classList.remove("hidden");
+          if (amountEl) amountEl.textContent = OrionUI.money(data.balance || 0);
 
           const addForm = document.getElementById("credit-add-form");
-          addForm.classList.remove("hidden");
+          if (addForm) {
+            addForm.classList.remove("hidden");
           addForm.onsubmit = async (e) => {
             e.preventDefault();
             const fd = new FormData(addForm);
@@ -399,6 +400,7 @@ const OrionTenantOps = {
             addForm.reset();
             location.reload();
           };
+          }
 
           const txEl = document.getElementById("credit-transactions");
           const txData = await OrionAPI.get(`/store-credit/transactions?customer_email=${encodeURIComponent(email)}`);
@@ -406,7 +408,7 @@ const OrionTenantOps = {
           if (!txRows.length) { txEl.textContent = OrionI18n.t("لا توجد حركات.", "No transactions."); return; }
           SafeDOM.clear(txEl);
           for (const t of txRows) {
-            txEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 text-sm" }, [`${t.type} — ${OrionUI.money(t.amount)} — ${t.reason || ""} (${new Date(t.created_at).toLocaleDateString(OrionUI.locale())})`]));
+            txEl.appendChild(SafeDOM.elem("div", { className: "border-b py-1 text-sm" }, [`${t.type} — ${OrionUI.money(t.amount)} — ${t.reason || ""} (${OrionUI.date(t.created_at)})`]));
           }
         } catch (err) {
           OrionUI.toast(err.message || OrionI18n.t("تعذّر تحميل الرصيد", "Failed to load balance"), "error");

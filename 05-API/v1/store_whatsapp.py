@@ -14,20 +14,31 @@ from order_svc.whatsapp_order_service import WhatsAppOrderService
 def cart_items_with_names(carts, cart) -> list[dict]:
     """Cart items + localized names for products and bundles (tenant-scoped)."""
     from bundle.bundle import ProductBundle
-    from i18n_svc.translation_service import TranslationService
+    from i18n.product_translation import ProductTranslation
 
     from catalog.product import Product
     from core.context import get_locale
 
     items = [item.to_dict() for item in carts.list_items(cart)]
     locale = get_locale()
-    translate = TranslationService()
     product_ids = [item["product_id"] for item in items if item.get("product_id")]
     products = (
         {
             p.id: p
             for p in Product.query.filter(
                 Product.tenant_id == cart.tenant_id, Product.id.in_(product_ids)
+            ).all()
+        }
+        if product_ids
+        else {}
+    )
+    translations = (
+        {
+            t.product_id: t
+            for t in ProductTranslation.query.filter(
+                ProductTranslation.tenant_id == cart.tenant_id,
+                ProductTranslation.product_id.in_(product_ids),
+                ProductTranslation.locale == locale,
             ).all()
         }
         if product_ids
@@ -59,8 +70,8 @@ def cart_items_with_names(carts, cart) -> list[dict]:
         if product is None:
             item["product_name"] = str(item.get("product_id"))
             continue
-        merged = translate.merge_product(product, locale)
-        item["product_name"] = merged.get("name") or product.name
+        trans = translations.get(item.get("product_id"))
+        item["product_name"] = (trans.name if trans else None) or product.name
     return items
 
 

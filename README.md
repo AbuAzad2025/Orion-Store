@@ -19,8 +19,11 @@ Multi-tenant e-commerce SaaS — **Waves 0–15 complete** ✅ + **Full-stack co
 | Development | `docker-compose.dev.yml` | 5432 | `azadexa_dev` |
 | Tests | `docker-compose.test.yml` | 5433 | `azadexa_test` |
 | Staging | `docker-compose.staging.yml` | 5000 / 9090 / 3000 | `azadexa_staging` |
-| Production | `docker-compose.prod.yml` | 5000 | `azadexa_prod` |
+| Production | `docker-compose.prod.yml` | 5000 | `orionstore_db` (override with `POSTGRES_DB`) |
 | CI (GitHub Actions) | Postgres 15 service | 5432 | `orion_test_db` |
+
+Production DB name comes from `POSTGRES_DB` in `.env.production` (default `orionstore_db`);
+compose, `scripts/backup_db.ps1` and `docs/RUNBOOK.md` all follow it.
 
 ## Quick start (Windows — native PostgreSQL)
 

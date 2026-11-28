@@ -25,6 +25,10 @@ BEAT_SCHEDULE = {
         "task": "orion.celery_heartbeat",
         "schedule": 30.0,
     },
+    "platform-backup-daily": {
+        "task": "orion.platform_backup.scheduled",
+        "schedule": 86400.0,
+    },
 }
 
 _default_broker = (
@@ -48,6 +52,7 @@ _task_app = None
 def _build_task_app():
     """Minimal app for beat/worker processes (no blueprint registration)."""
     from flask import Flask
+
     from orion.extensions import db
 
     app = Flask(__name__)
@@ -93,6 +98,7 @@ def celery_heartbeat() -> bool:
 
 celery_app.Task = ContextTask
 
+import backup_svc.tasks  # noqa: E402,F401
 import notification_svc.tasks  # noqa: E402,F401
 import order_svc.tasks  # noqa: E402,F401
 

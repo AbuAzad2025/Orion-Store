@@ -19,6 +19,12 @@ def _alembic_cfg() -> Config:
     return cfg
 
 
+@pytest.fixture(autouse=True)
+def _postgres_only(database_url):
+    if not database_url.startswith("postgresql"):
+        pytest.skip("Alembic upgrades require PostgreSQL")
+
+
 def test_alembic_upgrade_and_downgrade(app):
     with app.app_context():
         db.drop_all()

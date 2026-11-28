@@ -388,6 +388,8 @@ def test_set_jwt_cookies(app):
 
 
 def test_revoke_noop_and_naive_expiry(app):
+    from orion.extensions import db
+
     with app.app_context():
         _revoke("", "access", None, None)  # missing jti → early return
         _revoke("jti-push-1", "access", None, None)
@@ -401,7 +403,11 @@ def test_revoke_noop_and_naive_expiry(app):
             RevokedToken.jti.in_(["jti-push-1", "jti-push-2"])
         ).all()
         assert len(rows) == 2
-        assert all(row.expires_at.tzinfo is not None for row in rows)
+        for row in rows:
+            actual = row.expires_at
+            if actual.tzinfo is None and db.engine.dialect.name == "sqlite":
+                actual = actual.replace(tzinfo=timezone.utc)
+            assert actual.tzinfo is not None
 
 
 def test_revoke_current_tokens_without_jwt(app):

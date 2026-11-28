@@ -71,6 +71,29 @@ const OrionUI = {
       : "—";
     return currency ? `${text} ${currency}` : text;
   },
+  val(id) {
+    return document.getElementById(id)?.value ?? "";
+  },
+  checked(id) {
+    return Boolean(document.getElementById(id)?.checked);
+  },
+  set(id, value, prop = "value") {
+    const el = document.getElementById(id);
+    if (!el) return false;
+    el[prop] = prop === "checked" ? Boolean(value) : (value ?? "");
+    return true;
+  },
+  date(value) {
+    if (!value) return "—";
+    const d = new Date(value);
+    if (!Number.isFinite(d.getTime())) return "—";
+    const base = (OrionUI.locale() || "ar").replace("_", "-").split("-u-")[0];
+    try {
+      return d.toLocaleDateString(`${base}-u-ca-gregory`);
+    } catch (err) {
+      return d.toLocaleDateString("en-GB");
+    }
+  },
 
   confirmDanger(message) {
     return window.confirm(message);

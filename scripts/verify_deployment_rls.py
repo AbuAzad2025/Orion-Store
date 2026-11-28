@@ -3,8 +3,11 @@
 
 Run against the *application* DATABASE_URL (not the migration/admin URL):
 
-    DATABASE_URL=postgresql://orion_app:***@host:5432/azadexa_prod \
+    DATABASE_URL=postgresql://orion_app:***@host:5432/${POSTGRES_DB:-orionstore_db} \
         python scripts/verify_deployment_rls.py --check
+
+    (orionstore_db is the live default; ${POSTGRES_DB:-...} is the configurable
+    override shared with docker-compose.prod.yml and backup_db.ps1.)
 
 Checks:
   1. current role is neither superuser nor BYPASSRLS.

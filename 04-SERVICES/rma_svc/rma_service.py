@@ -217,7 +217,7 @@ class RmaService:
             except Exception:
                 pass
 
-        row.status = "refunded" if refund_result is not None else "closed"
+        row.status = "refunded" if row.return_type == "refund" else "closed"
         row.completed_at = utc_now()
         db.session.commit()
         return {"return": row.to_dict(), "refund": refund_result}

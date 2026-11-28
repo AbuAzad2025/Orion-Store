@@ -60,8 +60,11 @@ python scripts/verify_backup_restore.py --pg-bin "C:\Program Files\PostgreSQL\18
 3. استعد داخل حاوية Postgres:
 ```powershell
 docker compose --env-file .env.production -f 01-FOUNDATION/infrastructure/docker-compose.prod.yml `
-  exec -T postgres pg_restore --clean --if-exists -U azadexa -d azadexa_prod < backup.dump
+  exec -T postgres pg_restore --clean --if-exists -U orion_admin -d orionstore_db < backup.dump
 ```
+> Use the `POSTGRES_DB` value from `.env.production` (default `orionstore_db`);
+> `-U orion_admin` is the migration/admin role defined in the production compose file.
+
 4. تحقق: `python scripts/audit_rls.py --check` و `python scripts/audit_schema.py --check`
    (مع `DATABASE_URL` يشير لقاعدة الإنتاج) ثم `.\scripts\dev.ps1 launch-verify`.
 

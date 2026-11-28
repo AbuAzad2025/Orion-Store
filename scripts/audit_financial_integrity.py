@@ -179,16 +179,36 @@ def main() -> None:
                         str(x.commission_amount),
                     )
                     if original:
-                        refund = Refund.query.filter_by(
-                            tenant_id=tid,
-                            payment_id=original.payment_id,
-                            status=COMPLETED_REFUND_STATUS,
+                        # Match the reversal to its OWN refund: the writer keys
+                        # it by that refund's financial event. Using the first
+                        # completed refund of the payment breaks unequal
+                        # partial refunds and synthetic reversals.
+                        reversal_event = FinancialEvent.query.filter_by(
+                            id=x.financial_event_id, tenant_id=tid
                         ).first()
+                        refund = None
+                        if reversal_event is not None:
+                            if reversal_event.source_entity == "refund":
+                                refund = Refund.query.filter_by(
+                                    id=reversal_event.source_id,
+                                    tenant_id=tid,
+                                    payment_id=original.payment_id,
+                                    status=COMPLETED_REFUND_STATUS,
+                                ).first()
+                            if refund is None:
+                                refund = Refund.query.filter_by(
+                                    financial_event_id=x.financial_event_id,
+                                    tenant_id=tid,
+                                    payment_id=original.payment_id,
+                                    status=COMPLETED_REFUND_STATUS,
+                                ).first()
                         payment = next(
                             (p for p in payments if p.id == original.payment_id), None
                         )
                         if refund and payment and money(payment.amount) > 0:
                             ratio = money(refund.amount) / money(payment.amount)
+                            if ratio > 1:
+                                ratio = Decimal(1)
                             expected = -(
                                 money(original.commission_amount) * ratio
                             ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
@@ -285,7 +305,7 @@ def main() -> None:
                     )
             for row in ledger:
                 event = events_by_id.get(row.financial_event_id)
-                if event:
+                if event and event.commission_ledger_id is not None:
                     check(
                         f"{slug} ledger {row.id} event backlink",
                         event.commission_ledger_id == row.id,

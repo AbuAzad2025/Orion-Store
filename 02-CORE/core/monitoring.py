@@ -227,6 +227,9 @@ def init_prometheus(app: Flask) -> None:
 
 
 def register_monitoring(app: Flask) -> None:
+    if app.extensions.get("_orion_monitoring_registered"):
+        return
+    app.extensions["_orion_monitoring_registered"] = True
     configure_logging(app)
     init_sentry(app)
     init_prometheus(app)

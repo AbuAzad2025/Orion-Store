@@ -69,6 +69,12 @@ files:
   "04-SERVICES/order_svc/order_service.py": { wave: 3, min: 93 }
   "05-API/v1/storefront.py": { wave: 3, min: 73 }
   "05-API/v1/storefront_search.py": { wave: 16, min: 85 }
+  "05-API/v1/store_bundles.py": { wave: 16, min: 60 }
+  "05-API/v1/store_whatsapp.py": { wave: 16, min: 60 }
+  "02-CORE/core/i18n_messages.py": { wave: 16, min: 70 }
+  "04-SERVICES/order_svc/whatsapp_order_service.py": { wave: 16, min: 60 }
+  "05-API/v1/tax_api.py": { wave: 16, min: 60 }
+  "05-API/v1/tenant_tax_config.py": { wave: 16, min: 60 }
   # wave 4 — financial events
   "03-MODELS/platform_models/financial_event.py": { wave: 4, min: 98 }
   "04-SERVICES/platform_svc/financial_events_service.py": { wave: 4, min: 92 }
@@ -165,6 +171,9 @@ files:
   "05-API/v1/brands.py": { wave: 16, min: 82 }
   "04-SERVICES/payment_svc/external_refund_service.py": { wave: 16, min: 98 }
   "03-MODELS/platform_models/revoked_token.py": { wave: 16, min: 98 }
+
+  # wave 17 — deferred backup ops (round 10)
+  "04-SERVICES/backup_svc/tasks.py": { wave: 17, min: 95 }
 
 # PRs: changed production files must appear in `files` (or exclude_from_scan).
 pr_modified_min: 60

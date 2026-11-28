@@ -4,37 +4,76 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from bundle.bundle import BundleItem
 from bundle_svc.bundle_service import BundleService
 from flask import g, jsonify
-from i18n_svc.translation_service import TranslationService
+from i18n.product_translation import ProductTranslation
 
+from catalog.product import Product
 from catalog_svc.product_service import ProductService
 from core.exceptions import NotFoundError, OrionError
 from core.middleware import require_tenant_context
 from v1.storefront import storefront_bp
 
 
-def _payload(bundle, locale: str) -> dict:
-    svc = BundleService()
+def preload_bundle_data(bundles, tenant_id: int, locale: str | None = None):
+    """Batch bundle items, their products and (optionally) translations."""
+    bundle_ids = [b.id for b in bundles]
+    items = (
+        BundleItem.query.filter(BundleItem.bundle_id.in_(bundle_ids))
+        .order_by(BundleItem.id)
+        .all()
+        if bundle_ids
+        else []
+    )
+    items_by_bundle: dict[int, list[BundleItem]] = {}
+    for item in items:
+        items_by_bundle.setdefault(item.bundle_id, []).append(item)
+    product_ids = list({item.product_id for item in items})
+    products = (
+        {
+            p.id: p
+            for p in ProductService()
+            .query_for_tenant(tenant_id)
+            .filter(Product.id.in_(product_ids))
+            .all()
+        }
+        if product_ids
+        else {}
+    )
+    translations = (
+        {
+            t.product_id: t
+            for t in ProductTranslation.query.filter(
+                ProductTranslation.tenant_id == tenant_id,
+                ProductTranslation.product_id.in_(product_ids),
+                ProductTranslation.locale == locale,
+            ).all()
+        }
+        if locale and product_ids
+        else {}
+    )
+    return items_by_bundle, products, translations
+
+
+def _payload(bundle, locale: str, loaded=None) -> dict:
+    if loaded is None:
+        loaded = preload_bundle_data([bundle], g.tenant_id, locale)
+    items_by_bundle, products, translations = loaded
     items = []
-    for item in svc.items_for(bundle.id):
-        product = (
-            ProductService()
-            .query_for_tenant(g.tenant_id)
-            .filter_by(id=item.product_id)
-            .first()
-        )
+    for item in items_by_bundle.get(bundle.id, []):
+        product = products.get(item.product_id)
         if not product:
             continue
-        merged = TranslationService().merge_product(product, locale)
-        price = Decimal(str(merged.get("price") or product.price or "0"))
+        trans = translations.get(product.id)
+        price = Decimal(str(product.to_dict()["price"] or product.price or "0"))
         line = price * (Decimal("1") - Decimal(str(item.discount_percent)) / 100)
         items.append(
             {
                 "product_id": product.id,
                 "public_id": product.public_id,
-                "name": merged.get("name") or product.name,
-                "slug": merged.get("slug") or product.slug,
+                "name": (trans.name if trans else None) or product.name,
+                "slug": (trans.slug if trans else None) or product.slug,
                 "quantity": item.quantity,
                 "discount_percent": str(item.discount_percent),
                 "unit_price": str(line.quantize(Decimal("0.01"))),
@@ -59,7 +98,8 @@ def list_bundles(locale: str):
     try:
         tenant = require_tenant_context()
         rows = BundleService().list_published(tenant.id)
-        return jsonify({"bundles": [_payload(b, locale) for b in rows]}), 200
+        loaded = preload_bundle_data(rows, tenant.id, locale)
+        return jsonify({"bundles": [_payload(b, locale, loaded) for b in rows]}), 200
     except OrionError as exc:
         return jsonify({"error": exc.message}), exc.status_code
 
@@ -75,9 +115,9 @@ def get_bundle(slug: str, locale: str):
         return jsonify({"error": exc.message}), exc.status_code
 
 
-def bundle_matches(bundle, query: str, locale: str):
+def bundle_matches(bundle, query: str, locale: str, loaded=None):
     """Return bundle payload when it matches the search term, else None."""
-    payload = _payload(bundle, locale)
+    payload = _payload(bundle, locale, loaded)
     term = (query or "").strip().lower()
     if not term:
         return payload
@@ -91,8 +131,11 @@ def bundle_matches(bundle, query: str, locale: str):
 def bundle_cards(tenant_id: int) -> list[dict]:
     """Compact home-page bundle cards with localized names."""
     svc = BundleService()
+    bundles = svc.list_published(tenant_id)
+    items_by_bundle, products, _ = preload_bundle_data(bundles, tenant_id)
     cards = []
-    for b in svc.list_published(tenant_id):
+    for b in bundles:
+        bundle_items = items_by_bundle.get(b.id, [])
         cards.append(
             {
                 "name": b.name,
@@ -102,20 +145,17 @@ def bundle_cards(tenant_id: int) -> list[dict]:
                 "image_url": b.image_url,
                 "price": str(b.bundle_price),
                 "max_per_order": b.max_per_order,
-                "item_count": sum(x.quantity for x in svc.items_for(b.id)),
+                "item_count": sum(x.quantity for x in bundle_items),
                 "bundle_items": [
                     {
                         "name": getattr(
-                            ProductService()
-                            .query_for_tenant(tenant_id)
-                            .filter_by(id=x.product_id)
-                            .first()
+                            products.get(x.product_id)
                             or type("P", (), {"name": str(x.product_id)})(),
                             "name",
                         ),
                         "quantity": x.quantity,
                     }
-                    for x in svc.items_for(b.id)
+                    for x in bundle_items
                 ],
             }
         )

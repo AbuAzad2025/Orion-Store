@@ -63,7 +63,7 @@ const OrionAdminProducts = {
         const info = SafeDOM.elem("div", { className: "flex-1" }, [
           SafeDOM.elem("div", { className: "font-semibold" }, [product.name]),
           SafeDOM.elem("div", { className: "orion-muted text-xs" }, [
-            `${product.price} ₪ · ${OrionI18n.t('مخزون', 'Stock')}: ${product.quantity} · ${product.is_published ? OrionI18n.t('منشور', 'Published') : OrionI18n.t('مخفي', 'Hidden')}`,
+            `${OrionUI.money(product.price)} · ${OrionI18n.t('مخزون', 'Stock')}: ${product.quantity} · ${product.is_published ? OrionI18n.t('منشور', 'Published') : OrionI18n.t('مخفي', 'Hidden')}`,
           ]),
         ]);
         const edit = SafeDOM.actionBtn(OrionI18n.t('تعديل', 'Edit'), "orion-btn", () => this.fillForm(product));

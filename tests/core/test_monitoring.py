@@ -26,21 +26,23 @@ def test_json_log_formatter():
     assert payload["level"] == "INFO"
 
 
-def test_configure_logging(app):
-    app.config["LOG_JSON"] = True
+def test_configure_logging(app, monkeypatch):
+    monkeypatch.setitem(app.config, "LOG_JSON", True)
     configure_logging(app)
     assert app.logger.level == logging.INFO
 
 
-def test_init_sentry_skips_without_dsn(app):
-    app.config["TESTING"] = False
-    app.config["SENTRY_DSN"] = ""
+def test_init_sentry_skips_without_dsn(app, monkeypatch):
+    monkeypatch.setitem(app.config, "TESTING", False)
+    monkeypatch.setitem(app.config, "SENTRY_DSN", "")
     init_sentry(app)
 
 
-def test_init_sentry_with_dsn(app):
-    app.config["TESTING"] = False
-    app.config["SENTRY_DSN"] = "https://example@o0.ingest.sentry.io/0"
+def test_init_sentry_with_dsn(app, monkeypatch):
+    monkeypatch.setitem(app.config, "TESTING", False)
+    monkeypatch.setitem(
+        app.config, "SENTRY_DSN", "https://example@o0.ingest.sentry.io/0"
+    )
     with patch("sentry_sdk.init") as mock_init:
         init_sentry(app)
         mock_init.assert_called_once()
