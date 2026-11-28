@@ -1,6 +1,6 @@
 # Azadexa (Orion Engine)
 
-Multi-tenant e-commerce SaaS — **Waves 0–15 complete** ✅ + **Full-stack consistency audits (3 rounds)** ✅.
+Multi-tenant e-commerce SaaS — **Waves 0–15 complete** ✅ + **Full-stack consistency audits (3 rounds)** ✅ + **audit/fix rounds 1–10** ✅.
 
 **Current status:** production-ready technical core; remaining work is deployment/ops (secrets, TLS, merchant accounts, load test).
 **Repository:** [github.com/AbuAzad2025/Orion-Store](https://github.com/AbuAzad2025/Orion-Store)
@@ -32,7 +32,7 @@ compose, `scripts/backup_db.ps1` and `docs/RUNBOOK.md` all follow it.
 ```powershell
 .\scripts\dev.ps1 setup-local   # PG user/DBs, .env, Redis, migrate, seed
 .\scripts\dev.ps1 run           # API on http://127.0.0.1:5000
-.\scripts\dev.ps1 test            # pytest + coverage ≥85%
+.\scripts\dev.ps1 test            # pytest + coverage ≥85% (CI/pyproject تفرض ≥99%)
 .\scripts\dev.ps1 launch-verify   # /health + /ready
 ```
 

@@ -46,3 +46,14 @@ entry points.
   reversals link to the original commission entry.
 - `financial_events.source_entity/source_id` and `commission_ledger_id` are
   soft links checked by the audit because SQL FKs would create a cycle.
+
+## Verification log (historical, pre–Round-10 revision)
+
+`scripts/verify_accounting_flow.py <slug>` was previously run against the seeded
+demo DB (`orion_demo_live`, `FLASK_ENV=development`) with **94/94 checks passed
+on 2026-11-22** (outlet 18/18 without FX; gulf/euro/atlantic/sterling 19/19
+each). That revision also recorded the warehouse double-counting fix in
+`OmsService.sync_product_to_warehouse` and evidence from
+`tests/services/test_inventory_consistency.py`. The Round-10 rewrite replaced
+the log with the VAT disclosure above; this note restores the cross-reference
+used by `README.md` ("Verify the full purchase/refund/ledger cycle").

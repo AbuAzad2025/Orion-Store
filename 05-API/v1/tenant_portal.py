@@ -7,6 +7,7 @@ from decimal import Decimal
 from feature_flag_svc.feature_flag_service import FeatureFlagService
 from flask import Blueprint, g, jsonify, request
 from i18n_svc.translation_service import TranslationService
+from sqlalchemy import case, func
 
 from bnpl_svc.bnpl_service import BnplService
 from catalog_svc.category_service import CategoryService
@@ -22,7 +23,7 @@ from core.pagination import paginate_query, paginated_payload, pagination_params
 from core.permissions import require_permission
 from core.rate_limit import limiter
 from engine.whatsapp import normalize_phone
-from order_svc.order_service import OrderService
+from order.order import Order
 from orion.extensions import db
 from payment_svc.payment_service import PaymentService
 from platform_models.tenant_gateway import TenantPaymentGateway
@@ -33,7 +34,6 @@ from tenant_gateway_svc.gateway_service import GatewayService
 tenant_portal_bp = Blueprint("tenant_portal", __name__)
 _gateways = GatewayService()
 _templates = DocumentTemplateService()
-_orders = OrderService()
 _products = ProductService()
 _categories = CategoryService()
 _translations = TranslationService()
@@ -61,25 +61,34 @@ def _template_dict(row) -> dict:
 def tenant_dashboard_api():
     try:
         require_tenant_admin()
-        orders = _orders.list_for_tenant(g.tenant_id)
-        products = _products.list_for_tenant(g.tenant_id)
-        confirmed = [o for o in orders if o.payment_status == "paid"]
-        cancelled = sum(1 for o in orders if o.payment_status == "cancelled")
-        pending = sum(1 for o in orders if o.status in ("awaiting", "pending"))
-        revenue = sum((o.total for o in confirmed), Decimal("0"))
+        paid = Order.payment_status == "paid"
+        totals = (
+            db.session.query(
+                func.count(Order.id),
+                func.count(case((paid, 1))),
+                func.count(case((Order.payment_status == "cancelled", 1))),
+                func.count(case((Order.status.in_(("awaiting", "pending")), 1))),
+                func.count(case((Order.shipping_method_code == "whatsapp", 1))),
+                func.coalesce(func.sum(case((paid, Order.total))), 0),
+            )
+            .filter(Order.tenant_id == g.tenant_id)
+            .one()
+        )
+        products = _products.query_for_tenant(g.tenant_id)
+        products_total = products.count()
+        published = products.filter_by(is_published=True).count()
+        orders_total, orders_paid, cancelled, pending, whatsapp, revenue = totals
         stats = {
-            "orders_total": len(orders),
-            "orders_paid": len(confirmed),
-            "orders_confirmed": len(confirmed),
+            "orders_total": orders_total,
+            "orders_paid": orders_paid,
+            "orders_confirmed": orders_paid,
             "orders_cancelled": cancelled,
             "orders_pending": pending,
-            "orders_whatsapp": sum(
-                1 for o in orders if o.shipping_method_code == "whatsapp"
-            ),
-            "revenue_confirmed": f"{revenue:.2f}",
+            "orders_whatsapp": whatsapp,
+            "revenue_confirmed": f"{Decimal(str(revenue or 0)):.2f}",
             "currency": g.tenant.default_currency or "ILS",
-            "products_total": len(products),
-            "products_published": sum(1 for p in products if p.is_published),
+            "products_total": products_total,
+            "products_published": published,
         }
         return jsonify({"tenant": g.tenant.to_dict(), "stats": stats}), 200
     except OrionError as exc:

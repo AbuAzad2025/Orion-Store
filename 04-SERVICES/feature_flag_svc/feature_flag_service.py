@@ -75,8 +75,8 @@ class FeatureFlagService:
             override = TenantFeatureFlagOverride.query.filter_by(
                 flag_id=flag.id, tenant_id=tenant_id
             ).first()
+            value = self._resolve_value(flag, tenant_id, override)
             if override:
-                value = override.enabled
                 override_info = {
                     "override_reason": override.reason,
                     "override_set_by": override.set_by,
@@ -92,13 +92,13 @@ class FeatureFlagService:
                         ).strip()
                         override_info["override_set_by_name"] = full_name or user.email
             else:
-                value = self._evaluate_rollout(flag, tenant_id)
                 override_info = {}
             result.append(
                 {
                     **flag.to_dict(),
                     "value": value,
-                    "has_override": override is not None,
+                    "has_override": override is not None
+                    or self._active_legacy_override(flag, tenant_id) is not None,
                     "rollout_percent": flag.rollout_percent,
                     **override_info,
                 }

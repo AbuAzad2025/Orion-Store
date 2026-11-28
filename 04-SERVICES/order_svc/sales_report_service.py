@@ -5,8 +5,11 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 
+from sqlalchemy import func
+
 from orion.extensions import db
-from order.order import Order, OrderItem
+
+from order.order import Order, OrderItem  # isort: skip
 
 
 def _money(value) -> str:
@@ -20,46 +23,63 @@ class SalesReportService:
         date_from: datetime | None = None,
         date_to: datetime | None = None,
     ) -> dict:
-        query = Order.query.filter_by(tenant_id=tenant_id, payment_status="paid")
-        if date_from is not None:
-            query = query.filter(Order.created_at >= date_from)
-        if date_to is not None:
-            query = query.filter(Order.created_at <= date_to)
-        orders = query.order_by(Order.created_at.desc()).all()
-        order_ids = [order.id for order in orders]
-        items = (
-            db.session.query(OrderItem)
-            .filter(
-                OrderItem.tenant_id == tenant_id,
-                OrderItem.order_id.in_(order_ids),
+        def _paid_orders(query):
+            query = query.filter(
+                Order.tenant_id == tenant_id,
+                Order.payment_status == "paid",
             )
+            if date_from is not None:
+                query = query.filter(Order.created_at >= date_from)
+            if date_to is not None:
+                query = query.filter(Order.created_at <= date_to)
+            return query
+
+        totals = _paid_orders(
+            db.session.query(
+                func.count(Order.id).label("orders_count"),
+                func.coalesce(func.sum(Order.total), 0).label("revenue"),
+                func.coalesce(func.sum(Order.tax_amount), 0).label("tax"),
+                func.coalesce(func.sum(Order.discount_amount), 0).label("discounts"),
+                func.coalesce(func.sum(Order.shipping_cost), 0).label("shipping"),
+            )
+        ).one()
+
+        cogs = (
+            _paid_orders(
+                db.session.query(
+                    func.coalesce(func.sum(OrderItem.unit_cost * OrderItem.quantity), 0)
+                ).join(Order, Order.id == OrderItem.order_id)
+            )
+            .filter(OrderItem.tenant_id == tenant_id)
+            .scalar()
+        )
+
+        top_rows = (
+            _paid_orders(
+                db.session.query(
+                    OrderItem.product_name,
+                    func.sum(OrderItem.quantity).label("quantity"),
+                    func.sum(OrderItem.total_price).label("revenue"),
+                ).join(Order, Order.id == OrderItem.order_id)
+            )
+            .filter(OrderItem.tenant_id == tenant_id)
+            .group_by(OrderItem.product_name)
+            .order_by(
+                func.sum(OrderItem.total_price).desc(), OrderItem.product_name.asc()
+            )
+            .limit(10)
             .all()
-            if order_ids
-            else []
         )
-        revenue = sum((order.total for order in orders), Decimal("0"))
-        tax = sum((order.tax_amount for order in orders), Decimal("0"))
-        discounts = sum((order.discount_amount for order in orders), Decimal("0"))
-        shipping = sum((order.shipping_cost for order in orders), Decimal("0"))
-        cogs = sum(
-            (Decimal(str(item.unit_cost or 0)) * item.quantity for item in items),
-            Decimal("0"),
-        )
+
+        revenue = Decimal(str(totals.revenue or 0))
+        tax = Decimal(str(totals.tax or 0))
+        discounts = Decimal(str(totals.discounts or 0))
+        shipping = Decimal(str(totals.shipping or 0))
+        cogs = Decimal(str(cogs or 0))
         net_sales = revenue - tax - shipping
         gross_profit = net_sales - cogs
-        top: dict[str, dict] = {}
-        for item in items:
-            row = top.setdefault(
-                item.product_name,
-                {"name": item.product_name, "quantity": 0, "revenue": Decimal("0")},
-            )
-            row["quantity"] += item.quantity
-            row["revenue"] += Decimal(str(item.total_price or 0))
-        top_products = sorted(
-            top.values(), key=lambda row: row["revenue"], reverse=True
-        )[:10]
         return {
-            "orders_count": len(orders),
+            "orders_count": totals.orders_count,
             "revenue": _money(revenue),
             "tax": _money(tax),
             "discounts": _money(discounts),
@@ -72,10 +92,10 @@ class SalesReportService:
             ),
             "top_products": [
                 {
-                    "name": row["name"],
-                    "quantity": row["quantity"],
-                    "revenue": _money(row["revenue"]),
+                    "name": row.product_name,
+                    "quantity": row.quantity,
+                    "revenue": _money(row.revenue),
                 }
-                for row in top_products
+                for row in top_rows
             ],
         }

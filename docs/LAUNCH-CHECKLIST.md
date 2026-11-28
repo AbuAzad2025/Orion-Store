@@ -6,7 +6,7 @@
 ## 1. الأمان (P0)
 - [ ] `ProductionConfig` يرفض `SECRET_KEY` الافتراضي والمفاتيح الفارغة — `pytest tests/security/test_production_config.py`
 - [ ] كوكيز `Secure` + `HttpOnly` + `SameSite` وHSTS مُفعّل — نفس الاختبار
-- [ ] شهادة TLSwildcard في `infrastructure/certs/` وخدمة `nginx` تنهي TLS على 443 — `docs/RUNBOOK.md §0.1`
+- [ ] شهادة TLSwildcard في `01-FOUNDATION/infrastructure/certs/` وخدمة `nginx` تنهي TLS على 443 — `docs/RUNBOOK.md §0.1`
 - [ ] RLS على **كل** الجداول التي تحمل `tenant_id` — `python scripts/audit_rls.py --check`
 - [ ] دور التطبيق **ليس superuser** بعد النشر — `python scripts/verify_deployment_rls.py --check` (0 مشاكل)
 - [ ] FK سليمة وفهارس `tenant_id` موجودة — `python scripts/audit_schema.py --check`
@@ -21,7 +21,7 @@
 - [ ] webhook موقّع يُقبل ومزوّر يُرفض — `pytest tests/unit/test_webhook*`
 
 ## 3. قاعدة البيانات
-- [ ] بناء المخطط من الصفر: `flask db upgrade` على قاعدة فارغة → `schema_drift_parity_0009` (أحدث هجرة / head)
+- [ ] بناء المخطط من الصفر: `flask db upgrade` على قاعدة فارغة → `perf_indexes_0010` (أحدث هجرة / head)
 - [ ] كل هجرة قابلة للتراجع خطوة بخطوة — `pytest tests/integration/test_migration_downgrades.py`
 - [ ] النسخ والاستعادة مُختبرة — `python scripts/verify_backup_restore.py`
 - [ ] لا يوجد `.env` أو secret مُلتزم في git
